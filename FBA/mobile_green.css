@@ -1,0 +1,274 @@
+@charset "ISO-8859-1";
+
+
+.witBorder  { padding: 4px; border-style: solid; border-radius: 10px; border-width: 2px; border-color: #201d5e;  background-color: #FFFFFF;   color: #201d5e;    }
+.dosBorder  { padding: 4px; border-style: solid; border-radius: 10px; border-width: 2px; border-color: #AEADAE;
+    color: #0FEE0F; 
+    background-color: #000000;
+    background-image: radial-gradient( rgba(0, 90, 0, 0.75), black 120% );
+}
+
+
+
+.grey_dosBorder::after {
+    content: ""; display: "block";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 1000px;
+    height: 600px;
+    background: repeating-linear-gradient(rgba(10, 65, 10, 0.10), transparent 1px, transparent 2px);
+    pointer-events: none;
+   }
+
+
+
+.mTable     {                                  height: 18px;             display:table;    }
+.wideTab    { width:1385px; padding: 1px; border: none;  font-size: 14px; font-weight:400; } 
+.ulliTab    { width:855px;  padding: 1px; border: none;  font-size: 14px; font-weight:400; } 
+
+
+.instRow     {              padding: 1px; float: left; background-color: inherit;  min-height: 28px;               font-family: inherit; font-size: inherit; text-align: center; color: inherit;  }
+.attrRow     {              padding: 1px; float: left; background-color: inherit;  min-height: 28px;               font-family: Inconsolata, 'Montserrat', sans-serif; font-size: 14px; font-weight:400; text-align: center; color: #201d5e;  }
+.attrDash    { width:850px; padding: 1px; float: left; background-color: inherit;  min-height: 28px;               font-family: Inconsolata, sans-serif; font-size: 14px; font-weight:400; text-align: center; color: #201d5e; border-bottom: 1px solid #CCC;   }
+.attrLine    { width:850px; padding: 1px; float: left;               color:inherit;min-height: 16px; height: 16px; font-family :Inconsolata, monospace; font-size: 14px;font-weight:400;text-align: center;}
+.attrKeys    { width:750px; padding: 1px; float: left; background-color: inherit;  min-height: 48px;               font-family: Inconsolata, sans-serif; font-size: 14px; font-weight:400; text-align: center; color: #201d5e; border-bottom: 1px solid #CCC;   }
+.attrLine:nth-child(2n){  background: rgba(10, 95, 10, 0.10);  } 
+
+
+input[type="radio"] {
+    /* Add if not using autoprefixer */
+    -webkit-appearance: none;
+    appearance: none;
+
+    font-family:  Inconsolata, monospace, sans-serif; font-size: 13px; font-weight:400; text-align: center;
+
+    /* For iOS < 15 to remove gradient background */
+    background-color: #000;
+    /* Not removed via appearance */
+    margin: 0;
+  }
+  input[type="radio"]::before {
+    content: "Page";
+  }
+  
+
+.keyPanel   { width:182px;                             border: 1px solid #ccc;  float: left;   display: table-column; } 
+.largeKey   { width:100px;  height:40px; padding: 1px; border: 1px solid inherit; float: left; background-color: #10E110; font-family:  inherit; font-size: inherit; font-weight:600; color: #004000; }
+.key        { width: 70px;  height:16px;  margin: 0px; border: 0px solid inherit; float: left; background-color: #10E110; font-family:  inherit; font-size: inherit; font-weight:600; color: #004000; }
+
+button { color:#10E110; background-color:inherit; }
+input  { color:#10E110; background-color:inherit; }
+
+.L22    { width: 22px; overflow:hidden; padding: 2px; border: none; float: left;  font-family: inherit; font-size: inherit; font-weight:inherit; color: inherit; text-align: left;  }		
+.L40    { width: 40px; overflow:hidden; padding: 2px; border: none; float: left;  font-family: inherit; font-size: inherit; font-weight:inherit; color: inherit; text-align: left;  }		
+.L66    { width: 66px; overflow:hidden; padding: 2px; border: none; float: left;  font-family: inherit; font-size: inherit; font-weight:inherit; color: inherit; text-align: left;  }		
+.R90    { width: 90px; overflow:hidden; padding: 2px; border: none; float: left;  font-family: inherit; font-size: inherit; font-weight:inherit; color: inherit; text-align: right; }
+.C100   { width:100px; overflow:hidden; padding: 2px; border: none; float: left;  font-family: inherit; font-size: inherit; font-weight:inherit; color: inherit; }
+.R105   { width:105px; overflow:hidden; padding: 2px; border: none; float: left;  font-family: inherit; font-size: inherit; font-weight:inherit; color: inherit; text-align: right; }
+.L110   { width:110px; overflow:hidden; padding: 2px; border: none; float: left;  font-family: inherit; font-size: inherit; font-weight:inherit; color: inherit; text-align: left;}
+.L120   { width:120px; overflow:hidden; padding: 2px; border: none; float: left;  font-family: inherit; font-size: inherit; font-weight:inherit; color: inherit; text-align: left;}
+.C140   { width:140px; overflow:hidden; padding: 2px; border: none; float: left;  font-family: inherit; font-size: inherit; font-weight:inherit; color: inherit;}
+.L150   { width:150px; overflow:hidden; padding: 2px; border: none; float: left;  font-family: inherit; font-size: inherit; font-weight:inherit; color: inherit; text-align: left;}
+.R165   { width:165px; overflow:hidden; padding: 2px; border: none; float: left;  font-family: inherit; font-size: inherit; font-weight:inherit; color: inherit; text-align: right; }
+.L175   { width:175px; overflow:hidden; padding: 2px; border: none; float: left;  font-family: inherit; font-size: inherit; font-weight:inherit; color: inherit; text-align: left;}
+.L220   { width:220px; overflow:hidden; padding: 2px; border: none; float: left;  font-family: inherit; font-size: inherit; font-weight:inherit; color: inherit; text-align: left;}
+.L280   { width:280px; overflow:hidden; padding: 2px; border: none; float: left;  font-family: inherit; font-size: inherit; font-weight:inherit; color: inherit; text-align: left;} 
+.C280   { width:280px; overflow:hidden; padding: 2px; border: none; float: left;  font-family: inherit; font-size: inherit; font-weight:inherit; color: inherit; } 
+.CFUL   { width:833px; overflow:hidden; padding: 2px; border: none; float: left;  font-family: inherit; font-size: inherit; font-weight:inherit; color: inherit; }
+
+.scalesA{ width:210px;                  padding: 4px; border-style: solid; border-radius: 10px; border-width: 2px; border-color: #AEADAE;  float: left;
+          background-color: #000000; background-image: radial-gradient( rgba(0, 90, 0, 0.75), black 120% ); }
+a:hover     {  background-color: #CF4455; }
+
+ 
+* {
+  -webkit-transform-origin: inherit;
+          transform-origin: inherit;
+}
+ 
+body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  margin: 0;
+  font-size: 5pt;
+  font-family: Inconsolata, 'Montserrat', sans-serif;
+  background-color: var(--color-background);
+}
+
+.clock {
+  width:  200px;
+  height: 200px;
+  fill: currentColor;
+  -webkit-transform-origin: 50px 50px;
+          transform-origin: 50px 50px;
+  -webkit-animation-name: fade-in;
+          animation-name: fade-in;
+  -webkit-animation-duration: 500ms;
+          animation-duration: 500ms;
+  -webkit-animation-fill-mode: both;
+          animation-fill-mode: both;
+}
+
+ 
+
+.scalesB {
+  transition: -webkit-transform 200ms cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  transition: transform 200ms cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  transition: transform 200ms cubic-bezier(0.175, 0.885, 0.32, 1.275), -webkit-transform 200ms cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  stroke: #339922;
+  stroke-linecap: round;
+  opacity: 0.7;
+  stroke-width: 1px;
+}
+
+.scalesC {
+  font-family: Inconsolata, Times, 'Lucida Sans', Verdana, sans-serif;
+  font-size: 6px;
+  stroke: #88FF55;
+  opacity: 1.0;
+  stroke-width: 0.3pt;
+}
+
+
+.scalesD {
+  font-family:Inconsolata, 'Times', 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+  font-size: 7px;
+  stroke: #FFDDFF;
+  opacity: 1.0;
+  stroke-width: 0.2pt;
+}
+
+
+.scalesE {
+  font-family:Inconsolata, 'Times', 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+  font-size: 14px;
+  stroke: #EEFFEE;
+  opacity: 1.0;
+  stroke-width: 0.3px;
+}
+
+.field {
+  font-family:Inconsolata, 'Times', 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+  font-size: 14px;
+  stroke: #990000;
+  opacity: 1.0;
+  stroke-width: 0.3px;
+}
+
+
+.pointer {
+   stroke: #AADD77;
+   transition: -webkit-transform 700ms cubic-bezier(0.175, 0.885, 0.32, 1.275);
+   transition: transform 700ms cubic-bezier(0.175, 0.885, 0.32, 1.275);
+   transition: transform 700ms cubic-bezier(0.175, 0.885, 0.32, 1.275), -webkit-transform 700ms cubic-bezier(0.175, 0.885, 0.32, 1.275);
+ } 
+
+.line-0 {
+  -webkit-transform: rotate(210deg);
+          transform: rotate(210deg);
+}
+ 
+.line-1 {
+  -webkit-transform: rotate(225deg);
+          transform: rotate(225deg);
+}
+
+.line-2 {
+  -webkit-transform: rotate(240deg);
+          transform: rotate(240deg);
+}
+ 
+.line-3 {
+  -webkit-transform: rotate(255deg);
+          transform: rotate(255deg);
+}
+ 
+.line-4 {
+  -webkit-transform: rotate(270deg);
+          transform: rotate(270deg);
+}
+ 
+.line-5 {
+  -webkit-transform: rotate(285deg);
+          transform: rotate(285deg);
+}
+ 
+.line-6 {
+  -webkit-transform: rotate(300deg);
+          transform: rotate(300deg);
+}
+ 
+.line-7 {
+  -webkit-transform: rotate(315deg);
+          transform: rotate(315deg);
+}
+ 
+.line-8 {
+  -webkit-transform: rotate(330deg);
+          transform: rotate(330deg);
+}
+ 
+.line-9 {
+  -webkit-transform: rotate(345deg);
+          transform: rotate(345deg);
+}
+ 
+.line-10 {
+  -webkit-transform: rotate(  0deg);
+          transform: rotate(  0deg);
+}
+ 
+.line-11 {
+  -webkit-transform: rotate(15deg);
+          transform: rotate(15deg);
+}
+
+.line-12 {
+  -webkit-transform: rotate(30deg);
+          transform: rotate(30deg);
+}
+
+.line-13 {
+  -webkit-transform: rotate(45deg);
+          transform: rotate(45deg);
+}
+
+.line-14 {
+  -webkit-transform: rotate(60deg);
+          transform: rotate(60deg);
+}
+.line-15 {
+  -webkit-transform: rotate(75deg);
+          transform: rotate(75deg);
+}
+
+.line-16 {
+  -webkit-transform: rotate(90deg);
+          transform: rotate(90deg);
+}
+
+.line-17 {
+  -webkit-transform: rotate(105deg);
+          transform: rotate(105deg);
+}
+
+.line-18 {
+  -webkit-transform: rotate(120deg);
+          transform: rotate(120deg);
+}
+
+.line-19 {
+  -webkit-transform: rotate(135deg);
+          transform: rotate(135deg);
+}
+ 
+.line-20 {
+  -webkit-transform: rotate(150deg);
+          transform: rotate(150deg);
+}
+ 
+ 
+

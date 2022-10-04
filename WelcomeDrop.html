@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+  <link rel="stylesheet" href="./FBA/mobile_green.css"/>
+<head>
+  <meta charset="ISO-8859-1">
+  <meta name="viewport" content="width=device-width">
+  <title>Mobile Balance - LOGIN</title>
+</head>
+<body>
+  <div id='mainPage'>
+     <h1 id="SignUp">Sign Up</h1>
+        <div class="keyPanel" ondragover="dragOverHandler(event);" ondrop="dropHandler(event);">  
+          
+           <div  class="instRow"  >&nbsp;</div>            
+           <div  class="instRow" id="fileupload">&nbsp;</div>            
+            </div>
+  </div>
+  
+
+  <SCRIPT type="text/javascript" src="/client.js"></SCRIPT>
+  <SCRIPT type="text/javascript" src="/sheets.js"></SCRIPT>
+
+
+
+<SCRIPT type="text/javascript" >
+
+  var reader;
+  var content;
+
+  var formClient="";
+  var formYear="";
+
+
+  function dragOverHandler(ev) {
+     console.log('File(s) in drop zone');
+
+     // Prevent default behavior (Prevent file from being opened)
+     ev.preventDefault();
+  }
+
+
+function dropHandler(ev) {
+  console.log('File(s) dropped');
+
+  // Prevent default behavior (Prevent file from being opened)
+  ev.preventDefault();
+
+  if (ev.dataTransfer.items) {
+  // Use DataTransferItemList interface to access the file(s)
+     for (var i = 0; i < ev.dataTransfer.files.length; i++) {
+        // If dropped items aren't files, reject them
+        if (ev.dataTransfer.items[i].kind === 'file') {
+           var item = ev.dataTransfer.files[i];
+
+
+           // FUTURE
+           // check extension and file name conventions
+           var file = item; // .getAsFile();
+           let fName = file.name;
+           //console.log('FILES... file[' + i + '].name = ' + file.name);
+
+
+           var fr = new FileReader();
+           fr.onload = function () {
+
+              fileBuffer = this.result;            
+              
+              let jData = JSON.parse(fileBuffer);
+
+               jData.clientFunction="Booking"; // GH20220926
+
+               callServer('POST',"UPLOAD",JSON.stringify(jData),showResponse);
+                       
+
+
+           }
+           fr.readAsText(item);
+        }
+     }
+     console.log('MANAGED');
+  }
+}
+
+  function showResponse(response) {
+     let display = document.getElementById('mainPage');
+     if(display)
+        if(response) display.innerHTML=response;
+  }
+
+     
+   </SCRIPT>
+</body>
+</html>
+
