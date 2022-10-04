@@ -12,7 +12,7 @@ const app = express();
 const fs = require('fs');
 const qr = require('qrcode');
 const ejs = require("ejs");
-
+const path = require('path')
 
 const bodyParser = require("body-parser");
 
@@ -36,6 +36,8 @@ const clientHead= "<HEAD><meta http-equiv='content-type' content='text/html; cha
 
 var instance = Compiler.init(app,process.argv); // GH20221003 do that per module
 
+// react app
+app.use(express.static(path.join(__dirname, 'app', 'build')))
 
 // serve your css and index.html as static
 app.use(express.static(__dirname));
