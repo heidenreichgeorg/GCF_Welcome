@@ -43,27 +43,8 @@ function Component({ text }) {
     )
 }
 
-function StatusRow({ am1,tx1, am2, tx2, am3, tx3, da4,tx4,ln4}) {
-
-    return(
-        <div class="attrLine">
-            <div class="attrLine">
-                <div class="R90">{am1}</div>
-                <div class="L66">{tx1}</div>
-                <div class="R90">{am2}</div>
-                <div class="L66">{tx2}</div>
-                <div class="R90">{am3}</div>
-                <div class="L66">{tx3}</div>
-                <div class="L66">{da4}</div>
-                <div class="L66">{tx4}</div>
-                <div class="L175">{ln4}</div>
-            </div>
-        </div>
-    )
-}
-
 // account.html
-function AccountRow({lineNum, date, sender, reason, ref1, ref2, amount, saldo}) {
+export function AccountRow({lineNum, date, sender, reason, ref1, ref2, amount, saldo}) {
     return (
         <div class="attrLine">
             <div class="L40">{lineNum}</div>
@@ -79,7 +60,7 @@ function AccountRow({lineNum, date, sender, reason, ref1, ref2, amount, saldo}) 
 }
 
 // openbalance.html
-function OverviewRow({acct, amount, name1, name2}) { // 
+export function OverviewRow({acct, amount, name1, name2}) { // 
     return (
         <div class="attrLine">
             <div class="L175">{acct}</div>
@@ -91,7 +72,7 @@ function OverviewRow({acct, amount, name1, name2}) { //
 }
 
 // hgbregular.html
-function BalanceRow({text,level4,level3,level2,level1}) { 
+export function BalanceRow({text,level4,level3,level2,level1}) { 
     return (
         <div class="attrLine">
             <div class="L280">{text}</div>
@@ -104,7 +85,7 @@ function BalanceRow({text,level4,level3,level2,level1}) {
 }
 
 
-function FooterRow({long1A,long1B,long1C,long1D}) {
+export function FooterRow({long1A,long1B,long1C,long1D}) {
     return(
         <div class="attrLine">
             <div class="L120">&nbsp;</div>
@@ -114,7 +95,7 @@ function FooterRow({long1A,long1B,long1C,long1D}) {
     )
 }
 
-function GainLossRow({section,type,acct,xbrl,amount}) {
+export function GainLossRow({section,type,acct,xbrl,amount}) {
     return(
         <div class="attrLine">
             <div class="C100">{section}</div>
@@ -156,5 +137,6 @@ Erlangen
         <div class="key" oncontextmenu="accountMenu(event,'COGK')" onclick="listCreditAccount(10,'COGK')">COGK</div>
     </div>
 </div>
+
 
 */

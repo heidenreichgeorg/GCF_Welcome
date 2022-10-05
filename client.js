@@ -806,12 +806,12 @@ function setScreen(targetDocument,htmlPage) {
         var  arrHTML =[  ]; 
     
 
-        var autofocus='autofocus';
+        var autoFocus='autoFocus';
         for(var num=0;htmlPage;num++) {
             var next=null;
             if(!htmlPage.succPage) { nextPage(htmlPage,strLine);  } else next = htmlPage.succPage;
             arrHTML.push('<DIV class="ulliTab" id='+htmlPage.target+num+'>'+htmlPage.arrContent.join('')+'</DIV>');
-            arrPanel.push('<div class="key" onclick="select('+strTarget+','+num+')"><label class="form-control"><input type="radio" '+autofocus+'>'+num+'</input></label></div>');
+            arrPanel.push('<div class="key" onclick="select('+strTarget+','+num+')"><label class="form-control"><input type="radio" '+autoFocus+'>'+num+'</input></label></div>');
             autofocus='';
             htmlPage=next;
         }
@@ -871,7 +871,7 @@ function initTerminal(page,target,screenLines,nextFuncName) {
     let boxFooter2 = "<DIV class='L120' id='box2Footer'>&nbsp;"
     +"</DIV><DIV class='L280'>"+page["reference"]
     +"</DIV><DIV class='L280'>"+page["author"]
-    +"</DIV>" + (nextFuncName==null ? "": "<BUTTON autofocus class='L40' onclick='"+nextFuncName+"()'> >>> </BUTTON>");
+    +"</DIV>" + (nextFuncName==null ? "": "<BUTTON autoFocus class='L40' onclick='"+nextFuncName+"()'> >>> </BUTTON>");
     arrHTML.push('<DIV  class="attrLine" id="'+target+'termLine'+l+'">'+boxFooter2+'</DIV>');
     l++;
 
