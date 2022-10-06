@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react'
 
+export const S_COLUMN = 15;
+
 export default function App() {
 
     const [clicked, setClicked] = useState(0)
@@ -106,19 +108,6 @@ export function GainLossRow({section,type,acct,xbrl,amount}) {
         </div>
     )
 }
-
-/*
-Heidenreich Grundbesitz KG
-_
-Fürth HRA 10564
-216_162_50652
-
-DE46 7603 0080 0900 4976 10
-2022
-Dr. Georg Heidenreich
-Erlangen
-
-*/
 
 
 /*
