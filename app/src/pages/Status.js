@@ -7,6 +7,7 @@ import { S_COLUMN, FooterRow}  from './App';
 
 
 import { D_Report, X_ASSETS, X_INCOME, X_EQLIAB } from '../terms.js'
+import { useSession } from '../modules/sessionmanager';
 
 
 
@@ -14,8 +15,11 @@ export default function Status() {
     
     const [report, setReport] = useState()
 
+    const { session, status } = useSession()
+
     useEffect(() => {
-        fetch(`${process.env.REACT_APP_API_HOST}/SHOW`)
+        if(status !== 'success') return;
+        fetch(`${process.env.REACT_APP_API_HOST}/SHOW?sessionId=${session.id}`)
         .then(data => data.json())
         .then(data => {
             setReport(makeStatusData(data))

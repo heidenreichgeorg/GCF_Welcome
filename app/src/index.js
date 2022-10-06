@@ -6,6 +6,7 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 
 import App from './pages/App';
 import Status from './pages/Status'
+import { SessionProvider } from './modules/sessionmanager';
 
 const router = createBrowserRouter([
     {
@@ -20,6 +21,11 @@ const router = createBrowserRouter([
 const root = ReactDOM.createRoot(document.getElementById('windowBorder'));
 root.render(
     <React.StrictMode>
-        <RouterProvider router={router} />
+        <SessionProvider
+            createSession
+            onLoading={'Loading session...'}
+        >
+            <RouterProvider router={router} />
+        </SessionProvider>
     </React.StrictMode>
 );

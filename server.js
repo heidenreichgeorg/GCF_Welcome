@@ -13,18 +13,18 @@ const fs = require('fs');
 const qr = require('qrcode');
 const ejs = require("ejs");
 const path = require('path')
+const cors = require('cors')
 
 const bodyParser = require("body-parser");
 
 app.use(bodyParser.json({limit: '900kb'}));
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(cors())
 
 const { networkInterfaces } = require('os');
 
 const nets = networkInterfaces();
 const results = Object.create(null); // Or just '{}', an empty object
-
-
 
 
 // IMPORTS
@@ -107,6 +107,13 @@ function registerLink(command,htmlPage,sessionId) {
 }
 
 
+// TODO: process client year
+app.get('/SESSION', (_, res) => {
+    let session = sy_findSessionId('HGKG','2022');
+    console.log("\n0880 GET /SESSION FOUND => (SESSION  client="+session.client+"  year="+session.year+")");
+    if(session && session.id) res.json({ id: sessionId })
+    else res.json({ id: '0123' })
+})
 
 
 // WITH ACCESS TO SERVER CONSOLE ONLY
