@@ -1,6 +1,9 @@
 
 let debug=1;
-let debugReport=1;
+
+
+// THIS WILL VIOLATE PRIVACY AT THE ADMIN CONSOLE !!! 
+let debugReport=null;
 
 // table parsing
 const CEND= '|';
@@ -524,7 +527,7 @@ function compile(sessionData) {
                         result[D_Schema].client    = row[3];
                     }
                     else if(key && key==='A') {
-                        if(debug>0) console.log("compile.compile ASSET  "+row);
+                        if(debugReport) console.log("compile.compile ASSET  "+row);
                         const assetInfo = row;
                         if(assetInfo.length>J_ACCT) {
                             var date = assetInfo[1];
@@ -794,7 +797,7 @@ function compile(sessionData) {
 
 
                 result[D_Partner_NET]=partners;
-                if(debug>1) 
+                if(debugReport) 
                     for (let i in partners) { console.log("Server compile Partner("+i+") "+JSON.stringify(partners[i])); }
 
             } catch (err) {
@@ -802,7 +805,7 @@ function compile(sessionData) {
                 console.dir('0125 compile.js compile:'+err);
             }
 
-            console.log("0192 compile.compile.Schema="+JSON.stringify(result[D_Schema]));
+            if(debug) console.log("0192 compile.compile.Schema="+JSON.stringify(Object.keys(result[D_Schema])));
 
         } else console.error('0111 compile.js compile NO BALANCE');
 
@@ -814,11 +817,11 @@ function compile(sessionData) {
             console.dir('0200 compile.js compile() -> balance['+key+']'); 
         }
 
-    console.log("0210 COMPILED = "+JSON.stringify(result));
+    console.log("0210 COMPILED = "+JSON.stringify(Object.keys(result)));
 
     let balance = sendBalance(result);
 
-    console.log("0220 COMPILED = "+JSON.stringify(balance));
+    console.log("0220 COMPILED = "+JSON.stringify(Object.keys(balance)));
 
     return balance;
 
@@ -1095,7 +1098,7 @@ function sendBalance(balance) {
         var element = gReport[rxbrl];
         var account = element.account;
         account.gross=Account.getTransient(account);
-        if(debug) console.log("compile.js sendBalance send1 REPORT("+element.de_DE+") "+JSON.stringify(element.account));           
+        if(debugReport) console.log("compile.js sendBalance send1 REPORT("+element.de_DE+") "+JSON.stringify(element.account));           
     }
 
 
@@ -1123,7 +1126,7 @@ function sendBalance(balance) {
         varcap.netIncomeFin=p.netIncomeFin;
         varcap.gross=Account.getSaldo(varcap);
         varcap.next=Account.getNextYear(varcap);
-        if(debug && debug>1) console.log('compile sendBalance MODIFY K2xx accounts '+p.income + '>='+JSON.stringify(varcap));
+        if(debugReport) console.log('compile sendBalance MODIFY K2xx accounts '+p.income + '>='+JSON.stringify(varcap));
     }
 
 
@@ -1208,7 +1211,7 @@ function sendBalance(balance) {
                         // if(debugReport) console.dir("sendBalance UPDATE CLOSING VAR "+JSON.stringify(p)+"Partner("+i+") "+JSON.stringify(varcap)); 
                         let name = varcap.name;
                         let aci = varcap.income;
-                        if(negMoney(setEUMoney(aci))) {
+                        if(Money.negMoney(Money.setEUMoney(aci))) {
                             iMoney=closeIncome.credit[name]=Money.setEUMoney(cents2EU(-1 * Money.setEUMoney(aci).cents));
                         }
                         else iMoney=closeIncome.debit[name]=Money.setEUMoney(aci);
@@ -1218,10 +1221,10 @@ function sendBalance(balance) {
                 } catch(err) { console.error("compile.js sendBalance UPDATE CLOSING  VARCAP ERROR: "+err); }
             }
 
-            if(debugReport) console.log("sendBalance "+gross+" CLOSING "+JSON.stringify(closeIncome));
+            if(debugReport) console.log("sendBalance "+gross+" CLOSING "+JSON.stringify(Object.keys(closeIncome.credit))+"  "+JSON.stringify(Object.keys(closeIncome.debit)));
 
             gReport.xbrlIncome.closing = JSON.stringify(closeIncome);
-            console.dir("1900 compile.js sendBalance UPDATE gReport.xbrlIncome.closing="+gReport.xbrlIncome.closing);
+            if(debugReport) console.dir("1900 compile.js sendBalance UPDATE gReport.xbrlIncome.closing="+gReport.xbrlIncome.closing);
 
         } else console.dir("compile.js sendBalance UPDATE CLOSING: NO gReport.xbrlRegular.account.gross");
     } catch(err) { console.error("compile.js sendBalance UPDATE CLOSING ERROR: "+err); }
@@ -1359,14 +1362,14 @@ function makePage(balance) {
 
             for(let key in de_DE) {
                 page[key]=  de_DE[key];  
-                if(debugReport) console.log("compile makePage de_DE "+key+" -> "+de_DE[key]);
+                if(debug) console.log("compile makePage de_DE "+key+" -> "+de_DE[key]);
             }
 
             balance[D_Page] = page;
             // side-effect AND return value
 
             console.log();
-            if(debugReport) console.log("compile makePage "+JSON.stringify(page));
+            if(debug) console.log("compile makePage "+JSON.stringify(Object.keys(page)));
 
         } else console.error("compile makePage:  NO schema");
     } else console.error("compile makePage: NO balance");

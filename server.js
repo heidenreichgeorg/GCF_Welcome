@@ -145,7 +145,7 @@ app.get("/LATEST", (req, res) => {
                 let strTimeSymbol = timeSymbol();
                 let time = strTimeSymbol;
                 let year=session.year;
-                console.log("LATEST 30 reading session="+JSON.stringify(session)); 
+                console.log("LATEST 30 reading session="+JSON.stringify(Object.keys(session))); 
 
 
                 // START A NEW SESSION
