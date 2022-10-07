@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import Screen from '../modules/Screen'
 
 
-import { S_COLUMN, prettyTXN, FooterRow}  from './App';
+import { iCpField, prettyTXN, FooterRow}  from './App';
 
 
 import { D_Balance, D_Report, D_History, D_Schema, X_ASSETS, X_INCOME, X_EQLIAB, SCREENLINES } from '../terms.js'
@@ -97,9 +97,8 @@ function makeStatusData(response) {
     if(maxCom>maxRow) maxRow=maxCom;
     if(maxCor>maxRow) maxRow=maxCor;
 
-    let statusData = Object.keys(jAccounts).map((name, i) => ({i}));
-    console.log("STATUS.JS STATUSDATA INIT "+JSON.stringify(statusData))
-
+    let statusData = []; for(let i=0;i<=maxRow;i++) statusData[i]={};
+    
     let iLeft=0;
     for (let name in aLeft)   {
         var account=aLeft[name];
@@ -165,7 +164,7 @@ function makeStatusData(response) {
                 let aMount=jPrettyTXN.credit.concat(jPrettyTXN.debit);
                 aMount.push("-.--"); aMount.push("-.--"); aMount.push("-.--");
 
-                let sAmount = (aMount[0]+"  "+aMount[1]+"  "+aMount[2]+"  "+aMount[3]+ " ").slice(0,S_COLUMN);
+                let sAmount = (aMount[0]+"  "+aMount[1]+"  "+aMount[2]+"  "+aMount[3]+ " ").slice(0,iCpField);
 
                 statusData[iTran].dTran=jPrettyTXN.entry[0].slice(2);
                 statusData[iTran].nTran=jPrettyTXN.entry[1].slice(0,9);
@@ -193,7 +192,7 @@ function StatusRow({ am1,tx1, am2, tx2, am3, tx3, d, n, l}) {
             <div class="L66"> {tx3}</div>
             <div class="L22"> &nbsp;</div>
             <div class="L66"> {d}</div>
-            <div class="C100"> {n}</div>
+            <div class="L66"> {n}</div>
             <div class="L220">{l}</div>
         </div>
     )

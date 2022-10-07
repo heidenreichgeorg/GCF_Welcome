@@ -4,7 +4,7 @@ import { J_ACCT, COLMIN, DOUBLE } from '../terms.js'
 
 
 export const S_COLUMN = 15;
-export const iCpField = 16;
+export const iCpField = 35;
 
 export default function App() {
 

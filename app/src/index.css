@@ -36,6 +36,6 @@ code { font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', mon
 
 .ulliTab  { width:995px;  padding: 1px; border: none;  font-size: 14px; font-weight:400; } 
 .mTable   {                                  height: 18px;             display:table;    }
-.dosBorder{               padding: 4px; border-style: solid; border-radius: 10px; border-width: 2px; border-color: #AEADAE;
+.dosBorder{ max-width:1005px; padding: 4px; border-style: solid; border-radius: 10px; border-width: 2px; border-color: #AEADAE;
    background-color: #000000; color: #0FEE0F; 
   background-image: radial-gradient( rgba(0, 90, 0, 0.75), black 120% );}
