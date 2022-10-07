@@ -109,9 +109,9 @@ function registerLink(command,htmlPage,sessionId) {
 
 // TODO: process client year
 app.get('/SESSION', (_, res) => {
-    let session = sy_findSessionId('HGKG','2022');
-    console.log("\n0880 GET /SESSION FOUND => (SESSION  client="+session.client+"  year="+session.year+")");
-    if(session && session.id) res.json({ id: sessionId })
+    let sessionId = sy_findSessionId('HGKG','2022');
+    console.log("\n0880 GET /SESSION FOUND => "+sessionId);
+    if(sessionId) res.json({ id: sessionId })
     else res.json({ id: '0123' })
 })
 

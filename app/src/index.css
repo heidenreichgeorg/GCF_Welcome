@@ -25,16 +25,17 @@ code { font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', mon
 .L220     { width:220px; overflow:hidden; padding: 2px; border: none; float: left;  font-family: inherit; font-size: inherit; font-weight:inherit; color: inherit; text-align: left;}
 .L280     { width:280px; overflow:hidden; padding: 2px; border: none; float: left;  font-family: inherit; font-size: inherit; font-weight:inherit; color: inherit; text-align: left;} 
 .C280     { width:280px; overflow:hidden; padding: 2px; border: none; float: left;  font-family: inherit; font-size: inherit; font-weight:inherit; color: inherit; } 
-.CFUL     { width:833px; overflow:hidden; padding: 2px; border: none; float: left;  font-family: inherit; font-size: inherit; font-weight:inherit; color: inherit; }
+.CFUL     { width:883px; overflow:hidden; padding: 2px; border: none; float: left;  font-family: inherit; font-size: inherit; font-weight:inherit; color: inherit; }
 
 .key      { width: 70px;  height:16px;  margin: 0px; border: 0px solid inherit; float: left; background-color: #10E110; font-family:  inherit; font-size: inherit; font-weight:600; color: #004000; }
 
-.attrLine { width:880px; padding: 1px; float: left;               color:inherit;min-height: 16px; height: 16px; font-family :Roboto, monospace; font-size: 12px;font-weight:400;text-align: center;}
+.attrLine { width:990px; padding: 1px; float: left;               color:inherit;min-height: 16px; height: 16px; font-family :Roboto, monospace; font-size: 12px;font-weight:400;text-align: center;}
 .attrRow  {              padding: 1px; float: left; background-color: inherit;  min-height: 28px;               font-family: Inconsolata, 'Montserrat', sans-serif; font-size: 14px; font-weight:400; text-align: center; color: #201d5e;  }
 
 
 
-.ulliTab  { width:885px;  padding: 1px; border: none;  font-size: 14px; font-weight:400; } 
+.ulliTab  { width:995px;  padding: 1px; border: none;  font-size: 14px; font-weight:400; } 
 .mTable   {                                  height: 18px;             display:table;    }
-.dosBorder{ padding: 4px; border-style: solid; border-radius: 10px; border-width: 2px; border-color: #AEADAE; background-color: #000000; color: #0FEE0F; 
+.dosBorder{               padding: 4px; border-style: solid; border-radius: 10px; border-width: 2px; border-color: #AEADAE;
+   background-color: #000000; color: #0FEE0F; 
   background-image: radial-gradient( rgba(0, 90, 0, 0.75), black 120% );}

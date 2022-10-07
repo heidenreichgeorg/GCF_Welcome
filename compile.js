@@ -231,7 +231,8 @@ function init(app, argv) {
             // SERVER FUNCTION INTERPRET1 GH20220918
 
 
-            console.dir("1920 app.get SHOW sends Balance ="+JSON.stringify(balance));
+            console.dir("1920 app.get SHOW sends Balance ="+JSON.stringify(Object.keys(balance)))
+            // .map((element,i)=>(element + Object.keys(balance.element).length))));
             res.writeHead(Sheets.HTTP_OK, {"Content-Type": "text/html"}); 
             send(res,balance); 
         }
@@ -420,7 +421,7 @@ function initBalance() {
         xbrlRegFin:  { level:3, xbrl:"de-gaap-ci_is.netIncome.regular.fin", de_DE:de_DE.RegularFIN},      
         xbrlRegOTC:  { level:3, xbrl:"de-gaap-ci_is.netIncome.regular.operatingTC", de_DE:de_DE.RegularOTC},      
         xbrlRegular: { level:2, xbrl:"de-gaap-ci_is.netIncome.regular", de_DE:'Gewinn/Verlust'},      
-        xbrlEqLiab : { level:2, xbrl: "de-gaap-ci_bs.eqLiab", de_DE:'Passiva o G'}, // see HGBBeginYear.html HGBRegular.html
+        xbrlEqLiab : { level:2, xbrl: "de-gaap-ci_bs.eqLiab", de_DE:'Passiv_oG'}, // see HGBBeginYear.html HGBRegular.html
         xbrlIncome: {  level:1, xbrl: "de-gaap-ci_bs.eqLiab.income", de_DE:'Passiva'},
         // see sendBalance(), CloseAndSave.htmlReport.xbrlIncome.closing.split(CSEP);
         //xbrlNIP:    {  level:1, xbrl: "de-gaap-ci_bs.eqLiab.equity.netIncomePartnerships", de_DE:'Bilanzgewinn'},

@@ -74,7 +74,7 @@ D_REPORT = {
 "xbrlRegFin":{"level":3,"xbrl":"de-gaap-ci_is.netIncome.regular.fin","de_DE":"Finanzergebnis","account":{"name":"Finanzergebnis","desc":"Finanzergebnis","xbrl":"de-gaap-ci_is.netIncome.regular.fin","credit":"6.470,48","debit":"0,00","init":"0,00","min":"0,00","gross":"6.470,48"}},
 "xbrlRegOTC":{"level":3,"xbrl":"de-gaap-ci_is.netIncome.regular.operatingTC","de_DE":"Betriebsergebnis","account":{"name":"Betriebsergebnis","desc":"Betriebsergebnis","xbrl":"de-gaap-ci_is.netIncome.regular.operatingTC","credit":"12.119,77","debit":"-686,99","init":"0,00","min":"0,00","gross":"11.432,78"}},
 "xbrlRegular":{"level":2,"xbrl":"de-gaap-ci_is.netIncome.regular","de_DE":"Gewinn/Verlust","account":{"name":"Gewinn/Verlust","desc":"Gewinn/Verlust","xbrl":"de-gaap-ci_is.netIncome.regular","credit":"18.590,25","debit":"-686,99","init":"0,00","min":"0,00","gross":"17.903,26"}},
-"xbrlEqLiab":{"level":2,"xbrl":"de-gaap-ci_bs.eqLiab","de_DE":"Passiva o G","account":{"name":"Passiva o G","desc":"Passiva o G","xbrl":"de-gaap-ci_bs.eqLiab","credit":"240.306,04","debit":"0,00","init":"241.725,74","min":"0,00","gross":"240.306,04"}},
+"xbrlEqLiab":{"level":2,"xbrl":"de-gaap-ci_bs.eqLiab","de_DE":"Passiv_oG","account":{"name":"Passiv_oG","desc":"Passiv_oG","xbrl":"de-gaap-ci_bs.eqLiab","credit":"240.306,04","debit":"0,00","init":"241.725,74","min":"0,00","gross":"240.306,04"}},
 "xbrlIncome":{"level":1,"xbrl":"de-gaap-ci_bs.eqLiab.income","de_DE":"Passiva","account":{"name":"Passiva","desc":"Passiva","xbrl":"de-gaap-ci_bs.eqLiab.income","init":"0,00","min":"0,00","credit":"0,00","debit":"0,00","gross":"0,00"}}}
 
 

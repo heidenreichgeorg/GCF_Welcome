@@ -2,11 +2,13 @@
 
 import { useEffect, useState } from 'react';
 import Screen from '../modules/Screen'
-import { S_COLUMN, FooterRow}  from './App';
 
 
+import { S_COLUMN, prettyTXN, FooterRow}  from './App';
 
-import { D_Report, X_ASSETS, X_INCOME, X_EQLIAB } from '../terms.js'
+
+import { D_Balance, D_Report, D_History, D_Schema, X_ASSETS, X_INCOME, X_EQLIAB, SCREENLINES } from '../terms.js'
+
 import { useSession } from '../modules/sessionmanager';
 
 
@@ -24,15 +26,15 @@ export default function Status() {
         .then(data => {
             setReport(makeStatusData(data))
         })
-    }, [])
+    }, [status])
 
     if(!report) return 'Loading...';
 
     return (
         <Screen>
             {
-                report.map((row, i) => (
-                    <StatusRow am1={row.aLeft} tx1={row.nLeft} am2={row.aMidl} tx2={row.nMidl} am3={row.aRite} tx3={row.nLeft} />    
+                report.map((row) => (
+                    <StatusRow am1={row.gLeft} tx1={row.nLeft} am2={row.gMidl} tx2={row.nMidl} am3={row.gRite} tx3={row.nRite} d={row.dTran} n={row.nTran} l={row.lTran}/>    
                 ))
             }
             <FooterRow long1A="Heidenreich Grundbesitz KG" long1B="" long1C="Fürth HRA 10564" long1D="216_162_50652" />
@@ -44,9 +46,14 @@ export default function Status() {
 
 function makeStatusData(response) {
 
-    var jAccounts={};
-    var jReport = response[D_Report];
 
+    var jReport = response[D_Report];
+    console.log("makeStatusData from response D_Report"+JSON.stringify(Object.keys(jReport)));
+
+    var jHistory = response[D_History];
+    var gSchema = response[D_Schema];
+
+    var jAccounts = response[D_Balance];
     // add three additional accounts: ASSETS, EQLIAB, GAINLOSS
     if(jReport["xbrlAssets"].account) { 
         let ass = jReport["xbrlAssets"].account; 
@@ -63,8 +70,9 @@ function makeStatusData(response) {
         console.log("GALOS "+JSON.stringify(gls)); 
         jAccounts["xbrlRegular"]=gls;
     }
+    console.log("makeStatusData from response D_Balance"+JSON.stringify(Object.keys(jAccounts)));
 
-
+    
     // build three columns
     let aLeft={};
     let aMidl={};
@@ -84,10 +92,13 @@ function makeStatusData(response) {
     let maxCol = Object.keys(aLeft).length;
     let maxCom = Object.keys(aMidl).length;
     let maxCor = Object.keys(aRite).length;
-    let maxRow=  maxCol>maxCom ? maxCol : maxCom;
-    maxRow=  maxRow>maxCor ? maxRow : maxCor;
+    let maxRow= SCREENLINES;
+    if(maxCol>maxRow) maxRow=maxCol;
+    if(maxCom>maxRow) maxRow=maxCom;
+    if(maxCor>maxRow) maxRow=maxCor;
 
-    let statusData = new Array(maxRow); 
+    let statusData = Object.keys(jAccounts).map((name, i) => ({i}));
+    console.log("STATUS.JS STATUSDATA INIT "+JSON.stringify(statusData))
 
     let iLeft=0;
     for (let name in aLeft)   {
@@ -95,11 +106,12 @@ function makeStatusData(response) {
         var gross = account.gross;
         var iName = account.name;
 
-        statusData[iLeft].gLeft = gross;
-        statusData[iLeft].nLeft = iName;
+        console.log("STATUS.JS STATUSDATA LEFT "+iLeft+" "+name+"="+gross);
+
+        statusData[iLeft]={"gLeft":gross,"nLeft":iName};
         iLeft++;
     }
-    for (let i=iLeft;i<maxRow;i++) { statusData[i].gLeft='&nbsp;'; statusData[i].nLeft='&nbsp;'; }
+    for (let i=iLeft;i<maxRow;i++) { statusData[i]={ "gLeft":" ", "nLeft": " " }; }
 
 
     let iMidl=0;
@@ -112,7 +124,7 @@ function makeStatusData(response) {
         statusData[iMidl].nMidl = iName;
         iMidl++;
     }
-    for (let i=iMidl;i<maxRow;i++) { statusData[i].gMidl='&nbsp;'; statusData[i].nMidl='&nbsp;'; }
+    for (let i=iMidl;i<maxRow;i++) { statusData[i].gMidl=' '; statusData[i].nMidl=' '; }
 
 
     let iRite=0;
@@ -125,10 +137,10 @@ function makeStatusData(response) {
         statusData[iRite].nRite = iName;
         iRite++;
     }
-    for (let i=iRite;i<maxRow;i++) { statusData[i].gRite='&nbsp;'; statusData[i].nRite='&nbsp;'; }
+    for (let i=iRite;i<maxRow;i++) { statusData[i].gRite=' '; statusData[i].nRite=' '; }
 
 
-/*
+
     if(jHistory && gSchema.Names && gSchema.Names.length>0) {
 
         var names=gSchema.Names;
@@ -136,45 +148,53 @@ function makeStatusData(response) {
         var eLen = gSchema.eqliab;
         let hLen = Object.keys(jHistory).length;
         var bLine=0;
+        var iTran=0;
+        console.log("Status TXN Schema "+aLen+":"+eLen);
+        console.log("Status TXN Schema "+JSON.stringify(Object.keys(gSchema)))
 
         for (let hash in jHistory)  {
 
-            if(bLine>=hLen-S_COLUMN) {
-        //    if(iTran<S_COLUMN) {
-                let jPrettyTXN = prettyTXN(jHistory,hash,null,null,names,aLen,eLen);
+            console.log("Status TXN HASH "+bLine+":"+hash);
 
+            if(bLine>=hLen-maxRow) {
+        
+                let jPrettyTXN = prettyTXN(jHistory,hash,null,null,names,aLen,eLen);
                 jPrettyTXN.credit.shift();
                 jPrettyTXN.debit.shift();
                 jPrettyTXN.debit.shift();
                 let aMount=jPrettyTXN.credit.concat(jPrettyTXN.debit);
                 aMount.push("-.--"); aMount.push("-.--"); aMount.push("-.--");
 
-                let sAmount = (aMount[0]+"  "+aMount[1]+"  "+aMount[2]+"  "+aMount[3]+ " ").slice(0,26);
+                let sAmount = (aMount[0]+"  "+aMount[1]+"  "+aMount[2]+"  "+aMount[3]+ " ").slice(0,S_COLUMN);
 
-                dTran[iTran]=jPrettyTXN.entry[0].slice(2);
-                nTran[iTran]=jPrettyTXN.entry[1].slice(0,9);
-                lTran[iTran]=sAmount;                                
+                statusData[iTran].dTran=jPrettyTXN.entry[0].slice(2);
+                statusData[iTran].nTran=jPrettyTXN.entry[1].slice(0,9);
+                statusData[iTran].lTran= sAmount;                                
                 iTran++;
             }
             bLine++;
         }
     }
-    */
+    
    return statusData;
 }
 
-function StatusRow({ am1,tx1, am2, tx2, am3, tx3}) {
+function StatusRow({ am1,tx1, am2, tx2, am3, tx3, d, n, l}) {
 
     return(
         <div class="attrLine">
-            <div class="R90">{am1}</div>
-            <div class="L66">{tx1}</div>
-            <div class="L66">&nbsp;</div>
-            <div class="R90">{am2}</div>
-            <div class="L66">{tx2}</div>
-            <div class="L66">&nbsp;</div>
-            <div class="R90">{am3}</div>
-            <div class="L66">{tx3}</div>
+            <div class="R90"> {am1}</div>
+            <div class="L66"> {tx1}</div>
+            <div class="L22"> &nbsp;</div>
+            <div class="R90"> {am2}</div>
+            <div class="L66"> {tx2}</div>
+            <div class="L22"> &nbsp;</div>
+            <div class="R90"> {am3}</div>
+            <div class="L66"> {tx3}</div>
+            <div class="L22"> &nbsp;</div>
+            <div class="L66"> {d}</div>
+            <div class="C100"> {n}</div>
+            <div class="L220">{l}</div>
         </div>
     )
 }
