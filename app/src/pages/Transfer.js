@@ -31,6 +31,15 @@ export default function Transfer() {
             <TransferRow date={report.date} sender={report.sender} reason={report.reason} ref1={report.ref1} ref2={report.ref2} />    
             <TransferRow date={report.lTran[0]} sender={report.lTran[1]} reason={report.lTran[2]} ref1={report.lTran[3]} ref2={report.lTran[4]} />    
             <TransferRow/> 
+            <InputRow date={report.date} sender={report.sender} reason={report.reason} ref1={report.ref1} ref2={report.ref2} />    
+            <TransferRow/> 
+            <AccountRow name1={report.aNames.pop()} amount1={report.aAmount.pop()}
+                        name2={report.aNames.pop()} amount2={report.aAmount.pop()}
+                        name3={report.aNames.pop()} amount3={report.aAmount.pop()}
+                        name4={report.aNames.pop()} amount4={report.aAmount.pop()}
+                        name5={report.aNames.pop()} amount5={report.aAmount.pop()}
+            /> 
+            <TransferRow/> 
             { /*
                 report.map((row) => (
                     <TransferRow am1={row.gLeft} tx1={row.nLeft} am2={row.gMidl} tx2={row.nMidl} am3={row.gRite} tx3={row.nRite} d={row.dTran} n={row.nTran} l={row.lTran}/>    
@@ -70,6 +79,46 @@ function TransferRow({ date,sender,reason,ref1,ref2}) {
         </div>)
 }
 
+function InputRow({ date,sender,reason,ref1,ref2}) {
+    
+    return(
+        <div class="attrLine">
+            <div class="L66"> &nbsp;</div>
+            <div class="L150"> <input id="cDate" value={date}/></div>
+            <div class="L22"> &nbsp;</div>
+            <div class="L150"> <input id="cSender" value={sender}/></div>
+            <div class="L22"> &nbsp;</div>
+            <div class="L150"> <input id="cReason" value={reason}/></div>
+            <div class="L22"> &nbsp;</div>
+            <div class="L150"> <input id="cRef1" value={ref1}/></div>
+            <div class="L22"> &nbsp;</div>
+            <div class="L150"> <input id="cRef2" value={ref2}/></div>
+        </div>)
+}
+
+
+function AccountRow({ name1,amount1, name2,amount2, name3,amount3, name4,amount4, name5,amount5}) {
+    
+    return(
+        <div class="attrLine">
+            <div class="L22"> &nbsp;</div>
+            <div class="L66"> {name1}</div>
+            <div class="R90"> <input type="edit" id="cAmt1" value={amount1}/></div>
+            <div class="L22"> &nbsp;</div>
+            <div class="L66"> {name2}</div>
+            <div class="R90"> <input type="edit" id="cAmt2" value={amount2}/></div>
+            <div class="L22"> &nbsp;</div>
+            <div class="L66"> {name3}</div>
+            <div class="R90"> <input type="edit" id="cAmt3" value={amount3}/></div>
+            <div class="L22"> &nbsp;</div>
+            <div class="L66"> {name4}</div>
+            <div class="R90"> <input type="edit" id="cAmt4" value={amount4}/></div>
+            <div class="L22"> &nbsp;</div>
+            <div class="L66"> {name5}</div>
+            <div class="R90"> <input type="edit" id="cAmt5" value={amount5}/></div>
+        </div>)
+}
+
 
 function getMax(response) {
     var jHistory = response[D_History];
@@ -86,9 +135,7 @@ function makeTransferData(response,iSelected) {
     var jHistory = response[D_History];
     var gSchema = response[D_Schema];
 
-    let transferData={};
-    let debitData=[];
-    let creditData=[];
+    let transferData={ date:'',sender:'',reason:'',ref1:'',ref2:'',lTran:["","","","","",""]};
 
     if(jHistory && gSchema.Names && gSchema.Names.length>0) {
 
@@ -118,16 +165,13 @@ function makeTransferData(response,iSelected) {
                 transferData.ref2  =  txn[5];
                 
                 let jPrettyTXN = prettyTXN(jHistory,hash,null,null,names,aLen,eLen);
-                jPrettyTXN.credit.shift();
-                jPrettyTXN.debit.shift();
-                jPrettyTXN.debit.shift();
 
-                let aMount=jPrettyTXN.credit.concat(jPrettyTXN.debit);
-                aMount.push("-.--"); aMount.push("-.--"); aMount.push("-.--");  aMount.push("-.--");  aMount.push("-.--");  aMount.push("-.--"); 
+                transferData.aNames = jPrettyTXN.aNames;                                
+                transferData.aAmount= jPrettyTXN.aAmount;
 
-                transferData.lTran= aMount;                                
-                iTran++;
+                transferData.lTran=jPrettyTXN.aNames.map((n,i)=>(n+jPrettyTXN.aAmount[i]));
                 
+                console.log("makeTransferData: lTran="+JSON.stringify(transferData.lTran))
             }
             bLine++;
         }

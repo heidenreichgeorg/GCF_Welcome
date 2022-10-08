@@ -121,6 +121,8 @@ export function prettyTXN(jHistory,hash,lPattern,aPattern,names,aLen,eLen) {
     var entry = [];
     var credit = ['&nbsp;'];
     var debit = ['','AN'];
+    var aNames = [];
+    var aAmount = [];
     var delta = [];
     var txnAcct = false;
 
@@ -147,7 +149,7 @@ export function prettyTXN(jHistory,hash,lPattern,aPattern,names,aLen,eLen) {
                 
             }
             for(var i=J_ACCT;i<parts.length;i++) {
-                if(parts[i] && parts[i].length>0) { 
+                if(parts[i] && parts[i].length>0 && i!=aLen && i!=eLen) { 
                     
                     // GH20220307 EU-style numbers
                     let item = parseInt(parts[i]);
@@ -169,6 +171,9 @@ export function prettyTXN(jHistory,hash,lPattern,aPattern,names,aLen,eLen) {
                         else if(i!=aLen && i!=eLen) iBalance -= value.cents;
                         console.dir("ADD "+parts[i]+ " --> "+value.cents+"  --> "+iBalance);
                     }
+
+                    aNames.push(names[i]);   
+                    aAmount.push(parts[i]);   
 
                     // POS ASSET
                     if(item>0 && i<aLen && i!=eLen) credit.push(names[i]+DOUBLE+parts[i]);                                        
@@ -194,15 +199,13 @@ export function prettyTXN(jHistory,hash,lPattern,aPattern,names,aLen,eLen) {
     result.credit=credit;
     result.debit=debit;
     result.iBalance=iBalance;
+    result.aNames=aNames;
+    result.aAmount=aAmount;
 
     return result;
 }
 
-function setMoney(iCents) {
-    var currency=new Object();
-    currency.cents=iCents;
-    return currency;
-}
+function setMoney(iCents) { return { 'cents':iCents }; }
 
 export function setEUMoney(strSet) {
     var euros=0;

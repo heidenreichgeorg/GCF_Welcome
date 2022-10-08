@@ -9,6 +9,7 @@ body {
 
 code { font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace; }
 
+input  { color:#10E110; background-color:inherit; }
 
 .L22      { width: 22px; overflow:hidden; padding: 2px; border: none; float: left;  font-family: inherit; font-size: inherit; font-weight:inherit; color: inherit; text-align: left;  }		
 .L40      { width: 40px; overflow:hidden; padding: 2px; border: none; float: left;  font-family: inherit; font-size: inherit; font-weight:inherit; color: inherit; text-align: left;  }		
