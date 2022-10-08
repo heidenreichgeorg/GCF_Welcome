@@ -6,6 +6,7 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 
 import App from './pages/App';
 import Status from './pages/Status'
+import Transfer from './pages/Transfer'
 import { SessionProvider } from './modules/sessionmanager';
 
 const router = createBrowserRouter([
@@ -16,6 +17,10 @@ const router = createBrowserRouter([
     {
         path: '/status',
         element: <Status />
+    },
+    {
+        path: '/transfer',
+        element: <Transfer />
     }
 ]);
 const root = ReactDOM.createRoot(document.getElementById('windowBorder'));
