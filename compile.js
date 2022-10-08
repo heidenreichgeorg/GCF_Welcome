@@ -1,9 +1,9 @@
 
-let debug=1;
+let debug=null;
 
 
 // THIS WILL VIOLATE PRIVACY AT THE ADMIN CONSOLE !!! 
-let debugReport=null;
+let debugReport=1;
 
 // table parsing
 const CEND= '|';
@@ -160,7 +160,7 @@ function init(app, argv) {
         console.log("\n\n");
         // from TransferForm.html       
         console.log(Server.timeSymbol());
-        console.log("0010 app.post BOOK prepareTXN('"+JSON.stringify(req.body)+"')");
+        if(debugReport) console.log("0010 app.post BOOK prepareTXN('"+JSON.stringify(req.body)+"')");
 
         var result="SERVER BOOKED";
         let sessionId = req.body.sessionId;

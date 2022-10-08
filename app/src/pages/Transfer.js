@@ -12,8 +12,8 @@ export default function Transfer() {
     const [ sheet,  setSheet] = useState()
 
     const [iRow, setIRow] = useState(0)
-    function upClick() {setIRow(iRow + 1); if(iRow>=getMax(sheet)) setIRow(1);}
-    function downClick() {setIRow(iRow - 1); if(iRow<=0) setIRow(getMax(sheet));}
+
+
 
     useEffect(() => {
         if(status !== 'success') return;
@@ -21,6 +21,51 @@ export default function Transfer() {
         .then(data => data.json())
         .then(data => { setSheet(data);})
     }, [status])
+
+
+    const [jTXN, setJTXN] = useState(0)
+
+
+
+    function upClick() {setIRow(iRow + 1); if(iRow>=getMax(sheet)) setIRow(1);}
+    function downClick() {setIRow(iRow - 1); if(iRow<=0) setIRow(getMax(sheet));}
+    function onBook() { 
+        let jTXN = {
+            "date":"2022-10-05",
+            "sender":"a",
+            "refAcct":"b",
+            "svwz":"c",
+            "svwz2":"d",
+            "credit":{"EBKS":{"index":7,"cents":1234}},
+            "debit":{"COGK":{"index":10,"cents":1234}},
+
+            "sessionId" : session.id
+        }
+        book(jTXN); 
+    }
+
+
+    
+    function book(jTXN) {
+
+/*
+    // Simple POST request with a JSON body using fetch
+        fetch('https://reqres.in/api/posts', requestOptions)
+            .then(response => response.json())
+            .then(data => this.setState({ postId: data.id }));
+*/
+
+        const requestOptions = {
+            method: 'POST',
+            headers: {  'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                      },
+            body: JSON.stringify(jTXN)
+        };
+
+        fetch(`${process.env.REACT_APP_API_HOST}/BOOK?sessionId=${session.id}`, requestOptions)
+       
+    }
 
     if(!sheet) return 'Loading...';
 
@@ -53,6 +98,9 @@ export default function Transfer() {
                 <div class="R90"> &nbsp;</div>
                 <div class="L22"> &nbsp;</div>
                 <div class="L66"><div class="key" onClick={downClick}>-</div></div>
+                <div class="R90"> &nbsp;</div>
+                <div class="L22"> &nbsp;</div>
+                <div class="L66"><div class="key" onClick={onBook}>-</div></div>
             </div>
             <TransferRow/>
             <FooterRow long1A="Heidenreich Grundbesitz KG" long1B="" long1C="Fürth HRA 10564" long1D="216_162_50652" />
