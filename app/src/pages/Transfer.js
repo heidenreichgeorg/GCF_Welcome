@@ -1,10 +1,10 @@
 import { useEffect, useState, useRef  } from 'react';
 
 import Screen from '../modules/Screen'
-import { prettyTXN, buildTXN, setEUMoney, FooterRow}  from './App';
-import { D_Report, D_History, D_Schema, SCREENLINES } from '../terms.js'
+import { prettyTXN, buildTXN, FooterRow}  from './App';
+import { D_Report, D_History, D_Schema } from '../terms.js'
 import { useSession } from '../modules/sessionmanager';
-import e from 'cors';
+
 
 export default function Transfer() {
 
@@ -143,14 +143,20 @@ export default function Transfer() {
 
     return (
         <Screen>
+            <TransferRow/> 
+            <TransferRow/> 
+            <TransferRow/> 
             <TransferRow date={report.date} sender={report.sender} reason={report.reason} ref1={report.ref1} ref2={report.ref2} />    
             <TransferRow date={report.lTran[0]} sender={report.lTran[1]} reason={report.lTran[2]} ref1={report.lTran[3]} ref2={report.lTran[4]} />    
             <TransferRow/> 
+            <TransferRow/> 
+            <TransferRow/> 
             <form  onSubmit={(e)=>onBook(e)} >
-            
-                
                 <InputRow date={report.date} sender={report.sender} reason={report.reason} ref1={report.ref1} ref2={report.ref2}/>    
                 <TransferRow/> 
+                <TransferRow/> 
+                <TransferRow/> 
+
                 <AccountRow name1={report.aNames[0]} amount1={report.aAmount[0]}
                             name2={report.aNames[1]} amount2={report.aAmount[1]}
                             name3={report.aNames[2]} amount3={report.aAmount[2]}
@@ -158,9 +164,12 @@ export default function Transfer() {
                             name5={report.aNames[4]} amount5={report.aAmount[4]}
                 /> 
                 <TransferRow/> 
+                <TransferRow/> 
                 <UpDownSubmitRow/>
             </form>
-            
+            <TransferRow/> 
+            <TransferRow/> 
+            <TransferRow/> 
             <TransferRow/>
             <FooterRow long1A="Heidenreich Grundbesitz KG" long1B="" long1C="Fürth HRA 10564" long1D="216_162_50652" />
             <FooterRow long1A="DE46 7603 0080 0900 4976 10" long1B="2022" long1C="Dr. Georg Heidenreich" long1D="Erlangen" />
@@ -169,7 +178,7 @@ export default function Transfer() {
     
 }
 
-function TransferRow({ date,sender,reason,ref1,ref2}) {
+function TransferRow({ date,sender,reason,ref1,ref2 }) {
 
     return(
         <div class="attrLine">
@@ -197,30 +206,21 @@ function getMax(response) {
 
 function makeTransferData(response,iSelected) {
 
-    var jReport = response[D_Report];
-//    console.log("makeTransferData from response D_Report"+JSON.stringify(Object.keys(jReport)));
-
     var jHistory = response[D_History];
     var gSchema = response[D_Schema];
 
     let transferData={ date:'',sender:'',reason:'',ref1:'',ref2:'',lTran:["","","","","",""]};
 
     if(jHistory && gSchema.Names && gSchema.Names.length>0) {
-
         var names=gSchema.Names;
         var aLen = gSchema.assets;
         var eLen = gSchema.eqliab;
         var bLine=0;
-//        console.log("makeTransferData Schema "+aLen+":"+eLen);
-//        console.log("makeTransferData Schema "+JSON.stringify(Object.keys(gSchema)))
 
         for (let hash in jHistory)  {
 
             if(bLine===iSelected) {
                 let txn = jHistory[hash];
-
-                //console.log("makeTransferData txn="+JSON.stringify(Object.keys(txn)));
-
                 transferData.date   = txn[1];
                 transferData.sender = txn[2];
                 transferData.reason = txn[3];
@@ -228,18 +228,13 @@ function makeTransferData(response,iSelected) {
                 transferData.ref2  =  txn[5];
                 
                 let jPrettyTXN = prettyTXN(jHistory,hash,null,null,names,aLen,eLen);
-
                 transferData.aNames = jPrettyTXN.aNames;                                
                 transferData.aAmount= jPrettyTXN.aAmount;
-
                 transferData.lTran=jPrettyTXN.aNames.map((n,i)=>(n+jPrettyTXN.aAmount[i]));
-                
-                //console.log("makeTransferData: lTran="+JSON.stringify(Object.keys(transferData.lTran)))
             }
             bLine++;
         }
-    }
-    
+    }  
    return transferData;
 }
 

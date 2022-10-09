@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
 
-import { J_ACCT, COLMIN, DOUBLE } from '../terms.js'
+import { J_ACCT, COLMIN, DOUBLE, D_History, D_Page, D_Schema } from '../terms.js'
 
-
+export const CSEP = ';';
 export const S_COLUMN = 15;
 export const iCpField = 35;
 
@@ -256,6 +256,118 @@ export function setEUMoney(strSet) {
     return setMoney(factor * cents);
 }
 
+
+export function cents2EU(cents) {
+    var sign=""; if(cents<0) { sign="-"; cents=-cents; }
+
+    
+
+    var kiloNum = parseInt(cents/100000);
+    var megaNum = parseInt(kiloNum/1000);
+    var megaStr = megaNum>0 ? megaNum.toString()+"." : "";
+
+    var milleNum = kiloNum-(1000*megaNum); 
+    var milleStr = milleNum>0 ? milleNum.toString()+"." : "";
+    cents-=(kiloNum*100000);
+
+    var euroNum = parseInt(cents/100);
+    var euroStr = milleNum>0  ? euroNum.toString().padStart(3,'0') : euroNum.toString();
+    cents-=(euroNum*100);
+
+    return sign + megaStr + milleStr + euroStr+","+(parseInt(cents%100).toString().padStart(2,'0'));
+}
+
+export function makeHistory(sheet) {       
+
+    console.log("makeHistory sheet="+Object.keys(sheet));
+
+
+    const arrHistory = [];                
+    //const response = JSON.parse(strText);
+    const jHistory  = sheet[D_History];
+    const aLen = sheet[D_Schema].assets;
+    const eLen = sheet[D_Schema].eqliab;
+    const gSchema = sheet[D_Schema];
+    const pageGlobal = sheet[D_Page];
+
+
+     if(pageGlobal) {
+        
+        arrHistory.push(CSEP+CSEP+pageGlobal["History"]+CSEP+pageGlobal["header"]+CSEP+CSEP);
+
+        
+        // 20220701
+        var lPattern = getParam("LPATTERN");
+        if(lPattern && lPattern.length<2) lPattern=null;
+
+        var aPattern = getParam("APATTERN");
+        if(aPattern && aPattern.length<2) aPattern=null;
+
+
+        if(gSchema.Names && gSchema.Names.length>0) {
+            var names=gSchema.Names;
+
+            var bLine=0;
+            for (let hash in jHistory)  {
+                bLine++;
+
+                let jPrettyTXN = prettyTXN(jHistory,hash,lPattern,aPattern,names,aLen,eLen);
+
+                // GH 20220703
+                if(jPrettyTXN.txnAcct) {
+
+                    let deltaText = "'"+jPrettyTXN.delta.join(CSEP)+"'";
+                    let boxHead = "'"+jPrettyTXN.entry.join(CSEP)+"'";   
+                    let boxText = "'"+jPrettyTXN.credit.join(CSEP)+CSEP+jPrettyTXN.debit.join(CSEP)+"'";   
+                    let boxNote = "'"+pageGlobal["author"].replace('&nbsp;',CSEP)+"'";                 
+                    let iBalance= jPrettyTXN.iBalance;
+                    
+
+
+                    let balCheck= '<DIV class="L66">'+cents2EU(iBalance)+'</DIV>';
+                    console.dir("LINE "+bLine+" --> "+iBalance);
+                    console.dir();
+
+                    let data = (
+                        jPrettyTXN.entry.join(CSEP)
+                        +CSEP+jPrettyTXN.credit.join(CSEP)
+                        +CSEP+jPrettyTXN.debit.join(CSEP)+CSEP+CSEP
+                        ).split(CSEP);
+
+                    
+                    
+                    var i=0;
+                    var htmlLine=[];
+                    for (i=0;i< 6;i++) { htmlLine.push(data[i]); }  arrHistory.push(htmlLine.join(CSEP));
+                    
+                    var htmlLine=[];
+                    for (i=6;i<12;i++) { htmlLine.push(data[i]); }  arrHistory.push(htmlLine.join(CSEP));
+                    
+                }
+            }
+
+
+            /*
+            // 20220701 search pattern 
+            let sessionId = getId();
+            let searchForm = "<FORM><DIV class='L280'>"
+                +"<BUTTON autoFocus class='L66'>Search</BUTTON>"
+                +"Line:<INPUT TYPE='edit' NAME='LPATTERN'/>&nbsp;"
+            +"</DIV><DIV class='L280'>"
+                +"Acct:<INPUT TYPE='edit' NAME='APATTERN'/>"
+            +"</DIV><INPUT TYPE='hidden' NAME='sessionId' VALUE='"+sessionId+"'/></FORM>";
+            cursor=printHTML(cursor,searchForm);
+
+            setTrailer(pageGlobal, cursor);
+            setScreen(document,htmlPage);
+            */
+        }
+    }
+    console.log("makeHistory="+JSON.stringify(arrHistory))
+
+    return arrHistory;
+}  
+
 /*
 
 // from Transfer.html
@@ -275,3 +387,9 @@ export function setEUMoney(strSet) {
 
 
 */
+
+function getParam(strParam) {
+    
+    var searchParams = new URL(window.location.href).searchParams;
+    return searchParams.get(strParam);
+}
