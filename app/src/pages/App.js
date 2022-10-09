@@ -169,7 +169,7 @@ export function prettyTXN(jHistory,hash,lPattern,aPattern,names,aLen,eLen) {
                         let value = setEUMoney(parts[i]);
                         if(i<aLen) iBalance += value.cents;
                         else if(i!=aLen && i!=eLen) iBalance -= value.cents;
-                        console.dir("ADD "+parts[i]+ " --> "+value.cents+"  --> "+iBalance);
+                        //console.dir("ADD "+parts[i]+ " --> "+value.cents+"  --> "+iBalance);
                     }
 
                     aNames.push(names[i]);   
