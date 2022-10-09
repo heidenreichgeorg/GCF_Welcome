@@ -205,6 +205,33 @@ export function prettyTXN(jHistory,hash,lPattern,aPattern,names,aLen,eLen) {
     return result;
 }
 
+export function buildTXN(schema,flow,name,amount) {
+    
+    var balanceNames =schema.Names;
+    var aLen = schema.assets;
+    var eLen =  schema.eqliab;
+
+
+    let credit=flow.credit;
+    let debit = flow.debit;
+
+
+    if(balanceNames && balanceNames.length>2) {
+        for(var i=J_ACCT;i<balanceNames.length;i++) {
+            if(balanceNames[i] && balanceNames[i].length>0 && i!=aLen && i!=eLen && balanceNames[i]===name) { 
+                
+                let entry = { index:i, cents:setEUMoney(amount).cents}
+
+                if(i<aLen && i!=eLen) credit[name]=entry;
+            
+                if(i>aLen && i!=eLen) debit[name]= entry;
+            }
+        }
+    }
+    
+    return flow;
+}
+
 function setMoney(iCents) { return { 'cents':iCents }; }
 
 export function setEUMoney(strSet) {
