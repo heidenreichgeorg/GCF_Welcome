@@ -2,7 +2,7 @@ import { useEffect, useState, useRef  } from 'react';
 
 import Screen from '../modules/Screen'
 import { prettyTXN, buildTXN, FooterRow}  from './App';
-import { D_Report, D_History, D_Schema } from '../terms.js'
+import { D_Page, D_History, D_Schema } from '../terms.js'
 import { useSession } from '../modules/sessionmanager';
 
 
@@ -141,6 +141,11 @@ export default function Transfer() {
 
     let report = makeTransferData(sheet,iRow)
 
+    function prevFunc() {console.log("CLICK PREVIOUS"); window.location.href="http://localhost:3000/status" }
+    function nextFunc() {  console.log("CLICK NEXT");   window.location.href="http://localhost:3000/history"}
+
+    let page = sheet[D_Page];
+
     return (
         <Screen>
             <TransferRow/> 
@@ -171,8 +176,8 @@ export default function Transfer() {
             <TransferRow/> 
             <TransferRow/> 
             <TransferRow/>
-            <FooterRow long1A="Heidenreich Grundbesitz KG" long1B="" long1C="Fürth HRA 10564" long1D="216_162_50652" />
-            <FooterRow long1A="DE46 7603 0080 0900 4976 10" long1B="2022" long1C="Dr. Georg Heidenreich" long1D="Erlangen" />
+            <FooterRow left={page["client"]}  right={page["register"]} prevFunc={prevFunc} nextFunc={nextFunc}/>
+            <FooterRow left={page["reference"]} right={page["author"]} prevFunc={prevFunc} nextFunc={nextFunc}/>
         </Screen>
     )
     

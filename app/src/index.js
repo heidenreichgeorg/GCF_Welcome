@@ -13,7 +13,7 @@ import { SessionProvider } from './modules/sessionmanager';
 const router = createBrowserRouter([
     {
         path: "/",
-        element: <App />,
+        element: <Status />,
     },
     {
         path: '/status',

@@ -1,21 +1,14 @@
 
-
 import { useEffect, useState } from 'react';
 import Screen from '../modules/Screen'
-
-
 import { iCpField, prettyTXN, FooterRow}  from './App';
-
-
-import { D_Balance, D_Report, D_History, D_Schema, X_ASSETS, X_INCOME, X_EQLIAB, SCREENLINES } from '../terms.js'
-
+import { D_Balance, D_Page, D_Report, D_History, D_Schema, X_ASSETS, X_INCOME, X_EQLIAB, SCREENLINES } from '../terms.js'
 import { useSession } from '../modules/sessionmanager';
-
 
 
 export default function Status() {
     
-    const [report, setReport] = useState()
+    const [sheet, setSheet] = useState()
 
     const { session, status } = useSession()
 
@@ -24,11 +17,17 @@ export default function Status() {
         fetch(`${process.env.REACT_APP_API_HOST}/SHOW?sessionId=${session.id}`)
         .then(data => data.json())
         .then(data => {
-            setReport(makeStatusData(data))
+            setSheet(data)
         })
     }, [status])
 
-    if(!report) return 'Loading...';
+    if(!sheet) return 'Loading...';
+
+    function prevFunc() {console.log("CLICK PREVIOUS"); window.location.href="http://localhost:3000/history" }
+    function nextFunc() {  console.log("CLICK NEXT");   window.location.href="http://localhost:3000/transfer"}
+
+    let page = sheet[D_Page];
+    let report = makeStatusData(sheet);
 
     return (
         <Screen>
@@ -37,8 +36,8 @@ export default function Status() {
                     <StatusRow am1={row.gLeft} tx1={row.nLeft} am2={row.gMidl} tx2={row.nMidl} am3={row.gRite} tx3={row.nRite} d={row.dTran} n={row.nTran} l={row.lTran}/>    
                 ))
             }
-            <FooterRow long1A="Heidenreich Grundbesitz KG" long1B="" long1C="Fürth HRA 10564" long1D="216_162_50652" />
-            <FooterRow long1A="DE46 7603 0080 0900 4976 10" long1B="2022" long1C="Dr. Georg Heidenreich" long1D="Erlangen" />
+            <FooterRow left={page["client"]}  right={page["register"]} prevFunc={prevFunc} nextFunc={nextFunc}/>
+            <FooterRow left={page["reference"]} right={page["author"]} prevFunc={prevFunc} nextFunc={nextFunc}/>
         </Screen>
     )
     
