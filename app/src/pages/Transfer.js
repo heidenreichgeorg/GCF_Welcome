@@ -2,7 +2,7 @@ import { useEffect, useState, useRef  } from 'react';
 
 import Screen from '../modules/Screen'
 import { prettyTXN, buildTXN, FooterRow}  from './App';
-import { D_Page, D_History, D_Schema } from '../terms.js'
+import { J_ACCT, D_Page, D_History, D_Schema, CSEP } from '../terms.js'
 import { useSession } from '../modules/sessionmanager';
 
 
@@ -79,6 +79,64 @@ export default function Transfer() {
     }
 
     
+    function AcctButtonRow({aGroup}) {
+
+        let lineA = aGroup.slice(0,9);
+        let lineB=[];
+        if(aGroup.length>10) lineB = aGroup.slice(10,19);
+
+        return(
+            <div class="attrLine">
+            <div class="attrLine">
+                <div class="L22">&nbsp;</div>
+                <div class="C55"><div class="key" draggable="true" id="cNam0">{lineA[0]}</div></div>
+                <div class="L22">&nbsp;</div>
+                <div class="C55"><div class="key"  draggable="true" id="cNam1">{lineA[1]}</div></div>
+                <div class="L22">&nbsp;</div>
+                <div class="C55"><div class="key"  draggable="true" id="cNam2">{lineA[2]}</div></div>
+                <div class="L22">&nbsp;</div>
+                <div class="C55"><div class="key" draggable="true"  id="cNam3">{lineA[3]}</div></div>
+                <div class="L22">&nbsp;</div>
+                <div class="C55"><div class="key" draggable="true"  id="cNam4">{lineA[4]}</div></div>
+                <div class="L22">&nbsp;</div>
+                <div class="C55"><div class="key" draggable="true"  id="cNam5">{lineA[5]}</div></div>
+                <div class="L22">&nbsp;</div>
+                <div class="C55"><div class="key" draggable="true"  id="cNam6">{lineA[6]}</div></div>
+                <div class="L22">&nbsp;</div>
+                <div class="C55"><div class="key" draggable="true"  id="cNam7">{lineA[7]}</div></div>
+                <div class="L22">&nbsp;</div>
+                <div class="C55"><div class="key"  draggable="true" id="cNam8">{lineA[8]}</div></div>
+                <div class="L22">&nbsp;</div>
+                <div class="C55"><div class="key"  draggable="true" id="cNam9">{lineA[9]}</div></div>
+                <div class="L22">&nbsp;</div>
+            </div>
+            <div class="attrLine">
+                <div class="L22">&nbsp;</div>
+                <div class="C55"><div class="key" draggable="true" id="cNam0">{lineB[0]}</div></div>
+                <div class="L22">&nbsp;</div>
+                <div class="C55"><div class="key"  draggable="true" id="cNam1">{lineB[1]}</div></div>
+                <div class="L22">&nbsp;</div>
+                <div class="C55"><div class="key"  draggable="true" id="cNam2">{lineB[2]}</div></div>
+                <div class="L22">&nbsp;</div>
+                <div class="C55"><div class="key" draggable="true"  id="cNam3">{lineB[3]}</div></div>
+                <div class="L22">&nbsp;</div>
+                <div class="C55"><div class="key" draggable="true"  id="cNam4">{lineB[4]}</div></div>
+                <div class="L22">&nbsp;</div>
+                <div class="C55"><div class="key" draggable="true"  id="cNam5">{lineB[5]}</div></div>
+                <div class="L22">&nbsp;</div>
+                <div class="C55"><div class="key" draggable="true"  id="cNam6">{lineB[6]}</div></div>
+                <div class="L22">&nbsp;</div>
+                <div class="C55"><div class="key" draggable="true"  id="cNam7">{lineB[7]}</div></div>
+                <div class="L22">&nbsp;</div>
+                <div class="C55"><div class="key"  draggable="true" id="cNam8">{lineB[8]}</div></div>
+                <div class="L22">&nbsp;</div>
+                <div class="C55"><div class="key"  draggable="true" id="cNam9">{lineB[9]}</div></div>
+                <div class="L22">&nbsp;</div>
+            </div>
+            </div>
+            )
+    }
+    
     const refDate=useRef({})
     const refSender=useRef({})
     const refReason=useRef({})
@@ -146,22 +204,27 @@ export default function Transfer() {
 
     let page = sheet[D_Page];
 
+    let names = sheet[D_Schema].Names;
+
+    let aLen = where(names,"ASSETS");
+    let eLen = where(names,"EQLIAB");
+    let aSlice = names.slice( J_ACCT, aLen)
+    let gSlice = names.slice(aLen+1,eLen)
+    let eSlice = names.slice(eLen+1)
+
+
     return (
         <Screen>
-            <TransferRow/> 
             <TransferRow/> 
             <TransferRow/> 
             <TransferRow date={report.date} sender={report.sender} reason={report.reason} ref1={report.ref1} ref2={report.ref2} />    
             <TransferRow date={report.lTran[0]} sender={report.lTran[1]} reason={report.lTran[2]} ref1={report.lTran[3]} ref2={report.lTran[4]} />    
             <TransferRow/> 
             <TransferRow/> 
-            <TransferRow/> 
-            <form  onSubmit={(e)=>onBook(e)} >
+            <form onSubmit={(e)=>onBook(e)} >
                 <InputRow date={report.date} sender={report.sender} reason={report.reason} ref1={report.ref1} ref2={report.ref2}/>    
                 <TransferRow/> 
                 <TransferRow/> 
-                <TransferRow/> 
-
                 <AccountRow name1={report.aNames[0]} amount1={report.aAmount[0]}
                             name2={report.aNames[1]} amount2={report.aAmount[1]}
                             name3={report.aNames[2]} amount3={report.aAmount[2]}
@@ -173,6 +236,15 @@ export default function Transfer() {
                 <UpDownSubmitRow/>
             </form>
             <TransferRow/> 
+            {
+                // ['GRSB','EBKS','CDAK','COGK','CDAK','FSTF','KEST','KESO','NKFO']
+                // ['MIET','AUFW','NKG', 'NKHA','EZIN','FSAL','AZIN','EDIV']
+                // ['G195','KAUT','K2GH','K2EH','K2AL','K2KR','K2TO','K2LE','GALS']
+            }
+            
+            <AcctButtonRow aGroup={names.slice( J_ACCT, aLen)}/>
+            <AcctButtonRow aGroup={names.slice(aLen+1,eLen)}/>
+            <AcctButtonRow aGroup={names.slice(eLen+1)}/>
             <TransferRow/> 
             <TransferRow/> 
             <TransferRow/>
@@ -183,8 +255,11 @@ export default function Transfer() {
     
 }
 
-function TransferRow({ date,sender,reason,ref1,ref2 }) {
+function where(array,key) {
+    for(let i=0;i<array.length;i++) if((array[i]+CSEP).startsWith(key)) return i;
+}
 
+function TransferRow({ date,sender,reason,ref1,ref2 }) {
     return(
         <div class="attrLine">
             <div class="L66"> &nbsp;</div>

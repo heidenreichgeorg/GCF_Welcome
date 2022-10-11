@@ -13,6 +13,7 @@ input  { color:#10E110; background-color:inherit; }
 
 .L22      { width: 22px; overflow:hidden; padding: 2px; border: none; float: left;  font-family: inherit; font-size: inherit; font-weight:inherit; color: inherit; text-align: left;  }		
 .L40      { width: 40px; overflow:hidden; padding: 2px; border: none; float: left;  font-family: inherit; font-size: inherit; font-weight:inherit; color: inherit; text-align: left;  }		
+.C55      { width: 55px; overflow:hidden; padding: 2px; border: none; float: left;  font-family: inherit; font-size: inherit; font-weight:inherit; color: inherit; }		
 .L66      { width: 66px; overflow:hidden; padding: 2px; border: none; float: left;  font-family: inherit; font-size: inherit; font-weight:inherit; color: inherit; text-align: left;  }		
 .R90      { width: 90px; overflow:hidden; padding: 2px; border: none; float: left;  font-family: inherit; font-size: inherit; font-weight:inherit; color: inherit; text-align: right; }
 .C100     { width:100px; overflow:hidden; padding: 2px; border: none; float: left;  font-family: inherit; font-size: inherit; font-weight:inherit; color: inherit; }
