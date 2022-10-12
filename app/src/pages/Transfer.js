@@ -4,6 +4,7 @@ import Screen from '../modules/Screen'
 import { prettyTXN, buildTXN, FooterRow}  from './App';
 import { J_ACCT, D_Page, D_History, D_Schema, CSEP } from '../terms.js'
 import { useSession } from '../modules/sessionmanager';
+import e from 'cors';
 
 
 export default function Transfer() {
@@ -55,25 +56,33 @@ export default function Transfer() {
             </div>)
     }
     
-    
-
+    function handleDragOver(e) { e.preventDefault(); }
+    function setDragging(e,name) { 
+        console.log("start dragging "+name); 
+        //const data = JSON.stringify({'account':name});
+        e.dataTransfer.setData("text/plain",name);
+    }
+    function handleDrop(e) {
+        console.log("drop "+e.dataTransfer.getData("text/plain"));
+        e.currentTarget.value=e.dataTransfer.getData("text/plain");
+    }
     function AccountRow({ name1,amount1, name2,amount2, name3,amount3, name4,amount4, name5,amount5}) {
         return(
             <div class="attrLine">
                 <div class="L22"> &nbsp;</div>
-                <div class="L66"> <input type="text" id="cNam1" name="cNam1"  value={name1}/></div>
+                <div class="L66"> <input type="text" id="cNam1" name="cNam1"  value={name1} onDragOver={handleDragOver}  onDrop={handleDrop}/></div>
                 <div class="R90"> <input type="edit" id="cAmt1" name="cAmt1"  ref={rAmount1} defaultValue={amount1}/></div>
                 <div class="L22"> &nbsp;</div>
-                <div class="L66"> <input type="text" id="cNam2" name="cNam2"  value={name2}/></div>
+                <div class="L66"> <input type="text" id="cNam2" name="cNam2"  value={name2} onDragOver={handleDragOver}  onDrop={handleDrop}/></div>
                 <div class="R90"> <input type="edit" id="cAmt2" name="cAmt2"  ref={rAmount2} defaultValue={amount2}/></div>
                 <div class="L22"> &nbsp;</div>
-                <div class="L66"> <input type="text" id="cNam3" name="cNam3"  value={name3}/></div>
+                <div class="L66"> <input type="text" id="cNam3" name="cNam3"  value={name3} onDragOver={handleDragOver}  onDrop={handleDrop}/></div>
                 <div class="R90"> <input type="edit" id="cAmt3" name="cAmt3"  ref={rAmount3} defaultValue={amount3}/></div>
                 <div class="L22"> &nbsp;</div>
-                <div class="L66"> <input type="text" id="cNam4" name="cNam4"  value={name4}/></div>
+                <div class="L66"> <input type="text" id="cNam4" name="cNam4"  value={name4} onDragOver={handleDragOver}  onDrop={handleDrop}/></div>
                 <div class="R90"> <input type="edit" id="cAmt4" name="cAmt4"  ref={rAmount4} defaultValue={amount4}/></div>
                 <div class="L22"> &nbsp;</div>
-                <div class="L66"> <input type="text" id="cNam5" name="cNam5"  value={name5}/></div>
+                <div class="L66"> <input type="text" id="cNam5" name="cNam5"  value={name5} onDragOver={handleDragOver}  onDrop={handleDrop}/></div>
                 <div class="R90"> <input type="edit" id="cAmt5" name="cAmt5"  ref={rAmount5} defaultValue={amount5}/></div>
             </div>)
     }
@@ -81,33 +90,33 @@ export default function Transfer() {
     
     function AcctButtonRow({aGroup}) {
 
-        let lineA = aGroup.slice(0,9);
+        let lineA = aGroup.slice(0,10);
         let lineB=[];
-        if(aGroup.length>10) lineB = aGroup.slice(10,19);
+        if(aGroup.length>10) lineB = aGroup.slice(10,20);
 
         return(
             <div class="attrLine">
             <div class="attrLine">
                 <div class="L22">&nbsp;</div>
-                <div class="C55"><div class="key" draggable="true" id="cNam0">{lineA[0]}</div></div>
+                <div class="C55"><div class="key" draggable="true" id="cNam0" onDragStart={(e) => (setDragging(e,lineA[0]))}>{lineA[0]} </div></div>
                 <div class="L22">&nbsp;</div>
-                <div class="C55"><div class="key"  draggable="true" id="cNam1">{lineA[1]}</div></div>
+                <div class="C55"><div class="key"  draggable="true" id="cNam1" onDragStart={(e) => (setDragging(e,lineA[1]))}>{lineA[1]} </div></div>
                 <div class="L22">&nbsp;</div>
-                <div class="C55"><div class="key"  draggable="true" id="cNam2">{lineA[2]}</div></div>
+                <div class="C55"><div class="key"  draggable="true" id="cNam2" onDragStart={(e) => (setDragging(e,lineA[2]))}>{lineA[2]} </div></div>
                 <div class="L22">&nbsp;</div>
-                <div class="C55"><div class="key" draggable="true"  id="cNam3">{lineA[3]}</div></div>
+                <div class="C55"><div class="key" draggable="true"  id="cNam3" onDragStart={(e) => (setDragging(e,lineA[3]))}>{lineA[3]} </div></div>
                 <div class="L22">&nbsp;</div>
-                <div class="C55"><div class="key" draggable="true"  id="cNam4">{lineA[4]}</div></div>
+                <div class="C55"><div class="key" draggable="true"  id="cNam4" onDragStart={(e) => (setDragging(e,lineA[4]))}>{lineA[4]}</div></div>
                 <div class="L22">&nbsp;</div>
-                <div class="C55"><div class="key" draggable="true"  id="cNam5">{lineA[5]}</div></div>
+                <div class="C55"><div class="key" draggable="true"  id="cNam5" onDragStart={(e) => (setDragging(e,lineA[5]))}>{lineA[5]} </div></div>
                 <div class="L22">&nbsp;</div>
-                <div class="C55"><div class="key" draggable="true"  id="cNam6">{lineA[6]}</div></div>
+                <div class="C55"><div class="key" draggable="true"  id="cNam6" onDragStart={(e) => (setDragging(e,lineA[6]))}>{lineA[6]} </div></div>
                 <div class="L22">&nbsp;</div>
-                <div class="C55"><div class="key" draggable="true"  id="cNam7">{lineA[7]}</div></div>
+                <div class="C55"><div class="key" draggable="true"  id="cNam7" onDragStart={(e) => (setDragging(e,lineA[7]))}>{lineA[7]} </div></div>
                 <div class="L22">&nbsp;</div>
-                <div class="C55"><div class="key"  draggable="true" id="cNam8">{lineA[8]}</div></div>
+                <div class="C55"><div class="key"  draggable="true" id="cNam8" onDragStart={(e) => (setDragging(e,lineA[8]))}>{lineA[8]} </div></div>
                 <div class="L22">&nbsp;</div>
-                <div class="C55"><div class="key"  draggable="true" id="cNam9">{lineA[9]}</div></div>
+                <div class="C55"><div class="key"  draggable="true" id="cNam9" onDragStart={(e) => (setDragging(e,lineA[9]))}>{lineA[9]} </div></div>
                 <div class="L22">&nbsp;</div>
             </div>
             <div class="attrLine">
