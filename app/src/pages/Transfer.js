@@ -70,19 +70,19 @@ export default function Transfer() {
         return(
             <div class="attrLine">
                 <div class="L22"> &nbsp;</div>
-                <div class="L66"> <input type="text" id="cNam1" name="cNam1"  value={name1} onDragOver={handleDragOver}  onDrop={handleDrop}/></div>
+                <div class="L66"> <input type="text" id="cNam1" name="cNam1"   ref={rName1} defaultValue={name1} onDragOver={handleDragOver}  onDrop={handleDrop}/></div>
                 <div class="R90"> <input type="edit" id="cAmt1" name="cAmt1"  ref={rAmount1} defaultValue={amount1}/></div>
                 <div class="L22"> &nbsp;</div>
-                <div class="L66"> <input type="text" id="cNam2" name="cNam2"  value={name2} onDragOver={handleDragOver}  onDrop={handleDrop}/></div>
+                <div class="L66"> <input type="text" id="cNam2" name="cNam2"   ref={rName2} defaultValue={name2} onDragOver={handleDragOver}  onDrop={handleDrop}/></div>
                 <div class="R90"> <input type="edit" id="cAmt2" name="cAmt2"  ref={rAmount2} defaultValue={amount2}/></div>
                 <div class="L22"> &nbsp;</div>
-                <div class="L66"> <input type="text" id="cNam3" name="cNam3"  value={name3} onDragOver={handleDragOver}  onDrop={handleDrop}/></div>
+                <div class="L66"> <input type="text" id="cNam3" name="cNam3"   ref={rName3} defaultValue={name3} onDragOver={handleDragOver}  onDrop={handleDrop}/></div>
                 <div class="R90"> <input type="edit" id="cAmt3" name="cAmt3"  ref={rAmount3} defaultValue={amount3}/></div>
                 <div class="L22"> &nbsp;</div>
-                <div class="L66"> <input type="text" id="cNam4" name="cNam4"  value={name4} onDragOver={handleDragOver}  onDrop={handleDrop}/></div>
+                <div class="L66"> <input type="text" id="cNam4" name="cNam4"   ref={rName4} defaultValue={name4} onDragOver={handleDragOver}  onDrop={handleDrop}/></div>
                 <div class="R90"> <input type="edit" id="cAmt4" name="cAmt4"  ref={rAmount4} defaultValue={amount4}/></div>
                 <div class="L22"> &nbsp;</div>
-                <div class="L66"> <input type="text" id="cNam5" name="cNam5"  value={name5} onDragOver={handleDragOver}  onDrop={handleDrop}/></div>
+                <div class="L66"> <input type="text" id="cNam5" name="cNam5"   ref={rName5} defaultValue={name5} onDragOver={handleDragOver}  onDrop={handleDrop}/></div>
                 <div class="R90"> <input type="edit" id="cAmt5" name="cAmt5"  ref={rAmount5} defaultValue={amount5}/></div>
             </div>)
     }
@@ -156,13 +156,22 @@ export default function Transfer() {
     const rAmount3=useRef({})
     const rAmount4=useRef({})
     const rAmount5=useRef({})
+    const rName1=useRef({})
+    const rName2=useRef({})
+    const rName3=useRef({})
+    const rName4=useRef({})
+    const rName5=useRef({})
 
     function onBook(e) {
         e.preventDefault();
 
-
+        let cNames = [ 
+            rName1.current.value,
+            rName2.current.value,
+            rName3.current.value,
+            rName4.current.value,
+            rName5.current.value]
    
-
         let cAmounts = [ 
             rAmount1.current.value,
             rAmount2.current.value,
@@ -170,19 +179,11 @@ export default function Transfer() {
             rAmount4.current.value,
             rAmount5.current.value]
 
-
-        /*
-                "credit":{"EBKS":{"index":7,"cents":1234}},
-                "debit": {"COGK":{"index":10,"cents":1234}},
-
-        */
-
+        console.log("BOOK N "+JSON.stringify(cNames));
         console.log("BOOK A "+JSON.stringify(cAmounts));
-        console.log("BOOK N "+JSON.stringify(report.aNames));
-
         
         let flow = { 'credit': {}, 'debit':{} }
-        for(let i=0;i<5;i++) buildTXN(sheet[D_Schema],flow,report.aNames[i],cAmounts[i]);
+        for(let i=0;i<5;i++) buildTXN(sheet[D_Schema],flow,cNames[i],cAmounts[i]);
 
         console.log("BOOK F "+JSON.stringify(flow));
         

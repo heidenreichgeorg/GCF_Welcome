@@ -5,6 +5,7 @@
 # In 2021 the server was ported to NODE JS which sends the same (huge) JSON packet to the 14 client pages in JavaScript
 #         new function: search keyword or account in all historic transactions
 #         new function: status page of all accounts and recent transactions
-# In 2022 server runs NODE JS on Amazon Web Services while client uses JavaScript and another client uses React
-
+# In 2022 the frontend based on React was added
+#         the server runs NODE JS on Amazon Web Services while one client uses JavaScript and another client uses React
+#
 
