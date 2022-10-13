@@ -381,6 +381,9 @@ function bookSheet(sessionId,tBuffer,sessionTime,nextSessionId) {
                     if(debugWrite) console.log("2020 sheets.bookSheet APPEND  "+JSON.stringify(tBuffer)+" to ("+client+","+year+") #"+numLines);
 
                     Server.setSession(session);
+
+                    if(debugWrite) console.log("2024 sheets.bookSheet SET SESSION  "+session.id + " "+session.client + " "+session.year + " --> "+JSON.stringify(Object.keys(session)));
+                    
                 }
                 else if(debugWrite) console.log("2021 sheets.bookSheet SAVE NO booking statement tBuffer ("+client+","+year+") #"+numLines);
             }
@@ -389,6 +392,8 @@ function bookSheet(sessionId,tBuffer,sessionTime,nextSessionId) {
         else if(debugWrite) console.log("2025 sheets.bookSheet SAVE NO sheetName"+sessionId);
     }
     else if(debugWrite) console.log("2027 sheets.bookSheet SAVE NO session"+sessionId);
+
+    return session;
 }
 module.exports['bookSheet']=bookSheet;
 
