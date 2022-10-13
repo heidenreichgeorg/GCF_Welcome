@@ -48,11 +48,11 @@ const PORT = 81;
 
 
 // session management
-var arrSession = [];
+var arrSession = []; // LIFO
 function setSession(aSession) {  arrSession.push(aSession); }
 module.exports['setSession']=setSession;
 
-// FIND SESSION in list of known sessions
+// FIND most recent SESSION in list of known sessions
 function getSession(id) { 
     let result=null;
     arrSession.forEach(session => {
@@ -342,9 +342,6 @@ function timeSymbol() {
     '.' + (u.getUTCMilliseconds() / 1000).toFixed(3).slice(2, 5) 
 };
 
-function unixYear() {
-    return new Date(Date.now()).getUTCFullYear();
-};
 
 
 function strSymbol(pat) {
@@ -364,7 +361,7 @@ function strSymbol(pat) {
     }
     return out.join('');
 }
-
+module.exports['strSymbol']=strSymbol;
 
 
 function timeSymbol() { // same as in client.js

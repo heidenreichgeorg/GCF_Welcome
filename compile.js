@@ -163,19 +163,23 @@ function init(app, argv) {
         if(debugReport) console.log("0010 app.post BOOK prepareTXN('"+JSON.stringify(req.body)+"')");
 
         var result="SERVER BOOKED";
-        let sessionId = req.body.sessionId;
-        if(sessionId) {
+        let sessionId = req.body.sessionId; // OLD
+        let oldSession=Server.getSession(sessionId);
+        let client = oldSession.client;
+        let year = oldSession.year;
+        if(sessionId && client && year) {
 
             // SECURITY SANITIZE req.body
             let tBuffer = prepareTXN(sessionId,req.body);
             let sessionTime=Server.timeSymbol();
-            let nextSessionId= sessionId; // HACK strSymbol(sessionTime+session.client+session.year+sessionTime);
+            let nextSessionId= Server.strSymbol(sessionTime+client+year+sessionTime);
 
             // modifies session object and stores it under new sessionId
-            Sheets.bookSheet(sessionId,tBuffer,sessionTime,nextSessionId);
+            let session = Sheets.bookSheet(sessionId,tBuffer,sessionTime,nextSessionId);
             // 20220516 Sheets.xlsxWrite(req.body.sessionId,tBuffer,sessionTime,nextSessionId); 
             // state change in YYYYCCCC.json
 
+            Sheets.save2Server(session,client,year,res,"/LATEST"); // .then (x => y)
 
         } else {
             result="NO SESSION ID";

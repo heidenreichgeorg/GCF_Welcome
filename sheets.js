@@ -351,9 +351,6 @@ function readNumeric(csvLines,makeMoneyFunc) {
 }
 
 
-
-
-
 function bookSheet(sessionId,tBuffer,sessionTime,nextSessionId) {
 
     var session = Server.getSession(sessionId);
@@ -368,7 +365,6 @@ function bookSheet(sessionId,tBuffer,sessionTime,nextSessionId) {
                 var numLines = session.sheetCells.length;
                 if(debugWrite) console.log("2010 sheets.bookSheet ENTER "+session.sheetName+ " for ("+client+","+year+") with "+numLines+" lines in sheet ");
                 
-//                let schemaLen = session.sheetCells[H_LEN].length;
                 if(tBuffer) {
                     // add hash
                     if(tBuffer[0]>0) tBuffer[0]=symbolic(tBuffer.join('')); 
