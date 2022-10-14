@@ -24,8 +24,9 @@ export default function History() {
 
     let page = sheet[D_Page];
 
+    let aNums=[0,1,2,3,4]
     return (
-        <Screen  prevFunc={prevFunc} nextFunc={nextFunc} >
+        <Screen prevFunc={prevFunc} nextFunc={nextFunc} tabSelector={aNums} >
             { makeHistory(sheet).map((row) => (  
                 <SigRow aRow={row.split(CSEP)} />
             ))}

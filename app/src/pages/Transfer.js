@@ -224,8 +224,10 @@ export default function Transfer() {
 
     function handleKey(e) { console.log("handleKey e.key="+e.key);}
 
+    const aNums = [0];
+
     return (
-        <Screen prevFunc={prevFunc} nextFunc={nextFunc} >
+        <Screen prevFunc={prevFunc} nextFunc={nextFunc} tabSelector={aNums} >
             <TransferRow/> 
             <TransferRow/> 
             <TransferRow date={report.date} sender={report.sender} reason={report.reason} ref1={report.ref1} ref2={report.ref2} />    

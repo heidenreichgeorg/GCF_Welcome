@@ -29,8 +29,9 @@ export default function Status() {
     let page = sheet[D_Page];
     let report = makeStatusData(sheet);
 
+    const aNums = [0];
     return (
-        <Screen  prevFunc={prevFunc} nextFunc={nextFunc} >
+        <Screen prevFunc={prevFunc} nextFunc={nextFunc} tabSelector={aNums} >
             {
                 report.map((row) => (
                     <StatusRow am1={row.gLeft} tx1={row.nLeft} am2={row.gMidl} tx2={row.nMidl} am3={row.gRite} tx3={row.nRite} d={row.dTran} n={row.nTran} l={row.lTran}/>    
