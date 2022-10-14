@@ -30,7 +30,7 @@ export default function Status() {
     let report = makeStatusData(sheet);
 
     return (
-        <Screen>
+        <Screen  prevFunc={prevFunc} nextFunc={nextFunc} >
             {
                 report.map((row) => (
                     <StatusRow am1={row.gLeft} tx1={row.nLeft} am2={row.gMidl} tx2={row.nMidl} am3={row.gRite} tx3={row.nRite} d={row.dTran} n={row.nTran} l={row.lTran}/>    

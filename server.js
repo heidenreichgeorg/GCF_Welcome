@@ -389,16 +389,9 @@ function jLoginURL(session) {
     // console.dir(">>> URL: "+mainSid+"."+postFix+"="+sessionId);
     return {'url':"/LOGIN?year="+year+"&client="+client+"&cFunction="+cFunction+"&mainSid="+mainSid+"&postFix="+postFix, 'mainSid':mainSid, 'postFix':postFix };
 }
+module.exports['jLoginURL']=jLoginURL;
 
 
- /*
- function showResponse(response) {
-    let display = document.getElementById('mainPage');
-    if(display)
-        if(response) display.innerHTML=response;
- }
- */
- 
  
  
  // READ DIR functions

@@ -222,9 +222,10 @@ export default function Transfer() {
     let gSlice = names.slice(aLen+1,eLen)
     let eSlice = names.slice(eLen+1)
 
+    function handleKey(e) { console.log("handleKey e.key="+e.key);}
 
     return (
-        <Screen>
+        <Screen prevFunc={prevFunc} nextFunc={nextFunc} >
             <TransferRow/> 
             <TransferRow/> 
             <TransferRow date={report.date} sender={report.sender} reason={report.reason} ref1={report.ref1} ref2={report.ref2} />    

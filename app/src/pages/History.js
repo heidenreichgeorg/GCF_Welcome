@@ -25,7 +25,7 @@ export default function History() {
     let page = sheet[D_Page];
 
     return (
-        <Screen>
+        <Screen  prevFunc={prevFunc} nextFunc={nextFunc} >
             { makeHistory(sheet).map((row) => (  
                 <SigRow aRow={row.split(CSEP)} />
             ))}
@@ -38,7 +38,7 @@ export default function History() {
 }
 
 function SigRow(jRow) {
-    { console.log("SigRow "+JSON.stringify(jRow.aRow)) }
+    { /* console.log("SigRow "+JSON.stringify(jRow.aRow)) */ } 
     return (
             <div class="attrLine">
                 <div class="L120">{jRow.aRow[0]}</div>
