@@ -40,8 +40,10 @@ export default function Screen({ children, prevFunc, nextFunc, tabSelector }) {
 
     function select(target,num) {
 
+        console.log("Screen select "+target+JSON.stringify(num));
+
         // eHistory is the tab to be displayed
-        let eHistory = document.getElementById(target+num);
+        let eHistory = document.getElementById(target+num.tabNum);
         var screen=eHistory;
         var style="none";
         
@@ -69,13 +71,14 @@ export default function Screen({ children, prevFunc, nextFunc, tabSelector }) {
             
             <div class="attrRow">
                 <div class="key" onClick={((e) => select('PageContent',-1))}>Print</div>
-                {tabSelector.map((row,i) => (
-                    <div class="key" onClick={((e) => select('PageContent',{i}))}><label class="form-control"><input type="radio" autoFocus="" />{row}</label></div>
+                {tabSelector.map((row,tabNum) => (
+                    <div class="key" onClick={((e) => select('PageContent',{tabNum}))}><label class="form-control"><input type="radio" autoFocus="" />{row}</label></div>
                 ))}
             </div>
-
-            <div class="ulliTab" id="PageContent0" style={{ display: 'block' }}>
+            <div>
+                
                 {children}
+                
             </div>
         </div>
     )

@@ -148,12 +148,12 @@ function makeStatusData(response) {
         let hLen = Object.keys(jHistory).length;
         var bLine=0;
         var iTran=0;
-        console.log("Status TXN Schema "+aLen+":"+eLen);
-        console.log("Status TXN Schema "+JSON.stringify(Object.keys(gSchema)))
+       // console.log("Status TXN Schema "+aLen+":"+eLen);
+       // console.log("Status TXN Schema "+JSON.stringify(Object.keys(gSchema)))
 
         for (let hash in jHistory)  {
 
-            console.log("Status TXN HASH "+bLine+":"+hash);
+          //  console.log("Status TXN HASH "+bLine+":"+hash);
 
             if(bLine>=hLen-maxRow) {
         

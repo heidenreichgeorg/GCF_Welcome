@@ -24,14 +24,22 @@ export default function History() {
 
     let page = sheet[D_Page];
 
-    let aNums=[0,1,2,3,4]
+    let sHistory=makeHistory(sheet);
+    let sPages = sHistory.length / 20;
+    let aPages = [];
+    for(let p=0;p<sPages;p++) aPages[p]=p;
+
     return (
-        <Screen prevFunc={prevFunc} nextFunc={nextFunc} tabSelector={aNums} >
-            { makeHistory(sheet).map((row) => (  
-                <SigRow aRow={row.split(CSEP)} />
+        <Screen prevFunc={prevFunc} nextFunc={nextFunc} tabSelector={aPages} >
+            {aPages.map((m,n) => (
+            <div class="ulliTab" id={"PageContent"+n} style={{ display: ((n+1)==sPages) ? 'block':'none' }}>
+                { sHistory.slice(n*20,(n+1)*20).map((row) => (  
+                    <SigRow aRow={row.split(CSEP)} />
+                ))}
+                <FooterRow left={page["client"]}  right={page["register"]} prevFunc={prevFunc} nextFunc={nextFunc}/>
+                <FooterRow left={page["reference"]} right={page["author"]} prevFunc={prevFunc} nextFunc={nextFunc}/>
+            </div>
             ))}
-            <FooterRow left={page["client"]}  right={page["register"]} prevFunc={prevFunc} nextFunc={nextFunc}/>
-            <FooterRow left={page["reference"]} right={page["author"]} prevFunc={prevFunc} nextFunc={nextFunc}/>
         </Screen>
     )
     {/*long1A="Heidenreich Grundbesitz KG" long1B="" long1C="Fürth HRA 10564" long1D="216_162_50652" */}

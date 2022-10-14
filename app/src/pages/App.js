@@ -297,6 +297,7 @@ export function makeHistory(sheet) {
         
         arrHistory.push(CSEP+CSEP+pageGlobal["History"]+CSEP+pageGlobal["header"]+CSEP+CSEP);
 
+        arrHistory.push(CSEP+CSEP+CSEP+CSEP+CSEP);
         
         // 20220701
         var lPattern = getParam("LPATTERN");
@@ -347,6 +348,9 @@ export function makeHistory(sheet) {
                     
                 }
             }
+
+
+            for (let i=1;i<20;i++) arrHistory.push(CSEP+CSEP+CSEP+CSEP+CSEP);
 
 
             /*
