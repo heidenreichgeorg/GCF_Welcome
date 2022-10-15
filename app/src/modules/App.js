@@ -5,7 +5,7 @@ import { J_ACCT, COLMIN, DOUBLE, D_History, D_Page, D_Schema } from '../terms.js
 export const CSEP = ';';
 export const S_COLUMN = 15;
 export const iCpField = 35;
-
+/*
 export default function App() {
 
     const [clicked, setClicked] = useState(0)
@@ -49,7 +49,8 @@ function Component({ text }) {
     )
 }
 
-// account.html
+
+
 export function AccountRow({lineNum, date, sender, reason, ref1, ref2, amount, saldo}) {
     return (
         <div class="attrLine">
@@ -64,6 +65,22 @@ export function AccountRow({lineNum, date, sender, reason, ref1, ref2, amount, s
         </div>
     )
 }
+
+
+
+export function FooterRow({left,right,prevFunc,nextFunc}) {
+    return(
+        <div class="attrLine">
+            <div class="L120">&nbsp;</div>
+            <div class="L166 key" onClick={(() => prevFunc())}>&lt;&lt;</div>
+            <div class="L280">{left}</div>
+            <div class="L280">{right}</div>
+            <div class="L166 key" onClick={(() => nextFunc())}>&gt;&gt;</div>
+       </div>
+    )
+}
+
+*/
 
 // openbalance.html
 export function OverviewRow({acct, amount, name1, name2}) { // 
@@ -87,19 +104,6 @@ export function BalanceRow({text,level4,level3,level2,level1}) {
             <div class="R105">{level2}</div>
             <div class="R105">{level1}</div>
         </div>
-    )
-}
-
-
-export function FooterRow({left,right,prevFunc,nextFunc}) {
-    return(
-        <div class="attrLine">
-            <div class="L120">&nbsp;</div>
-            <div class="L166 key" onClick={(() => prevFunc())}>&lt;&lt;</div>
-            <div class="L280">{left}</div>
-            <div class="L280">{right}</div>
-            <div class="L166 key" onClick={(() => nextFunc())}>&gt;&gt;</div>
-       </div>
     )
 }
 
@@ -279,122 +283,8 @@ export function cents2EU(cents) {
     return sign + megaStr + milleStr + euroStr+","+(parseInt(cents%100).toString().padStart(2,'0'));
 }
 
-export function makeHistory(sheet) {       
 
-    console.log("makeHistory sheet="+Object.keys(sheet));
-
-
-    const arrHistory = [];                
-    //const response = JSON.parse(strText);
-    const jHistory  = sheet[D_History];
-    const aLen = sheet[D_Schema].assets;
-    const eLen = sheet[D_Schema].eqliab;
-    const gSchema = sheet[D_Schema];
-    const pageGlobal = sheet[D_Page];
-
-
-     if(pageGlobal) {
-        
-        arrHistory.push(CSEP+CSEP+pageGlobal["History"]+CSEP+pageGlobal["header"]+CSEP+CSEP);
-
-        arrHistory.push(CSEP+CSEP+CSEP+CSEP+CSEP);
-        
-        // 20220701
-        var lPattern = getParam("LPATTERN");
-        if(lPattern && lPattern.length<2) lPattern=null;
-
-        var aPattern = getParam("APATTERN");
-        if(aPattern && aPattern.length<2) aPattern=null;
-
-
-        if(gSchema.Names && gSchema.Names.length>0) {
-            var names=gSchema.Names;
-
-            var bLine=0;
-            for (let hash in jHistory)  {
-                bLine++;
-
-                let jPrettyTXN = prettyTXN(jHistory,hash,lPattern,aPattern,names,aLen,eLen);
-
-                // GH 20220703
-                if(jPrettyTXN.txnAcct) {
-
-                    let deltaText = "'"+jPrettyTXN.delta.join(CSEP)+"'";
-                    let boxHead = "'"+jPrettyTXN.entry.join(CSEP)+"'";   
-                    let boxText = "'"+jPrettyTXN.credit.join(CSEP)+CSEP+jPrettyTXN.debit.join(CSEP)+"'";   
-                    let boxNote = "'"+pageGlobal["author"].replace('&nbsp;',CSEP)+"'";                 
-                    let iBalance= jPrettyTXN.iBalance;
-                    
-
-
-                    let balCheck= '<DIV class="L66">'+cents2EU(iBalance)+'</DIV>';
-                    console.dir("LINE "+bLine+" --> "+iBalance);
-                    console.dir();
-
-                    let data = (
-                        jPrettyTXN.entry.join(CSEP)
-                        +CSEP+jPrettyTXN.credit.join(CSEP)
-                        +CSEP+jPrettyTXN.debit.join(CSEP)+CSEP+CSEP
-                        ).split(CSEP);
-
-                    
-                    
-                    var i=0;
-                    var htmlLine=[];
-                    for (i=0;i< 6;i++) { htmlLine.push(data[i]); }  arrHistory.push(htmlLine.join(CSEP));
-                    
-                    var htmlLine=[];
-                    for (i=6;i<12;i++) { htmlLine.push(data[i]); }  arrHistory.push(htmlLine.join(CSEP));
-                    
-                }
-            }
-
-
-            for (let i=1;i<20;i++) arrHistory.push(CSEP+CSEP+CSEP+CSEP+CSEP);
-
-
-            /*
-            // 20220701 search pattern 
-            let sessionId = getId();
-            let searchForm = "<FORM><DIV class='L280'>"
-                +"<BUTTON autoFocus class='L66'>Search</BUTTON>"
-                +"Line:<INPUT TYPE='edit' NAME='LPATTERN'/>&nbsp;"
-            +"</DIV><DIV class='L280'>"
-                +"Acct:<INPUT TYPE='edit' NAME='APATTERN'/>"
-            +"</DIV><INPUT TYPE='hidden' NAME='sessionId' VALUE='"+sessionId+"'/></FORM>";
-            cursor=printHTML(cursor,searchForm);
-
-            setTrailer(pageGlobal, cursor);
-            setScreen(document,htmlPage);
-            */
-        }
-    }
-    console.log("makeHistory="+JSON.stringify(arrHistory))
-
-    return arrHistory;
-}  
-
-/*
-
-// from Transfer.html
-
-<div class="attrLine" id="PageContenttermLine1"> <div class="C100">
-        <div class="key" onclick="doCommand('1')">1</div></div> <div class="C100">
-        <div class="key" onclick="doCommand('2')">2</div></div> <div class="C100">
-        <div class="key" onclick="doCommand('3')">3</div></div><div class="C100" id="selGRSB">
-        
-        <div class="key" oncontextmenu="accountMenu(event,'GRSB')" onclick="listCreditAccount(6,'GRSB')">GRSB</div></div><div class="C100" id="selEBKS">
-        <div class="key" oncontextmenu="accountMenu(event,'EBKS')" onclick="listCreditAccount(7,'EBKS')">EBKS</div></div><div class="C100" id="selCDAK">
-        <div class="key" oncontextmenu="accountMenu(event,'CDAK')" onclick="listCreditAccount(8,'CDAK')">CDAK</div></div><div class="C100" id="selFSTF">
-        <div class="key" oncontextmenu="accountMenu(event,'FSTF')" onclick="listCreditAccount(9,'FSTF')">FSTF</div></div><div class="C100" id="selCOGK">
-        <div class="key" oncontextmenu="accountMenu(event,'COGK')" onclick="listCreditAccount(10,'COGK')">COGK</div>
-    </div>
-</div>
-
-
-*/
-
-function getParam(strParam) {
+export function getParam(strParam) {
     
     var searchParams = new URL(window.location.href).searchParams;
     return searchParams.get(strParam);

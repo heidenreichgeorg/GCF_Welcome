@@ -1,3 +1,4 @@
+const debug=null;
 
 const D_XBRL   = "XBRL";
 const D_Balance= "Bilanz";
@@ -64,7 +65,7 @@ function getFromServer(responseHandler) {
                 if(debug) console.log("getFromServer RESPONSE received = "+value);
                 responseHandler(strTarget,value);
             }
-            else console.log(strTarget+' --> '+request.status);			    
+            else if(debug) console.log(strTarget+' --> '+request.status);			    
         }
     }		
 
@@ -517,7 +518,7 @@ function newPopup(url,command,width,lines) {
     let leftPos=(tile%2)==0 ? 30 :890;
     let verticalPos=(tile>1?470:-10);
     
-    console.dir("NEW POPUP "+command+ "  Width="+width + " Tile="+tile + "  X="+leftPos+"  Y="+verticalPos);
+    if(debug) console.dir("NEW POPUP "+command+ "  Width="+width + " Tile="+tile + "  X="+leftPos+"  Y="+verticalPos);
 
     let panel = window.open(url, 'window'+command,'height='+(240*pLines)+',width='+pWidth+', top='+verticalPos+', left='+leftPos+',resizable=no ,scrollbars=no ,toolbar=no ,menubar=no ,location=no ,directories=no ,status=no ');
 
@@ -598,7 +599,7 @@ function printInternal(htmlPage,arrCSS,content,strHTML) {
 function printHTML(htmlPage,strHTML) {
     if(htmlPage && strHTML) {             
         if(htmlPage.arrContent && htmlPage.arrContent.length>=htmlPage.screenLines) {   
-            console.dir("printHTML PAGE BREAK");
+            
             let newPage=createPage(htmlPage.arrCSS,htmlPage.arrContent[0],htmlPage.target);
             htmlPage.succPage = newPage;
             htmlPage=newPage;
@@ -1098,7 +1099,7 @@ function dateFormat(timeStr) {
 
 function setAutoJSON(sessionId) {    
     // client-side JSON download 
-    console.log("0050 SET TIMER FOR SAVING JSON ("+sessionId+").");
+    if(debug) console.log("0050 SET TIMER FOR SAVING JSON ("+sessionId+").");
 
     setInterval(function(){
         let timeStr = timeSymbol();
@@ -1113,7 +1114,7 @@ function setAutoJSON(sessionId) {
         let sInfo=JSON.stringify(jInfo);
         callServer('GET',"DOWNLOAD?sessionId="+sessionId,"",downloadSession);
         
-        console.log("1570 TIMER POSTED JSON DOWNLOAD("+sInfo+") SESSION\n");
+        if(debug) console.log("1570 TIMER POSTED JSON DOWNLOAD("+sInfo+") SESSION\n");
     }, 
     3600000 ); // hourly interval of saving a JSON file
 
@@ -1129,8 +1130,8 @@ function downloadSession(strOut) {
   let monthYearHour = sessionTime.slice(4,10);
   let fileName = session.year+session.client+monthYearHour+'.json';
   
-  console.log("1580 Client.downloadJSON saving to file="+fileName);
-  console.log(strOut);
+  if(debug) console.log("1580 Client.downloadJSON saving to file="+fileName);
+  if(debug) console.log(strOut);
 
   var textFile=null,makeTextFile = function (text) {
     var data = new Blob([text], {type: 'text/plain'});

@@ -1,7 +1,8 @@
 
 import { useEffect, useState } from 'react';
-import Screen from '../modules/Screen'
-import { iCpField, prettyTXN, FooterRow}  from './App';
+import Screen from '../pages/Screen'
+import FooterRow from '../components/FooterRow'
+import { iCpField, prettyTXN}  from '../modules/App';
 import { D_Balance, D_Page, D_Report, D_History, D_Schema, X_ASSETS, X_INCOME, X_EQLIAB, SCREENLINES } from '../terms.js'
 import { useSession } from '../modules/sessionmanager';
 

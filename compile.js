@@ -3,7 +3,7 @@ let debug=null;
 
 
 // THIS WILL VIOLATE PRIVACY AT THE ADMIN CONSOLE !!! 
-let debugReport=1;
+let debugReport=null;
 
 // table parsing
 const CEND= '|';
@@ -157,9 +157,9 @@ function init(app, argv) {
 
 
     app.post("/BOOK", (req, res) => { 
-        console.log("\n\n");
+        if(debug) console.log("\n\n");
         // from TransferForm.html       
-        console.log(Server.timeSymbol());
+        if(debug) console.log(Server.timeSymbol());
         if(debugReport) console.log("0010 app.post BOOK prepareTXN('"+JSON.stringify(req.body)+"')");
 
         var result="SERVER BOOKED";
@@ -197,13 +197,13 @@ function init(app, argv) {
     app.post("/STORE", (req, res) => { 
         // STORE txn into LOG for later use
         // from HistoryList.html       
-        console.log("\n\n");
-        console.log(Server.timeSymbol());
-        console.log("0010 app.post STORE LOG txn into log('"+JSON.stringify(req.body)+"')");
+        if(debug) console.log("\n\n");
+        if(debug) console.log(Server.timeSymbol());
+        if(debug) console.log("0010 app.post STORE LOG txn into log('"+JSON.stringify(req.body)+"')");
         
         let delta = req.body.delta;
 
-        console.log("0019 app.post STORE LOG with session id=("+req.body.sessionId+")");
+        if(debug) console.log("0019 app.post STORE LOG with session id=("+req.body.sessionId+")");
 
         if(delta) Sheets.saveSessionLog(req.body.sessionId,req.body);
         else console.log("0021 app.post STORE LOG Id=("+req.body.sessionId+") did not save: no transaction!");
@@ -321,70 +321,6 @@ function init(app, argv) {
 
 
 
-    /*
-
-    app.post('/SAVE', (req, res) => {
-        // save  sheetFile into file named by session.sheetFile / sheetName 
-        console.log("\n\n");
-        console.log(Server.timeSymbol());
-
-        // add closing lines to XLSX balance sheet 
-        console.log("1610 /SAVE/ req.query.sessionId="+req.query.sessionId);
-        console.log("1620 /SAVE/ req.body.sessionId="+req.body.sessionId);
-
-        Sheets.xlsxWrite(req.body.sessionId,null,'',''); 
-
-        res.writeHead(Sheets.HTTP_OK, {"Content-Type": "text/html"});    
-        res.end("\nSAVED.\n");
-
-    });
-    // save to Excel
-
-
-
-    app.post('/INIT', (req, res) => {
-        // generate a new sheetFile and download
-        console.log("\n\n");
-        console.log(Server.timeSymbol());
-
-        // add closing lines to XLSX balance sheet 
-        console.log("1710 /INIT/ req.query.sessionId="+req.query.sessionId);
-        console.log("1720 /INIT/ req.body.sessionId="+req.body.sessionId);
-
-        let time = Server.timeSymbol();
-
-        let year = time.slice(0,4);
-
-        let session = getSession(req.body.sessionId);
-
-        let fileName = session.year+session.client+'.json';
-
-        let result = {
-            "client":session.client,
-            "year":year,
-            "remote":"::ffff:192.168.178.38",
-            "time":time,
-            "sheetCells":[["C","IBAN1","Sender",        "Konto",     "SVWZ1","SVWZ2","Bank","ASSETS","Sales","EQLIAB","Partner"],
-                        ["N","Name","Name Kontakt",   "Wohnort",   ".",    ".",    "BANK","ASSETS","SALE", "EQLIAB","K2UP"   ],
-                        ["I","IBAN2","Registernummer","St.Nummer", "",     "",     "",    "",      "",     "",      ""       ],
-                        ["K","KoNr",year,             "Firmenname",".",    ".",    "1810","",      "4105", "",      "2010"   ],
-                        ["E","Eigenkapital","",       "",          "",     "",     "",    "",      "",     "","de-gaap-ci_table.kke.allKindsOfEquityAccounts.unlimitedPartners.VK"],
-                        ["X","BALANCE","",            "",          "",     "","de-gaap-ci_bs.ass.currAss.cashEquiv.bank",,"","de-gaap-ci_is.netIncome.regular.operatingTC.grossTradingProfit","","de-gaap-ci_bs.eqLiab.equity.subscribed.unlimitedLiablePartners.VK"] 
-                        ["P","Partnername","",        "",          "",     "",     "",    "",      "",     "","Name Partner"],
-                        ["1",year+"-01-01","",        "Eröffnung", "",     "",     "0,00","0,00",  "0,00", "0,00","0,00"]
-                        ]}
-
-        res.set('Content-Disposition', 'attachment; fileName='+fileName);
-        res.json(result);    
-
-    });
-    // save to Excel
-
-
-    function dateFormat(timeStr) {
-        return timeStr.slice(0,4)+"-"+timeStr.slice(4,6)+"-"+timeStr.slice(6,8)+"  "+timeStr.slice(8,10)+":"+timeStr.slice(10,12);
-    }
-    */
 
 
     return processArgv(argv);
@@ -1150,13 +1086,16 @@ function sendBalance(balance) {
             }
         }
     }
-
-    // transfer all history
+/*
+    // transfer all history in reverse order
     for (let hash in bHistory)   {
-        txns[hash]=bHistory[hash]; 
 
+        txns[hash]=bHistory[hash]; 
         if(debugReport) console.log("compile js sendBalance3 HISTORY "+hash+"="+txns[hash]);           
     }
+*/
+    Object.keys(bHistory).reverse().map((hash,i) => {txns[i] = bHistory[hash]});
+
     
     // transfer all fixed assets
     gResponse[D_FixAss] = balance[D_FixAss];
@@ -1255,14 +1194,14 @@ function sendBalance(balance) {
 
 
 function distribute(money,partners,target) {      
-    if(debug) console.log('__________');
+    if(debug) console.log('__________distribute()');
     var strNumber="0,00";
     if(typeof(money)=='number' && !Number.isNaN(money)) {
         strNumber=(100*money).toString();
         //console.log("compile.js distribute("+target+") format number="+money+ " string="+strNumber);
     } 
     var err="";
-    console.log("Sender.distribute("+target+") "+money.cents+" cents "+err); 
+    if(debugReport) console.log("Sender.distribute("+target+") "+money.cents+" cents "+err); 
     if(!partners) { console.log("compile.js distribute() NO PARTNERS"); return; }
 
     return distributeMoney(money,partners,target);

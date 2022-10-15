@@ -1,7 +1,8 @@
 import { useEffect, useState, useRef  } from 'react';
 
-import Screen from '../modules/Screen'
-import { prettyTXN, buildTXN, FooterRow}  from './App';
+import FooterRow from '../components/FooterRow'
+import Screen from '../pages/Screen'
+import { prettyTXN, buildTXN }  from '../modules/App';
 import { J_ACCT, D_Page, D_History, D_Schema, CSEP } from '../terms.js'
 import { useSession } from '../modules/sessionmanager';
 import e from 'cors';

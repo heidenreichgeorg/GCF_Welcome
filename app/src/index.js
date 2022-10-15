@@ -4,7 +4,6 @@ import './index.css';
 
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 
-import App from './pages/App';
 import History from './pages/History'
 import Status from './pages/Status'
 import Transfer from './pages/Transfer'
