@@ -140,6 +140,7 @@ function makeStatusData(response) {
     for (let i=iRite;i<maxRow;i++) { statusData[i].gRite=' '; statusData[i].nRite=' '; }
 
 
+    // build fourth column with recent transactions
 
     if(jHistory && gSchema.Names && gSchema.Names.length>0) {
 
@@ -156,7 +157,7 @@ function makeStatusData(response) {
 
           //  console.log("Status TXN HASH "+bLine+":"+hash);
 
-            if(bLine>=hLen-maxRow) {
+            if(bLine<maxRow) {
         
                 let jPrettyTXN = prettyTXN(jHistory,hash,null,null,names,aLen,eLen);
                 jPrettyTXN.credit.shift();
