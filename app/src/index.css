@@ -29,6 +29,26 @@ input  { color:#10E110; background-color:inherit; }
 .C280     { width:280px; overflow:hidden; padding: 2px; border: none; float: left;  font-family: inherit; font-size: inherit; font-weight:inherit; color: inherit; } 
 .CFUL     { width:883px; overflow:hidden; padding: 2px; border: none; float: left;  font-family: inherit; font-size: inherit; font-weight:inherit; color: inherit; }
 
+
+
+
+input[type="radio"] {
+  /* Add if not using autoprefixer */
+  -webkit-appearance: none;
+  appearance: none;
+
+  font-family:  Inconsolata, monospace, sans-serif; font-size: 13px; font-weight:400; text-align: center;
+
+  /* For iOS < 15 to remove gradient background */
+  background-color: #000;
+  /* Not removed via appearance */
+  margin: 0;
+}
+input[type="radio"]::before {
+  content: "Page";
+}
+
+
 .key      { width: 70px;  height:16px;  margin: 0px; border: 0px solid inherit; float: left; background-color: #10E110; font-family:  inherit; font-size: inherit; font-weight:600; color: #004000; }
 
 .attrLine { width:990px; padding: 1px; float: left;               color:inherit;min-height: 16px; height: 16px; font-family :Roboto, monospace; font-size: 12px;font-weight:400;text-align: center;}

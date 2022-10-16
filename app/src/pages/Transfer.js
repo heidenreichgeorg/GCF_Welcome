@@ -16,7 +16,7 @@ export default function Transfer() {
         if(status !== 'success') return;
         fetch(`${process.env.REACT_APP_API_HOST}/SHOW?sessionId=${session.id}`)
         .then(data => data.json())
-        .then(data => { setSheet(data);})
+        .then(data => { setSheet(data); })
     }, [status]) 
 
     const [iRow, setIRow] = useState(0)
@@ -45,19 +45,19 @@ export default function Transfer() {
         return(
             <div class="attrLine">
                 <div class="L66"> &nbsp;</div>
-                <div class="L150"> <input type="edit" id="cDate"   name="cDate"   defaultValue ={date}   ref={refDate} /></div>
+                <div class="L150"> <input type="edit" id="cDate"   name="cDate"   defaultValue ={date} onDrop={ignore}  ref={refDate} /></div>
                 <div class="L22"> &nbsp;</div>
-                <div class="L150"> <input type="edit" id="cSender" name="cSender" defaultValue ={sender} ref={refSender}/></div>
+                <div class="L150"> <input type="edit" id="cSender" name="cSender" defaultValue ={sender} onDrop={ignore} ref={refSender}/></div>
                 <div class="L22"> &nbsp;</div>
-                <div class="L150"> <input type="edit" id="cReason" name="cReason" defaultValue ={reason} ref={refReason}/></div>
+                <div class="L150"> <input type="edit" id="cReason" name="cReason" defaultValue ={reason} onDrop={ignore}  ref={refReason}/></div>
                 <div class="L22"> &nbsp;</div>
-                <div class="L150"> <input type="edit" id="cRef1"   name="cRef1"   defaultValue ={ref1}   ref={refRef1}/></div>
+                <div class="L150"> <input type="edit" id="cRef1"   name="cRef1"   defaultValue ={ref1} onDrop={ignore}   ref={refRef1}/></div>
                 <div class="L22"> &nbsp;</div>
-                <div class="L150"> <input type="edit" id="cRef2"   name="cRef2"   defaultValue ={ref2}   ref={refRef2}/></div>
+                <div class="L150"> <input type="edit" id="cRef2"   name="cRef2"   defaultValue ={ref2} onDrop={ignore}   ref={refRef2}/></div>
             </div>)
     }
     
-    function handleDragOver(e) { e.preventDefault(); }
+    function ignore(e) { e.preventDefault(); }
     function setDragging(e,name) { 
         console.log("start dragging "+name); 
         //const data = JSON.stringify({'account':name});
@@ -66,25 +66,26 @@ export default function Transfer() {
     function handleDrop(e) {
         console.log("drop "+e.dataTransfer.getData("text/plain"));
         e.currentTarget.value=e.dataTransfer.getData("text/plain");
+        e.preventDefault();
     }
     function AccountRow({ name1,amount1, name2,amount2, name3,amount3, name4,amount4, name5,amount5}) {
         return(
             <div class="attrLine">
                 <div class="L22"> &nbsp;</div>
-                <div class="L66"> <input type="text" id="cNam1" name="cNam1"   ref={rName1} defaultValue={name1} onDragOver={handleDragOver}  onDrop={handleDrop}/></div>
-                <div class="R90"> <input type="edit" id="cAmt1" name="cAmt1"  ref={rAmount1} defaultValue={amount1}/></div>
+                <div class="L66"> <input type="text" id="cNam1" name="cNam1"   ref={rName1} defaultValue={name1} onDragOver={ignore}  onDrop={handleDrop}/></div>
+                <div class="R90"> <input type="edit" id="cAmt1" name="cAmt1"  ref={rAmount1} defaultValue={amount1} onDrop={ignore}  /></div>
                 <div class="L22"> &nbsp;</div>
-                <div class="L66"> <input type="text" id="cNam2" name="cNam2"   ref={rName2} defaultValue={name2} onDragOver={handleDragOver}  onDrop={handleDrop}/></div>
-                <div class="R90"> <input type="edit" id="cAmt2" name="cAmt2"  ref={rAmount2} defaultValue={amount2}/></div>
+                <div class="L66"> <input type="text" id="cNam2" name="cNam2"   ref={rName2} defaultValue={name2} onDragOver={ignore}  onDrop={handleDrop}/></div>
+                <div class="R90"> <input type="edit" id="cAmt2" name="cAmt2"  ref={rAmount2} defaultValue={amount2} onDrop={ignore}  /></div>
                 <div class="L22"> &nbsp;</div>
-                <div class="L66"> <input type="text" id="cNam3" name="cNam3"   ref={rName3} defaultValue={name3} onDragOver={handleDragOver}  onDrop={handleDrop}/></div>
-                <div class="R90"> <input type="edit" id="cAmt3" name="cAmt3"  ref={rAmount3} defaultValue={amount3}/></div>
+                <div class="L66"> <input type="text" id="cNam3" name="cNam3"   ref={rName3} defaultValue={name3} onDragOver={ignore}  onDrop={handleDrop}/></div>
+                <div class="R90"> <input type="edit" id="cAmt3" name="cAmt3"  ref={rAmount3} defaultValue={amount3} onDrop={ignore}  /></div>
                 <div class="L22"> &nbsp;</div>
-                <div class="L66"> <input type="text" id="cNam4" name="cNam4"   ref={rName4} defaultValue={name4} onDragOver={handleDragOver}  onDrop={handleDrop}/></div>
-                <div class="R90"> <input type="edit" id="cAmt4" name="cAmt4"  ref={rAmount4} defaultValue={amount4}/></div>
+                <div class="L66"> <input type="text" id="cNam4" name="cNam4"   ref={rName4} defaultValue={name4} onDragOver={ignore}  onDrop={handleDrop}/></div>
+                <div class="R90"> <input type="edit" id="cAmt4" name="cAmt4"  ref={rAmount4} defaultValue={amount4} onDrop={ignore}  /></div>
                 <div class="L22"> &nbsp;</div>
-                <div class="L66"> <input type="text" id="cNam5" name="cNam5"   ref={rName5} defaultValue={name5} onDragOver={handleDragOver}  onDrop={handleDrop}/></div>
-                <div class="R90"> <input type="edit" id="cAmt5" name="cAmt5"  ref={rAmount5} defaultValue={amount5}/></div>
+                <div class="L66"> <input type="text" id="cNam5" name="cNam5"   ref={rName5} defaultValue={name5} onDragOver={ignore}  onDrop={handleDrop}/></div>
+                <div class="R90"> <input type="edit" id="cAmt5" name="cAmt5"  ref={rAmount5} defaultValue={amount5} onDrop={ignore}  /></div>
             </div>)
     }
 
@@ -206,7 +207,7 @@ export default function Transfer() {
         console.log("BOOK O booked.");
     }    
 
-    if(!sheet) return 'Loading...';
+    if(!sheet) return null; // 'Loading...';
 
     let report = makeTransferData(sheet,iRow)
 

@@ -18,7 +18,7 @@ export default function History() {
         .then(data => { setSheet(data);})
     }, [status]) 
 
-    if(!sheet) return 'Loading...';
+    if(!sheet) return null; //'Loading...';
 
     function prevFunc() {console.log("CLICK PREVIOUS"); window.location.href="http://localhost:3000/transfer" }
     function nextFunc() {  console.log("CLICK NEXT");   window.location.href="http://localhost:3000/status"}
