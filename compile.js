@@ -19,6 +19,7 @@ const Server = require('./server');
 
 
 const D_Page = "Seite";   // client register reference author
+const HTMLSPACE=" "; 
 
 
 // OBSOLETE extra XML pattern
@@ -1278,7 +1279,6 @@ function distributeMoney(money,bPartner,target) { // GH20211215
 }
 
 
-
 function makePage(balance) {
 
     var page = {};
@@ -1296,12 +1296,12 @@ function makePage(balance) {
             let client=gSchema.client;
 
 
-            page['header'] = de_DE['reportYear'] + "&nbsp;" + reportYear; // de_DE:
+            page['header'] = de_DE['reportYear'] + HTMLSPACE + reportYear; // de_DE:
             page['client'] = client;
-            page['register'] = register+"&nbsp;"+taxnumber;
-            page['reference'] = iban+"&nbsp;"+reportYear;
-            page['author'] = author+"&nbsp;"+residence;
-            page['footer'] = iban+"&nbsp;"+residence;
+            page['register'] = register+HTMLSPACE+taxnumber;
+            page['reference'] = iban+HTMLSPACE+reportYear;
+            page['author'] = author+HTMLSPACE+residence;
+            page['footer'] = iban+HTMLSPACE+residence;
 
             for(let key in de_DE) {
                 page[key]=  de_DE[key];  

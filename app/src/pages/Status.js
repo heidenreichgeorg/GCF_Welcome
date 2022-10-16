@@ -101,6 +101,8 @@ function makeStatusData(response) {
     let statusData = []; for(let i=0;i<=maxRow;i++) statusData[i]={};
     
     let iLeft=0;
+    statusData[iLeft++].nLeft= "Assets";
+
     for (let name in aLeft)   {
         var account=aLeft[name];
         var gross = account.gross;
@@ -115,6 +117,8 @@ function makeStatusData(response) {
 
 
     let iMidl=0;
+    statusData[iMidl++].nMidl= "Gain/Loss";
+
     for (let name in aMidl)   {
         var account=aMidl[name];
         var gross = account.gross;
@@ -128,6 +132,8 @@ function makeStatusData(response) {
 
 
     let iRite=0;
+    statusData[iRite++].nRite= "Equity/Liab";
+
     for (let name in aRite)   {
         var account=aRite[name];
         var gross = account.gross;
@@ -143,15 +149,15 @@ function makeStatusData(response) {
     // build fourth column with recent transactions
 
     if(jHistory && gSchema.Names && gSchema.Names.length>0) {
-
         var names=gSchema.Names;
         var aLen = gSchema.assets;
         var eLen = gSchema.eqliab;
         let hLen = Object.keys(jHistory).length;
         var bLine=0;
         var iTran=0;
-       // console.log("Status TXN Schema "+aLen+":"+eLen);
-       // console.log("Status TXN Schema "+JSON.stringify(Object.keys(gSchema)))
+
+        statusData[iTran++].lTran= "Recent Transactions";
+
 
         for (let hash in jHistory)  {
 

@@ -1,86 +1,12 @@
-import { useEffect, useState } from 'react'
 
 import { J_ACCT, COLMIN, DOUBLE, D_History, D_Page, D_Schema } from '../terms.js'
+
+const HTMLSPACE=" "; 
 
 export const CSEP = ';';
 export const S_COLUMN = 15;
 export const iCpField = 35;
-/*
-export default function App() {
 
-    const [clicked, setClicked] = useState(0)
-
-    const [data, setData] = useState()
-
-    useEffect(() => {
-        // nur erster render
-        setTimeout(() => setData('123'), 1000)
-    }, [])
-
-    function handleClick() {
-        setClicked(clicked + 1)
-    }
-
-    if(!data) return 'Loading...'
-
-    return (
-        <div className="App">
-            <header className="App-header">
-                <p>
-                    Edit <code>src/App.js</code> and save to reload.
-                </p>
-                <Component text={'Learn React' + data} />
-                <button onClick={handleClick}>Clicked: {clicked}</button>
-            </header>
-        </div>
-    );
-}
-
-function Component({ text }) {
-    return (
-        <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-        >
-            {text}
-        </a>
-    )
-}
-
-
-
-export function AccountRow({lineNum, date, sender, reason, ref1, ref2, amount, saldo}) {
-    return (
-        <div class="attrLine">
-            <div class="L40">{lineNum}</div>
-            <div class="C100">{date}</div>
-            <div class="L110">{sender}</div>
-            <div class="L110">{reason}</div>
-            <div class="L110">{ref1}</div>
-            <div class="L110">{ref2}</div>
-            <div class="R105">{amount}</div>
-            <div class="R105">{saldo}</div>
-        </div>
-    )
-}
-
-
-
-export function FooterRow({left,right,prevFunc,nextFunc}) {
-    return(
-        <div class="attrLine">
-            <div class="L120">&nbsp;</div>
-            <div class="L166 key" onClick={(() => prevFunc())}>&lt;&lt;</div>
-            <div class="L280">{left}</div>
-            <div class="L280">{right}</div>
-            <div class="L166 key" onClick={(() => nextFunc())}>&gt;&gt;</div>
-       </div>
-    )
-}
-
-*/
 
 // openbalance.html
 export function OverviewRow({acct, amount, name1, name2}) { // 
@@ -125,7 +51,7 @@ export function prettyTXN(jHistory,hash,lPattern,aPattern,names,aLen,eLen) {
     var iBalance=0;
 
     var entry = [];
-    var credit = ['&nbsp;'];
+    var credit = [HTMLSPACE];
     var debit = ['','AN'];
     var aNames = [];
     var aAmount = [];
