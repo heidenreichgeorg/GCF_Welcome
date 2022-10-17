@@ -24,7 +24,7 @@ app.use(cors())
 const { networkInterfaces } = require('os');
 
 const nets = networkInterfaces();
-const results = Object.create(null); // Or just '{}', an empty object
+//const results = Object.create(null); // Or just '{}', an empty object
 
 
 // IMPORTS
@@ -484,4 +484,5 @@ app.post("/UPLOAD", (req, res) => {
     res.write("\n<HTML><HEAD><link rel='stylesheet' href='./FBA/mobile_green.css'/></HEAD><TITLE>UPLOAD Welcome</TITLE>INVALID SESSION FILE 'client' and/or 'year' missing</HTML>\n\n"); 
     res.end();
 });
+
 

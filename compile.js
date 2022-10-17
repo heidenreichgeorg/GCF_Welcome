@@ -11,6 +11,7 @@ const CSEP = ';';
 const J_ACCT = 6; // first account
 const J_MINROW=7;
 
+const Buffer = require('buffer' );
 
 const Account = require('./account');
 const Money = require('./money');
@@ -321,12 +322,58 @@ function init(app, argv) {
     });
 
 
+    app.get('/EXCEL', (req, res) => {
+        
+        console.log("\n"+Server.timeSymbol());
+        console.log("1600 GET EXCEL");
+        let session = null;
 
+        if(req.query.sessionId) {
+            session=Server.getSession(req.query.sessionId);
+            if(session) {
+                console.log("1610 GET EXCEL FOR "+session.id.slice(-4));
+        
+                if(session.sheetName) {
+                    let client = session.client;
+                    let year = session.year;
+                    let sheetName = session.sheetName;
+                    if(debugReport) console.log("1620 /EXCEL sheetName="+sheetName); 
+                    if(client && year) {
+
+                        let sessionTime=Server.timeSymbol();
+                        let nextSessionId= Server.strSymbol(sessionTime+client+year+sessionTime);
+
+                        if(debugReport) console.log("1630 sheets.xlsxWrite GET /EXCEL "+sheetName+ " for ("+client+","+year+") in file "+sheetFile);
+
+                        let jExcel = Sheets.makeXLTabs(sheetName,client,year,session.sheetCells,session.logT,session.addrT,null,sessionTime,nextSessionId);
+
+                        if(debugReport) console.log("1640 sheets.xlsxWrite GET /EXCEL JSON "+JSON.stringify(Object.keys(jExcel)));
+
+                        let monthYearHour = sessionTime.slice(4,10);
+            
+                        // download JSON-format of Excel file
+                        let fileName = session.year+session.client+monthYearHour+'XLSX.json';
+                        console.log("1650 app.post DOWNLOAD download JSON as "+fileName);
+
+                        res.set('Content-Disposition', 'attachment; fileName='+fileName);
+                        res.json(jExcel);    
+
+                        return;
+
+                    } else console.log("1621 sheets.xlsxWrite GET /EXCEL NO CLIENT NO YEAR");
+                } else console.log("1623 sheets.xlsxWrite GET /EXCEL NO SHEETNAME IN SESSION");
+            } else console.log("1625 sheets.xlsxWrite GET /EXCEL NO SESSION");
+        } else console.log("1627 sheets.xlsxWrite GET /EXCEL NO ID in QUERY");
+        res.end("NO FILE.");
+    } );
+    // get Excel by client
+    
 
 
     return processArgv(argv);
 }
 module.exports['init']=init;
+
 
 
 
@@ -1463,13 +1510,4 @@ async function send(res,gResponse) {
     res.end(); 
 }
 
-
-function datetime() { // same as in server.js
-    var u = new Date(Date.now()); 
-    return ''+ u.getUTCFullYear()+
-      ('0' + (1+u.getUTCMonth())).slice(-2) +
-      ('0' + u.getUTCDate()).slice(-2) + 
-      ('0' + u.getUTCHours()).slice(-2) +
-      ('0' + u.getUTCMinutes()).slice(-2);
-};     
 

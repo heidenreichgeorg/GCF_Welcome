@@ -363,7 +363,7 @@ function bookSheet(sessionId,tBuffer,sessionTime,nextSessionId) {
             if(client && year && session.sheetCells) {
 
                 var numLines = session.sheetCells.length;
-                if(debugWrite) console.log("2010 sheets.bookSheet ENTER "+session.sheetName+ " for ("+client+","+year+") with "+numLines+" lines in sheet ");
+                if(debugWrite) console.log("2010 sheets.bookSheet ENTER "+sheetName+ " for ("+client+","+year+") with "+numLines+" lines in sheet ");
                 
                 if(tBuffer) {
                     // add hash
@@ -462,236 +462,211 @@ function getNLine(aoaCells) {
 // skip tBuffer ??
 function xlsxWrite(sessionId,tBuffer,sessionTime,nextSessionId) {
 
-    // ignore session.sheetFile
-
     var session = Server.getSession(sessionId);
-
     if(session) {
-
+        // ignore session.sheetFile
         let sheetFile = getClientDir(session.client) + session.year + session.client + ".xlsx"
-
         if(sheetFile) {
             if(session.sheetName) {
-            let client = session.client;
-            let year = session.year;
+                let client = session.client;
+                let year = session.year;
+                let sheetName = session.sheetName;
+                if(client && year) {
+                        if(debugWrite) console.log("1400 sheets.xlsxWrite ENTER "+sheetName+ " for ("+client+","+year+") in file "+sheetFile);
 
-            if(client && year) {
+                        let jExcel = makeXLTabs(sheetName,client,year,session.sheetCells,session.logT,session.addrT,tBuffer,sessionTime,nextSessionId);
 
-                    if(debugWrite) console.log("1400 sheets.xlsxWrite ENTER "+session.sheetName+ " for ("+client+","+year+") in file "+sheetFile);
+                        let workBook = makeWorkBook(jExcel);
 
-                    var excelData=[];            
-                    var numLines = 0;
-                    var schemaLen = 0;
-
-                    if(session.sheetCells) {
-                        var r=0;
-
-                        numLines = session.sheetCells.length;
-                        schemaLen = session.sheetCells[H_LEN].length;
-                        // GH20220131
-                        let response = getNLine(session.sheetCells);
-                        let aLen = parseInt(response[D_Schema].assets);
-                        let eLen = parseInt(response[D_Schema].eqliab);
-                        console.dir("1410 sheets.xlsxWrite using aLen "+aLen+" schemaLen "+schemaLen+" for #"+numLines);
-
-                        var aCentsTotal=0;
-                        var eCentsTotal=0;
-                        for(;r<numLines;r++) {
-                            let arrNum = session.sheetCells[r];
-
-                            if(parseInt(arrNum[0])>0) {
-                            
-                                // 20220627 add all-String ASSET sum to arrTransaction
-                                var centsSum=0;
-                                for(var col=J_ACCT;col<aLen;col++) {
-                                    let cVal = Money.setEUMoney(arrNum[col]).cents;
-                                    if(cVal!=0) centsSum = cVal+centsSum;
-                                }
-                                arrNum[aLen]=Money.cents2EU(centsSum);
-                                if(centsSum!=0) {
-                                    aCentsTotal=aCentsTotal+centsSum;
-                                }
-
-                                // 20220628 add all-String GALS,EQLIAB sum to arrTransaction
-                                centsSum=0;
-                                for(var col=aLen+1;col<schemaLen;col++) {
-                                    let cVal = Money.setEUMoney(arrNum[col]).cents;
-                                    if(cVal!=0 && col!=eLen) centsSum = cVal+centsSum;
-                                }
-                                arrNum[eLen]=Money.cents2EU(centsSum);
-                                if(centsSum!=0) {
-                                    eCentsTotal=eCentsTotal+centsSum;
-                                }
-                            }
-                            
-                            var arrTransaction = numericSheet(arrNum,schemaLen);
-                            arrTransaction.push(CEND);
-                            excelData.push(arrTransaction);
-                        }
-                    } else console.error("1415 sheets.xlsxWrite NO sheetCells");
-
-                    console.dir("1416 sheets.xlsxWrite "+numLines+" lines with ASSETS "+Money.cents2EU(aCentsTotal)+"  and GALS+EQLIAB="+Money.cents2EU(eCentsTotal));
-
-                    var excelLogT=[];            
-                    var numLogs = 0;
-                    if(session.logT) {
-                        var s=0;
-                        for(let id in session.logT) {
-                            let arrLine = [ id, JSON.stringify(session.logT[id]) ];
-                            excelLogT.push(arrLine);
-                            numLogs++;
-                        }                       
-                    } else console.dir("1425 sheets.xlsxWrite NO LOGT");
-
-
-                    var excelAddrT=[];            
-                    var numAddrs = 0;
-                    try {
-                        if(session.addrT) {
-                            for(let id in session.addrT) {
-                                let title = [ id ];
-                                let arrLine = title.concat(session.addrT[id]);
-                                excelAddrT.push(arrLine);
-                                numAddrs++;
-                            }                       
-                        } else console.dir("1435 sheets.xlsxWrite NO ADDRT");
-                    } catch(err) {console.dir("1445 sheets.xlsxWrite ADDRT "+err);}
-
-
-                    if(tBuffer) {
-                        // add hash
-                        if(tBuffer[0]>0) tBuffer[0]=symbolic(tBuffer.join('')); 
-
-                        var arrTransaction = numericSheet(tBuffer,schemaLen);
-                        numLines = session.sheetCells.push(tBuffer); 
-                        arrTransaction.push(CEND);
-                        excelData.push(arrTransaction); 
-
-                        session.time=sessionTime;
-                        session.id=nextSessionId;
-
-                        // add new txn to JSON
-                        let len=session.sheetName.length;
-                        if(len>6) {
-
-                            if(debugWrite) console.log("1450 sheets.xlsxWrite JSON save2Server("+arrTransaction+") to "+client+","+year);
-                            save2Server(session,client,year);
-                            
-                        } else console.dir("1455 sheets.xlsxWrite can't write to "+session.sheetName);
-
-                        if(debugWrite) console.log("1460 sheets.xlsxWrite APPEND  "+JSON.stringify(tBuffer)+" to ("+client+","+year+") #"+numLines);
-                    }
-                    else if(debugWrite) console.log("1465 sheets.xlsxWrite SAVE NO TRANSACTION ("+client+","+year+") #"+numLines);
-
-
-
-                    // MAKE NEW SHEETS
-                    var  xSheet = XLSX.utils.json_to_sheet(excelData,{skipHeader:true });
-                    var  lSheet = null; if(excelLogT) lSheet=XLSX.utils.json_to_sheet(excelLogT,{skipHeader:true }); 
-                    var  aSheet = null; if(excelAddrT) aSheet=XLSX.utils.json_to_sheet(excelAddrT,{skipHeader:true }); 
-                    var  workBook = null;
-                    try{  
-                        workBook = XLSX.readFile(sheetFile);
-                        // GH20220118 workBook.Sheets[session.sheetName]=xSheet;
-                    } catch(err) { console.dir("1475 sheets.xlsxWrite FAILED to OPEN sheetFile "+sheetFile+" for ("+client+","+year+") #"+numLines);}
-
-                    if(workBook==null) {
-                        workBook = XLSX.utils.book_new();
-                        console.dir("1480 sheets.xlsxWrite CREATE new workbook for ("+client+","+year+") #"+numLines);
-                    }
-
-
-                    if(numLines>0 && excelData && xSheet) {
-                        if(workBook.Sheets && workBook.Sheets[session.sheetName]) {
-                            if(debugWrite) console.log("sheets.xlsxWrite UPDATE SHEET ("+client+year+") #"+numLines);
-                            workBook.Sheets[session.sheetName]=xSheet;                
-                        } else {
-                            // append did not work, so make a new one
-                            console.dir("1485 sheets.xlsxWrite CREATE SHEET "+session.sheetName+" for ("+client+","+year+") #"+numLines);
-                            XLSX.utils.book_append_sheet(workBook, xSheet, session.sheetName);
-                        }
-                        if(debugWrite) console.log("sheets.xlsxWrite SHEET ("+client+year+")  OK ");
-                    }
-
-
-                    if(numLogs>0 && excelLogT && lSheet) {
-                        if(workBook.Sheets && workBook.Sheets['LOGT']) {
-                            if(debugWrite) console.log("1490 sheets.xlsxWrite UPDATE SHEET LOGT #"+numLogs);
-                            workBook.Sheets['LOGT']=lSheet;                
-                        } else {
-                            // did not work
-                            console.dir("1495 sheets.xlsxWrite CREATE SHEET LOGT "+numLogs);
-                            XLSX.utils.book_append_sheet(workBook, lSheet, 'LOGT');
-                        }
-                        if(debugWrite) console.log("1500 sheets.xlsxWrite SHEET LOGT OK ");
-                    }
-
-
-                    if(numAddrs>0 && excelAddrT && aSheet) {
-                        if(workBook.Sheets && workBook.Sheets['ADDR']) {
-                            if(debugWrite) console.log("1510 sheets.xlsxWrite UPDATE SHEET ADDR #"+numAddrs);
-                            workBook.Sheets['ADDR']=aSheet;                
-                        } else {
-                            // did not work
-                            console.dir("1515 sheets.xlsxWrite CREATE SHEET ADDR #"+numAddrs);
-                            XLSX.utils.book_append_sheet(workBook, aSheet, 'ADDR');
-                        }
-                        if(debugWrite) console.log("1520 sheets.xlsxWrite SHEET ADDR OK ");
-                    }
-
-
-                    XLSX.writeFile(workBook, sheetFile);
-                    if(debugWrite)  console.log("1530 sheets.xlsxWrite WRITE FILE "+sheetFile);
-                    
+                        XLSX.writeFile(workBook, sheetFile);
+                        
+                        if(debugWrite)  console.log("1530 sheets.xlsxWrite WRITE FILE "+sheetFile);
+                        
+                    } else {
+                        console.dir("1535 sheets.xlsxWrite() NO client / year "+JSON.stringify(session));
+                    }   
                 } else {
-                    console.dir("1535 sheets.xlsxWrite() NO client / year "+JSON.stringify(session));
-                }   
+                    console.dir("1545 sheets.xlsxWrite() NO sheetName and NOT writing "+JSON.stringify(session));
+                }
             } else {
-                console.dir("1545 sheets.xlsxWrite() NO sheetName and NOT writing "+JSON.stringify(session));
+                console.dir("1555 sheets.xlsxWrite NO sheetFile and NOT writing "+JSON.stringify(session));
             }
         } else {
-                console.dir("1555 sheets.xlsxWrite NO sheetFile and NOT writing "+JSON.stringify(session));
+            console.dir("1565 sheets.xlsxWrite NO SESSION "+sessionId);
         }
-    } else {
-        console.dir("1565 sheets.xlsxWrite NO SESSION "+sessionId);
     }
-}
 module.exports['xlsxWrite']=xlsxWrite;
 
 
 
 
+function makeWorkBook(jExcel) {
 
+    var  workBook = null;
+    try{  
+        workBook = XLSX.readFile(sheetFile);
+        console.dir("1478 sheets.makeWorkBook READ workbook for ("+sheetName+")");
 
+    } catch(err) { console.dir("1477 sheets.makeWorkBook FAILED to OPEN sheetFile "+sheetFile+" for ("+sheetName+")");}
 
-function getFromFile(client,year,sFile,time,sName) {
+    if(workBook==null) {
+        workBook = XLSX.utils.book_new();
+        console.dir("1480 sheets.makeWorkBook CREATE new workbook for ("+sheetName+")");
+    }
 
-    var sheetCells=[];
-    var dir = getRoot()+client+Slash; // GH20220430
+    if(jExcel) {
+        let sheetName=jExcel.sheetName;
+        let sheetFile=jExcel.sheetFile;
 
-    if(debug) console.log("getFromFile "+sFile+" in "+dir);
+        for(tabName in jExcel) {
+            let jSheet = jExcel[tabName];
+            if(jSheet) {
+                let numLines = jSheet.length;
+                if(tabName===sheetFile) {
+                } else if(tabName===sheetName) {
+                } else if(numLines>0) {                    
+                    var  xSheet = XLSX.utils.json_to_sheet(jSheet,{skipHeader:true });
+                    if(xSheet) {
+                        if(workBook.Sheets && workBook.Sheets[sheetName]) {
+                            workBook.Sheets[sheetName]=xSheet;   
+                            if(debugWrite) console.log("1482 sheets.makeWorkBook UPDATE SHEET ("+tabName+") #"+numLines);
 
-    if(sFile) {
+                        } else {
+                            // append did not work, so make a new one
+                            XLSX.utils.book_append_sheet(workBook, xSheet, tabName);
+                            console.dir("1484 sheets.makeWorkBook CREATE SHEET "+sheetName+" for ("+tabName+") #"+numLines);
+                        }
+                        if(debugWrite) console.log("1486 sheets.makeWorkBook SHEET ("+tabName+")  OK ");
+                        
+                    } else console.log("1489 sheets.makeWorkBook SHEET ("+tabName+") BULDING X-SHEET FAILED");
+                } else console.log("147 sheets.makeWorkBook SHEET ("+tabName+") NO DATA IN PARAMETER");
+            } else console.log("1485 sheets.makeWorkBook SHEET ("+tabName+") NO TAB");
+        } // for
+    } else console.log("1481 sheets.makeWorkBook NO JSON INPUT");
 
-        let ext = sFile.split('\.').pop();
-
-        // temporary object names
-        if(ext==='csv') {
-            if(debug) console.log("getFromFile Found CSV in "+sFile);
-            sheetCells = readCSVFile(sFile);
-        }
-        else if(ext==='xlsx') {
-            if(debug) console.log("getFromFile Found XLSX in "+sFile);
-            sheetCells = readXLSXFile(sFile,sName);
-        }
-
-        var numLines = sheetCells.length;            
-        console.log("getFromFile Found "+sFile+" with "+numLines+" lines.");                    
-    }            
-
-    return sheetCells;
-       
+    return workBook;
 }
+module.exports['makeWorkBook']=makeWorkBook;
+
+
+function makeXLTabs(sheetName,client,year,sheetCells,logT,addrT,tBuffer,sessionTime,nextSessionId) {
+    // putrs three arrays into an array EXCEL-formatted tabs
+    var excelData=[];            
+    var numLines = 0;
+    var schemaLen = 0;
+
+    if(sheetCells) {
+        var r=0;
+
+        numLines = sheetCells.length;
+        schemaLen = sheetCells[H_LEN].length;
+        // GH20220131
+        let response = getNLine(sheetCells);
+        let aLen = parseInt(response[D_Schema].assets);
+        let eLen = parseInt(response[D_Schema].eqliab);
+        console.dir("1410 sheets.makeXLTabs using aLen "+aLen+" schemaLen "+schemaLen+" for #"+numLines);
+
+        var aCentsTotal=0;
+        var eCentsTotal=0;
+        for(;r<numLines;r++) {
+            let arrNum = sheetCells[r];
+
+            if(parseInt(arrNum[0])>0) {
+            
+                // 20220627 add all-String ASSET sum to arrTransaction
+                var centsSum=0;
+                for(var col=J_ACCT;col<aLen;col++) {
+                    let cVal = Money.setEUMoney(arrNum[col]).cents;
+                    if(cVal!=0) centsSum = cVal+centsSum;
+                }
+                arrNum[aLen]=Money.cents2EU(centsSum);
+                if(centsSum!=0) {
+                    aCentsTotal=aCentsTotal+centsSum;
+                }
+
+                // 20220628 add all-String GALS,EQLIAB sum to arrTransaction
+                centsSum=0;
+                for(var col=aLen+1;col<schemaLen;col++) {
+                    let cVal = Money.setEUMoney(arrNum[col]).cents;
+                    if(cVal!=0 && col!=eLen) centsSum = cVal+centsSum;
+                }
+                arrNum[eLen]=Money.cents2EU(centsSum);
+                if(centsSum!=0) {
+                    eCentsTotal=eCentsTotal+centsSum;
+                }
+            }
+            
+            var arrTransaction = numericSheet(arrNum,schemaLen);
+            arrTransaction.push(CEND);
+            excelData.push(arrTransaction);
+        }
+    } else console.error("1415 sheets.makeXLTabs NO sheetCells");
+
+    console.dir("1416 sheets.makeXLTabs "+numLines+" lines with ASSETS "+Money.cents2EU(aCentsTotal)+"  and GALS+EQLIAB="+Money.cents2EU(eCentsTotal));
+
+    var excelLogT=[];            
+    var numLogs = 0;
+    try {
+        if(logT) {
+            var s=0;
+            for(let id in logT) {
+                let arrLine = [ id, JSON.stringify(logT[id]) ];
+                excelLogT.push(arrLine);
+                numLogs++;
+            }                       
+        } else console.dir("1425 sheets.makeXLTabs NO LOGT");
+    } catch(err) {console.dir("1427 sheets.makeXLTabs ADDRT "+err);}
+
+
+    var excelAddrT=[];            
+    var numAddrs = 0;
+    try {
+        if(addrT) {
+            for(let id in addrT) {
+                let title = [ id ];
+                let arrLine = title.concat(addrT[id]);
+                excelAddrT.push(arrLine);
+                numAddrs++;
+            }                       
+        } else console.dir("1435 sheets.makeXLTabs NO ADDRT");
+    } catch(err) {console.dir("1437 sheets.makeXLTabs ADDRT "+err);}
+
+
+    if(tBuffer) {
+        // add hash
+        if(tBuffer[0]>0) tBuffer[0]=symbolic(tBuffer.join('')); 
+
+        var arrTransaction = numericSheet(tBuffer,schemaLen);
+        numLines = session.sheetCells.push(tBuffer); 
+        arrTransaction.push(CEND);
+        excelData.push(arrTransaction); 
+
+        session.time=sessionTime;
+        session.id=nextSessionId;
+
+        // add new txn to JSON
+        let len=sheetName.length;
+        if(len>6) {
+
+            if(debugWrite) console.log("1450 sheets.makeXLTabs JSON save2Server("+arrTransaction+") to "+client+","+year);
+            save2Server(session,client,year);
+            
+        } else console.dir("1455 sheets.makeXLTabs can't write to "+sheetName);
+
+        if(debugWrite) console.log("1460 sheets.makeXLTabs APPEND  "+JSON.stringify(tBuffer)+" to ("+client+","+year+") #"+numLines);
+    }
+    else if(debugWrite) console.log("1465 sheets.makeXLTabs SAVE NO TRANSACTION ("+client+","+year+") #"+numLines);
+
+    // make a TAB-structure
+    let fileName = client+year;
+    let excelTabs = {  'LOGT':excelLogT, 'ADDR':excelAddrT, 'sheetFile':fileName, 'sheetName':fileName };
+    excelTabs[fileName] = excelData;
+
+    console.log("1470 sheets.makeXLTabs RESULT  "+JSON.stringify(Object.keys(excelTabs)));
+    return excelTabs;
+}
+module.exports['makeXLTabs']=makeXLTabs;
+
 
 
 
@@ -848,3 +823,34 @@ function symbolic(pat) {
 module.exports['symbolic']=symbolic;
 
 
+
+/*
+function getFromFile(client,year,sFile,time,sName) {
+
+    var sheetCells=[];
+    var dir = getRoot()+client+Slash; // GH20220430
+
+    if(debug) console.log("getFromFile "+sFile+" in "+dir);
+
+    if(sFile) {
+
+        let ext = sFile.split('\.').pop();
+
+        // temporary object names
+        if(ext==='csv') {
+            if(debug) console.log("getFromFile Found CSV in "+sFile);
+            sheetCells = readCSVFile(sFile);
+        }
+        else if(ext==='xlsx') {
+            if(debug) console.log("getFromFile Found XLSX in "+sFile);
+            sheetCells = readXLSXFile(sFile,sName);
+        }
+
+        var numLines = sheetCells.length;            
+        console.log("getFromFile Found "+sFile+" with "+numLines+" lines.");                    
+    }            
+
+    return sheetCells;
+     
+}
+*/
