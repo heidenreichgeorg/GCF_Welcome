@@ -1,5 +1,5 @@
 
-let debug=null;
+let debug=1;
 
 
 // THIS WILL VIOLATE PRIVACY AT THE ADMIN CONSOLE !!! 
@@ -348,21 +348,14 @@ function init(app, argv) {
                         let jExcel = Sheets.makeXLTabs(sheetName,client,year,session.sheetCells,session.logT,session.addrT,null,sessionTime,nextSessionId);
 
                         if(debugReport) console.log("1640 sheets.xlsxWrite GET /EXCEL JSON "+JSON.stringify(Object.keys(jExcel)));
-
-                        let monthYearHour = sessionTime.slice(4,10);
-            
-                        // download JSON-format of Excel file
-                        let fileName = session.year+session.client+monthYearHour+'XLSX.json';
-                        console.log("1650 app.post DOWNLOAD download JSON as "+fileName);
-
-                        res.set('Content-Disposition', 'attachment; fileName='+fileName);
+                       
                         res.json(jExcel);    
-
+                        
                         return;
 
-                    } else console.log("1621 sheets.xlsxWrite GET /EXCEL NO CLIENT NO YEAR");
-                } else console.log("1623 sheets.xlsxWrite GET /EXCEL NO SHEETNAME IN SESSION");
-            } else console.log("1625 sheets.xlsxWrite GET /EXCEL NO SESSION");
+                    } else console.log("1621 sheets.xlsxWrite GET /EXCEL NO CLIENT NO YEAR"+JSON.stringify(Object.keys(session)));
+                } else console.log("1623 sheets.xlsxWrite GET /EXCEL NO SHEETNAME IN SESSION"+JSON.stringify(Object.keys(session)));
+            } else console.log("1625 sheets.xlsxWrite GET /EXCEL NO SESSION"+req.query.sessionId);
         } else console.log("1627 sheets.xlsxWrite GET /EXCEL NO ID in QUERY");
         res.end("NO FILE.");
     } );

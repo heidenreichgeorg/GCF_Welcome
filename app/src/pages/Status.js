@@ -1,7 +1,6 @@
 
 import { useEffect, useState } from 'react';
 import { utils, writeFile, readFile  } from 'xlsx';
-//import { book_new,json_to_sheet,book_append_sheet  } from 'xlsx';
 import Screen from '../pages/Screen'
 import FooterRow from '../components/FooterRow'
 import { iCpField, prettyTXN}  from '../modules/App';
@@ -29,38 +28,44 @@ export default function Status() {
     function nextFunc() {  console.log("CLICK NEXT");   window.location.href="http://localhost:3000/transfer"}
 
 
+    function handleXLSave() {
+        console.log("1110 Status.handleXLSave sessionId = "+session.id);
+        const rqOptions = { method: 'GET', headers: {  'Accept': 'application/json', 'Content-Type': 'application/json' } };       
+        try {
+            fetch(`${process.env.REACT_APP_API_HOST}/EXCEL?sessionId=${session.id}`, rqOptions)
+            .then(data => data.json())
+            .then(json => {
+                console.log("1120 handleXLSave EXCEL "+JSON.stringify(Object.keys(json)))
+                makeXLSButton(json)
+            })
+            .catch((err) => {
+                console.log("1127 handleXLSave ERR "+err)
+            })            
+        } catch(err) { console.log("1117 GET /ECEL handleXLSave:"+err);}
+        console.log("1140 Status.handleXLSave EXIT");
+    }
+
 
     function makeXLSButton(json) { 
 
+        console.log("1194 makeXLSButton ENTER "+JSON.stringify(Object.keys(json)));
+
         let xlsxFile = makeWorkBook(json);
 
-        writeFile(xlsxFile, "c:/Privat/HGKG/CLIENTXLSX.json");
 
-        /*
+        
         let a = document.createElement('a');
-        a.href = window.URL.createObjectURL(new Blob([blob], {type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"}));
+        a.href = window.URL.createObjectURL(new Blob([xlsxFile], {type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"}));
         a.download = "CLIENT.xlsx";
         a.style.display = 'block'; // was none
         a.className = "key";
+        a.innerHTML = "Download";
         document.body.appendChild(a); 
         console.log("1160 downloadButton make button");
-        */
+        
     };
       
 
-    function handleXLSave() {
-        console.log("1110 CloseAndSave sessionId = "+session.id);
-        
-        const rqOptions = { method: 'GET', headers: {  'Accept': 'application/json', 'Content-Type': 'application/json' } };
-        
-        try {
-            fetch(`${process.env.REACT_APP_API_HOST}/EXCEL?sessionId=${session.id}`, rqOptions)
-            .then((response) => makeXLSButton(response.body))
-            
-            
-        } catch(err) { console.log("1117 GET /ECEL handleXLSave:"+err);}
-        console.log("1190 CloseAndSave Download EXIT");
-    }
 
     let page = sheet[D_Page];
     let report = makeStatusData(sheet);
@@ -249,13 +254,13 @@ function makeWorkBook(jExcel) {
     let sheetFile=jExcel.sheetFile;
     try{  
         workBook = readFile(sheetFile);
-        console.dir("1478 sheets.makeWorkBook READ workbook for ("+sheetName+")");
+        console.dir("1478 Status.makeWorkBook READ workbook for ("+sheetName+")");
 
-    } catch(err) { console.dir("1477 sheets.makeWorkBook FAILED to OPEN sheetFile "+sheetFile+" for ("+sheetName+")");}
+    } catch(err) { console.dir("1477 Status.makeWorkBook FAILED to OPEN sheetFile "+sheetFile+" for ("+sheetName+")");}
 
     if(workBook==null) {
         workBook = utils.book_new();
-        console.dir("1480 sheets.makeWorkBook CREATE new workbook for ("+sheetName+")");
+        console.dir("1480 Status.makeWorkBook CREATE new workbook for ("+sheetName+")");
     }
 
     if(jExcel) {       
@@ -263,27 +268,34 @@ function makeWorkBook(jExcel) {
             let jSheet = jExcel[tabName];
             if(jSheet) {
                 let numLines = jSheet.length;
-                if(tabName===sheetFile) {
-                } else if(tabName===sheetName) {
+                if(tabName==='sheetFile') {
+                } else if(tabName==='sheetName') {
                 } else if(numLines>0) {                    
-                    var  xSheet = utils.json_to_sheet(jSheet,{skipHeader:true });
-                    if(xSheet) {
-                        if(workBook.Sheets && workBook.Sheets[sheetName]) {
-                            workBook.Sheets[sheetName]=xSheet;   
-                            console.log("1482 sheets.makeWorkBook UPDATE SHEET ("+tabName+") #"+numLines);
+                    try {
+                        console.log("1482 Status.makeWorkBook UPDATE SHEET ("+tabName+") #"+numLines);
+                        var  xSheet = utils.json_to_sheet(jSheet,{skipHeader:true });
+                        if(xSheet) {
+                            if(workBook.Sheets && workBook.Sheets[sheetName]) {
+                                workBook.Sheets[sheetName]=xSheet;   
+                                console.log("1484 Status.makeWorkBook UPDATE SHEET ("+tabName+") #"+numLines);
 
-                        } else {
-                            // append did not work, so make a new one
-                            utils.book_append_sheet(workBook, xSheet, tabName);
-                            console.dir("1484 sheets.makeWorkBook CREATE SHEET "+sheetName+" for ("+tabName+") #"+numLines);
-                        }
-                        console.log("1486 sheets.makeWorkBook SHEET ("+tabName+")  OK ");
-                        
-                    } else console.log("1489 sheets.makeWorkBook SHEET ("+tabName+") BULDING X-SHEET FAILED");
-                } else console.log("147 sheets.makeWorkBook SHEET ("+tabName+") NO DATA IN PARAMETER");
-            } else console.log("1485 sheets.makeWorkBook SHEET ("+tabName+") NO TAB");
+                            } else {
+                                // append did not work, so make a new one
+                                utils.book_append_sheet(workBook, xSheet, tabName);
+                                console.dir("1486 Status.makeWorkBook CREATE SHEET "+sheetName+" for ("+tabName+") #"+numLines);
+                            }
+                            console.log("1488 Status.makeWorkBook SHEET ("+tabName+")  OK ");
+                            
+                        } else console.log("1489 Status.makeWorkBook SHEET ("+tabName+") BULDING X-SHEET FAILED");
+                    } catch(err) {};
+
+                } else console.log("1487 Status.makeWorkBook SHEET ("+tabName+") NO DATA IN PARAMETER");
+            } else console.log("1485 Status.makeWorkBook SHEET ("+tabName+") NO TAB");
         } // for
-    } else console.log("1481 sheets.makeWorkBook NO JSON INPUT");
+    } else console.log("1481 Status.makeWorkBook NO JSON INPUT");
 
+    writeFile(workBook, "c:/Privat/HGKG/CLIENTXLSX.json");
+
+ // 1127 handleXLSave ERR Error: Unrecognized bookType |json|
     return workBook;
 }

@@ -503,28 +503,28 @@ module.exports['xlsxWrite']=xlsxWrite;
 function makeWorkBook(jExcel) {
 
     var  workBook = null;
-    try{  
-        workBook = XLSX.readFile(sheetFile);
-        console.dir("1478 sheets.makeWorkBook READ workbook for ("+sheetName+")");
-
-    } catch(err) { console.dir("1477 sheets.makeWorkBook FAILED to OPEN sheetFile "+sheetFile+" for ("+sheetName+")");}
-
-    if(workBook==null) {
-        workBook = XLSX.utils.book_new();
-        console.dir("1480 sheets.makeWorkBook CREATE new workbook for ("+sheetName+")");
-    }
-
     if(jExcel) {
         let sheetName=jExcel.sheetName;
         let sheetFile=jExcel.sheetFile;
 
+        try{  
+            workBook = XLSX.readFile(sheetFile);
+            console.dir("1478 sheets.makeWorkBook READ workbook for ("+sheetName+")");
+    
+        } catch(err) { console.dir("1477 sheets.makeWorkBook FAILED to OPEN sheetFile "+sheetFile+" for ("+sheetName+")");}
+    
+        if(workBook==null) {
+            workBook = XLSX.utils.book_new();
+            console.dir("1480 sheets.makeWorkBook CREATE new workbook for ("+sheetName+")");
+        }
+    
         for(tabName in jExcel) {
             let jSheet = jExcel[tabName];
             if(jSheet) {
                 let numLines = jSheet.length;
-                if(tabName===sheetFile) {
-                } else if(tabName===sheetName) {
-                } else if(numLines>0) {                    
+                if(tabName==='sheetFile') {
+                } else if(tabName==='sheetName') {
+                } else if(numLines>0 && jSheet.forEach!=null) {                    
                     var  xSheet = XLSX.utils.json_to_sheet(jSheet,{skipHeader:true });
                     if(xSheet) {
                         if(workBook.Sheets && workBook.Sheets[sheetName]) {
