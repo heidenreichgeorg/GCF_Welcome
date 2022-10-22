@@ -462,21 +462,30 @@ function getNLine(aoaCells) {
 // skip tBuffer ??
 function xlsxWrite(sessionId,tBuffer,sessionTime,nextSessionId) {
 
+    let sheetFile = "BOOKING.xlsx"
+    let client="client";
+    let year="YYYY";
     var session = Server.getSession(sessionId);
     if(session) {
+       
+
         // ignore session.sheetFile
-        let sheetFile = getClientDir(session.client) + session.year + session.client + ".xlsx"
+        sheetFile = getClientDir(session.client) + session.year + session.client + ".xlsx"
         if(sheetFile) {
             if(session.sheetName) {
-                let client = session.client;
-                let year = session.year;
+                client = session.client;
+                year = session.year;
                 let sheetName = session.sheetName;
                 if(client && year) {
                         if(debugWrite) console.log("1400 sheets.xlsxWrite ENTER "+sheetName+ " for ("+client+","+year+") in file "+sheetFile);
 
                         let jExcel = makeXLTabs(sheetName,client,year,session.sheetCells,session.logT,session.addrT,tBuffer,sessionTime,nextSessionId);
+                        // and write JSON file synchronously if there is a tBuffer
 
                         let workBook = makeWorkBook(jExcel);
+
+                        //csv = XLSX.stream.to_csv(jExcel.sheetName);
+                        //if(debugWrite)  console.log("1528 sheets.xlsxWriteMAKE CSV "+csv);
 
                         XLSX.writeFile(workBook, sheetFile);
                         
@@ -494,6 +503,9 @@ function xlsxWrite(sessionId,tBuffer,sessionTime,nextSessionId) {
         } else {
             console.dir("1565 sheets.xlsxWrite NO SESSION "+sessionId);
         }
+
+        // return csv;
+        return {'serverFile':sheetFile, 'localFile': (client+year+".xlsx"),'id':sessionId};
     }
 module.exports['xlsxWrite']=xlsxWrite;
 
@@ -548,7 +560,7 @@ function makeWorkBook(jExcel) {
 }
 module.exports['makeWorkBook']=makeWorkBook;
 
-
+// and write JSON file syncvhronously if there is a tBuffer
 function makeXLTabs(sheetName,client,year,sheetCells,logT,addrT,tBuffer,sessionTime,nextSessionId) {
     // putrs three arrays into an array EXCEL-formatted tabs
     var excelData=[];            
@@ -604,18 +616,18 @@ function makeXLTabs(sheetName,client,year,sheetCells,logT,addrT,tBuffer,sessionT
 
     console.dir("1416 sheets.makeXLTabs "+numLines+" lines with ASSETS "+Money.cents2EU(aCentsTotal)+"  and GALS+EQLIAB="+Money.cents2EU(eCentsTotal));
 
+
     var excelLogT=[];            
     var numLogs = 0;
     try {
         if(logT) {
-            var s=0;
             for(let id in logT) {
-                let arrLine = [ id, JSON.stringify(logT[id]) ];
+                let logLine = title.concat(logT[id]);
                 excelLogT.push(arrLine);
                 numLogs++;
             }                       
         } else console.dir("1425 sheets.makeXLTabs NO LOGT");
-    } catch(err) {console.dir("1427 sheets.makeXLTabs ADDRT "+err);}
+    } catch(err) {console.dir("1427 sheets.makeXLTabs LOGT "+err);}
 
 
     var excelAddrT=[];            
@@ -644,7 +656,7 @@ function makeXLTabs(sheetName,client,year,sheetCells,logT,addrT,tBuffer,sessionT
         session.time=sessionTime;
         session.id=nextSessionId;
 
-        // add new txn to JSON
+        // add new txn to JSON and WRITE JSON file synchronously !!!
         let len=sheetName.length;
         if(len>6) {
 

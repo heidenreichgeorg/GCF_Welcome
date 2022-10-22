@@ -345,11 +345,26 @@ function init(app, argv) {
 
                         if(debugReport) console.log("1630 sheets.xlsxWrite GET /EXCEL "+sheetName+ " for ("+client+","+year+") in file "+sheetFile);
 
-                        let jExcel = Sheets.makeXLTabs(sheetName,client,year,session.sheetCells,session.logT,session.addrT,null,sessionTime,nextSessionId);
+                        // may use sam time and id
+                        let fileName = Sheets.xlsxWrite(session.id,null,sessionTime,nextSessionId);
+                        // makeXLTabs(sheetName,client,year,session.sheetCells,session.logT,session.addrT,null,sessionTime,nextSessionId);
 
                         if(debugReport) console.log("1640 sheets.xlsxWrite GET /EXCEL JSON "+JSON.stringify(Object.keys(jExcel)));
                        
-                        res.json(jExcel);    
+
+/*                          
+                            // Image will be stored at this path
+                            const path = `${__dirname}/files/img.jpeg`; 
+                            const filePath = fs.createWriteStream(path);
+                            res.pipe(filePath);
+                            filePath.on('finish',() => {
+                                filePath.close();
+                                console.log('Download Completed'); 
+                            })
+                        })
+*/                        
+
+                        res.send(fileName);    
                         
                         return;
 

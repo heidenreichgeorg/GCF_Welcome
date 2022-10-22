@@ -1,6 +1,6 @@
 
 import { useEffect, useState } from 'react';
-import { utils, writeFile, readFile  } from 'xlsx';
+import { utils, stream  } from 'xlsx';
 import Screen from '../pages/Screen'
 import FooterRow from '../components/FooterRow'
 import { iCpField, prettyTXN}  from '../modules/App';
@@ -35,8 +35,8 @@ export default function Status() {
             fetch(`${process.env.REACT_APP_API_HOST}/EXCEL?sessionId=${session.id}`, rqOptions)
             .then(data => data.json())
             .then(json => {
-                console.log("1120 handleXLSave EXCEL "+JSON.stringify(Object.keys(json)))
-                makeXLSButton(json)
+                console.log("1120 handleXLSave EXCEL "+JSON.stringify(json))
+                //makeXLSButton(csv)
             })
             .catch((err) => {
                 console.log("1127 handleXLSave ERR "+err)
@@ -46,17 +46,14 @@ export default function Status() {
     }
 
 
-    function makeXLSButton(json) { 
+    function makeXLSButton(csv) { 
 
-        console.log("1194 makeXLSButton ENTER "+JSON.stringify(Object.keys(json)));
-
-        let xlsxFile = makeWorkBook(json);
-
-
+    
+        console.log("1198 makeXLSButton csv "+csv);
         
         let a = document.createElement('a');
-        a.href = window.URL.createObjectURL(new Blob([xlsxFile], {type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"}));
-        a.download = "CLIENT.xlsx";
+        a.href = window.URL.createObjectURL(csv, {type: "text/csv"});
+        a.download = "CLIENT.csv";
         a.style.display = 'block'; // was none
         a.className = "key";
         a.innerHTML = "Download";
@@ -247,55 +244,5 @@ function StatusRow({ am1,tx1, am2, tx2, am3, tx3, d, n, l}) {
     )
 }
 
-function makeWorkBook(jExcel) {
 
-    var  workBook = null;
-    let sheetName=jExcel.sheetName;
-    let sheetFile=jExcel.sheetFile;
-    try{  
-        workBook = readFile(sheetFile);
-        console.dir("1478 Status.makeWorkBook READ workbook for ("+sheetName+")");
 
-    } catch(err) { console.dir("1477 Status.makeWorkBook FAILED to OPEN sheetFile "+sheetFile+" for ("+sheetName+")");}
-
-    if(workBook==null) {
-        workBook = utils.book_new();
-        console.dir("1480 Status.makeWorkBook CREATE new workbook for ("+sheetName+")");
-    }
-
-    if(jExcel) {       
-        for(let tabName in jExcel) {         
-            let jSheet = jExcel[tabName];
-            if(jSheet) {
-                let numLines = jSheet.length;
-                if(tabName==='sheetFile') {
-                } else if(tabName==='sheetName') {
-                } else if(numLines>0) {                    
-                    try {
-                        console.log("1482 Status.makeWorkBook UPDATE SHEET ("+tabName+") #"+numLines);
-                        var  xSheet = utils.json_to_sheet(jSheet,{skipHeader:true });
-                        if(xSheet) {
-                            if(workBook.Sheets && workBook.Sheets[sheetName]) {
-                                workBook.Sheets[sheetName]=xSheet;   
-                                console.log("1484 Status.makeWorkBook UPDATE SHEET ("+tabName+") #"+numLines);
-
-                            } else {
-                                // append did not work, so make a new one
-                                utils.book_append_sheet(workBook, xSheet, tabName);
-                                console.dir("1486 Status.makeWorkBook CREATE SHEET "+sheetName+" for ("+tabName+") #"+numLines);
-                            }
-                            console.log("1488 Status.makeWorkBook SHEET ("+tabName+")  OK ");
-                            
-                        } else console.log("1489 Status.makeWorkBook SHEET ("+tabName+") BULDING X-SHEET FAILED");
-                    } catch(err) {};
-
-                } else console.log("1487 Status.makeWorkBook SHEET ("+tabName+") NO DATA IN PARAMETER");
-            } else console.log("1485 Status.makeWorkBook SHEET ("+tabName+") NO TAB");
-        } // for
-    } else console.log("1481 Status.makeWorkBook NO JSON INPUT");
-
-    writeFile(workBook, "c:/Privat/HGKG/CLIENTXLSX.json");
-
- // 1127 handleXLSave ERR Error: Unrecognized bookType |json|
-    return workBook;
-}
