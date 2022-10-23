@@ -212,7 +212,7 @@ export default function Transfer() {
     let report = makeTransferData(sheet,iRow)
 
     function prevFunc() {console.log("CLICK PREVIOUS"); window.location.href="http://localhost:3000/status" }
-    function nextFunc() {  console.log("CLICK NEXT");   window.location.href="http://localhost:3000/history"}
+    function nextFunc() {  console.log("CLICK NEXT");   window.location.href="http://localhost:3000/balance"}
 
     let page = sheet[D_Page];
 
