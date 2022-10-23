@@ -3,7 +3,7 @@ let debug=1;
 
 
 // THIS WILL VIOLATE PRIVACY AT THE ADMIN CONSOLE !!! 
-let debugReport=null;
+let debugReport=1;
 
 // table parsing
 const CEND= '|';
@@ -12,6 +12,7 @@ const J_ACCT = 6; // first account
 const J_MINROW=7;
 
 const Buffer = require('buffer' );
+const fs = require('fs');
 
 const Account = require('./account');
 const Money = require('./money');
@@ -188,8 +189,8 @@ function init(app, argv) {
             console.log("0015 app.post BOOK NO sessionId");
         }
 
-        res.writeHead(Sheets.HTTP_OK, {"Content-Type": "text/html"});       
-        res.end("\n"+result+".\n");
+        //res.writeHead(Sheets.HTTP_OK, {"Content-Type": "text/html"});       
+        res.send("\n"+result+".\n");
     });
 
 
@@ -304,6 +305,7 @@ function init(app, argv) {
             let sessionTime=Server.timeSymbol();
             let monthYearHour = sessionTime.slice(4,10);
 
+            // no state change, because no tBuffer is given
             Sheets.xlsxWrite(sessionId,null,sessionTime,sessionId); 
             console.log("1530 app.post DOWNLOAD writing XLSX");
 
@@ -343,35 +345,20 @@ function init(app, argv) {
                         let sessionTime=Server.timeSymbol();
                         let nextSessionId= Server.strSymbol(sessionTime+client+year+sessionTime);
 
-                        if(debugReport) console.log("1630 sheets.xlsxWrite GET /EXCEL "+sheetName+ " for ("+client+","+year+") in file "+sheetFile);
+                        if(debugReport) console.log("1630 GET /EXCEL "+sheetName+ " for ("+client+","+year+")");
 
-                        // may use sam time and id
-                        let fileName = Sheets.xlsxWrite(session.id,null,sessionTime,nextSessionId);
-                        // makeXLTabs(sheetName,client,year,session.sheetCells,session.logT,session.addrT,null,sessionTime,nextSessionId);
+                        // may use same time and id because no tBuffer is given
+                        let fileSig = Sheets.xlsxWrite(session.id,null,sessionTime,nextSessionId);
 
-                        if(debugReport) console.log("1640 sheets.xlsxWrite GET /EXCEL JSON "+JSON.stringify(Object.keys(jExcel)));
-                       
+                        if(debugReport) console.log("1640 GET /EXCEL JSON "+JSON.stringify(fileSig));
 
-/*                          
-                            // Image will be stored at this path
-                            const path = `${__dirname}/files/img.jpeg`; 
-                            const filePath = fs.createWriteStream(path);
-                            res.pipe(filePath);
-                            filePath.on('finish',() => {
-                                filePath.close();
-                                console.log('Download Completed'); 
-                            })
-                        })
-*/                        
-
-                        res.send(fileName);    
-                        
+                        sendFile(fileSig, res);
+                            // close file
                         return;
-
-                    } else console.log("1621 sheets.xlsxWrite GET /EXCEL NO CLIENT NO YEAR"+JSON.stringify(Object.keys(session)));
-                } else console.log("1623 sheets.xlsxWrite GET /EXCEL NO SHEETNAME IN SESSION"+JSON.stringify(Object.keys(session)));
-            } else console.log("1625 sheets.xlsxWrite GET /EXCEL NO SESSION"+req.query.sessionId);
-        } else console.log("1627 sheets.xlsxWrite GET /EXCEL NO ID in QUERY");
+                    } else console.log("1621 GET /EXCEL NO CLIENT NO YEAR"+JSON.stringify(Object.keys(session)));
+                } else console.log("1623 GET /EXCEL NO SHEETNAME IN SESSION"+JSON.stringify(Object.keys(session)));
+            } else console.log("1625 GET /EXCEL NO SESSION"+req.query.sessionId);
+        } else console.log("1627 GET /EXCEL NO ID in QUERY");
         res.end("NO FILE.");
     } );
     // get Excel by client
@@ -383,7 +370,25 @@ function init(app, argv) {
 module.exports['init']=init;
 
 
-
+async function sendFile(sig, response) {  
+    // Check if file specified by the filePath exists
+    fs.exists(sig.serverFile, function (exists) {
+        if (exists) {
+            // Content-type is very interesting part that guarantee that
+            // Web browser will handle response in an appropriate manner.
+            //response.writeHead(200, {
+            //    "Content-Type": "application/octet-stream",
+            //    "Content-Disposition": "attachment; filename=" + sig.serverFile
+            //});
+            console.log("1650 TRANSFER "+sig.serverFile);
+            fs.createReadStream(sig.serverFile).pipe(response);
+            console.log("1660 PIPING "+sig.serverFile);
+            return;
+        }
+        response.writeHead(400, { "Content-Type": "text/plain" });
+        response.end("ERROR File does not exist");
+    });
+}
 
 // XBRL
 function initBalance() {

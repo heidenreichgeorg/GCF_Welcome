@@ -363,7 +363,7 @@ function bookSheet(sessionId,tBuffer,sessionTime,nextSessionId) {
             if(client && year && session.sheetCells) {
 
                 var numLines = session.sheetCells.length;
-                if(debugWrite) console.log("2010 sheets.bookSheet ENTER "+sheetName+ " for ("+client+","+year+") with "+numLines+" lines in sheet ");
+                if(debugWrite) console.log("2010 sheets.bookSheet ENTER "+session.sheetName+ " for ("+client+","+year+") with "+numLines+" lines in sheet ");
                 
                 if(tBuffer) {
                     // add hash

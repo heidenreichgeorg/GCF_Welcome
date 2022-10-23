@@ -1,6 +1,6 @@
 
 import { useEffect, useState } from 'react';
-import { utils, stream  } from 'xlsx';
+
 import Screen from '../pages/Screen'
 import FooterRow from '../components/FooterRow'
 import { iCpField, prettyTXN}  from '../modules/App';
@@ -30,36 +30,34 @@ export default function Status() {
 
     function handleXLSave() {
         console.log("1110 Status.handleXLSave sessionId = "+session.id);
-        const rqOptions = { method: 'GET', headers: {  'Accept': 'application/json', 'Content-Type': 'application/json' } };       
+        const rqOptions = { method: 'GET', headers: {  'Accept': 'application/octet-stream'}};
+        // for the POST body : , 'Content-Type': 'application/octet-stream'
         try {
+            
             fetch(`${process.env.REACT_APP_API_HOST}/EXCEL?sessionId=${session.id}`, rqOptions)
-            .then(data => data.json())
-            .then(json => {
-                console.log("1120 handleXLSave EXCEL "+JSON.stringify(json))
-                //makeXLSButton(csv)
-            })
-            .catch((err) => {
-                console.log("1127 handleXLSave ERR "+err)
-            })            
+            .then((response) => response.blob())
+            .then((blob) => URL.createObjectURL(blob))
+            .then((url) => console.log("1120 handleXLSave URL= "+ makeXLSButton(url)))
+            .catch((err) => console.error("1127 handleXLSave ERR "+err));
+            
         } catch(err) { console.log("1117 GET /ECEL handleXLSave:"+err);}
         console.log("1140 Status.handleXLSave EXIT");
     }
 
+    function makeXLSButton(url) { 
 
-    function makeXLSButton(csv) { 
-
-    
-        console.log("1198 makeXLSButton csv "+csv);
+        console.log("1196 makeXLSButton XLSX "+url);
         
         let a = document.createElement('a');
-        a.href = window.URL.createObjectURL(csv, {type: "text/csv"});
-        a.download = "CLIENT.csv";
+        a.href = url
+        a.download = "CLIENT.XLSX";
         a.style.display = 'block'; // was none
         a.className = "key";
         a.innerHTML = "Download";
         document.body.appendChild(a); 
-        console.log("1160 downloadButton make button");
+        console.log("1198 downloadButton make button");
         
+        return url;
     };
       
 
