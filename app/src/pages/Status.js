@@ -134,7 +134,7 @@ function makeStatusData(response) {
     if(maxCom>maxRow) maxRow=maxCom;
     if(maxCor>maxRow) maxRow=maxCor;
 
-    let statusData = []; for(let i=0;i<=maxRow;i++) statusData[i]={};
+    let statusData = []; for(let i=0;i<=maxRow && i<SCREENLINES;i++) statusData[i]={};
     
     let iLeft=0;
     statusData[iLeft++].nLeft= "Assets";
@@ -146,10 +146,12 @@ function makeStatusData(response) {
 
         console.log("STATUS.JS STATUSDATA LEFT "+iLeft+" "+name+"="+gross);
 
-        statusData[iLeft]={"gLeft":gross,"nLeft":iName};
+        if(iLeft<SCREENLINES) {
+            statusData[iLeft]={"gLeft":gross,"nLeft":iName};
+        }
         iLeft++;
     }
-    for (let i=iLeft;i<maxRow;i++) { statusData[i]={ "gLeft":" ", "nLeft": " " }; }
+    for (let i=iLeft;i<maxRow && i<SCREENLINES;i++) { statusData[i]={ "gLeft":" ", "nLeft": " " }; }
 
 
     let iMidl=0;
@@ -164,7 +166,7 @@ function makeStatusData(response) {
         statusData[iMidl].nMidl = iName;
         iMidl++;
     }
-    for (let i=iMidl;i<maxRow;i++) { statusData[i].gMidl=' '; statusData[i].nMidl=' '; }
+    for (let i=iMidl;i<maxRow && i<SCREENLINES;i++) { statusData[i].gMidl=' '; statusData[i].nMidl=' '; }
 
 
     let iRite=0;
@@ -175,11 +177,14 @@ function makeStatusData(response) {
         var gross = account.gross;
         var iName = account.name;
 
-        statusData[iRite].gRite = gross;
-        statusData[iRite].nRite = iName;
-        iRite++;
+        if(iRite<SCREENLINES) {
+            statusData[iRite].gRite = gross;
+            statusData[iRite].nRite = iName;
+            iRite++;
+        }
+        
     }
-    for (let i=iRite;i<maxRow;i++) { statusData[i].gRite=' '; statusData[i].nRite=' '; }
+    for (let i=iRite;i<maxRow && i<SCREENLINES;i++) { statusData[i].gRite=' '; statusData[i].nRite=' '; }
 
 
     // build fourth column with recent transactions
@@ -199,7 +204,7 @@ function makeStatusData(response) {
 
           //  console.log("Status TXN HASH "+bLine+":"+hash);
 
-            if(bLine<maxRow) {
+            if(bLine<maxRow && iTran<SCREENLINES) {
         
                 let jPrettyTXN = prettyTXN(jHistory,hash,null,null,names,aLen,eLen);
                 jPrettyTXN.credit.shift();

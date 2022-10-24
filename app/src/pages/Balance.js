@@ -7,7 +7,6 @@ import { D_Balance, D_History, D_Page, D_Report, D_Schema, X_ASSETS, X_EQLIAB, X
 import { useSession } from '../modules/sessionmanager';
 
 
-const SCREEN_TXNS=8;
 
 export default function Balance() {
 
@@ -97,68 +96,80 @@ function makeBalance(response) {
     if(maxCol>maxRow) maxRow=maxCol;
     if(maxCom>maxRow) maxRow=maxCom;
 
-    let balance = []; for(let i=0;i<=maxRow;i++) balance[i]={};
-    
-    let iLeft=0;
-    balance[iLeft++].am1= "Assets";
+    var eqliab=0;
+    var income=0;
 
-    for (let name in aLeft)   {
-        var account=aLeft[name];
-        var gross = account.gross;
-        var iName = account.name;
+    let balance = []; 
+ 
+    var iRite=2;
+    var iLeft=2;
+    balance.push({  });
+    balance.push({ 'tw1':jReport.xbrlAssets.de_DE, 'tx1':jReport.xbrlEqLiab.de_DE });
 
-        console.log("BALANCE.JS makeBalance LEFT "+iLeft+" "+name+"="+gross);
-
-        balance[iLeft]={"am1":gross,"tw1":iName};
-        iLeft++;
-    }
-
-    for (let i=iLeft;i<maxRow;i++) { balance[i]={ "am1":" ", "tw1": " " }; }
-
-
-
-
-
-    let iRite=0;    
-    for (let name in aRite)   {
-        var account=aRite[name];
-        var gross = account.gross;
-        var iName = account.name;
-        balance[iRite].am2=gross;balance[iRite].tw2=iName;
-        iRite++;
-    }
-
-    if(gls) {
-        balance[iRite].am2= gls.gross;
-        balance[iRite].tw2= gls.name;
-        iRite++;
+    for (let tag in jReport)   {
+        console.log("Report "+JSON.stringify(jReport[tag]));
         
-        balance[iRite].am2 = cents2EU(  
-            setEUMoney(gls.gross).cents
-            +setEUMoney(eql.gross).cents );
-    }
-    balance[iRite].tw2= "Equity/Liab";
-    iRite++;
+        var element = jReport[tag];
+        var level = element.level;
+        var account=element.account;
+        var gross = account.gross;
+        var iName = account.name;
+        var full_xbrl = account.xbrl;
 
-    for (let i=iRite;i<maxRow;i++) { balance[i].am2=" ";balance[i].tw2=" "; }; 
+        if(gross && iName && full_xbrl) {
+            // collect compute total right side amount
+            if(full_xbrl==='de-gaap-ci_bs.eqLiab') { eqliab=parseInt(gross.replace('.','').replace(',',''));  gross=cents2EU(eqliab); }
+            if(full_xbrl==='de-gaap-ci_is.netIncome.regular') { income=parseInt(gross.replace('.','').replace(',','')); }
+            if(full_xbrl==='de-gaap-ci_bs.eqLiab.income') { gross=cents2EU(eqliab+income); }
+
+            var xbrl = full_xbrl.split('\.');
+            var side = xbrl[1];
+            //var xbrl_pre = xbrl.pop()+'.'+xbrl.pop()+'.'+xbrl.pop();
+            console.log('makeBalance side='+side);
+
+            if(side==='ass') {
+                if(!balance[iLeft]) balance[iLeft]={};
+                balance[iLeft].tw1=iName;
+                if(level==1) { balance[iLeft].am1=gross; }
+                if(level==2) { balance[iLeft].am2=gross; }
+                if(level==3) { balance[iLeft].am3=gross; }
+                iLeft++;
+            } else {
+                if(!balance[iRite]) balance[iRite]={};
+                balance[iRite].tx1=iName;
+                if(level==1) { balance[iRite].an1=gross; }
+                if(level==2) { balance[iRite].an2=gross; }
+                if(level==3) { balance[iRite].an3=gross; }
+                iRite++;
+            }
+
+
+        } else {
+            // divider line out
+            console.log('makeBalance unknown '+JSON.stringify(account));
+        }
+    }
+
+    balance.push({  });
+    balance.push({  });
+
 
     return balance;
 }
 
+
 function BalanceRow({ jArgs }) {
     return(
         <div class="attrLine">
-            <div class="R90"> {jArgs.am1}</div>
-            <div class="L66"> {jArgs.tw1}</div>
-            <div class="L66"> {jArgs.tx1}</div>
-            <div class="L66"> {jArgs.ty1}</div>
-            <div class="L66"> {jArgs.tz1}</div>
-            <div class="L22">|&nbsp;</div>
+            <div class="L175"> {jArgs.tw1}</div>
+            <div class="R90"> {jArgs.am3}</div>
             <div class="R90"> {jArgs.am2}</div>
-            <div class="L66"> {jArgs.tw2}</div>
-            <div class="L66"> {jArgs.tx2}</div>
-            <div class="L66"> {jArgs.ty2}</div>
-            <div class="L66"> {jArgs.tz2}</div>
+            <div class="R90"> {jArgs.am1}</div>
+            <div class="L22">|&nbsp;</div>
+            <div class="L175"> {jArgs.tx1}</div>
+            <div class="R90"> {jArgs.an3}</div>
+            <div class="R90"> {jArgs.an2}</div>
+            <div class="R90"> {jArgs.an1}</div>
         </div>
     )
 }
