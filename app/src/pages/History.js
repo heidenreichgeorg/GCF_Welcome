@@ -36,9 +36,11 @@ export default function History() {
     for(let p=1;p<sPages-1;p++) aPages[p]='none'; 
     aPages[0]='block';
    
+    var search = ((e) => console.log(JSON.stringify(e.target)));
 
     return (
         <Screen prevFunc={prevFunc} nextFunc={nextFunc} tabSelector={aPages} >
+            <SearchForm handleSearch={search} sessionId={session.id}></SearchForm>
             {aPages.map((m,n) => ( 
                 <div class="ulliTab" id={"PageContent"+n} style= {{ 'display': m}} >
                     { sHistory.slice(n*SCREEN_TXNS,(n+1)*SCREEN_TXNS).map((row) => (  <SigRow row={row}/>  ))}
@@ -49,8 +51,6 @@ export default function History() {
             )}
         </Screen>
     )
-    {/*long1A="Heidenreich Grundbesitz KG" long1B="" long1C="Fürth HRA 10564" long1D="216_162_50652" */}
-    {/*long1A="DE46 7603 0080 0900 4976 10" long1B="2022" long1C="Dr. Georg Heidenreich" long1D="Erlangen"  */}
 }
 
 function SigRow(row) {
@@ -94,8 +94,7 @@ function SigRow(row) {
 function makeHistory(sheet) {       
 
     console.log("makeHistory sheet="+Object.keys(sheet));
- //   console.log("makeHistory sheet="+JSON.stringify(sheet));
-
+ 
 
     const arrHistory = [];                
     //const response = JSON.parse(strText);
@@ -143,9 +142,7 @@ function makeHistory(sheet) {
                         +CSEP+jPrettyTXN.credit.join(CSEP)
                         +CSEP+jPrettyTXN.debit.join(CSEP)+CSEP+CSEP+CSEP
                         ).split(CSEP);
-
-                    
-                    
+                   
                     var i=0;
                     var sigLine=[];
                     for (i=0;i< 6;i++) { sigLine.push(data[i]); }  
@@ -153,33 +150,26 @@ function makeHistory(sheet) {
                     var moneyLine=[];
                     for (i=6;i<13;i++) { moneyLine.push(data[i]); }  
                     
-                    arrHistory.push({'sig':sigLine.join(CSEP),'money':moneyLine.join(CSEP)});
-                    
-                    
+                    arrHistory.push({'sig':sigLine.join(CSEP),'money':moneyLine.join(CSEP)});                                        
                 }
             }
-
-
             for (let i=1;i<SCREEN_TXNS;i++) arrHistory.push({sig:CSEP+CSEP+CSEP+CSEP+CSEP,money:CSEP+CSEP+CSEP+CSEP+CSEP+CSEP});
-
-
-            /*
-            // 20220701 search pattern 
-            let sessionId = getId();
-            let searchForm = "<FORM><DIV class='L280'>"
-                +"<BUTTON autoFocus class='L66'>Search</BUTTON>"
-                +"Line:<INPUT TYPE='edit' NAME='LPATTERN'/>&nbsp;"
-            +"</DIV><DIV class='L280'>"
-                +"Acct:<INPUT TYPE='edit' NAME='APATTERN'/>"
-            +"</DIV><INPUT TYPE='hidden' NAME='sessionId' VALUE='"+sessionId+"'/></FORM>";
-            cursor=printHTML(cursor,searchForm);
-
-            setTrailer(pageGlobal, cursor);
-            setScreen(document,htmlPage);
-            */
         }
     }
     console.log("makeHistory="+JSON.stringify(arrHistory))
-
     return arrHistory;
 }  
+
+function SearchForm(sessionId) {
+    return (
+        <div class="attrLine">
+            <form onSubmit={(e)=>(console.log("SEARCH "+JSON.stringify(e.target)))} >                
+                <div class='R90'></div>                
+                <div class='L280'>Line:<input type='edit' name='LPATTERN'/>&nbsp;</div>                
+                <div class='L280'>Acct:<input type='edit' name='APATTERN'/></div>                
+                <input type='hidden' name='sessionId' defaultValue={sessionId}/>
+                <div class='R90'><button autoFocus class='L66 key'>Search</button></div>
+            </form>
+        </div>
+    )
+}

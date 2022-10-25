@@ -67,12 +67,16 @@ export default function Screen({ children, prevFunc, nextFunc, tabSelector }) {
     }
     
     return (
-        <div class="mTable">
-            
-            <div class="attrRow">
-                <div class="key" onClick={((e) => select('PageContent',-1))}><label class="form-control"><input type="radio" name="tabSelector" />Blank</label></div>
+        <div class="mTable">            
+            <div class="attrLine">
+                <div class="L66" onClick={((e) => select('PageContent',-1))}><label class="L66"><input type="radio" name="tabSelector" />__</label></div>
                 {tabSelector.map((row,tabNum) => (
-                    <div class="key" onClick={((e) => select('PageContent',{tabNum}))}><label class="form-control"><input type="radio" name="tabSelector" autoFocus={tabNum==0?"1":""} />{tabNum}</label></div>
+                    <div class="L66" onClick={((e) => select('PageContent',{tabNum}))}>
+                        <label class="L66">
+                            <input type="radio" name="tabSelector" autoFocus={tabNum==0?"1":""} />
+                            {tabNum}
+                        </label>
+                    </div>
                 ))}
             </div>
             <div>
