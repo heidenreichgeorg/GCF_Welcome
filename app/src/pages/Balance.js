@@ -25,27 +25,30 @@ export default function Balance() {
     function nextFunc() {  console.log("CLICK NEXT");   window.location.href="http://localhost:3000/history"}
 
     let page = sheet[D_Page];
-    let aPages = [];
     
+    let report = [ makeBalance(sheet,'init'), makeBalance(sheet,'gross') ];
 
-    let report = makeBalance(sheet);
 
-    const aNums = [0];
+    let aPages = [];
+    for(let p=1;p<report.length;p++) aPages[p]='none'; 
+    aPages[0]='block';
     return (
-        <Screen prevFunc={prevFunc} nextFunc={nextFunc} tabSelector={aNums} >
-            {
-                report.map((row) => (
+        <Screen prevFunc={prevFunc} nextFunc={nextFunc} tabSelector={aPages} >
+            {report.map((balance,n) => ( 
+            <div class="ulliTab" id={"PageContent"+n} style= {{ 'display': aPages[n]}} >
+                {balance.map((row) => (
                     <BalanceRow jArgs={row}/>    
-                ))
-            }
-            <FooterRow left={page["client"]}  right={page["register"]} prevFunc={prevFunc} nextFunc={nextFunc}/>
-            <FooterRow left={page["reference"]} right={page["author"]} prevFunc={prevFunc} nextFunc={nextFunc}/>
+                ))}           
+                <FooterRow left={page["client"]}  right={page["register"]} prevFunc={prevFunc} nextFunc={nextFunc}/>
+                <FooterRow left={page["reference"]} right={page["author"]} prevFunc={prevFunc} nextFunc={nextFunc}/>
+            </div>
+            ))}
         </Screen>
     )
 }
 
 
-function makeBalance(response) {
+function makeBalance(response,value) {
 
 
     var jReport = response[D_Report];
@@ -112,15 +115,15 @@ function makeBalance(response) {
         var element = jReport[tag];
         var level = element.level;
         var account=element.account;
-        var gross = account.gross;
+        var dispValue = account[value]; // account.gross;
         var iName = account.name;
         var full_xbrl = account.xbrl;
 
-        if(gross && iName && full_xbrl) {
+        if(dispValue && iName && full_xbrl) {
             // collect compute total right side amount
-            if(full_xbrl==='de-gaap-ci_bs.eqLiab') { eqliab=parseInt(gross.replace('.','').replace(',',''));  gross=cents2EU(eqliab); }
-            if(full_xbrl==='de-gaap-ci_is.netIncome.regular') { income=parseInt(gross.replace('.','').replace(',','')); }
-            if(full_xbrl==='de-gaap-ci_bs.eqLiab.income') { gross=cents2EU(eqliab+income); }
+            if(full_xbrl==='de-gaap-ci_bs.eqLiab') { eqliab=parseInt(dispValue.replace('.','').replace(',',''));  dispValue=cents2EU(eqliab); }
+            if(full_xbrl==='de-gaap-ci_is.netIncome.regular') { income=parseInt(dispValue.replace('.','').replace(',','')); }
+            if(full_xbrl==='de-gaap-ci_bs.eqLiab.income') { dispValue=cents2EU(eqliab+income); }
 
             var xbrl = full_xbrl.split('\.');
             var side = xbrl[1];
@@ -130,16 +133,16 @@ function makeBalance(response) {
             if(side==='ass') {
                 if(!balance[iLeft]) balance[iLeft]={};
                 balance[iLeft].tw1=iName;
-                if(level==1) { balance[iLeft].am1=gross; }
-                if(level==2) { balance[iLeft].am2=gross; }
-                if(level==3) { balance[iLeft].am3=gross; }
+                if(level==1) { balance[iLeft].am1=dispValue; }
+                if(level==2) { balance[iLeft].am2=dispValue; }
+                if(level==3) { balance[iLeft].am3=dispValue; }
                 iLeft++;
             } else {
                 if(!balance[iRite]) balance[iRite]={};
                 balance[iRite].tx1=iName;
-                if(level==1) { balance[iRite].an1=gross; }
-                if(level==2) { balance[iRite].an2=gross; }
-                if(level==3) { balance[iRite].an3=gross; }
+                if(level==1) { balance[iRite].an1=dispValue; }
+                if(level==2) { balance[iRite].an2=dispValue; }
+                if(level==3) { balance[iRite].an3=dispValue; }
                 iRite++;
             }
 

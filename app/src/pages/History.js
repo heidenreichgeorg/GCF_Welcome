@@ -28,11 +28,10 @@ export default function History() {
     function nextFunc() {  console.log("CLICK NEXT");   window.location.href="http://localhost:3000/status"}
 
     let page = sheet[D_Page];
-    let aPages = [];
     let sHistory=makeHistory(sheet);
-
-
     let sPages = sHistory.length / SCREEN_TXNS;    
+    
+    let aPages = [];
     for(let p=1;p<sPages-1;p++) aPages[p]='none'; 
     aPages[0]='block';
    
