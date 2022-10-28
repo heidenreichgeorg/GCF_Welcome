@@ -98,8 +98,8 @@ function makeBalance(response,value) {
 
     let balance = []; 
  
-    var iRite=2;
-    var iLeft=2;
+    var iRite=1;
+    var iLeft=1;
     balance.push({  });
     balance.push({ 'tw1':jReport.xbrlAssets.de_DE, 'tx1':jReport.xbrlEqLiab.de_DE });
 

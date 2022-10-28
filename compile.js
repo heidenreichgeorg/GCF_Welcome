@@ -408,7 +408,7 @@ function initBalance() {
         xbrlFixed  : { level:2, xbrl: "de-gaap-ci_bs.ass.fixAss", de_DE:'Anlagevermögen'},
         abrlABank: {   level:4, xbrl: "de-gaap-ci_bs.ass.currAss.cashEquiv.bank", de_DE:'Bankkonto'},
         abrlAmoney: {  level:3, xbrl: "de-gaap-ci_bs.ass.currAss.cashEquiv", de_DE:'Geldinstr.'},
-        xbrlCapTax: {  level:4, xbrl: "de-gaap-ci_bs.ass.currAss.receiv.other.otherTaxRec.CapTax", de_DE:'gez. KapSteuer'},      
+        xbrlPaidTax: { level:4, xbrl: "de-gaap-ci_bs.ass.currAss.receiv.other.otherTaxRec", de_DE:'gezahlte Steuer'},      
         xbrlArec:  {   level:3, xbrl: "de-gaap-ci_bs.ass.currAss.receiv", de_DE:'Forderungen'},
         xbrlAcurr:  {  level:2, xbrl: "de-gaap-ci_bs.ass.currAss", de_DE:'Umlaufvermögen'},
         xbrlAssets :{  level:1, xbrl: "de-gaap-ci_bs.ass", de_DE:'Aktiva'},
@@ -997,7 +997,7 @@ function sendBalance(balance) {
         element.account = Account.openAccount(Account.makeAccount(element.de_DE,element.xbrl),"0,00");
     }
 
-    var kestPaid,kesoPaid;
+    var cTaxPaid=0;
                 
     // ADD bAccounts' saldi to gReport
     for (let name in bAccounts)   {
@@ -1011,19 +1011,14 @@ function sendBalance(balance) {
                 
 
                 // GH20221028
-                if(axbrl.startsWith(bReport.xbrlRegular.xbrl)) {
+                if(axbrl.startsWith(bReport.xbrlRegular.xbrl)) {  // clear income
                     if(debugReport) console.log("compile.js sendBalance REGULAR:"+axbrl);
-                    account.next="0";
+                    account.next="0,00";
                 }
-                else if(name=='KEST') {
-                    kestPaid=Account.getSaldo(account);
-                    if(debugReport) console.log("compile.js sendBalance KEST Paid="+kestPaid);
-                    account.next="0";
-                }
-                else if(name=='KESO') {
-                    kesoPaid=Account.getSaldo(account);
-                    if(debugReport) console.log("compile.js sendBalance KESO Paid="+kesoPaid);
-                    account.next="0";
+                else if(axbrl.startsWith(bReport.xbrlPaidTax.xbrl)) { // move tax paid
+                    cTaxPaid += Money.setEUMoney(account.gross).cents;
+                    if(debugReport) console.log("compile.js sendBalance Tax Paid="+Money.cents2EU(cTaxPaid));
+                    account.next="0,00";
                 }
                 else account.next=account.gross;
 
@@ -1045,15 +1040,7 @@ function sendBalance(balance) {
             }
         }
     }
-
-
-    var kesoShares = distribute(Money.setEUMoney(kesoPaid),partners,'keso');
-    if(debugReport) console.log("compile.js sendBalance KESO  G"+kesoShares[0]+" E"+kesoShares[1]+" A"+kesoShares[2]+" K"+kesoShares[3]+" T"+kesoShares[4]+" L"+kesoShares[5]); 
-
-    var kestShares = distribute(Money.setEUMoney(kestPaid),partners,'kest');
-    if(debugReport) console.log("compile.js sendBalance KEST  G"+kestShares[0]+" E"+kestShares[1]+" A"+kestShares[2]+" K"+kestShares[3]+" T"+kestShares[4]+" L"+kestShares[5]); 
-
-
+    distribute({ 'cents':cTaxPaid },partners,'tax');
 
 
     // find common VAVA account GH202112222 and distribute current-year changes to partners
@@ -1116,7 +1103,7 @@ function sendBalance(balance) {
         var element = gReport[rxbrl];
         var account = element.account;
         account.gross=Account.getTransient(account);
-        account.next = "0";
+        account.next = "0,00";
 
         if(debugReport) console.log("compile.js sendBalance send1 REPORT("+element.de_DE+") "+JSON.stringify(element.account));           
     }
@@ -1149,12 +1136,11 @@ function sendBalance(balance) {
         varcap.netIncomeOTC=p.netIncomeOTC;
         varcap.netIncomeFin=p.netIncomeFin;
         varcap.gross=Account.getSaldo(varcap);
-        let mGross = Money.setEUMoney(varcap.gross);
-        let mIncome = Money.setEUMoney(varcap.income);
-        let mKestPaid = Money.setEUMoney(p.kest);
-        let mKesoPaid = Money.setEUMoney(p.keso);
-        varcap.next=  Money.cents2EU( mGross.cents + mIncome.cents - mKestPaid.cents- mKesoPaid.cents ); 
-        // GH 20221028 substract kestShare kesoShare
+        let mGross  =  Money.setEUMoney(varcap.gross);
+        let mIncome  = Money.setEUMoney(varcap.income);
+        let mTaxPaid = Money.setEUMoney(p.tax);
+        varcap.next =  Money.cents2EU( mGross.cents + mIncome.cents - mTaxPaid.cents ); 
+        // GH 20221028 substract paid tax
         if(debugReport) console.log('compile sendBalance  '+JSON.stringify(p) + " ==>> MODIFY K2xx "+JSON.stringify(varcap));
     }
 
