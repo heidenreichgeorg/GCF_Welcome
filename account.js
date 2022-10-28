@@ -2,7 +2,7 @@ const debug=null;
 
 const Money = require('./money.js');
 
-function makeAccount(n,x,d,c) { return { "name":n, "index":c, "xbrl":x, "desc":(d?d:n), "init":"0,00", "min":"0,00",  "credit":"0,00", "debit":"0,00" }; }
+function makeAccount(n,x,d,c) { return { "name":n, "index":c, "xbrl":x, "desc":(d?d:n), "init":"0,00", "min":"0,00",  "credit":"0,00", "debit":"0,00", "next":"0,00" }; }
 module.exports['makeAccount']=makeAccount;
 
 
@@ -47,7 +47,10 @@ function getNextYear(account) {
     var credit=Money.addEUMoney(account.credit,init);    
     var sum=Money.addEUMoney(account.debit,credit);    
     var next=sum;
-    if(account.income && parseFloat(account.income)!=0.0) next=Money.addEUMoney(account.income,sum);
+    if(account.income && parseFloat(account.income)!=0.0) {
+        next=Money.addEUMoney(account.income,sum);
+        console.log("getNexYear("+account.name+") = "+next);
+    }
     return Money.moneyString(next);
 }
 module.exports['getNextYear']=getNextYear;

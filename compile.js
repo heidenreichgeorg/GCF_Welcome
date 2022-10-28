@@ -18,6 +18,7 @@ const Account = require('./account');
 const Money = require('./money');
 const Sheets = require('./sheets');
 const Server = require('./server');
+const { stringify } = require('querystring');
 
 
 const D_Page = "Seite";   // client register reference author
@@ -407,6 +408,7 @@ function initBalance() {
         xbrlFixed  : { level:2, xbrl: "de-gaap-ci_bs.ass.fixAss", de_DE:'Anlagevermögen'},
         abrlABank: {   level:4, xbrl: "de-gaap-ci_bs.ass.currAss.cashEquiv.bank", de_DE:'Bankkonto'},
         abrlAmoney: {  level:3, xbrl: "de-gaap-ci_bs.ass.currAss.cashEquiv", de_DE:'Geldinstr.'},
+        xbrlCapTax: {  level:4, xbrl: "de-gaap-ci_bs.ass.currAss.receiv.other.otherTaxRec.CapTax", de_DE:'gez. KapSteuer'},      
         xbrlArec:  {   level:3, xbrl: "de-gaap-ci_bs.ass.currAss.receiv", de_DE:'Forderungen'},
         xbrlAcurr:  {  level:2, xbrl: "de-gaap-ci_bs.ass.currAss", de_DE:'Umlaufvermögen'},
         xbrlAssets :{  level:1, xbrl: "de-gaap-ci_bs.ass", de_DE:'Aktiva'},
@@ -1004,16 +1006,29 @@ function sendBalance(balance) {
             if(account && account.xbrl && account.xbrl.length>COLMIN) {
                 var axbrl = account.xbrl;
 
-                //if(axbrl.includes('receiv.other.otherTaxRec.CapTax')) {
-                if(name=='KEST') {
+                account.gross=Account.getSaldo(account); // GH20221028
+
+                
+
+                // GH20221028
+                if(axbrl.startsWith(bReport.xbrlRegular.xbrl)) {
+                    if(debugReport) console.log("compile.js sendBalance REGULAR:"+axbrl);
+                    account.next="0";
+                }
+                else if(name=='KEST') {
                     kestPaid=Account.getSaldo(account);
                     if(debugReport) console.log("compile.js sendBalance KEST Paid="+kestPaid);
+                    account.next="0";
                 }
-
-                if(name=='KESO') {
+                else if(name=='KESO') {
                     kesoPaid=Account.getSaldo(account);
                     if(debugReport) console.log("compile.js sendBalance KESO Paid="+kesoPaid);
+                    account.next="0";
                 }
+                else account.next=account.gross;
+
+
+
 
                 // search, find and update corresponding SYNTHETIC report account
                 for(let rxbrl in gReport) {
@@ -1022,7 +1037,9 @@ function sendBalance(balance) {
                     if(collect && axbrl.startsWith(element.xbrl)) {
                         element.account = Account.addEUMoney(collect,Account.getSaldo(account));
                         element.account.init = Money.moneyString(Money.addEUMoney(element.account.init, Money.setEUMoney(account.init))); // GH20220103 GH20220104 wrong gross value, contains init
-                        if(debugReport) console.log("compile.js sendBalance SYNTHETIC ("+name+"  "+axbrl+") IN "+element.de_DE + "   "+JSON.stringify(element.account));    
+                        element.account.next = Money.moneyString(Money.addEUMoney(element.account.next, Money.setEUMoney(account.next))); // GH20221028
+                        
+                        //if(debugReport) console.log("compile.js sendBalance SYNTHETIC ("+name+"  "+axbrl+") IN "+element.de_DE + "   "+JSON.stringify(element.account));    
                     }
                 }
             }
@@ -1099,6 +1116,8 @@ function sendBalance(balance) {
         var element = gReport[rxbrl];
         var account = element.account;
         account.gross=Account.getTransient(account);
+        account.next = "0";
+
         if(debugReport) console.log("compile.js sendBalance send1 REPORT("+element.de_DE+") "+JSON.stringify(element.account));           
     }
 
@@ -1117,8 +1136,12 @@ function sendBalance(balance) {
     distribute(netIncomeOTC,partners,'netIncomeOTC');
     // GH20220206
 
+
+
+
     
     // GH20220206 MODIFY K2xx accounts 
+    // substract KEST
     for (let id in partners) {
         var p=partners[id];
         var varcap=bAccounts[p.vk];
@@ -1126,8 +1149,13 @@ function sendBalance(balance) {
         varcap.netIncomeOTC=p.netIncomeOTC;
         varcap.netIncomeFin=p.netIncomeFin;
         varcap.gross=Account.getSaldo(varcap);
-        varcap.next=Account.getNextYear(varcap);
-        if(debugReport) console.log('compile sendBalance MODIFY K2xx accounts '+p.income + '>='+JSON.stringify(varcap));
+        let mGross = Money.setEUMoney(varcap.gross);
+        let mIncome = Money.setEUMoney(varcap.income);
+        let mKestPaid = Money.setEUMoney(p.kest);
+        let mKesoPaid = Money.setEUMoney(p.keso);
+        varcap.next=  Money.cents2EU( mGross.cents + mIncome.cents - mKestPaid.cents- mKesoPaid.cents ); 
+        // GH 20221028 substract kestShare kesoShare
+        if(debugReport) console.log('compile sendBalance  '+JSON.stringify(p) + " ==>> MODIFY K2xx "+JSON.stringify(varcap));
     }
 
 
@@ -1135,26 +1163,46 @@ function sendBalance(balance) {
 
     // build gResponse[D_Balance]==gross from bAccounts:normal Accounts
     // update gross result with saldo for each account
+    // clear CapTax accounts
     for (let name in bAccounts)   {
         // add gross saldo value
         if(name && name.length>=COLMIN) {
             var account=bAccounts[name];
             if(account && account.xbrl && account.xbrl.length>COLMIN) {
-                var grossAcc=account;
-                grossAcc.gross=Account.getSaldo(grossAcc);
-                gross[name]=grossAcc; 
-                if(debugReport) console.log("compile.js sendBalance2 ACCOUNT "+JSON.stringify(grossAcc));           
+                account.gross=Account.getSaldo(account);
+                
+                gross[name]=account; 
+                if(debugReport) console.log("compile.js sendBalance2 ACCOUNT "+JSON.stringify(account));           
             }
         }
     }
-/*
-    // transfer all history in reverse order
-    for (let hash in bHistory)   {
 
-        txns[hash]=bHistory[hash]; 
-        if(debugReport) console.log("compile js sendBalance3 HISTORY "+hash+"="+txns[hash]);           
+    
+
+    // GH20221028     
+    // ADD bAccounts' next to gReport.next
+    // this will overwrite the income accounts, as all other accounts.next are already set
+    for (let name in bAccounts)   {
+        if(name && name.length>=COLMIN) {
+            var account=bAccounts[name];
+            if(account && account.xbrl && account.xbrl.length>COLMIN
+                // && account.xbrl.startsWith(xbrlEqLiab) // GH20221028
+                 ) { 
+                var axbrl = account.xbrl;
+
+                for(let rxbrl in gReport) {
+                    var element=gReport[rxbrl];
+                    var collect=element.account;
+                    if(collect && axbrl.startsWith(element.xbrl)) {
+                        element.account.next = Money.moneyString(Money.addEUMoney(element.account.next, Money.setEUMoney(account.next))); 
+                        //if(debugReport) console.log("compile.js sendBalance SYNTHETIC  NEXT("+name+"  "+axbrl+") IN "+element.de_DE + "   "+JSON.stringify(element.account));    
+                    }
+                }
+            }
+        }
     }
-*/
+
+
     Object.keys(bHistory).reverse().map((hash,i) => {txns[i] = bHistory[hash]});
 
     
@@ -1163,9 +1211,6 @@ function sendBalance(balance) {
 
     // transfer schema information
     gResponse[D_Schema] = balance[D_Schema];
-
-
-
 
 
     // compensating closing statement
@@ -1365,14 +1410,14 @@ function makePage(balance) {
 
             for(let key in de_DE) {
                 page[key]=  de_DE[key];  
-                if(debug) console.log("compile makePage de_DE "+key+" -> "+de_DE[key]);
+                if(debug>1) console.log("compile makePage de_DE "+key+" -> "+de_DE[key]);
             }
 
             balance[D_Page] = page;
             // side-effect AND return value
 
             console.log();
-            if(debug) console.log("compile makePage "+JSON.stringify(Object.keys(page)));
+            if(debug>1) console.log("compile makePage "+JSON.stringify(Object.keys(page)));
 
         } else console.error("compile makePage:  NO schema");
     } else console.error("compile makePage: NO balance");

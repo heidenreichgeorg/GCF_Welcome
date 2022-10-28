@@ -26,7 +26,7 @@ export default function Balance() {
 
     let page = sheet[D_Page];
     
-    let report = [ makeBalance(sheet,'init'), makeBalance(sheet,'gross') ];
+    let report = [ makeBalance(sheet,'init'), makeBalance(sheet,'gross'), makeBalance(sheet,'next')  ];
 
 
     let aPages = [];
@@ -93,12 +93,6 @@ function makeBalance(response,value) {
         }
     }
     
-    let maxCol = 1+Object.keys(aLeft).length;
-    let maxCom = 3+Object.keys(aRite).length;
-    let maxRow= SCREENLINES;
-    if(maxCol>maxRow) maxRow=maxCol;
-    if(maxCom>maxRow) maxRow=maxCom;
-
     var eqliab=0;
     var income=0;
 
@@ -131,19 +125,23 @@ function makeBalance(response,value) {
             console.log('makeBalance side='+side);
 
             if(side==='ass') {
-                if(!balance[iLeft]) balance[iLeft]={};
-                balance[iLeft].tw1=iName;
-                if(level==1) { balance[iLeft].am1=dispValue; }
-                if(level==2) { balance[iLeft].am2=dispValue; }
-                if(level==3) { balance[iLeft].am3=dispValue; }
-                iLeft++;
+                if(iLeft<SCREENLINES) {
+                    if(!balance[iLeft]) balance[iLeft]={};
+                    balance[iLeft].tw1=iName;
+                    if(level==1) { balance[iLeft].am1=dispValue; }
+                    if(level==2) { balance[iLeft].am2=dispValue; }
+                    if(level==3) { balance[iLeft].am3=dispValue; }
+                    iLeft++;
+                }
             } else {
-                if(!balance[iRite]) balance[iRite]={};
-                balance[iRite].tx1=iName;
-                if(level==1) { balance[iRite].an1=dispValue; }
-                if(level==2) { balance[iRite].an2=dispValue; }
-                if(level==3) { balance[iRite].an3=dispValue; }
-                iRite++;
+                if(iRite<SCREENLINES) {
+                    if(!balance[iRite]) balance[iRite]={};
+                    balance[iRite].tx1=iName;
+                    if(level==1) { balance[iRite].an1=dispValue; }
+                    if(level==2) { balance[iRite].an2=dispValue; }
+                    if(level==3) { balance[iRite].an3=dispValue; }
+                    iRite++;
+                }
             }
 
 
@@ -153,8 +151,11 @@ function makeBalance(response,value) {
         }
     }
 
-    balance.push({  });
-    balance.push({  });
+    while(iRite<SCREENLINES && iLeft<SCREENLINES) {
+        balance.push({  });
+        iLeft++;
+        iRite++;
+    }
 
 
     return balance;
