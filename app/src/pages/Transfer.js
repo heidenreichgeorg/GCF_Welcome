@@ -248,7 +248,6 @@ export default function Transfer() {
                 /> 
                 <TransferRow/> 
                 <TransferRow/> 
-                <UpDownSubmitRow/>
             </form>
             <TransferRow/> 
             {
@@ -261,6 +260,8 @@ export default function Transfer() {
             <AcctButtonRow aGroup={names.slice(aLen+1,eLen)}/>
             <AcctButtonRow aGroup={names.slice(eLen+1)}/>
             <TransferRow/> 
+            <TransferRow/> 
+                <UpDownSubmitRow/>
             <TransferRow/> 
             <TransferRow/>
             <FooterRow left={page["client"]}  right={page["register"]} prevFunc={prevFunc} nextFunc={nextFunc}/>

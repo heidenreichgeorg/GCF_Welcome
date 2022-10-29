@@ -1136,12 +1136,22 @@ function sendBalance(balance) {
         varcap.netIncomeOTC=p.netIncomeOTC;
         varcap.netIncomeFin=p.netIncomeFin;
         varcap.gross=Account.getSaldo(varcap);
+        
+        // GH 20221028 substract paid tax
         let mGross  =  Money.setEUMoney(varcap.gross);
         let mIncome  = Money.setEUMoney(varcap.income);
         let mTaxPaid = Money.setEUMoney(p.tax);
         varcap.next =  Money.cents2EU( mGross.cents + mIncome.cents - mTaxPaid.cents ); 
-        // GH 20221028 substract paid tax
-        if(debugReport) console.log('compile sendBalance  '+JSON.stringify(p) + " ==>> MODIFY K2xx "+JSON.stringify(varcap));
+
+        // 20221029 detailed partner account info
+        p.init = varcap.init;
+        p.credit = varcap.credit;
+        p.debit = varcap.debit;
+        p.gross = varcap.gross;
+        p.next=varcap.next;
+
+
+        if(debugReport) console.log('compile sendBalance  '+JSON.stringify(p) + "\n ==>> MODIFY K2xx "+JSON.stringify(varcap));
     }
 
 

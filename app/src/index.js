@@ -6,6 +6,7 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 
 import Balance from './pages/Balance'
 import History from './pages/History'
+import Partner from './pages/Partner'
 import Status from './pages/Status'
 import Transfer from './pages/Transfer'
 import { SessionProvider } from './modules/sessionmanager';
@@ -14,6 +15,10 @@ const router = createBrowserRouter([
     {
         path: '/balance',
         element: <Balance />
+    },
+    {
+        path: '/partner',
+        element: <Partner />
     },
     {
         path: '/history',

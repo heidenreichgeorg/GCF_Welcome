@@ -24,7 +24,7 @@ export default function Status() {
 
     if(!sheet) return null; // 'Loading...';
 
-    function prevFunc() {console.log("CLICK PREVIOUS"); window.location.href="http://localhost:3000/history" }
+    function prevFunc() {console.log("CLICK PREVIOUS"); window.location.href="http://localhost:3000/partner" }
     function nextFunc() {  console.log("CLICK NEXT");   window.location.href="http://localhost:3000/transfer"}
 
 

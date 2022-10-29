@@ -25,7 +25,7 @@ export default function History() {
     if(!sheet) return null; //'Loading...';
 
     function prevFunc() {console.log("CLICK PREVIOUS"); window.location.href="http://localhost:3000/balance" }
-    function nextFunc() {  console.log("CLICK NEXT");   window.location.href="http://localhost:3000/status"}
+    function nextFunc() {  console.log("CLICK NEXT");   window.location.href="http://localhost:3000/partner"}
 
     let page = sheet[D_Page];
     let sHistory=makeHistory(sheet);
