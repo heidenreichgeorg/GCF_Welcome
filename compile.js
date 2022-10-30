@@ -1,4 +1,10 @@
 
+/*
+
+2021 - sales xbrl MIET
+
+*/
+
 let debug=1;
 
 
@@ -1547,6 +1553,14 @@ function processArgv(processArgv) {
 
     return instance;
 }
+
+
+function getRoot() {  return Sheets.getRoot(); }
+module.exports['getRoot']=getRoot;
+
+function getYear() {  return currentYear; }
+module.exports['getYear']=getYear;
+
 
 
 async function send(res,gResponse) {

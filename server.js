@@ -1,6 +1,9 @@
 // LOCAL START
 // node server.js root=d:\Privat\ auto=900
 
+
+// SET NEW URL localhost:81/LATEST?client=HGKG&year=2021&ext=JSON
+
 let debug=1;
 
 const HTTP_OK = 200;
@@ -76,7 +79,8 @@ function getClient(client) {
         console.log("\n0700  => (SESSION  time="+result.time+"  client="+result.client+"  year="+result.year+")");
     }
 
-    return result; 
+    if(result) return result.id;
+    else return null;
 }
 module.exports['getClient']=getClient;
 
@@ -107,76 +111,91 @@ function registerLink(command,htmlPage,sessionId) {
 }
 
 
-// TODO: process client year
+// WITH ACCESS TO SERVER CONSOLE ONLY
+// WITH THAt SERVER HOSTING THE dat.JSON as a file
+//start session with uploading the latest session file in a given base directory for a known client
+app.get("/LATEST", (req, res) => { 
+    let remote = req.socket.remoteAddress;
+    let rawData = req.query;
+
+    let base =  Compiler.getRoot();
+    console.log("0010 app.get \LATEST at base "+base+"  from "+remote);
+
+    if(rawData && rawData.client && rawData.client.length>2 ) { // && (rawData.client == "[a-zA-Z0-9]")) {
+        // Security sanitize input client
+        
+        if(rawData && rawData.year && rawData.year.length>2 && (parseInt(rawData.year)>1)) {
+            // Security sanitize input year
+
+            if(rawData.ext && rawData.ext.length>0) { //} && rawData.ext == "[a-zA-Z0-9]" ) {
+                // Security sanitize input ext
+
+
+                console.log("0014 app.get \LATEST "+JSON.stringify(rawData)+" from "+remote);
+
+                let client = rawData.client;
+                let year   = parseInt(rawData.year); // Security sanitize input year
+                let ext    = rawData.ext;
+                let dir=base+client+"/"+year+"/";
+
+                console.log("0020 app.get LATEST of year "+year+" in "+dir+"*."+ext);
+                let fileName = getMostRecentFile(dir,ext);
+                if(fileName) {
+
+                    
+                    var session = JSON.parse(fs.readFileSync(dir+fileName, 'utf8'));
+
+                    if(client===session.client) {
+
+                        let strTimeSymbol = timeSymbol();
+                        let time = strTimeSymbol;
+                        let year=session.year;
+                        console.log("LATEST 30 reading session="+JSON.stringify(Object.keys(session))); 
+
+
+                        // START A NEW SESSION
+                        let sessionId = strSymbol(time+client+year+time);
+                        session.id=sessionId;
+                        session.generated = Compiler.compile(session);
+                        session.ext=ext;
+                        setSession(session);
+
+
+                        sendDisplay(session,res);
+
+                    } else {
+                        console.dir("0071 app.get LATEST "+client+" dir contains "+session.client+" object!!");
+                        res.write('<DIV class="attrRow"><H1>['+base+'|'+client+'&nbsp;]</H1>'
+                            +'<DIV class="attrRow"><DIV class="C100"><BUTTON class="largeKey">STOP</BUTTON></DIV></DIV>'
+                            +'</DIV>'
+                        );
+                        res.end();
+                    }
+
+                    return;
+
+                } else console.log ( "0013 LATEST file not found for rawData="+JSON.stringify(rawData)+",addr="+remote);
+
+            } else console.log ( "0023 LATEST file no valid base for rawData="+JSON.stringify(rawData)+",addr="+remote);
+            
+        } else console.log ( "0017 LATEST file no valid client for rawData="+JSON.stringify(rawData)+",addr="+remote);
+    }
+
+    res.write("\n<HTML><HEAD><link rel='stylesheet' href='./FBA/mobile_green.css'/></HEAD><TITLE>Welcome</TITLE>INVALID SESSION FILE 'client' and/or 'base' and/or 'ext' missing</HTML>\n\n"); 
+    res.end();
+});
+
+
+// TODO process client 
 app.get('/SESSION', (_, res) => {
-    let sessionId = sy_findSessionId('HGKG','2022');
+    let sessionId = getClient('HGKG',);
     console.log("\n0880 GET /SESSION FOUND => "+sessionId);
     if(sessionId) res.json({ id: sessionId })
     else res.json({ id: '0123' })
 })
 
 
-// WITH ACCESS TO SERVER CONSOLE ONLY
-// WITH THAt SERVER HOSTING THE dat.JSON as a file
-//start session with uploading the latest session file in a given base directory for a known client
-app.get("/LATEST", (req, res) => { 
-    let remote = req.socket.remoteAddress;
-    console.log("0010 app.get LATEST from "+remote);
 
-    let rawData = req.query;
-
-    if(rawData && rawData.base && rawData.client && rawData.ext) {
-
-        let base = (rawData.base.slice(-1)==='\\' || rawData.base.slice(-1)==='/') ? rawData.base : rawData.base+"/";
-        let client  =  rawData.client;
-        //let clientFlag=rawData.clientSave; // 'JSON' to save JSON on client-side, for the client admin console
-        let ext    =   rawData.ext;
-        let dir=base+client+"/";
-
-        console.log("0020 app.get LATEST file in "+dir+"*."+ext);
-        let fileName = getMostRecentFile(dir,ext);
-        if(fileName) {
-
-            
-            var session = JSON.parse(fs.readFileSync(dir+fileName, 'utf8'));
-
-            if(client===session.client) {
-
-                let strTimeSymbol = timeSymbol();
-                let time = strTimeSymbol;
-                let year=session.year;
-                console.log("LATEST 30 reading session="+JSON.stringify(Object.keys(session))); 
-
-
-                // START A NEW SESSION
-                let sessionId = strSymbol(time+client+year+time);
-                session.id=sessionId;
-                session.generated = Compiler.compile(session);
-                session.ext=ext;
-                setSession(session);
-
-
-                sendDisplay(session,res);
-
-            } else {
-                console.dir("0071 app.get LATEST "+client+" dir contains "+session.client+" object!!");
-                res.write('<DIV class="attrRow"><H1>['+base+'|'+client+'&nbsp;]</H1>'
-                    +'<DIV class="attrRow"><DIV class="C100"><BUTTON class="largeKey">STOP</BUTTON></DIV></DIV>'
-                    +'</DIV>'
-                );
-                res.end();
-            }
-
-            return;
-
-        } else console.log ( "0013 LATEST file not found for rawData="+JSON.stringify(rawData)+",addr="+remote);
-    }
-
-
-
-    res.write("\n<HTML><HEAD><link rel='stylesheet' href='./FBA/mobile_green.css'/></HEAD><TITLE>Welcome</TITLE>INVALID SESSION FILE 'client' and/or 'base' and/or 'ext' missing</HTML>\n\n"); 
-    res.end();
-});
 
 
 // LOGIN clientSave=JSON -> admin console with OCR and auto-saving JSON
