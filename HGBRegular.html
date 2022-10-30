@@ -50,28 +50,28 @@
                     var element = jReport[tag];
                     var level = element.level;
                     var account=element.account;
-                    var gross = account.gross;
+                    var yearEnd = account.yearEnd;
                     var iName = account.name;
                     var full_xbrl = account.xbrl;
 
 
-                    if(gross && iName && full_xbrl) {
+                    if(yearEnd && iName && full_xbrl) {
                         // collect compute total right side amount
-                        if(full_xbrl==='de-gaap-ci_bs.eqLiab') { eqliab=parseInt(gross.replace('.','').replace(',',''));  gross=cents2EU(eqliab); }
-                        if(full_xbrl==='de-gaap-ci_is.netIncome.regular') { income=parseInt(gross.replace('.','').replace(',','')); }
-                        if(full_xbrl==='de-gaap-ci_bs.eqLiab.income') { gross=cents2EU(eqliab+income); }
+                        if(full_xbrl==='de-gaap-ci_bs.eqLiab') { eqliab=parseInt(yearEnd.replace('.','').replace(',',''));  yearEnd=cents2EU(eqliab); }
+                        if(full_xbrl==='de-gaap-ci_is.netIncome.regular') { income=parseInt(yearEnd.replace('.','').replace(',','')); }
+                        if(full_xbrl==='de-gaap-ci_bs.eqLiab.income') { yearEnd=cents2EU(eqliab+income); }
 
                         var xbrl = full_xbrl.split('\.');
                         var xbrl_pre = xbrl.pop()+'.'+xbrl.pop()+'.'+xbrl.pop();
 
                         if(level==1) {
-                            cursor=printFormat(cursor,[iName,' ',' ',' ',gross]);
+                            cursor=printFormat(cursor,[iName,' ',' ',' ',yearEnd]);
                         }
                         if(level==2) {
-                            cursor=printFormat(cursor,[iName,' ',gross]);
+                            cursor=printFormat(cursor,[iName,' ',yearEnd]);
                         }
                         if(level==3) {
-                            cursor=printFormat(cursor,[iName,gross]);
+                            cursor=printFormat(cursor,[iName,yearEnd]);
                         }
 
 

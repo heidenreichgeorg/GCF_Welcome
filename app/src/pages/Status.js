@@ -141,13 +141,13 @@ function makeStatusData(response) {
 
     for (let name in aLeft)   {
         var account=aLeft[name];
-        var gross = account.gross;
+        var yearEnd = account.yearEnd;
         var iName = account.name;
 
-        console.log("STATUS.JS STATUSDATA LEFT "+iLeft+" "+name+"="+gross);
+        console.log("STATUS.JS STATUSDATA LEFT "+iLeft+" "+name+"="+yearEnd);
 
         if(iLeft<SCREENLINES) {
-            statusData[iLeft]={"gLeft":gross,"nLeft":iName};
+            statusData[iLeft]={"gLeft":yearEnd,"nLeft":iName};
         }
         iLeft++;
     }
@@ -159,10 +159,10 @@ function makeStatusData(response) {
 
     for (let name in aMidl)   {
         var account=aMidl[name];
-        var gross = account.gross;
+        var yearEnd = account.yearEnd;
         var iName = account.name;
 
-        statusData[iMidl].gMidl = gross;
+        statusData[iMidl].gMidl = yearEnd;
         statusData[iMidl].nMidl = iName;
         iMidl++;
     }
@@ -174,11 +174,11 @@ function makeStatusData(response) {
 
     for (let name in aRite)   {
         var account=aRite[name];
-        var gross = account.gross;
+        var yearEnd = account.yearEnd;
         var iName = account.name;
 
         if(iRite<SCREENLINES) {
-            statusData[iRite].gRite = gross;
+            statusData[iRite].gRite = yearEnd;
             statusData[iRite].nRite = iName;
             iRite++;
         }

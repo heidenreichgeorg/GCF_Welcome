@@ -19,8 +19,8 @@ export default function Partner() {
 
     if(!sheet) return null; //'Loading...';
 
-    function prevFunc() {console.log("CLICK PREVIOUS"); window.location.href="http://localhost:3000/transfer" }
-    function nextFunc() {  console.log("CLICK NEXT");   window.location.href="http://localhost:3000/history"}
+    function prevFunc() {console.log("CLICK PREVIOUS"); window.location.href="http://localhost:3000/history" }
+    function nextFunc() {  console.log("CLICK NEXT");   window.location.href="http://localhost:3000/transfer"}
     
     let page = sheet[D_Page];
     
@@ -28,12 +28,7 @@ export default function Partner() {
     console.log("Partner() with response D_Report"+JSON.stringify(jReport));
 
     let aPages = [];
-/*
-    let numPages = 1+jReport.length/SCREENLINES;
 
-    for(let p=1;p<numPages;p++) aPages[p]='none'; 
-    aPages[0]='block';
-*/
     let jLength = Object.keys(jReport).length;
     let  filler=[];
     for(let p=jLength;p<SCREENLINES;p++) {
@@ -44,7 +39,7 @@ export default function Partner() {
         <Screen prevFunc={prevFunc} nextFunc={nextFunc} tabSelector={aPages} >
             
             <div class="ulliTab" id={"PageContent1"} style= {{ 'display': 'block'}} >
-            <PartnerRow p={ {'name':'name', 'init':'init', 'credit':'credit', 'debit':'debit', 'gross':'gross', 'income':'income', 'tax':'tax', 'next':'next'} } />
+            <PartnerRow p={ {'name':'name', 'init':'init', 'credit':'credit', 'debit':'debit', 'yearEnd':'yearEnd', 'netIncomeOTC':'netIncomeOTC', 'netIncomeFin':'netIncomeFin', 'close':'close', 'tax':'tax', 'next':'next'} } />
                 {Object.keys(jReport).map((id) => (
                     <PartnerRow p={jReport[id]}/>    
                 ))}           
@@ -69,14 +64,14 @@ function PartnerRow(mRow) {
     return (
 
         <div class="attrLine">
-            <div class="L22">&nbsp;</div>
             <div class="L66">{mRow.p.name}</div>
-            <div class="L22">&nbsp;</div>
             <div class="R90">{mRow.p.init}</div>
             <div class="R90">{mRow.p.credit}</div>
             <div class="R90">{mRow.p.debit}</div>
-            <div class="R90">{mRow.p.gross}</div>
-            <div class="R90">{mRow.p.income}</div>
+            <div class="R90">{mRow.p.yearEnd}</div>
+            <div class="R90">{mRow.p.netIncomeOTC}</div>
+            <div class="R90">{mRow.p.netIncomeFin}</div>
+            <div class="R90">{mRow.p.close}</div>
             <div class="R90">{mRow.p.tax}</div>
             <div class="R90">{mRow.p.next}</div>
         </div>

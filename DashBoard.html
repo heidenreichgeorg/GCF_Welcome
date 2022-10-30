@@ -115,46 +115,46 @@
 
                 for (let vname in gAccounts)   {
                     var account=gAccounts[vname];
-                    var gross = account.gross;
+                    var yearEnd = account.yearEnd;
                     var iName = account.name;
                     var xbrl = account.xbrl;
                     console.log(iName+":"+xbrl);
                     var check = xbrl.trim();
 
 
-                    if(gross && iName && xbrl) {
+                    if(yearEnd && iName && xbrl) {
 
-                        let cGross = setEUMoney(gross).cents;
+                        let cYearEnd = setEUMoney(yearEnd).cents;
 
 
                         if(check.includes(X_INCOME_REGULAR_OTC)) {
-                            centsOTC +=  cGross;
-                            if(cGross>0) cSales += cGross;
+                            centsOTC +=  cYearEnd;
+                            if(cYearEnd>0) cSales += cYearEnd;
                         }
 
                         if(check.includes(X_INCOME_REGULAR_FIN) || check.includes(X_OTC_OTHER_REVENUE)) {
-                            centsFIN += cGross;
-                            if(cGross>0) cSales += cGross;
+                            centsFIN += cYearEnd;
+                            if(cYearEnd>0) cSales += cYearEnd;
                         }
                         
 
                         if(check.startsWith('de-gaap-ci_bs.eqLiab')) {
-                            cBalance+= cGross;
+                            cBalance+= cYearEnd;
 
                             if(check.startsWith('de-gaap-ci_bs.eqLiab.liab')) {
-                                cLiab += cGross;
+                                cLiab += cYearEnd;
                             }
 
 
                             else if(check.startsWith('de-gaap-ci_bs.eqLiab.equity')) { 
-                                cEquity += cGross;
+                                cEquity += cYearEnd;
                                 
                                 if(check.startsWith('de-gaap-ci_bs.eqLiab.equity.subscribed') && (xbrl.endsWith('.FK') ||  xbrl.endsWith('.KK'))) {
-                                    cFixedEq+= cGross;
+                                    cFixedEq+= cYearEnd;
                                 }
                                 else if(check.startsWith('de-gaap-ci_bs.eqLiab.equity.subscribed') && xbrl.endsWith('.VK')) {
                                     let min=(account.min)?account.min:"0,00";
-                                    partnerSaldo[iName]={'var':""+cGross, 'min':min, 'id':pNum++};
+                                    partnerSaldo[iName]={'var':""+cYearEnd, 'min':min, 'id':pNum++};
                                 }
 
                             }
@@ -164,10 +164,10 @@
                                           // de-gaap-ci_bs.ass.fixAss
                         if(check.startsWith('de-gaap-ci_bs.ass')) {
                             if(check.startsWith('de-gaap-ci_bs.ass.currAss')) {
-                                cCurrent += cGross;
+                                cCurrent += cYearEnd;
                             }
                             if(check.startsWith('de-gaap-ci_bs.ass.fixAss')) {
-                                cFixAss += cGross;
+                                cFixAss += cYearEnd;
                             }
                         }
 
@@ -395,7 +395,7 @@
 
                 if(name && gAccounts[name])   {
                     var account=gAccounts[name];
-                    closing= [ "31.12.",""+account.init,""+account.credit,""+account.debit,""+account.gross,schemaNames[index] ];
+                    closing= [ "31.12.",""+account.init,""+account.credit,""+account.debit,""+account.yearEnd,schemaNames[index] ];
                     cursor=printFormat(cursor,closing);
                 }
 

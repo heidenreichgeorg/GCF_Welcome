@@ -58,15 +58,15 @@
                 for (let tag in jReport)   {
                     var element = jReport[tag];
                     var account=element.account;
-                    var gross = account.gross;
+                    var yearEnd = account.yearEnd;
                     var iName = account.name;
                     var full_xbrl = account.xbrl;
                     var xbrl = full_xbrl.split('\.');
                     var xbrl_pre = xbrl.pop()+'.'+xbrl.pop()+'.'+xbrl.pop();
 
-                    if(gross && iName && xbrl) {
+                    if(yearEnd && iName && xbrl) {
                         result.push('<DIV class="attrLine"><DIV class="L120">'+iName
-                                        +'</DIV><DIV class="R105">'+gross
+                                        +'</DIV><DIV class="R105">'+yearEnd
                                         +'</DIV><DIV class="L22">&nbsp'
                                         +'</DIV><DIV class="C280">'+xbrl_pre
                                         +'</DIV></DIV>');

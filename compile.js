@@ -1006,7 +1006,7 @@ function sendBalance(balance) {
             if(account && account.xbrl && account.xbrl.length>COLMIN) {
                 var axbrl = account.xbrl;
 
-                account.gross=Account.getSaldo(account); // GH20221028
+                account.yearEnd=Account.getSaldo(account); // GH20221028
 
                 
 
@@ -1016,11 +1016,11 @@ function sendBalance(balance) {
                     account.next="0,00";
                 }
                 else if(axbrl.startsWith(bReport.xbrlPaidTax.xbrl)) { // move tax paid
-                    cTaxPaid += Money.setEUMoney(account.gross).cents;
+                    cTaxPaid += Money.setEUMoney(account.yearEnd).cents;
                     if(debugReport) console.log("compile.js sendBalance Tax Paid="+Money.cents2EU(cTaxPaid));
                     account.next="0,00";
                 }
-                else account.next=account.gross;
+                else account.next=account.yearEnd;
 
 
 
@@ -1098,11 +1098,11 @@ function sendBalance(balance) {
        console.log("compile.js sendBalance EQLINC = "+JSON.stringify(aEqlinc));           
     }
         
-    // set the gross component in each gReport account
+    // set the yearEnd component in each gReport account
     for(let rxbrl in gReport) {
         var element = gReport[rxbrl];
         var account = element.account;
-        account.gross=Account.getTransient(account);
+        account.yearEnd=Account.getTransient(account);
         account.next = "0,00";
 
         if(debugReport) console.log("compile.js sendBalance send1 REPORT("+element.de_DE+") "+JSON.stringify(element.account));           
@@ -1135,19 +1135,20 @@ function sendBalance(balance) {
         varcap.income=p.income;
         varcap.netIncomeOTC=p.netIncomeOTC;
         varcap.netIncomeFin=p.netIncomeFin;
-        varcap.gross=Account.getSaldo(varcap);
+        varcap.yearEnd=Account.getSaldo(varcap);
         
         // GH 20221028 substract paid tax
-        let mGross  =  Money.setEUMoney(varcap.gross);
+        let mYearEnd =  Money.setEUMoney(varcap.yearEnd);
         let mIncome  = Money.setEUMoney(varcap.income);
         let mTaxPaid = Money.setEUMoney(p.tax);
-        varcap.next =  Money.cents2EU( mGross.cents + mIncome.cents - mTaxPaid.cents ); 
+        varcap.next =  Money.cents2EU( mYearEnd.cents + mIncome.cents - mTaxPaid.cents ); 
 
         // 20221029 detailed partner account info
         p.init = varcap.init;
         p.credit = varcap.credit;
         p.debit = varcap.debit;
-        p.gross = varcap.gross;
+        p.yearEnd = varcap.yearEnd;
+        p.close = Money.cents2EU( mYearEnd.cents + mIncome.cents ); 
         p.next=varcap.next;
 
 
@@ -1158,14 +1159,14 @@ function sendBalance(balance) {
 
 
     // build gResponse[D_Balance]==gross from bAccounts:normal Accounts
-    // update gross result with saldo for each account
+    // update yearEnd result with saldo for each account
     // clear CapTax accounts
     for (let name in bAccounts)   {
-        // add gross saldo value
+        // add yearEnd saldo value
         if(name && name.length>=COLMIN) {
             var account=bAccounts[name];
             if(account && account.xbrl && account.xbrl.length>COLMIN) {
-                account.gross=Account.getSaldo(account);
+                account.yearEnd=Account.getSaldo(account);
                 
                 gross[name]=account; 
                 if(debugReport) console.log("compile.js sendBalance2 ACCOUNT "+JSON.stringify(account));           
@@ -1218,7 +1219,7 @@ function sendBalance(balance) {
         let gAccounts = gResponse[D_Balance];
         let gReport = gResponse[D_Report]
 
-        if(gReport.xbrlRegular.account.gross) {
+        if(gReport.xbrlRegular.account.yearEnd) {
             var closeIncome = { 'credit':{}, 'debit':{}  };
             closeIncome['date']='31.12.'+year;
             closeIncome['sender']='System';
@@ -1226,8 +1227,8 @@ function sendBalance(balance) {
             closeIncome['svwz']=de_DE['NextYear'];
             closeIncome['svwz2']=de_DE['Closing'];
 
-            let gross = gReport.xbrlRegular.account.gross;
-            if(debugReport) console.log("sendBalance CLOSING income "+gross);
+            let yearEnd = gReport.xbrlRegular.account.yearEnd;
+            if(debugReport) console.log("sendBalance CLOSING income "+yearEnd);
 
             var aNum=0;
             for(let name in gAccounts) {
@@ -1236,11 +1237,11 @@ function sendBalance(balance) {
                     let acc = gAccounts[name];
                     let xbrl = acc.xbrl;
                     if(xbrl.includes("netIncome.regular")) {
-                        if(Money.negMoney(Money.setEUMoney(acc.gross))) 
+                        if(Money.negMoney(Money.setEUMoney(acc.yearEnd))) 
                         {
-                            iMoney=closeIncome.debit[name]=Money.setEUMoney(Money.cents2EU(-1 * Money.setEUMoney(acc.gross).cents));
+                            iMoney=closeIncome.debit[name]=Money.setEUMoney(Money.cents2EU(-1 * Money.setEUMoney(acc.yearEnd).cents));
                         }
-                        else iMoney=closeIncome.credit[name]=Money.setEUMoney(acc.gross);
+                        else iMoney=closeIncome.credit[name]=Money.setEUMoney(acc.yearEnd);
                         iMoney.index=acc.index; 
                         if(debugReport) console.log("sendBalance CLOSING OTC "+JSON.stringify(iMoney));
                     }
@@ -1266,12 +1267,12 @@ function sendBalance(balance) {
                 } catch(err) { console.error("compile.js sendBalance UPDATE CLOSING  VARCAP ERROR: "+err); }
             }
 
-            if(debugReport) console.log("sendBalance "+gross+" CLOSING "+JSON.stringify(Object.keys(closeIncome.credit))+"  "+JSON.stringify(Object.keys(closeIncome.debit)));
+            if(debugReport) console.log("sendBalance "+yearEnd+" CLOSING "+JSON.stringify(Object.keys(closeIncome.credit))+"  "+JSON.stringify(Object.keys(closeIncome.debit)));
 
             gReport.xbrlIncome.closing = JSON.stringify(closeIncome);
             if(debugReport) console.dir("1900 compile.js sendBalance UPDATE gReport.xbrlIncome.closing="+gReport.xbrlIncome.closing);
 
-        } else console.dir("compile.js sendBalance UPDATE CLOSING: NO gReport.xbrlRegular.account.gross");
+        } else console.dir("compile.js sendBalance UPDATE CLOSING: NO gReport.xbrlRegular.account.yearEnd");
     } catch(err) { console.error("compile.js sendBalance UPDATE CLOSING ERROR: "+err); }
 
     

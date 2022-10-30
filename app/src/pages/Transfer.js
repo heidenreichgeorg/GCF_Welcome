@@ -250,11 +250,6 @@ export default function Transfer() {
                 <TransferRow/> 
             </form>
             <TransferRow/> 
-            {
-                // ['GRSB','EBKS','CDAK','COGK','CDAK','FSTF','KEST','KESO','NKFO']
-                // ['MIET','AUFW','NKG', 'NKHA','EZIN','FSAL','AZIN','EDIV']
-                // ['G195','KAUT','K2GH','K2EH','K2AL','K2KR','K2TO','K2LE','GALS']
-            }
             
             <AcctButtonRow aGroup={names.slice( J_ACCT, aLen)}/>
             <AcctButtonRow aGroup={names.slice(aLen+1,eLen)}/>

@@ -26,7 +26,7 @@ export default function Balance() {
 
     let page = sheet[D_Page];
     
-    let report = [ makeBalance(sheet,'init'), makeBalance(sheet,'gross'), makeBalance(sheet,'next')  ];
+    let report = [ makeBalance(sheet,'init'), makeBalance(sheet,'yearEnd'), makeBalance(sheet,'next')  ];
 
 
     let aPages = [];
@@ -109,7 +109,7 @@ function makeBalance(response,value) {
         var element = jReport[tag];
         var level = element.level;
         var account=element.account;
-        var dispValue = account[value]; // account.gross;
+        var dispValue = account[value]; // account.yearEnd;
         var iName = account.name;
         var full_xbrl = account.xbrl;
 

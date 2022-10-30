@@ -75,7 +75,7 @@
                 for (let name in jAccounts)   {
                     var account=jAccounts[name];
                     var desc = account.desc;
-                    var gross = account.gross;
+                    var yearEnd = account.yearEnd;
                     var iName = account.name;
                     var full_xbrl = account.xbrl;
                     var xbrl = full_xbrl.split('\.');
@@ -83,14 +83,14 @@
 
                     console.log("putResponse  "+JSON.stringify(account));
 
-                    if(gross && iName && xbrl) {
+                    if(yearEnd && iName && xbrl) {
                         var check = full_xbrl.trim();
 
                         // leftmost column with general client info
                         let info = (welcomeRecord.length>wIndex)?welcomeRecord[wIndex]:".";
 
                         if(check.includes(X_ASSET_TAX))
-                            cursor=printFormat(cursor,[' ','T',iName,xbrl_pre,gross]);
+                            cursor=printFormat(cursor,[' ','T',iName,xbrl_pre,yearEnd]);
 
                     } 
                 }
@@ -117,7 +117,7 @@
                 for (let name in jAccounts)   {
                     var account=jAccounts[name];
                     var desc = account.desc;
-                    var gross = account.gross;
+                    var yearEnd = account.yearEnd;
                     var iName = account.name;
                     var full_xbrl = account.xbrl;
                     var xbrl = full_xbrl.split('\.');
@@ -125,7 +125,7 @@
 
                     console.log("putResponse  "+JSON.stringify(account));
 
-                    if(gross && iName && xbrl) {
+                    if(yearEnd && iName && xbrl) {
                         var check = full_xbrl.trim();
 
                         // leftmost column with general client info
@@ -135,10 +135,10 @@
 
                             console.log("putResponse OTC "+JSON.stringify(account));
 
-                            partnerRecord[id].push({'item':info, 'ref':iName, 'note':desc, 'value':gross, 'xbrl':xbrl_pre });
-                            cursor=printFormat(cursor,[' ','*',iName,xbrl_pre,gross]);
+                            partnerRecord[id].push({'item':info, 'ref':iName, 'note':desc, 'value':yearEnd, 'xbrl':xbrl_pre });
+                            cursor=printFormat(cursor,[' ','*',iName,xbrl_pre,yearEnd]);
 
-                            centsOTC +=  setEUMoney(gross).cents;
+                            centsOTC +=  setEUMoney(yearEnd).cents;
                             wIndex++;
                         }
 
@@ -160,14 +160,14 @@
                 for (let name in jAccounts)   {
                     var account=jAccounts[name];
                     var desc = account.desc;
-                    var gross = account.gross;
+                    var yearEnd = account.yearEnd;
                     var iName = account.name;
                     var full_xbrl = account.xbrl;
                     var xbrl = full_xbrl.split('\.');
                     var xbrl_pre = xbrl.pop()+'.'+xbrl.pop()+'.'+xbrl.pop();
 
 
-                    if(gross && iName && xbrl) {
+                    if(yearEnd && iName && xbrl) {
                         var check = full_xbrl.trim();
 
                         // leftmost column with general client info
@@ -177,10 +177,10 @@
 
                             console.log("putResponse FIN "+JSON.stringify(account));
 
-                            partnerRecord[id].push({'item':info, 'ref':iName, 'note':desc, 'value':gross, 'xbrl':xbrl_pre });
-                            cursor=printFormat(cursor,[' ','+',iName,xbrl_pre,gross]);
+                            partnerRecord[id].push({'item':info, 'ref':iName, 'note':desc, 'value':yearEnd, 'xbrl':xbrl_pre });
+                            cursor=printFormat(cursor,[' ','+',iName,xbrl_pre,yearEnd]);
 
-                            centsFIN +=  setEUMoney(gross).cents;
+                            centsFIN +=  setEUMoney(yearEnd).cents;
                             wIndex++;
                             
                         }
@@ -243,8 +243,8 @@
 
                         // SPLIT OTC and FIN
                         // GH2020112
-                    partnerRecord[id].push({'item':'&nbsp;', 'ref':p.vk, 'note':'Endstand', 'value':varcap.gross });
-                    cursor=printFormat(cursor,['&nbsp;','&nbsp;',p.vk,'Endstand',varcap.gross,cents2EU(nyCents=euCents(varcap.gross))]);
+                    partnerRecord[id].push({'item':'&nbsp;', 'ref':p.vk, 'note':'Endstand', 'value':varcap.yearEnd });
+                    cursor=printFormat(cursor,['&nbsp;','&nbsp;',p.vk,'Endstand',varcap.yearEnd,cents2EU(nyCents=euCents(varcap.yearEnd))]);
 
 
                     partnerRecord[id].push({'item':'&nbsp;', 'ref':'', 'note':'Gewinn', 'value':varcap.income });

@@ -345,7 +345,7 @@ function makeAccount(index,name) {
 
     if(name && gAccounts[name])   {
         var account=gAccounts[name];
-        closing= [ "31.12.",""+account.init,""+account.credit,""+account.debit,""+account.gross,schemaNames[index] ];
+        closing= [ "31.12.",""+account.init,""+account.credit,""+account.debit,""+account.yearEnd,schemaNames[index] ];
         cursor=printFormat(cursor,closing);
     }
 

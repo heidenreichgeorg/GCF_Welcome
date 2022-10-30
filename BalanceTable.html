@@ -73,7 +73,7 @@
 
                 for (let name in jAccounts)   {
                     var account=jAccounts[name];
-                    var gross = account.gross;
+                    var yearEnd = account.yearEnd;
                     var desc = account.desc;
                     var iName = account.name;
                     var full_xbrl = account.xbrl;
@@ -86,8 +86,8 @@
 
 
 
-                        if(gross && iName && xbrl) {
-                            cursor=printFormat(cursor,[iName,gross,(desc?desc:"."),xbrl_pre]);
+                        if(yearEnd && iName && xbrl) {
+                            cursor=printFormat(cursor,[iName,yearEnd,(desc?desc:"."),xbrl_pre]);
                 
                         } else {
                             // ERROR out

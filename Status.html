@@ -98,10 +98,10 @@
 
                 for (let name in aLeft)   {
                     var account=aLeft[name];
-                    var gross = account.gross;
+                    var yearEnd = account.yearEnd;
                     var iName = account.name;
 
-                    sLeft[iLeft++] = '<DIV class="R90">'+gross+'</DIV><DIV class="L66">'+iName+'</DIV>';
+                    sLeft[iLeft++] = '<DIV class="R90">'+yearEnd+'</DIV><DIV class="L66">'+iName+'</DIV>';
                 }
                 for (let i=iLeft;i<S_COLUMN;i++) sLeft[i]='<DIV class="R90">&nbsp;</DIV><DIV class="L66">&nbsp;</DIV>';
 
@@ -109,20 +109,20 @@
                 
                 for (let name in aMidl)   {
                     var account=aMidl[name];
-                    var gross = account.gross;
+                    var yearEnd = account.yearEnd;
                     var iName = account.name;
 
-                    sMidl[iMidl++] = '<DIV class="R90">'+gross+'</DIV><DIV class="L66">'+iName+'</DIV>';
+                    sMidl[iMidl++] = '<DIV class="R90">'+yearEnd+'</DIV><DIV class="L66">'+iName+'</DIV>';
                 }
                 for (let i=iMidl;i<S_COLUMN;i++) sMidl[i]='<DIV class="R90">&nbsp;</DIV><DIV class="L66">&nbsp;</DIV>';
 
 
                 for (let name in aRite)   {
                     var account=aRite[name];
-                    var gross = account.gross;
+                    var yearEnd = account.yearEnd;
                     var iName = account.name;
 
-                    sRite[iRite++] = '<DIV class="R90">'+gross+'</DIV><DIV class="L66">'+iName+'</DIV>';
+                    sRite[iRite++] = '<DIV class="R90">'+yearEnd+'</DIV><DIV class="L66">'+iName+'</DIV>';
                 }
                 for (let i=iRite;i<S_COLUMN;i++) sRite[i]='<DIV class="R90">&nbsp;</DIV><DIV class="L66">&nbsp;</DIV>';
 

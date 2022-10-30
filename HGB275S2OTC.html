@@ -72,30 +72,30 @@
                     for (let name in jAccounts)   {
                         var account=jAccounts[name];
                         var init = account.init;
-                        var gross = account.gross;
+                        var yearEnd = account.yearEnd;
                         var iName = account.name;
                         var full_xbrl = account.xbrl;
 
 
 
-                        if(gross && iName && full_xbrl) {
-                            if(full_xbrl.startsWith('de-gaap-ci_bs.ass.fixAss'))  { cAvgFix+=(setEUMoney(init).cents+setEUMoney(gross).cents)/2; console.log("BNV  "+name+"="+cAvgFix); }
-                            if(full_xbrl.startsWith('de-gaap-ci_bs.ass.currAss')) { cAvgCur+=(setEUMoney(init).cents+setEUMoney(gross).cents)/2; console.log("DUV  "+name+"="+cAvgCur); }
-                            if(full_xbrl.startsWith('de-gaap-ci_bs.ass.currAss.receiv')) { cReceiv-=setEUMoney(gross).cents;                     console.log("FOR  "+name+"="+cReceiv); }
-                            if(full_xbrl.startsWith('de-gaap-ci_bs.ass.currAss.receiv.other.otherTaxRec')) { chgbF+=setEUMoney(gross).cents; console.log("TAX  "+name+"("+gross+")="+chgbF);  } // 20220521 keep tax claims separately
+                        if(yearEnd && iName && full_xbrl) {
+                            if(full_xbrl.startsWith('de-gaap-ci_bs.ass.fixAss'))  { cAvgFix+=(setEUMoney(init).cents+setEUMoney(yearEnd).cents)/2; console.log("BNV  "+name+"="+cAvgFix); }
+                            if(full_xbrl.startsWith('de-gaap-ci_bs.ass.currAss')) { cAvgCur+=(setEUMoney(init).cents+setEUMoney(yearEnd).cents)/2; console.log("DUV  "+name+"="+cAvgCur); }
+                            if(full_xbrl.startsWith('de-gaap-ci_bs.ass.currAss.receiv')) { cReceiv-=setEUMoney(yearEnd).cents;                     console.log("FOR  "+name+"="+cReceiv); }
+                            if(full_xbrl.startsWith('de-gaap-ci_bs.ass.currAss.receiv.other.otherTaxRec')) { chgbF+=setEUMoney(yearEnd).cents; console.log("TAX  "+name+"("+yearEnd+")="+chgbF);  } // 20220521 keep tax claims separately
 
-                            if(full_xbrl.startsWith('de-gaap-ci_is.netIncome.regular.operatingTC.grossTradingProfit')) { chgb1+=setEUMoney(gross).cents; }
-                            if(full_xbrl.startsWith('de-gaap-ci_is.netIncome.regular.operatingTC.otherCost.fixingLandBuildings')) { chgb5+=setEUMoney(gross).cents; }
+                            if(full_xbrl.startsWith('de-gaap-ci_is.netIncome.regular.operatingTC.yearEndTradingProfit')) { chgb1+=setEUMoney(yearEnd).cents; }
+                            if(full_xbrl.startsWith('de-gaap-ci_is.netIncome.regular.operatingTC.otherCost.fixingLandBuildings')) { chgb5+=setEUMoney(yearEnd).cents; }
 
-                            if(full_xbrl.startsWith('de-gaap-ci_is.netIncome.regular.operatingTC.deprAmort.fixAss.tan')) { chgb7+=setEUMoney(gross).cents; }
-                            if(full_xbrl.startsWith('de-gaap-ci_is.netIncome.regular.operatingTC.otherCost.otherOrdinary')) { chgb8+=setEUMoney(gross).cents; }
+                            if(full_xbrl.startsWith('de-gaap-ci_is.netIncome.regular.operatingTC.deprAmort.fixAss.tan')) { chgb7+=setEUMoney(yearEnd).cents; }
+                            if(full_xbrl.startsWith('de-gaap-ci_is.netIncome.regular.operatingTC.otherCost.otherOrdinary')) { chgb8+=setEUMoney(yearEnd).cents; }
                             
                             // EZIN = de-gaap-ci_is.netIncome.regular.fin.netInterest.income
-                            if(full_xbrl.startsWith('de-gaap-ci_is.netIncome.regular.fin.netParticipation')) { chgb9+=setEUMoney(gross).cents; }
-                            if(full_xbrl.startsWith('de-gaap-ci_is.netIncome.regular.fin.sale')) { chgbA+=setEUMoney(gross).cents; }
-                            if(full_xbrl.startsWith('de-gaap-ci_is.netIncome.regular.fin.netInterest')) { chgbB+=setEUMoney(gross).cents;  console.log("EZIN = "+gross+ " from "+JSON.stringify(account)); }
-                            if(full_xbrl.startsWith('de-gaap-ci_is.netIncome.regular.fin.expenses')) { chgbD+=setEUMoney(gross).cents; }
-                            if(full_xbrl.startsWith('de-gaap-ci_is.is.netIncome.tax')) { chgbE-=setEUMoney(gross).cents; }
+                            if(full_xbrl.startsWith('de-gaap-ci_is.netIncome.regular.fin.netParticipation')) { chgb9+=setEUMoney(yearEnd).cents; }
+                            if(full_xbrl.startsWith('de-gaap-ci_is.netIncome.regular.fin.sale')) { chgbA+=setEUMoney(yearEnd).cents; }
+                            if(full_xbrl.startsWith('de-gaap-ci_is.netIncome.regular.fin.netInterest')) { chgbB+=setEUMoney(yearEnd).cents;  console.log("EZIN = "+yearEnd+ " from "+JSON.stringify(account)); }
+                            if(full_xbrl.startsWith('de-gaap-ci_is.netIncome.regular.fin.expenses')) { chgbD+=setEUMoney(yearEnd).cents; }
+                            if(full_xbrl.startsWith('de-gaap-ci_is.is.netIncome.tax')) { chgbE-=setEUMoney(yearEnd).cents; }
 
                             console.log("READ xbrl="+full_xbrl+" "+chgb5+" "+chgb7+" "+chgb8+" "+chgbA+" "+chgbB+" "+chgbD+" "+chgbE+" "+chgbF);
                         }
@@ -105,7 +105,7 @@
                     let grossYield = chgb5+chgb1;
                     cursor=printFormat(cursor,[' ',page.Revenue,cents2EU(chgb1)]);
                     cursor=printFormat(cursor,[' ',page.DirectCost,cents2EU(chgb5)]);
-                    cursor=printFormat(cursor,['Gross Yield',' ',page.GrossYield,cents2EU(grossYield)]);
+                    cursor=printFormat(cursor,['Gross Yield',' ',page.yearEndYield,cents2EU(grossYield)]);
 
 
                     let regularOTC = grossYield+chgb7+chgb8;
