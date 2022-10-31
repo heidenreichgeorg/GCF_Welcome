@@ -1,4 +1,4 @@
-const debug=null;
+const debug=1;
 
 const D_XBRL   = "XBRL";
 const D_Balance= "Bilanz";

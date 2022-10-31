@@ -755,6 +755,7 @@ function saveSessionLog(sessionId,txn) {
 module.exports['saveSessionLog']=saveSessionLog;
 
 
+/*
 function logS(session,caller) {
     var  info = "empty";
     if(session) {
@@ -764,7 +765,7 @@ function logS(session,caller) {
     console.log("**** "+caller+" session "+info);
     
 }
-
+*/
 
 
 
