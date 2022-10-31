@@ -793,14 +793,17 @@ function getClientDir(client) {
 module.exports['getClientDir']=getClientDir;
 
 // GH20211119
+// GH20221031 
 function jsonMain(client,year,sid) {
-    return getClientDir(client)+year+"main.json";
+    return getClientDir(client)+Slash+year+Slash+year+"main.json";
 }
 
+/*
 function jsonFile(client,year,sid) {
     return getClientDir(client)+year+fileFromSession(sid)+".json";
     // return root+client+Slash+year+Slash+fileFromSession(sid)+".json"; 
 }
+*/
 
 function jsonLogf(client) {
     return getClientDir(client)+"logf.json";
