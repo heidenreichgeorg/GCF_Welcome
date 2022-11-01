@@ -263,13 +263,14 @@
                         cursor=printFormat(cursor,['&nbsp;','&nbsp;',' ','Verlustvortrag',cents2EU(-cyLoss),cents2EU(nyCents-=cyLoss)]);
                     }
 
-                    partnerRecord[id].push({'item':'&nbsp;', 'ref':'', 'note':'KapErtragSt', 'value':p.kest });
-                    cursor=printFormat(cursor,['&nbsp;','&nbsp;',' ',page['CapGainTax'],p.kest,cents2EU(nyCents-=euCents(p.kest))]);
+                    partnerRecord[id].push({'item':'&nbsp;', 'ref':'', 'note':'gez. Steuer', 'value':p.tax });
+                    cursor=printFormat(cursor,['&nbsp;','&nbsp;',' ',page['CapGainTax'],p.tax,cents2EU(nyCents-=euCents(p.tax))]);
 
-
+/*
+GH20221031 now included in p.tax
                     partnerRecord[id].push({'item':'&nbsp;', 'ref':'', 'note':'KapErtragSoli', 'value':p.keso });                      
                     cursor=printFormat(cursor,['&nbsp;','&nbsp;',' ',page['CapGainSoli'],p.keso,cents2EU(nyCents-=euCents(p.keso))]);
-
+*/
 
                     partnerRecord[id].push({'item':'Variables Kap', 'ref':'', 'note':page['NextYear'], 'value':cents2EU(nyCents) });
                     cursor=printFormat(cursor,['&nbsp;',page['VariableCap'],' ',page['NextYear'],cents2EU(nyCents)]);

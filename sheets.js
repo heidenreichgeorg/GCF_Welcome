@@ -682,7 +682,7 @@ module.exports['makeXLTabs']=makeXLTabs;
 
 
 
-async function save2Server(session,client,year,res,forwardURL) {
+async function save2Server(session,client,year) {
     console.log("0032 save2Server Start saving(JSON) to "+SERVEROOT);        
 
     const data = JSON.stringify(session);
@@ -707,18 +707,6 @@ async function save2Server(session,client,year,res,forwardURL) {
         //console.log("0016 save2Server Saving("+jsonFileName+")");          
     });
     console.log("0036 save2Server: JSON main save to "+jsonFileName+" started.");
-
-
-    // REDIRECT TO FORWARD PAGE
-    if(res && forwardURL) {
-        console.log("0038 save2Server: redirecting to "+forwardURL);
-
-        //res.redirect(forwardURL);
-        res.writeHead(HTTP_OK, {"Content-Type": "text/html"});
-        res.end("<HTML><HEAD><link rel='stylesheet' href='./FBA/mobile_green.css'/></HEAD><TITLE>LOGIN</TITLE><BODY><A class='keyPanel' HREF="+
-            forwardURL+">LOGIN</A></BODY><HTML>\n\n");
-   
-    }
 
     return jsonFileName;
 }

@@ -166,6 +166,7 @@ function init(app, argv) {
     })
 
 
+
     app.post("/BOOK", (req, res) => { 
         if(debug) console.log("\n\n");
         // from TransferForm.html       
@@ -177,6 +178,7 @@ function init(app, argv) {
         let oldSession=Server.getSession(sessionId);
         let client = oldSession.client;
         let year = oldSession.year;
+        let jFileName = year+client+".json";
         if(sessionId && client && year) {
 
             // SECURITY SANITIZE req.body
@@ -189,18 +191,18 @@ function init(app, argv) {
             // 20220516 Sheets.xlsxWrite(req.body.sessionId,tBuffer,sessionTime,nextSessionId); 
             // state change in YYYYCCCC.json
 
-            Sheets.save2Server(session,client,year,res,"/LATEST"); // .then (x => y)
+            let serverAddr = Server.localhost();
+
+            // async
+            Sheets.save2Server(session,client,year)
+                .then(jFileName => { if(res) res.json({url:serverAddr+'/LATEST', client, year, 'jFileName':jFileName  })
+                });
 
         } else {
             result="NO SESSION ID";
             console.log("0015 app.post BOOK NO sessionId");
-        }
-
-        //res.writeHead(Sheets.HTTP_OK, {"Content-Type": "text/html"});       
-        res.send("\n"+result+".\n");
+        }        
     });
-
-
 
 
         
@@ -223,11 +225,8 @@ function init(app, argv) {
     });
 
 
+
     app.get("/favicon.ico", (req, res)  => { res.sendFile(__dirname + "/favicon.jpg"); });
-
-
-
-
 
 
 
@@ -289,7 +288,6 @@ function init(app, argv) {
 
 
 
-
     app.get("/DOWNLOAD", (req, res) => { 
         // DOWNLOAD JSON to client     
 
@@ -329,6 +327,8 @@ function init(app, argv) {
             res.end("\nINVALID SESSION.\n");
         }
     });
+
+
 
 
     app.get('/EXCEL', (req, res) => {

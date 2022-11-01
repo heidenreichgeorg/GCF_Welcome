@@ -340,4 +340,11 @@ function book(jTXN,session) {
     };
 
     fetch(`${process.env.REACT_APP_API_HOST}/BOOK?sessionId=${session.id}`, requestOptions)
+    .then(data => data.json())
+    .then(body => {console.log("BOOK RESULT "+JSON.stringify(body))});
+
+    /*
+    BOOK RESULT 
+    {"url":"192.168.178.28:81/LATEST","client":"HGKG","year":"2021","jFileName":"c:\\Privat/HGKG//2021/2021main.json"}
+    */
 }

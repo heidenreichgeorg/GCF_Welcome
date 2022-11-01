@@ -251,7 +251,7 @@ function sendDisplay(session,res) {
         let loginInfo = jLoginURL(session);
         let usrLogin = loginInfo.url;
         let postFix = loginInfo.postFix;
-        let url = localhost() + ":"+ PORT + usrLogin;
+        let url = localhost() + usrLogin;
         console.dir("5010 sendDisplay() rendering url="+url);
 
         qr.toDataURL(url, (err, qrCodeDataUrl) => {
@@ -340,14 +340,14 @@ function localhost() {
         instance = results[0] ? results[0].addr : "127.0.0.1";
         console.dir ( "OS.address  "+instance);
     }
-    return instance;
+    return instance+ ":"+ PORT ;
 }
+module.exports['localhost']=localhost;
+
 
 
 
 // PURE FUNCTIONS
-
-
 
 
 function timeSymbol() {
