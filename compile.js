@@ -236,7 +236,7 @@ function init(app, argv) {
         // 2. with client name: return HTML dialoge with latest session
         console.log("\n\n");
         console.log(Server.timeSymbol());
-        console.log("1910 app.get SHOW sessionId="+ req.query.sessionId+ "  client="+req.query.client);
+        console.log("1910 app.get SHOW sessionId="+ req.query.sessionId);
 
         // load session via id
         let session = null;

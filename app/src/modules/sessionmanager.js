@@ -15,7 +15,7 @@ export function SessionProvider({ children, createSession=true, default_value, o
     useEffect(() => {
         if(createSession) {
             setStatus('loading')
-            fetch(`${process.env.REACT_APP_API_HOST}/SESSION`)
+            fetch(`${process.env.REACT_APP_API_HOST}/SESSION?client=HGKG&year=2022&ext=JSON`)
             .then(data => data.json())
             .then(data => {
                 setSession(data)

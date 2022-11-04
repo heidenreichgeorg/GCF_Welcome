@@ -43,7 +43,7 @@ root.render(
         <SessionProvider
             createSession
             onLoading={'Loading session...'}
-        >
+            >
             <RouterProvider router={router} />
         </SessionProvider>
     </React.StrictMode>

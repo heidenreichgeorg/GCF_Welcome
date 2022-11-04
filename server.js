@@ -50,6 +50,28 @@ app.use(express.static(__dirname));
 const PORT = 81;
 
 
+
+
+
+// show convenience link to create and load a new browser window
+app.listen(PORT, () => { 
+    console.log("\n\n");
+    console.log(timeSymbol());
+    console.log(`Server    started from ${PORT} using files in `+__dirname); 
+    console.log(`Server    http://ec2-A-B-C-D.compute-1.amazonaws.com:${PORT}/welcomedrop`); 
+    console.log(`Local     http://localhost:${PORT}/welcomedrop`); 
+})
+
+
+
+
+
+
+
+
+
+
+
 // session management
 var arrSession = []; // LIFO
 function setSession(aSession) {  arrSession.push(aSession); }
@@ -103,6 +125,8 @@ module.exports['sy_findSessionId']=sy_findSessionId;
 
 
 
+
+
 // CALLBACK for function plugin, registers an ENDPOINT
 function registerLink(command,htmlPage,sessionId) {
     let pattern = "/"+command;
@@ -111,88 +135,45 @@ function registerLink(command,htmlPage,sessionId) {
 }
 
 
-// WITH ACCESS TO SERVER CONSOLE ONLY
-// WITH THAt SERVER HOSTING THE dat.JSON as a file
-//start session with uploading the latest session file in a given base directory for a known client
+
+
+
+
+
+
+// PROVIDES UI TO SERVER CONSOLE 
+// WITH THAT SERVER HOSTING THE ClientYear.JSON  file
+//start session with loading the latest session file in a given base directory for a known client
 app.get("/LATEST", (req, res) => { 
-    let remote = req.socket.remoteAddress;
-    let rawData = req.query;
 
-    let base =  Compiler.getRoot();
-    console.log("0010 app.get \LATEST at base "+base+"  from "+remote);
-
-    if(rawData && rawData.client && rawData.client.length>2 ) { // && (rawData.client == "[a-zA-Z0-9]")) {
-        // Security sanitize input client
-        
-        if(rawData && rawData.year && rawData.year.length>2 && (parseInt(rawData.year)>1)) {
-            // Security sanitize input year
-
-            if(rawData.ext && rawData.ext.length>0) { //} && rawData.ext == "[a-zA-Z0-9]" ) {
-                // Security sanitize input ext
-
-
-                console.log("0014 app.get \LATEST "+JSON.stringify(rawData)+" from "+remote);
-
-                let client = rawData.client;
-                let year   = parseInt(rawData.year); // Security sanitize input year
-                let ext    = rawData.ext;
-                let dir=base+client+"/"+year+"/";
-
-                console.log("0020 app.get LATEST of year "+year+" in "+dir+"*."+ext);
-                let fileName = getMostRecentFile(dir,ext);
-                if(fileName) {
-
-                    
-                    var session = JSON.parse(fs.readFileSync(dir+fileName, 'utf8'));
-
-                    if(client===session.client) {
-
-                        let strTimeSymbol = timeSymbol();
-                        let time = strTimeSymbol;
-                        let year=session.year;
-                        console.log("LATEST 30 reading session="+JSON.stringify(Object.keys(session))); 
-
-
-                        // START A NEW SESSION
-                        let sessionId = strSymbol(time+client+year+time);
-                        session.id=sessionId;
-                        session.generated = Compiler.compile(session);
-                        session.ext=ext;
-                        setSession(session);
-
-
-                        sendDisplay(session,res);
-
-                    } else {
-                        console.dir("0071 app.get LATEST "+client+" dir contains "+session.client+" object!!");
-                        res.write('<DIV class="attrRow"><H1>['+base+'|'+client+'&nbsp;]</H1>'
-                            +'<DIV class="attrRow"><DIV class="C100"><BUTTON class="largeKey">STOP</BUTTON></DIV></DIV>'
-                            +'</DIV>'
-                        );
-                        res.end();
-                    }
-
-                    return;
-
-                } else console.log ( "0013 LATEST file not found for rawData="+JSON.stringify(rawData)+",addr="+remote);
-
-            } else console.log ( "0023 LATEST file no valid base for rawData="+JSON.stringify(rawData)+",addr="+remote);
-            
-        } else console.log ( "0017 LATEST file no valid client for rawData="+JSON.stringify(rawData)+",addr="+remote);
+    if(req && req.query && req.socket) {        
+        session = signUp(req.query,req.socket.remoteAddress);
+        console.log("\n0800 GET /LATEST FOUND => "+session.id);
+        if(session!=null) sendDisplay(session,res);
+        // exits via res.send
     }
-
-    res.write("\n<HTML><HEAD><link rel='stylesheet' href='./FBA/mobile_green.css'/></HEAD><TITLE>Welcome</TITLE>INVALID SESSION FILE 'client' and/or 'base' and/or 'ext' missing</HTML>\n\n"); 
-    res.end();
+    else {
+        res.write("\n<HTML><HEAD><link rel='stylesheet' href='./FBA/mobile_green.css'/></HEAD><TITLE>LATEST</TITLE>INVALID SESSION FILE 'client' and/or 'base' and/or 'ext' missing</HTML>\n\n"); 
+        res.end();
+    }
 });
 
 
-// TODO process client 
-app.get('/SESSION', (_, res) => {
-    let sessionId = getClient('HGKG',);
-    console.log("\n0880 GET /SESSION FOUND => "+sessionId);
-    if(sessionId) res.json({ id: sessionId })
-    else res.json({ id: '0123' })
-})
+// PROVIDES SESSION TO SERVER CONSOLE 
+// WITH THAT SERVER HOSTING THE ClientYear.JSON  file
+app.get('/SESSION', (req, res) => {
+    if(req && req.query && req.socket) {       
+        
+         session = signUp(req.query,req.socket.remoteAddress);
+        
+        if(session) console.log("\n0810 GET /SESSION FOUND => "+session.id);
+        else console.log("\n0811 GET /SESSION NOT FOUND => "+JSON.stringify(req.query));
+
+        if(session && session.id) res.json({ id: session.id });
+        else req.query.code = "Could not signUp()";
+    }
+    else res.json({ id: '0123', code : "NO VALID QUERY"})
+});
 
 
 
@@ -287,7 +268,7 @@ function sendDisplay(session,res) {
 /*
    req.body contains key-value pairs of data submitted in the request body. 
    By default, it is undefined, and is populated when you use body-parsing middleware such as body-parser.
-*/
+
 
 // USER SELECTS MATCHING FILE
 app.get('/welcomedrop', (req, res) => {
@@ -303,16 +284,7 @@ app.get('/loginclient', (req, res) => {
     
     res.sendFile('./LoginClient.html', { root: __dirname, base: req.params.base })
 })
-
-
-// show convenience link to create and load a new browser window
-app.listen(PORT, () => { 
-    console.log("\n\n");
-    console.log(timeSymbol());
-    console.log(`Server    started from ${PORT} using files in `+__dirname); 
-    console.log(`Server    http://ec2-A-B-C-D.compute-1.amazonaws.com:${PORT}/welcomedrop`); 
-    console.log(`Local     http://localhost:${PORT}/welcomedrop`); 
-})
+*/
 
 
 
@@ -503,5 +475,78 @@ app.post("/UPLOAD", (req, res) => {
     res.write("\n<HTML><HEAD><link rel='stylesheet' href='./FBA/mobile_green.css'/></HEAD><TITLE>UPLOAD Welcome</TITLE>INVALID SESSION FILE 'client' and/or 'year' missing</HTML>\n\n"); 
     res.end();
 });
+
+
+
+function signUp(query,remote) {
+    let base =  Compiler.getRoot();
+    console.log("0010 signUp at base "+base+"  for "+JSON.stringify(query));
+
+    if(query && query.client && query.client.length>2 ) { // && (query.client == "[a-zA-Z0-9]")) {
+
+        // Security sanitize input client
+        let client = query.client;
+        
+        if(query && query.year && query.year.length>2 && (parseInt(query.year)>1)) {
+
+            // Security sanitize input year
+            let year   = parseInt(query.year); // Security sanitize input year
+            console.log("0014 signUp for client "+client+"  year "+year);
+
+            if(query.ext && query.ext.length>0) { //} && query.ext == "[a-zA-Z0-9]" ) {
+
+                // Security sanitize input ext
+                let ext    = query.ext;
+
+                let dir=base+client+"/"+year+"/";
+                console.log("0018 signUp for client "+client+"  year "+year+"  in "+dir+"*."+ext);
+
+                let fileName = getMostRecentFile(dir,ext);
+                if(fileName) {
+                    console.log("0020 signUp for file "+fileName+",addr="+remote);
+        
+                    var session = JSON.parse(fs.readFileSync(dir+fileName, 'utf8'));
+
+                    if(client===session.client) {
+
+                        let strTimeSymbol = timeSymbol();
+                        let time = strTimeSymbol;
+                        let year=session.year;
+                        console.log("0024 signUp SUCCESS session="+JSON.stringify(Object.keys(session))); 
+
+
+                        // START A NEW SESSION
+                        let sessionId = strSymbol(time+client+year+time);
+                        session.id=sessionId;
+                        session.generated = Compiler.compile(session);
+                        session.ext=ext;
+                        setSession(session);
+
+                        return session;
+
+                    } else console.log ( "0017 LATEST client no OK for query="+JSON.stringify(query)+",addr="+remote);
+
+                } else console.log ( "0023 LATEST file no valid fileName for query="+JSON.stringify(query)+",addr="+remote);
+                        
+            } else console.log ( "0025 LATEST file no valid file ext for query="+JSON.stringify(query)+",addr="+remote);
+                        
+        } else console.log ( "0027 LATEST file no valid year for query="+JSON.stringify(query)+",addr="+remote);
+    
+    } else console.log ( "0029 LATEST file no valid client for query="+JSON.stringify(query)+",addr="+remote);
+    /*
+            // GH20221103 Do NOT SEND ANYTHING, LEAVE THAT TO THE CALLER
+                    } else {
+                        console.dir("0071 app.get LATEST "+client+" dir contains "+session.client+" object!!");
+                        res.write('<DIV class="attrRow"><H1>['+base+'|'+client+'&nbsp;]</H1>'
+                            +'<DIV class="attrRow"><DIV class="C100"><BUTTON class="largeKey">STOP</BUTTON></DIV></DIV>'
+                            +'</DIV>'
+                        );
+                        res.end();
+                    }
+
+                } else console.log ( "0013 LATEST file not found for query="+JSON.stringify(query)+",addr="+remote);
+*/
+        return null;
+};
 
 
