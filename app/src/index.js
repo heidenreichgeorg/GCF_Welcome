@@ -11,6 +11,8 @@ import Status from './pages/Status'
 import Transfer from './pages/Transfer'
 import { SessionProvider } from './modules/sessionmanager';
 
+
+
 const router = createBrowserRouter([
     {
         path: '/balance',
@@ -29,7 +31,7 @@ const router = createBrowserRouter([
         element: <Status />,
     },
     {
-        path: '/status',
+        path: "/status",
         element: <Status />
     },
     {
@@ -37,12 +39,15 @@ const router = createBrowserRouter([
         element: <Transfer />
     }
 ]);
+
 const root = ReactDOM.createRoot(document.getElementById('windowBorder'));
+
 root.render(
     <React.StrictMode>
         <SessionProvider
             createSession
             onLoading={'Loading session...'}
+            location={ router.state.location }
             >
             <RouterProvider router={router} />
         </SessionProvider>

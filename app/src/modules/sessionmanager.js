@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useState } from "react";
+import { createBrowserRouter, RouterProvider, useParams } from 'react-router-dom'
 
 const SessionContext = createContext()
 
@@ -6,16 +7,22 @@ export function useSession() {
     return useContext(SessionContext)
 }
 
-export function SessionProvider({ children, createSession=true, default_value, onLoading, onError }) {
+export function SessionProvider({ children, createSession=true, location, default_value, onLoading, onError }) {
 
     const [session, setSession] = useState(default_value)
 
     const [status, setStatus] = useState('loading')
 
+    //const [ strSearch, setStrSearch ] = useState();
+
+    let strSearch = location.search;
+    console.log("SessionProvider location="+strSearch)
+
+
     useEffect(() => {
         if(createSession) {
             setStatus('loading')
-            fetch(`${process.env.REACT_APP_API_HOST}/SESSION?client=HGKG&year=2022&ext=JSON`)
+            fetch(`${process.env.REACT_APP_API_HOST}/SESSION${strSearch}`)
             .then(data => data.json())
             .then(data => {
                 setSession(data)
@@ -26,6 +33,9 @@ export function SessionProvider({ children, createSession=true, default_value, o
             })
         }
     }, [])
+
+
+
 
     return (
         <SessionContext.Provider
@@ -40,6 +50,7 @@ export function SessionProvider({ children, createSession=true, default_value, o
                 ? onError
                 : children
             }
+
         </SessionContext.Provider>
     )
 }

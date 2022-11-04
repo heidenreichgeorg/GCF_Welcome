@@ -160,16 +160,33 @@ app.get("/LATEST", (req, res) => {
 
 
 // PROVIDES SESSION TO SERVER CONSOLE 
+// NO UPDATE AS LONG AS CLIENT/YEAR EXISTS AS A SESSION
 // WITH THAT SERVER HOSTING THE ClientYear.JSON  file
 app.get('/SESSION', (req, res) => {
     if(req && req.query && req.socket) {       
         
-         session = signUp(req.query,req.socket.remoteAddress);
-        
-        if(session) console.log("\n0810 GET /SESSION FOUND => "+session.id);
-        else console.log("\n0811 GET /SESSION NOT FOUND => "+JSON.stringify(req.query));
+        let query = req.query;
+        query.ext="JSON";
 
-        if(session && session.id) res.json({ id: session.id });
+        let sessionId=null;
+        let session=null;
+
+        //COLD START: LOAD FROM LATEST FILE
+        if(!(sessionId=sy_findSessionId(query.client,query.year))) {
+            session = signUp(query,req.socket.remoteAddress);
+            if(session) console.log("\n0810 GET /SESSION FOUND FILE => "+session.id);
+            else console.log("\n0811 GET /SESSION FILE NOT FOUND => "+JSON.stringify(query));
+    
+
+        // WARM START : FOUND EXISTING ID
+        } else {
+            session = getSession(sessionId);
+            if(session) console.log("\n0820 GET /SESSION FOUND LOADED => "+session.id);
+            else console.log("\n0821 GET /SESSION NOT FOUND => FOR EXISTING #"+sessionId);
+        }
+        
+
+        if(session && session.id) res.json({ id: session.id, client: session.client, year:session.year });
         else req.query.code = "Could not signUp()";
     }
     else res.json({ id: '0123', code : "NO VALID QUERY"})

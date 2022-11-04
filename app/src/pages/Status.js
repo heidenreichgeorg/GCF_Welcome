@@ -12,11 +12,15 @@ import { useSession } from '../modules/sessionmanager';
 export default function Status() {
     
     const [sheet, setSheet] = useState()
+    const [ year, setYear]  = useState()
+    const [client,setClient]  = useState()
 
     const { session, status } = useSession()
 
     useEffect(() => {
         if(status !== 'success') return;
+        setYear(session.year);
+        setClient(session.client);
         fetch(`${process.env.REACT_APP_API_HOST}/SHOW?sessionId=${session.id}`)
         .then(data => data.json())
         .then(data => { setSheet(data)})
@@ -24,8 +28,9 @@ export default function Status() {
 
     if(!sheet) return null; // 'Loading...';
 
-    function prevFunc() {console.log("CLICK PREVIOUS"); window.location.href="http://localhost:3000/partner" }
-    function nextFunc() {  console.log("CLICK NEXT");   window.location.href="http://localhost:3000/transfer"}
+    
+    function prevFunc() {console.log("CLICK PREVIOUS"); window.location.href="http://localhost:3000/partner?client="+client+"&year="+year; }
+    function nextFunc() {  console.log("CLICK NEXT");   window.location.href="http://localhost:3000/transfer?client="+client+"&year="+year; }
 
 
     function handleXLSave() {

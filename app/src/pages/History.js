@@ -24,8 +24,9 @@ export default function History() {
 
     if(!sheet) return null; //'Loading...';
 
-    function prevFunc() {console.log("CLICK PREVIOUS"); window.location.href="http://localhost:3000/balance" }
-    function nextFunc() {  console.log("CLICK NEXT");   window.location.href="http://localhost:3000/partner"}
+    
+    function prevFunc() {console.log("CLICK PREVIOUS"); window.location.href="http://localhost:3000/balance?client="+session.client+"&year="+session.year; }
+    function nextFunc() {  console.log("CLICK NEXT");   window.location.href="http://localhost:3000/partner?client="+session.client+"&year="+session.year; }
 
     let page = sheet[D_Page];
     let sHistory=makeHistory(sheet);

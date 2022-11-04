@@ -211,8 +211,9 @@ export default function Transfer() {
 
     let report = makeTransferData(sheet,iRow)
 
-    function prevFunc() {console.log("CLICK PREVIOUS"); window.location.href="http://localhost:3000/status" }
-    function nextFunc() {  console.log("CLICK NEXT");   window.location.href="http://localhost:3000/balance"}
+    
+    function prevFunc() {console.log("CLICK PREVIOUS"); window.location.href="http://localhost:3000/status?client="+session.client+"&year="+session.year; }
+    function nextFunc() {  console.log("CLICK NEXT");   window.location.href="http://localhost:3000/balance?client="+session.client+"&year="+session.year; }
 
     let page = sheet[D_Page];
 
