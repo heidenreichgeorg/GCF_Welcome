@@ -341,7 +341,13 @@ function book(jTXN,session) {
 
     fetch(`${process.env.REACT_APP_API_HOST}/BOOK?sessionId=${session.id}`, requestOptions)
     .then(data => data.json())
-    .then(body => {console.log("BOOK RESULT "+JSON.stringify(body))});
+    .then(body => { console.log("BOOK RESULT "+JSON.stringify(body));
+
+                    let urlCommand = process.env.REACT_APP_API_HOST+"/LATEST?client="+body.client+"&year="+body.year+"&ext=JSON";
+                    console.log("BOOK RELOAD "+urlCommand);
+                    fetch(urlCommand)
+                    .then(res => {console.log("BOOK REFRESH "+JSON.stringify(res.body))})
+        });
 
     /*
     BOOK RESULT 

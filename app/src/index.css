@@ -51,10 +51,33 @@ input[type="radio"]::before {
 
 .key      { width: 70px;  height:16px;  margin: 0px; border: 0px solid inherit; float: left; background-color: #10E110; font-family:  inherit; font-size: inherit; font-weight:600; color: #004000; }
 
-.attrLine { width:990px; padding: 1px; float: left; color:inherit;min-height: 16px; height: 16px; font-family :Roboto, monospace; font-size: 12px;font-weight:400;text-align: center;}
+.attrLine { width:990px; padding: 1px; float: left;               min-height: 16px; height: 16px; font-family :Roboto, monospace; font-size: 12px;font-weight:400;text-align: center;}
 .attrPair {              padding: 1px; float: left; color:inherit;min-height: 43px;               font-family: Inconsolata, 'Montserrat', sans-serif; font-size: 14px; font-weight:400; text-align: center; background-color: inherit; } 
 
 
+.line000 { color:#0FEE0F; }
+.line001 { color:#0FEE0F; }
+.line002 { color:#0FEE0F; }
+.line003 { color:#0FEE0F; }
+.line004 { color:#0FEE0F; }
+.line005 { color:#0FEE0F; }
+.line006 { color:#0FEE0F; }
+.line007 { color:#0FEE0F; }
+.line008 { color:#0FEE0F; }
+.line009 { color:#0FEE0F; }
+.line010 { color:#0FEE0F; }
+.line011 { color:#0FEE0F; }
+.line012 { color:#0FEE0F; }
+.line013 { color:#0FEE0F; }
+.line014 { color:#0FEE0F; }
+.line015 { color:#0FEE0F; }
+.line016 { color:#0FEE0F; }
+.line017 { color:#0FEE0F; }
+.line018 { color:#0FEE0F; }
+.line019 { color:#0FEE0F; }
+.line020 { color:#0FEE0F; }
+.line021 { color:#0FEE0F; }
+.line022 { color:#0FEE0F; }
 
 
 .ulliTab  { width:995px;  padding: 1px; border: none;  font-size: 14px; font-weight:400; } 

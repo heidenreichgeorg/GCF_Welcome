@@ -1,9 +1,9 @@
-import { useEffect, useState, useRef  } from 'react';
+import { useEffect, useState  } from 'react';
 
-import { cents2EU, setEUMoney } from '../modules/App'
+import { cents2EU } from '../modules/App'
 import Screen from '../pages/Screen'
 import FooterRow from '../components/FooterRow'
-import { D_Balance, D_History, D_Page, D_Report, D_Schema, X_ASSETS, X_EQLIAB, X_INCOME, SCREENLINES }  from '../terms.js';
+import { D_Balance, D_History, D_Page, D_Report, D_Schema, X_ASSETS, X_EQLIAB, SCREENLINES }  from '../terms.js';
 import { useSession } from '../modules/sessionmanager';
 
 
@@ -35,13 +35,13 @@ export default function Balance() {
     return (
         <Screen prevFunc={prevFunc} nextFunc={nextFunc} tabSelector={aPages} >
             {report.map((balance,n) => ( 
-            <div class="ulliTab" id={"PageContent"+n} style= {{ 'display': aPages[n]}} >
-                {balance.map((row) => (
-                    <BalanceRow jArgs={row}/>    
-                ))}           
-                <FooterRow left={page["client"]}  right={page["register"]} prevFunc={prevFunc} nextFunc={nextFunc}/>
-                <FooterRow left={page["reference"]} right={page["author"]} prevFunc={prevFunc} nextFunc={nextFunc}/>
-            </div>
+                <div class="ulliTab" id={"PageContent"+n} style= {{ 'display': aPages[n]}} >
+                    {balance.map((row,i) => (
+                        <BalanceRow jArgs={row} id={i} />    
+                    ))}
+                    <FooterRow  id={"21"}  left={page["client"]}   right={page["register"]} prevFunc={prevFunc} nextFunc={nextFunc}/>
+                    <FooterRow  id={"22"}  left={page["reference"]}  right={page["author"]} prevFunc={prevFunc} nextFunc={nextFunc}/>
+                </div>
             ))}
         </Screen>
     )
@@ -49,7 +49,6 @@ export default function Balance() {
 
 
 function makeBalance(response,value) {
-
 
     var jReport = response[D_Report];
     console.log("makeBalance from response D_Report"+JSON.stringify(Object.keys(jReport)));
@@ -98,20 +97,20 @@ function makeBalance(response,value) {
 
     let balance = []; 
  
-    var iRite=1;
-    var iLeft=1;
+    var iRite=2;
+    var iLeft=2;
     balance.push({  });
     balance.push({ 'tw1':jReport.xbrlAssets.de_DE, 'tx1':jReport.xbrlEqLiab.de_DE });
 
     for (let tag in jReport)   {
         console.log("Report "+JSON.stringify(jReport[tag]));
         
-        var element = jReport[tag];
-        var level = element.level;
-        var account=element.account;
+        var element    =  jReport[tag];
+        var level     =  element.level;
+        var account  = element.account;
         var dispValue = account[value]; // account.yearEnd;
-        var iName = account.name;
-        var full_xbrl = account.xbrl;
+        var iName    =    account.name;
+        var full_xbrl  =  account.xbrl;
 
         if(dispValue && iName && full_xbrl) {
             // collect compute total right side amount
@@ -151,20 +150,19 @@ function makeBalance(response,value) {
         }
     }
 
-    while(iRite<SCREENLINES && iLeft<SCREENLINES) {
+    while(iRite<=SCREENLINES && iLeft<=SCREENLINES) {
         balance.push({  });
         iLeft++;
         iRite++;
     }
 
-
     return balance;
 }
 
 
-function BalanceRow({ jArgs }) {
+function BalanceRow({ jArgs, id }) {
     return(
-        <div class="attrLine">
+        <div class={"attrLine line"+id} >
             <div class="L175"> {jArgs.tw1}</div>
             <div class="R90"> {jArgs.am3}</div>
             <div class="R90"> {jArgs.am2}</div>
