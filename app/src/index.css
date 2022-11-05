@@ -44,10 +44,19 @@ input[type="radio"] {
   /* Not removed via appearance */
   margin: 0;
 }
+
 input[type="radio"]::before {
-  content: "Page";
+  content: "#";
 }
 
+
+.attrDLine:nth-child(odd) {
+  background: #000;
+}
+
+.attrDLine:nth-child(even) {
+  background: rgb(16, 29, 16);
+}
 
 .key      { width: 70px;  height:16px;  margin: 0px; border: 0px solid inherit; float: left; background-color: #10E110; font-family:  inherit; font-size: inherit; font-weight:600; color: #004000; }
 

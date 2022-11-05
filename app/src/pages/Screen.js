@@ -71,18 +71,24 @@ export default function Screen({ children, prevFunc, nextFunc, tabSelector }) {
                 let element = document.getElementsByClassName('line3');
                 element.style.color = 'red';
             }
+
+
+            <div class="L66" onClick={((e) => select('PageContent',-1))}>
+
+            <label class="L66">Plain<input type="radio" name="tabSelector" /></label>
+                    </div>
         
     */
     return (
         <div class="mTable">    
             <script  type="text/javascript"  src="/client.js" />
             <div class="attrLine" onLoad="updateScreen()">
-                <div class="L66" onClick={((e) => select('PageContent',-1))}><label class="L66"><input type="radio" name="tabSelector" />__</label></div>
+                
                 {tabSelector.map((row,tabNum) => (
                     <div class="L66" onClick={((e) => select('PageContent',{tabNum}))}>
                         <label class="L66">
-                            <input type="radio" name="tabSelector" autoFocus={tabNum==0?"1":""} />
-                            {tabNum}
+                            <input type="radio" name="tabSelector" autoFocus={tabNum==0?"1":""}/>                          
+                            &nbsp;{tabNum}
                         </label>
                     </div>
                 ))}
