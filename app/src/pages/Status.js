@@ -78,7 +78,7 @@ export default function Status() {
                     <StatusRow am1={row.gLeft} tx1={row.nLeft} am2={row.gMidl} tx2={row.nMidl} am3={row.gRite} tx3={row.nRite} d={row.dTran} n={row.nTran} l={row.lTran}/>    
                 ))
             }
-            <div class="key" onClick={handleXLSave}>SAVE</div>
+            <div class="attrLine"><div class="key" onClick={handleXLSave}>SAVE</div></div>
             <FooterRow left={page["client"]}  right={page["register"]} prevFunc={prevFunc} nextFunc={nextFunc}/>
             <FooterRow left={page["reference"]} right={page["author"]} prevFunc={prevFunc} nextFunc={nextFunc}/>
         </Screen>
