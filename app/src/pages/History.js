@@ -15,23 +15,33 @@ export default function History() {
 
     const { session, status } = useSession()   
     const [ sheet,  setSheet] = useState(null)
+
+   // const [ year,  setYear] = useState()
+   // const [ client,  setClient] = useState()
+
     useEffect(() => {
         if(status !== 'success') return;
         fetch(`${process.env.REACT_APP_API_HOST}/SHOW?sessionId=${session.id}`)
         .then(data => data.json())
-        .then(data => { setSheet(data);})
+        .then(data => { setSheet(data); return data[D_Schema]; })
+       // .then(schema => { setYear(session.year); return schema; })
+       // .then(schema => { setClient(session.client); return schema; });
+      //  console.log("History setSheet for c="+client + ", y="+year);
     }, [status]) 
 
     if(!sheet) return null; //'Loading...';
 
-    
+    function token() { return { client:session.client, year:session.year }}
+
     function prevFunc() {console.log("CLICK PREVIOUS"); window.location.href="http://localhost:3000/balance?client="+session.client+"&year="+session.year; }
     function nextFunc() {  console.log("CLICK NEXT");   window.location.href="http://localhost:3000/partner?client="+session.client+"&year="+session.year; }
 
     let page = sheet[D_Page];
     let sHistory=makeHistory(sheet);
     let sPages = sHistory.length / SCREEN_TXNS;    
-    
+    let strToken=token();
+    console.log("strToken="+strToken);
+
     let aPages = [];
     for(let p=1;p<sPages-1;p++) aPages[p]='none'; 
     aPages[0]='block';
@@ -40,7 +50,8 @@ export default function History() {
 
     return (
         <Screen prevFunc={prevFunc} nextFunc={nextFunc} tabSelector={aPages} >
-            <SearchForm handleSearch={search} sessionId={session.id}></SearchForm>
+            <SearchForm handleSearch={search} token={strToken} ></SearchForm>
+            
             {aPages.map((m,n) => ( 
                 <div class="ulliTab" id={"PageContent"+n} style= {{ 'display': m}} >
                     { sHistory.slice(n*SCREEN_TXNS,(n+1)*SCREEN_TXNS).map((row) => (  <SigRow row={row}/>  ))}
@@ -160,14 +171,15 @@ function makeHistory(sheet) {
     return arrHistory;
 }  
 
-function SearchForm(sessionId) {
+function SearchForm(token) {
     return (
         <div class="attrLine">
             <form onSubmit={(e)=>(console.log("SEARCH "+JSON.stringify(e.target)))} >                
                 <div class='R90'></div>                
                 <div class='L280'>Line:<input type='edit' name='LPATTERN'/>&nbsp;</div>                
                 <div class='L280'>Acct:<input type='edit' name='APATTERN'/></div>                
-                <input type='hidden' name='sessionId' defaultValue={sessionId}/>
+                <input type='hidden' name='client' defaultValue={token.token.client}/>
+                <input type='hidden' name='year' defaultValue={token.token.year}/>
                 <div class='R90'><button autoFocus class='L66 key'>Search</button></div>
             </form>
         </div>

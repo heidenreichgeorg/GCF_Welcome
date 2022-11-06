@@ -17,9 +17,7 @@ input[type="radio"] {
   margin: 0;
 }
 
-input[type="radio"]::before {
-  content: "#";
-}
+input[type="radio"]::before {content: "#"; }
 
 
 .attrLine { width:990px; padding: 1px; float: left;               min-height: 16px; height: 16px; font-family :inherit; font-size: 12px;font-weight:400; text-align: center;}
