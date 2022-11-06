@@ -1,15 +1,43 @@
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  font-family:  'Roboto', 'Inconsolata', 'Oxygen', 'Ubuntu',monospace, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-code { font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace; }
+input  { color:#0F0F0F; background-color:inherit; }
 
-input  { color:#10E110; background-color:inherit; }
+
+input[type="radio"] {
+  /* Add if not using autoprefixer */
+  -webkit-appearance: none;
+  appearance: none;
+  font-family: 'Roboto', 'Inconsolata', 'Oxygen', 'Ubuntu',monospace, sans-serif; font-size: 13px; font-weight:400; text-align: center;
+  background-color: inherit;
+  margin: 0;
+}
+
+input[type="radio"]::before {
+  content: "#";
+}
+
+
+.attrLine { width:990px; padding: 1px; float: left;               min-height: 16px; height: 16px; font-family :inherit; font-size: 12px;font-weight:400; text-align: center;}
+.attrPair {              padding: 1px; float: left; color:inherit;min-height: 43px;               font-family: inherit; font-size: 14px; font-weight:400; text-align: center; background-color: inherit; } 
+
+
+.attrLine:nth-child(even) {
+  background: #F0F0F0;
+}
+
+.key      { width: 70px;  height:16px;  margin: 0px; border: 0px solid inherit; float: left; background-color: #F0F0F0; font-family:  inherit; font-size: inherit; font-weight:600; color: #000; }
+
+.ulliTab  { width:995px;  padding: 1px; border: none;  font-size: 14px; font-weight:400; } 
+.mTable   {                                  height: 18px;             display:table;    }
+.dosBorder{ max-width:1005px; padding: 4px; border-style: solid; border-radius: 10px; border-width: 2px; border-color: #AEADAE;
+   background-color: #FFF; color: #0F0F0F; }
+  
+.oldDOS{ background-image: radial-gradient( rgba(0, 90, 0, 0.75), black 120% );}
 
 .L22      { width: 22px; overflow:hidden; padding: 2px; border: none; float: left;  font-family: inherit; font-size: inherit; font-weight:inherit; color: inherit; text-align: left;  }		
 .L40      { width: 40px; overflow:hidden; padding: 2px; border: none; float: left;  font-family: inherit; font-size: inherit; font-weight:inherit; color: inherit; text-align: left;  }		
@@ -30,67 +58,3 @@ input  { color:#10E110; background-color:inherit; }
 .CFUL     { width:883px; overflow:hidden; padding: 2px; border: none; float: left;  font-family: inherit; font-size: inherit; font-weight:inherit; color: inherit; }
 
 
-
-
-input[type="radio"] {
-  /* Add if not using autoprefixer */
-  -webkit-appearance: none;
-  appearance: none;
-
-  font-family:  Inconsolata, monospace, sans-serif; font-size: 13px; font-weight:400; text-align: center;
-
-  /* For iOS < 15 to remove gradient background */
-  background-color: #000;
-  /* Not removed via appearance */
-  margin: 0;
-}
-
-input[type="radio"]::before {
-  content: "#";
-}
-
-
-.attrDLine:nth-child(odd) {
-  background: #000;
-}
-
-.attrDLine:nth-child(even) {
-  background: rgb(16, 29, 16);
-}
-
-.key      { width: 70px;  height:16px;  margin: 0px; border: 0px solid inherit; float: left; background-color: #10E110; font-family:  inherit; font-size: inherit; font-weight:600; color: #004000; }
-
-.attrLine { width:990px; padding: 1px; float: left;               min-height: 16px; height: 16px; font-family :Roboto, monospace; font-size: 12px;font-weight:400;text-align: center;}
-.attrPair {              padding: 1px; float: left; color:inherit;min-height: 43px;               font-family: Inconsolata, 'Montserrat', sans-serif; font-size: 14px; font-weight:400; text-align: center; background-color: inherit; } 
-
-
-.line000 { color:#0FEE0F; }
-.line001 { color:#0FEE0F; }
-.line002 { color:#0FEE0F; }
-.line003 { color:#0FEE0F; }
-.line004 { color:#0FEE0F; }
-.line005 { color:#0FEE0F; }
-.line006 { color:#0FEE0F; }
-.line007 { color:#0FEE0F; }
-.line008 { color:#0FEE0F; }
-.line009 { color:#0FEE0F; }
-.line010 { color:#0FEE0F; }
-.line011 { color:#0FEE0F; }
-.line012 { color:#0FEE0F; }
-.line013 { color:#0FEE0F; }
-.line014 { color:#0FEE0F; }
-.line015 { color:#0FEE0F; }
-.line016 { color:#0FEE0F; }
-.line017 { color:#0FEE0F; }
-.line018 { color:#0FEE0F; }
-.line019 { color:#0FEE0F; }
-.line020 { color:#0FEE0F; }
-.line021 { color:#0FEE0F; }
-.line022 { color:#0FEE0F; }
-
-
-.ulliTab  { width:995px;  padding: 1px; border: none;  font-size: 14px; font-weight:400; } 
-.mTable   {                                  height: 18px;             display:table;    }
-.dosBorder{ max-width:1005px; padding: 4px; border-style: solid; border-radius: 10px; border-width: 2px; border-color: #AEADAE;
-   background-color: #000000; color: #0FEE0F; 
-  background-image: radial-gradient( rgba(0, 90, 0, 0.75), black 120% );}
