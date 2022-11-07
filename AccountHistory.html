@@ -271,7 +271,7 @@
                     factor=-1;  //console.log(strCredit); 
                 }
                 var saldo = money.cents
-                    + parseInt( strCredit.replace('.','').replace(',',''));
+                    + parseInt( strCredit.replace('.','').(',',''));
 
                 return { 'cents': saldo };
             }

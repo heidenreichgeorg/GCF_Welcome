@@ -191,25 +191,24 @@ function makeStatusData(response) {
     }
     for (let i=iRite;i<maxRow && i<SCREENLINES;i++) { statusData[i].gRite=' '; statusData[i].nRite=' '; }
 
-
     // build fourth column with recent transactions
+
+    let iHistory=Object.keys(jHistory).map((x) => (x));
 
     if(jHistory && gSchema.Names && gSchema.Names.length>0) {
         var names=gSchema.Names;
         var aLen = gSchema.assets;
         var eLen = gSchema.eqliab;
+
         let hLen = Object.keys(jHistory).length;
-        var bLine=0;
-        var iTran=0;
+        var bLine=hLen;
+        var iTran=maxRow;
 
-        statusData[iTran++].lTran= "Recent Transactions";
-
+        statusData[0].lTran= "Recent Transactions";
 
         for (let hash in jHistory)  {
 
-          //  console.log("Status TXN HASH "+bLine+":"+hash);
-
-            if(bLine<maxRow && iTran<SCREENLINES) {
+            if(bLine<maxRow && iTran>0) {
         
                 let jPrettyTXN = prettyTXN(jHistory,hash,null,null,names,aLen,eLen);
                 jPrettyTXN.credit.shift();
@@ -220,12 +219,12 @@ function makeStatusData(response) {
 
                 let sAmount = (aMount[0]+"  "+aMount[1]+"  "+aMount[2]+"  "+aMount[3]+ " ").slice(0,iCpField);
 
+                iTran--;
                 statusData[iTran].dTran=jPrettyTXN.entry[0].slice(2);
                 statusData[iTran].nTran=jPrettyTXN.entry[1].slice(0,9);
                 statusData[iTran].lTran= sAmount;                                
-                iTran++;
             }
-            bLine++;
+            bLine--;
         }
     }
     

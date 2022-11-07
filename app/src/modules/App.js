@@ -57,6 +57,7 @@ export function prettyTXN(jHistory,hash,lPattern,aPattern,names,aLen,eLen) {
     var aAmount = [];
     var delta = [];
     var txnAcct = false;
+    var cSaldo=0;
 
     let parts = jHistory[hash];
     if(parts && parts.length>2) {
@@ -84,14 +85,18 @@ export function prettyTXN(jHistory,hash,lPattern,aPattern,names,aLen,eLen) {
                 if(parts[i] && parts[i].length>0 && i!=aLen && i!=eLen) { 
                     
                     // GH20220307 EU-style numbers
-                    let item = parseInt(parts[i]);
+                    let strCents = parts[i].replace('.','').replace(',','');
+                    let item = parseInt(strCents);
 
                     
                     // GH20220703
                     if(    !txnAcct
                         && names[i] && names[i].length>1 
                         && aPattern && aPattern.length>1 
-                        && names[i].toLowerCase().includes(aPattern.toLowerCase())) txnAcct=true;
+                        && names[i].toLowerCase().includes(aPattern.toLowerCase())) {
+                            txnAcct=true;
+                            cSaldo += item;
+                        }
 
 
                     if(item!=0) {
@@ -133,7 +138,7 @@ export function prettyTXN(jHistory,hash,lPattern,aPattern,names,aLen,eLen) {
     result.iBalance=iBalance;
     result.aNames=aNames;
     result.aAmount=aAmount;
-
+    result.cSaldo=cSaldo;
     return result;
 }
 

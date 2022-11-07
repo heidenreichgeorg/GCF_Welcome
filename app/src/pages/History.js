@@ -77,6 +77,10 @@ function SigRow(row) {
         mRow = smRow.split(CSEP);
     } catch(err) {}
 
+    let saldo="";
+    if(isNaN(row.row.saldo)) saldo="-,--";
+    else saldo = cents2EU(row.row.saldo);
+
     return (
         <div class="attrPair">
             <div class="attrLine">
@@ -97,6 +101,8 @@ function SigRow(row) {
                 <div class="C100">{mRow[4]}</div>
                 <div class="C100">{mRow[5]}</div>
                 <div class="C100">{mRow[6]}</div>
+                <div class="C100">{mRow[7]}</div>
+                <div class="C100">{saldo}</div>
             </div>
         </div>
     )
@@ -130,10 +136,9 @@ function makeHistory(sheet) {
 
         if(gSchema.Names && gSchema.Names.length>0) {
             var names=gSchema.Names;
+            var cSaldo=0;
 
-            var bLine=0;
             for (let hash in jHistory)  {
-                bLine++;
 
                 let jPrettyTXN = prettyTXN(jHistory,hash,lPattern,aPattern,names,aLen,eLen);
 
@@ -145,8 +150,6 @@ function makeHistory(sheet) {
                     
                     let iBalance= jPrettyTXN.iBalance;
                     let balCheck= '<DIV class="L66">'+cents2EU(iBalance)+'</DIV>';
-                    //console.dir("LINE "+bLine+" --> "+iBalance);
-                    //console.dir();
 
                     let data = (
                         jPrettyTXN.entry.join(CSEP)
@@ -159,15 +162,19 @@ function makeHistory(sheet) {
                     for (i=0;i< 6;i++) { sigLine.push(data[i]); }  
                     
                     var moneyLine=[];
-                    for (i=6;i<13;i++) { moneyLine.push(data[i]); }  
+                    for (i=6;i<14;i++) { moneyLine.push(data[i]); }  
+
+                    cSaldo += jPrettyTXN.cSaldo;
                     
-                    arrHistory.push({'sig':sigLine.join(CSEP),'money':moneyLine.join(CSEP)});                                        
+                    arrHistory.push({'sig':sigLine.join(CSEP),'money':moneyLine.join(CSEP), 'saldo':cSaldo});                                        
                 }
             }
+            let rHistory=arrHistory.reverse();
+
             for (let i=1;i<SCREEN_TXNS;i++) arrHistory.push({sig:CSEP+CSEP+CSEP+CSEP+CSEP,money:CSEP+CSEP+CSEP+CSEP+CSEP+CSEP});
         }
     }
-    console.log("makeHistory="+JSON.stringify(arrHistory))
+    //console.log("makeHistory="+JSON.stringify(arrHistory))
     return arrHistory;
 }  
 

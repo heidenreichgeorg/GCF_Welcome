@@ -1206,8 +1206,10 @@ function sendBalance(balance) {
     }
 
 
-    Object.keys(bHistory).reverse().map((hash,i) => {txns[i] = bHistory[hash]});
-
+    // reverse or nor GH20221107
+    //Object.keys(bHistory).reverse().map((hash,i) => {txns[i] = bHistory[hash]});
+    Object.keys(bHistory).map((hash,i) => {txns[i] = bHistory[hash]});
+    
     
     // transfer all fixed assets
     gResponse[D_FixAss] = balance[D_FixAss];
