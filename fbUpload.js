@@ -7,6 +7,8 @@ Um eine Datei in Cloud Storage hochzuladen, erstellen Sie zunächst einen Verwei
 //const base64 = require('Base64');
 const utf8 = require('utf8');
 
+const fbS = "/";
+
 const fbApp = require("firebase/app");
 const fbStorage = require("firebase/storage");
 
@@ -69,50 +71,73 @@ async function fbWriteJSON(bpStorage,client,year,jData) {
   let downloadUrl = "no Firebase Storage";
   if(fbStorage) {
     if(bpStorage) {
-      //WRITE FB to no Firebase Storage Instance
-      // instance missing
-      //if(bpStorage.instance) {
-          // sanitize input
+
+      // sanitize input
         let sClient = client.replace('.','_');
         let iYear = parseInt(year);
-        const strChild = sClient+"/"+iYear+"/main.json";
-        const firebaseStorageRef = fbStorage.ref(bpStorage, strChild);
 
+        const strChild = fbS+sClient+fbS+iYear+fbS+"main.json";
+        const fileRef = fbStorage.ref(bpStorage, strChild);
+        if(fileRef) {
 
-        //let firebaseStorageRef = bpStorage.instance.ref();
-        if(firebaseStorageRef) {
-
-          var fileRef = firebaseStorageRef; // .child(strChild);
-          if(fileRef) {
-            var jsonString = JSON.stringify(jData);
-            var bytes = utf8.encode(jsonString);
-            //var base64Str = base64.encode(bytes);
-            //var arr = base64.decode(base64Str); //arr will be Uint8list
-            var arr = str2ab(jsonString);
-
-            const uploadTask = fbStorage.uploadBytesResumable(fileRef, arr);
-//            let taskSnapshot = await uploadTask.onComplete;   
-            //downloadUrl = await taskSnapshot.ref.getDownloadURL();
-            
-            uploadTask.on("state_changed",
-            (snapshot) => {
+          var jsonString = JSON.stringify(jData);
+          var arr = str2ab(jsonString);
+          const uploadTask = fbStorage.uploadBytesResumable(fileRef, arr);
+          
+          uploadTask.on("state_changed", // params are: EVENT NEXT ERROR COMPLETE
+          (snapshot) => { // NEXT
               const progress =
                 Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
               //setProgresspercent(progress);
-              console.log("fbWriteJSON "+progress);},
-            
-            (error) => {
-              console.dir("fbWriteJSON "+JSON.stringify(error));
-            },
-            () => {
-              getDownloadURL(uploadTask.snapshot.ref).then((url) => {
-                downloadUrl=url;});
-            });
-            
+              
+                console.log("fbWriteJSON "+progress);
 
-          } else downloadUrl = "no Firebase Storage Ref for"+strChild;
-        } else downloadUrl = "no Firebase Storage root Ref ";
-      //} else downloadUrl = "no Firebase Storage Instance";
+            },
+          (error) => { // ERROR
+          // A full list of error codes is available at
+              // https://firebase.google.com/docs/storage/web/handle-errors
+              console.log(error.name +" "+error.code+" "+error._baseMessage);
+              /*
+              switch (error.code) {
+                case 'storage/unauthorized':
+                  break;
+                case 'storage/canceled':
+                  // User canceled the upload
+                  break;
+
+                // ...
+
+                case 'storage/unknown':
+                  // Unknown error occurred, inspect error.serverResponse
+                  break;          },
+                  */
+              },
+
+              // COMPLETE
+          () => { 
+            if(uploadTask.snapshot && uploadTask.snapshot.ref && uploadTask.snapshot.ref._location) {
+              const loc = uploadTask.snapshot.ref._location;
+              downloadUrl = loc.bucket+fbS+loc.path_;
+              console.log("Firebaee fbWriteJSON to: "+downloadUrl);          
+              //uploadTask.snapshot.ref.getDownloadURL().then((url) => { downloadUrl=url;}); 
+              }
+            }
+          );
+          
+/*
+
+{allPaths=**}
+if request.auth != null
+
+{"code":"storage/unauthorized",
+"customData":{"serverResponse":""},
+"name":"FirebaseError",
+"status_":403,"_baseMessage":
+"Firebase Storage: User does not have permission to access 'HGKG/2022/main.json'. 
+(storage/unauthorized)"
+}`
+*/
+        } else downloadUrl = "no Firebase Storage Ref for"+strChild;
     } else downloadUrl = "no Firebase Storage";
   }
   return downloadUrl;
@@ -122,62 +147,6 @@ module.exports['fbWriteJSON']=fbWriteJSON;
 
     
 /*      
-
-// 'file' comes from the Blob or File API
-uploadBytes(storageRef, file).then((snapshot) => {
-  console.log('Uploaded a blob or file!');
-});
-
-
-
-
-Hochladen von einem Byte-Array
-Zusätzlich zu den File und Blob -Typen kann uploadBytes() auch ein Uint8Array in Cloud Storage hochladen.
-
-
-
-const bytes = new Uint8Array([0x48, 0x65, 0x6c, 0x6c, 0x6f, 0x2c, 0x20, 0x77, 0x6f, 0x72, 0x6c, 0x64, 0x21]);
-uploadBytes(storageRef, bytes).then((snapshot) => {
-  console.log('Uploaded an array!');
-});
-
-
-
-
-Hochladen aus einer Zeichenfolge
-Wenn kein Blob , File oder Uint8Array verfügbar ist, können Sie die uploadString() -Methode verwenden, um eine Raw-, base64 -, base64url - oder data_url Zeichenfolge in Cloud Storage hochzuladen.
-
-
-// Raw string is the default if no format is provided
-const message = 'This is my message.';
-uploadString(storageRef, message).then((snapshot) => {
-  console.log('Uploaded a raw string!');
-});
-
-
-/*
-// Base64 formatted string
-const message2 = '5b6p5Y+344GX44G+44GX44Gf77yB44GK44KB44Gn44Go44GG77yB';
-uploadString(storageRef, message2, 'base64').then((snapshot) => {
-  console.log('Uploaded a base64 string!');
-});
-
-// Base64url formatted string
-const message3 = '5b6p5Y-344GX44G-44GX44Gf77yB44GK44KB44Gn44Go44GG77yB';
-uploadString(storageRef, message3, 'base64url').then((snapshot) => {
-  console.log('Uploaded a base64url string!');
-});
-
-// Data URL string
-const message4 = 'data:text/plain;base64,5b6p5Y+344GX44G+44GX44Gf77yB44GK44KB44Gn44Go44GG77yB';
-uploadString(storageRef, message4, 'data_url').then((snapshot) => {
-  console.log('Uploaded a data_url string!');
-});
-
-
-uploadString() gibt eine UploadTask zurück, die Sie als Zusage oder zur Verwaltung und Überwachung des Upload-Status verwenden können.
-
-Da die Referenz den vollständigen Pfad zur Datei definiert, stellen Sie sicher, dass Sie in einen nicht leeren Pfad hochladen.
 
 Dateimetadaten hinzufügen
 Beim Hochladen einer Datei können Sie auch Metadaten für diese Datei angeben. Diese Metadaten enthalten typische Dateimetadateneigenschaften wie name , size und contentType (allgemein als MIME-Typ bezeichnet). Cloud Storage leitet den Inhaltstyp automatisch von der Dateierweiterung ab, in der die Datei auf der Festplatte gespeichert ist, aber wenn Sie einen contentType in den Metadaten angeben, wird der automatisch erkannte Typ überschrieben. Wenn keine contentType -Metadaten angegeben sind und die Datei keine Dateierweiterung hat, verwendet Cloud Storage standardmäßig den Typ application/octet-stream . Weitere Informationen zu Dateimetadaten finden Sie im Abschnitt Dateimetadaten verwenden .
@@ -192,7 +161,6 @@ const metadata = {
 
 Uploads verwalten
 Zusätzlich zum Starten von Uploads können Sie Uploads mit den Methoden pause() , resume() und cancel() anhalten, fortsetzen und abbrechen. Das Aufrufen von pause() oder resume() löst pause oder running aus. Der Aufruf der Methode cancel() führt dazu, dass der Upload fehlschlägt und ein Fehler zurückgegeben wird, der darauf hinweist, dass der Upload abgebrochen wurde.
-
 
 import { uploadBytesResumable } from "firebase/storage";
 
@@ -226,10 +194,7 @@ task	firebaseStorage.UploadTask	Die Aufgabe ist eine Momentaufnahme, die verwend
 ref	firebaseStorage.Reference	Die Referenz, aus der diese Aufgabe stammt.
 Diese Zustandsänderungen bieten in Kombination mit den Eigenschaften des TaskSnapshot eine einfache, aber leistungsstarke Möglichkeit, Upload-Ereignisse zu überwachen.
 
-
-import {  getDownloadURL } from "firebase/storage";
 import { write } from "xlsx";
-
 
 // Register three observers:
 // 1. 'state_changed' observer, called any time the state changes
