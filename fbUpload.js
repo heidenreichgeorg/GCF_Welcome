@@ -8,6 +8,7 @@ Um eine Datei in Cloud Storage hochzuladen, erstellen Sie zunächst einen Verwei
 const utf8 = require('utf8');
 
 const fbS = "/";
+const MAIN = "main.json";
 
 const fbApp = require("firebase/app");
 const fbStorage = require("firebase/storage");
@@ -76,7 +77,7 @@ async function fbWriteJSON(bpStorage,client,year,jData) {
         let sClient = client.replace('.','_');
         let iYear = parseInt(year);
 
-        const strChild = fbS+sClient+fbS+iYear+fbS+"main.json";
+        const strChild = fbS+sClient+fbS+iYear+fbS+MAIN;
         const fileRef = fbStorage.ref(bpStorage, strChild);
         if(fileRef) {
 
@@ -118,7 +119,7 @@ async function fbWriteJSON(bpStorage,client,year,jData) {
             if(uploadTask.snapshot && uploadTask.snapshot.ref && uploadTask.snapshot.ref._location) {
               const loc = uploadTask.snapshot.ref._location;
               downloadUrl = loc.bucket+fbS+loc.path_;
-              console.log("Firebaee fbWriteJSON to: "+downloadUrl);          
+              console.log("Firebase fbWriteJSON to: "+downloadUrl);          
               //uploadTask.snapshot.ref.getDownloadURL().then((url) => { downloadUrl=url;}); 
               }
             }
@@ -282,3 +283,47 @@ uploadTaskB.on('state_changed',
   }
 );
 */
+
+function download(bpStorage,client,year,startSession,ext,res) {
+  let sClient = client.replace('.','_');
+  let iYear = parseInt(year);
+  const strChild = fbS+sClient+fbS+iYear+fbS+MAIN;
+  const strPath = firebaseConfig.storageBucket+strChild;
+
+  var gsReference = bpStorage.refFromURL('gs://'+strPath);
+  gsReference.getDownloadURL().then(function(url) {
+      // This can be downloaded directly:
+      console.log('storage/get '+url);
+      var xhr = new XMLHttpRequest();
+      xhr.responseType = 'text';
+      xhr.onload = function(event) {
+        var text = xhr.response;
+        console.log("Firebase.download reads "+text);
+        let jData = JSON.parse(text);
+        startSession(jData,ext,res);
+      };
+      xhr.open('GET', url);
+      xhr.send();
+    }).catch(function(error) {
+      // A full list of error codes is available at
+      // https://firebase.google.com/docs/storage/web/handle-errors
+      switch (error.code) {
+        case 'storage/object-not-found':
+          console.log('storage/object-not-found')
+          break;
+
+        case 'storage/unauthorized':
+          console.log('storage/unauthorized')
+          break;
+
+        case 'storage/canceled':
+          console.log('storage/canceled')
+          break;
+
+        case 'storage/unknown':
+          console.log('storage/unknown')
+          break;
+      }  
+  });
+}
+module.exports['download']=download;

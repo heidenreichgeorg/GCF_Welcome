@@ -84,7 +84,7 @@ function getSession(id) {
         if(session.id===id) result=session;
     });
     if(result) {
-        console.log("\n0600  => (SESSION  time="+result.time+"  client="+result.client+"  year="+result.year+")");
+        console.log("\n0600  getSession() => (SESSION  time="+result.time+"  client="+result.client+"  year="+result.year+")");
     }
 
     return result; 
@@ -148,9 +148,10 @@ function registerLink(command,htmlPage,sessionId) {
 app.get("/LATEST", (req, res) => { 
 
     if(req && req.query && req.socket) {        
-        session = signUp(req.query,req.socket.remoteAddress);
+        session = signDown(req.query,req.socket.remoteAddress,res);
+        //session = signUp(req.query,req.socket.remoteAddress,res);
         console.log("\n0800 GET /LATEST FOUND => "+session.id);
-        if(session!=null) sendDisplay(session,res);
+       
         // exits via res.send
     }
     else {
@@ -174,7 +175,7 @@ app.get('/SESSION', (req, res) => {
 
         //COLD START: LOAD FROM LATEST FILE
         if(!(sessionId=sy_findSessionId(query.client,query.year))) {
-            session = signUp(query,req.socket.remoteAddress);
+            session = signUp(query,req.socket.remoteAddress,null);
             if(session) console.log("\n0810 GET /SESSION FOUND FILE => "+session.id);
             else console.log("\n0811 GET /SESSION FILE NOT FOUND => "+JSON.stringify(query));
     
@@ -253,26 +254,28 @@ function sendDisplay(session,res) {
         let url = localhost() + usrLogin;
         console.dir("5010 sendDisplay() rendering url="+url);
 
-        qr.toDataURL(url, (err, qrCodeDataUrl) => {
-            if (err) res.send("Error occured");
+        if(res) {
+            qr.toDataURL(url, (err, qrCodeDataUrl) => {
+                if (err) res.send("Error occured");
 
-            res.header('Content-Type', 'text/html');
-        
-            // Let us return the QR code image as our response and set it to be the source used in the webpage
-            const html = ejs.render('<DIV class="attrRow"><img src="<%= qrCodeDataUrl %>" /></DIV>', { qrCodeDataUrl });
+                res.header('Content-Type', 'text/html');
+            
+                // Let us return the QR code image as our response and set it to be the source used in the webpage
+                const html = ejs.render('<DIV class="attrRow"><img src="<%= qrCodeDataUrl %>" /></DIV>', { qrCodeDataUrl });
 
-            console.dir("5020 sendDisplay() rendering QR code with #"+html.length+ "chars");
+                console.dir("5020 sendDisplay() rendering QR code with #"+html.length+ "chars");
 
-            res.writeHead(HTTP_OK);
-            res.write(
-                "<HTML>"+clientHead+"<BODY>"
-                +html
-                +'<DIV class="attrRow"><H1>'+year+'&nbsp;'+client+'&nbsp;'+postFix+'</H1>'
-                +banner                    
-                +'</DIV></BODY></HTML>'
-            );
-            res.end();
-        });
+                res.writeHead(HTTP_OK);
+                res.write(
+                    "<HTML>"+clientHead+"<BODY>"
+                    +html
+                    +'<DIV class="attrRow"><H1>'+year+'&nbsp;'+client+'&nbsp;'+postFix+'</H1>'
+                    +banner                    
+                    +'</DIV></BODY></HTML>'
+                );
+                res.end();
+            });
+        }
 
     } else {
         res.writeHead(HTTP_OK);
@@ -495,8 +498,36 @@ app.post("/UPLOAD", (req, res) => {
 });
 
 
+// load JSON file from Firebase storage
+function signDown(query,remote,res) {
+    let base =  Compiler.getRoot();
+    console.log("0010 signDown at base "+base+"  for "+JSON.stringify(query));
 
-function signUp(query,remote) {
+    if(query && query.client && query.client.length>2 ) { // && (query.client == "[a-zA-Z0-9]")) {
+
+        // Security sanitize input client
+        let client = query.client;
+        
+        if(query && query.year && query.year.length>2 && (parseInt(query.year)>1)) {
+
+            // Security sanitize input year
+            let year   = parseInt(query.year); // Security sanitize input year
+            console.log("0014 signDown for client "+client+"  year "+year);
+
+            if(query.ext && query.ext.length>0) { //} && query.ext == "[a-zA-Z0-9]" ) {
+
+                sheets.fbDownload(startSession,ext,res);
+               
+            } else console.log ( "0025 signDown file no valid file ext for query="+JSON.stringify(query)+",addr="+remote);
+                        
+        } else console.log ( "0027 signDown file no valid year for query="+JSON.stringify(query)+",addr="+remote);
+
+    } else console.log ( "0029 signDown file no valid client for query="+JSON.stringify(query)+",addr="+remote);
+}
+
+
+// load JSON from server storage
+function signUp(query,remote,res) {
     let base =  Compiler.getRoot();
     console.log("0010 signUp at base "+base+"  for "+JSON.stringify(query));
 
@@ -513,6 +544,7 @@ function signUp(query,remote) {
 
             if(query.ext && query.ext.length>0) { //} && query.ext == "[a-zA-Z0-9]" ) {
 
+
                 // Security sanitize input ext
                 let ext    = query.ext;
 
@@ -527,20 +559,7 @@ function signUp(query,remote) {
 
                     if(client===session.client) {
 
-                        let strTimeSymbol = timeSymbol();
-                        let time = strTimeSymbol;
-                        let year=session.year;
-                        console.log("0024 signUp SUCCESS session="+JSON.stringify(Object.keys(session))); 
-
-
-                        // START A NEW SESSION
-                        let sessionId = strSymbol(time+client+year+time);
-                        session.id=sessionId;
-                        session.generated = Compiler.compile(session);
-                        session.ext=ext;
-                        setSession(session);
-
-                        return session;
+                         startSession(session, ext, res); // exit via res.send
 
                     } else console.log ( "0017 LATEST client no OK for query="+JSON.stringify(query)+",addr="+remote);
 
@@ -551,20 +570,26 @@ function signUp(query,remote) {
         } else console.log ( "0027 LATEST file no valid year for query="+JSON.stringify(query)+",addr="+remote);
     
     } else console.log ( "0029 LATEST file no valid client for query="+JSON.stringify(query)+",addr="+remote);
-    /*
-            // GH20221103 Do NOT SEND ANYTHING, LEAVE THAT TO THE CALLER
-                    } else {
-                        console.dir("0071 app.get LATEST "+client+" dir contains "+session.client+" object!!");
-                        res.write('<DIV class="attrRow"><H1>['+base+'|'+client+'&nbsp;]</H1>'
-                            +'<DIV class="attrRow"><DIV class="C100"><BUTTON class="largeKey">STOP</BUTTON></DIV></DIV>'
-                            +'</DIV>'
-                        );
-                        res.end();
-                    }
-
-                } else console.log ( "0013 LATEST file not found for query="+JSON.stringify(query)+",addr="+remote);
-*/
-        return null;
+    
+    return null;
 };
 
+
+function startSession(session, ext, res) {
+
+    console.log("0024 signUp SUCCESS session="+JSON.stringify(Object.keys(session))); 
+
+    // START A NEW SESSION
+    let time = timeSymbol();
+    let year=session.year;
+    let client = session.client;
+    let sessionId = strSymbol(time+client+year+time);
+    session.id=sessionId;
+    session.generated = Compiler.compile(session);
+    session.ext=ext;
+
+    setSession(session);
+
+    sendDisplay(session,res);
+}
 

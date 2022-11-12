@@ -709,7 +709,6 @@ async function save2Server(session,client,year) {
     }
 
 
-
     // WRITE SESSION   1st PARAMETER
     fs.writeFileSync(jsonFileName, data, {'encoding':'utf8'}, (err) => { // was latin1 GH20211120
         if (err) {
@@ -723,6 +722,18 @@ async function save2Server(session,client,year) {
     return jsonFileName;
 }
 module.exports['save2Server']=save2Server;
+
+
+
+
+function fbDownload(callBack,ext,res) {
+    const bpStorage = fbUpload.fbInit();
+    fbUpload.download(bpStorage,client,year,callBack,ext,res);
+}
+module.exports['fbDownload']=fbDownload;
+
+
+
 
 
 function saveSessionLog(sessionId,txn) {
@@ -753,19 +764,6 @@ function saveSessionLog(sessionId,txn) {
     } else console.log("app.post saveSessionLog did not save: no session object!");
 }
 module.exports['saveSessionLog']=saveSessionLog;
-
-
-/*
-function logS(session,caller) {
-    var  info = "empty";
-    if(session) {
-        let sCells=session.sheetCells;
-        info = "{ client:"+session.client+" year:"+session.year+" time:"+session.time+ " sheetName:"+session.sheetName+" sheetCells#"+sCells.length+"  #="+sCells[sCells.length-1]+"}";
-    }
-    console.log("**** "+caller+" session "+info);
-    
-}
-*/
 
 
 
@@ -812,19 +810,6 @@ function jsonLogf(client) {
 
 
 
-function fileFromSession(sid) {
-    var result="main";
-    if(sid) {
-        var buffer=[ sid[0] ];
-        for(var i=1;i+4<sid.length;i+=4) buffer.push(sid[i]);
-        result=buffer.join('');
-    } 
-    return result;
-}
-
-
-
-
 function symbolic(pat) {
     var res = 0;
     if(pat) {
@@ -839,34 +824,3 @@ function symbolic(pat) {
 module.exports['symbolic']=symbolic;
 
 
-
-/*
-function getFromFile(client,year,sFile,time,sName) {
-
-    var sheetCells=[];
-    var dir = getRoot()+client+Slash; // GH20220430
-
-    if(debug) console.log("getFromFile "+sFile+" in "+dir);
-
-    if(sFile) {
-
-        let ext = sFile.split('\.').pop();
-
-        // temporary object names
-        if(ext==='csv') {
-            if(debug) console.log("getFromFile Found CSV in "+sFile);
-            sheetCells = readCSVFile(sFile);
-        }
-        else if(ext==='xlsx') {
-            if(debug) console.log("getFromFile Found XLSX in "+sFile);
-            sheetCells = readXLSXFile(sFile,sName);
-        }
-
-        var numLines = sheetCells.length;            
-        console.log("getFromFile Found "+sFile+" with "+numLines+" lines.");                    
-    }            
-
-    return sheetCells;
-     
-}
-*/

@@ -2,8 +2,8 @@ rules_version = '2';
 service firebase.storage {
   match /b/{bucket}/o {
     match /HGKG/{allPaths=**} {
-    	allow read, write: if true;
-      allow create, write, update: if true;
+    	allow read, write: if request.auth.uid != null;
+      allow create, write, update: if request.auth.uid != null;
     }
     match /{allPaths=**} {
     	allow read, write: if false;
