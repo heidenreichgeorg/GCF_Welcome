@@ -113,7 +113,8 @@ function sy_findSessionId(client,year) {
         console.log("\n0804  CHECK => (SESSION  client="+session.client+"  year="+session.year+")");
         if(session.year===year && session.client===client) {
             result=session;
-            console.log("\n0806  FOUND => (SESSION  client="+session.client+"  year="+session.year+")");
+            let fb=session.fireBase?session.fireBase:" no entry";
+            console.log("\n0806  FOUND => (SESSION  client="+session.client+"  year="+session.year+" fireBase="+fb+")");
         }
     });
     if(result) return result.id;

@@ -22,9 +22,12 @@ const { FORMERR } = require('dns');
 // File system
 const fs = require('fs');
 
+// Google Firebase
+const fbUpload = require('./fbUpload.js');
 
-const Money = require('../JN_myReader/backend/money.js');
-//const Client = require('./client.js');
+
+const Money = require('./money.js');
+
 
 const D_Schema = "Schema"; // includes .Names .total
 
@@ -691,11 +694,20 @@ async function save2Server(session,client,year) {
     let jsonFileName=jsonMain(client,year,sessionId);
 
 
+    // FIREBASE
+    // async
+    session.fireBase = "no response from Firebase";
+    const bpStorage = fbUpload.fbInit();
+    fbUpload.fbWriteJSON(bpStorage,client,year,session)
+        .then((url) => (session.fireBase=url));
+
+
     // REJECT IF FILE EXISTS
     if(checkExist(getClientDir(client),year)) {
         console.log("0033 sheets.save2Server: DETECTS COLLISION ");   
         return null;
     }
+
 
 
     // WRITE SESSION   1st PARAMETER
