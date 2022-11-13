@@ -2,9 +2,6 @@
 Um eine Datei in Cloud Storage hochzuladen, erstellen Sie zunächst einen Verweis auf den vollständigen Pfad der Datei, einschließlich des Dateinamens.
 */
 
-//import { initializeApp, getStorage, ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
-
-//const base64 = require('Base64');
 const utf8 = require('utf8');
 
 const fbS = "/";
@@ -46,6 +43,61 @@ function fbInit() {
 
 }
 module.exports['fbInit']=fbInit;
+
+
+// gsutil cors set cors.json gs://bookingpapages-a0a7c -
+
+function download(bpStorage,client,year,startSession,ext,res) {
+  let sClient = client.replace('.','_');
+  let iYear = parseInt(year);
+  const strChild = fbS+sClient+fbS+iYear+fbS+MAIN;
+  //const strPath = firebaseConfig.storageBucket+strChild;
+  
+  const fileRef = fbStorage.ref(bpStorage, strChild);
+  console.log('download '+JSON.stringify(fileRef));
+
+  fbStorage.getDownloadURL(fileRef)
+  .then(function(url) {
+  
+      // This can be downloaded directly:
+      console.log('storage/get '+url);
+      var xhr = new XMLHttpRequest();
+      xhr.responseType = 'text';
+      xhr.onload = function(event) {
+        console.log("Firebase.download ONLOAD");
+        var res = xhr.response;
+        res.getBytes().then(text => {
+          console.log("Firebase.download reads "+text);
+          let jData = JSON.parse(text);
+          startSession(jData,ext,res);
+        });
+      };
+      xhr.open('GET', url);
+      xhr.send();
+    }).catch(function(error) {
+      // A full list of error codes is available at
+      // https://firebase.google.com/docs/storage/web/handle-errors
+      switch (error.code) {
+        case 'storage/object-not-found':
+          console.log('storage/object-not-found')
+          break;
+
+        case 'storage/unauthorized':
+          console.log('storage/unauthorized')
+          break;
+
+        case 'storage/canceled':
+          console.log('storage/canceled')
+          break;
+
+        case 'storage/unknown':
+          console.log('storage/unknown')
+          break;
+      }  
+  });
+}
+module.exports['download']=download;
+
 
 /*
 
@@ -284,46 +336,3 @@ uploadTaskB.on('state_changed',
 );
 */
 
-function download(bpStorage,client,year,startSession,ext,res) {
-  let sClient = client.replace('.','_');
-  let iYear = parseInt(year);
-  const strChild = fbS+sClient+fbS+iYear+fbS+MAIN;
-  const strPath = firebaseConfig.storageBucket+strChild;
-
-  var gsReference = bpStorage.refFromURL('gs://'+strPath);
-  gsReference.getDownloadURL().then(function(url) {
-      // This can be downloaded directly:
-      console.log('storage/get '+url);
-      var xhr = new XMLHttpRequest();
-      xhr.responseType = 'text';
-      xhr.onload = function(event) {
-        var text = xhr.response;
-        console.log("Firebase.download reads "+text);
-        let jData = JSON.parse(text);
-        startSession(jData,ext,res);
-      };
-      xhr.open('GET', url);
-      xhr.send();
-    }).catch(function(error) {
-      // A full list of error codes is available at
-      // https://firebase.google.com/docs/storage/web/handle-errors
-      switch (error.code) {
-        case 'storage/object-not-found':
-          console.log('storage/object-not-found')
-          break;
-
-        case 'storage/unauthorized':
-          console.log('storage/unauthorized')
-          break;
-
-        case 'storage/canceled':
-          console.log('storage/canceled')
-          break;
-
-        case 'storage/unknown':
-          console.log('storage/unknown')
-          break;
-      }  
-  });
-}
-module.exports['download']=download;

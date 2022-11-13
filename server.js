@@ -148,8 +148,7 @@ function registerLink(command,htmlPage,sessionId) {
 app.get("/LATEST", (req, res) => { 
 
     if(req && req.query && req.socket) {        
-        session = signDown(req.query,req.socket.remoteAddress,res);
-        //session = signUp(req.query,req.socket.remoteAddress,res);
+        session = signIn(req.query,req.socket.remoteAddress,res);
         console.log("\n0800 GET /LATEST FOUND => "+session.id);
        
         // exits via res.send
@@ -175,7 +174,7 @@ app.get('/SESSION', (req, res) => {
 
         //COLD START: LOAD FROM LATEST FILE
         if(!(sessionId=sy_findSessionId(query.client,query.year))) {
-            session = signUp(query,req.socket.remoteAddress,null);
+            session = signIn(query,req.socket.remoteAddress,res); 
             if(session) console.log("\n0810 GET /SESSION FOUND FILE => "+session.id);
             else console.log("\n0811 GET /SESSION FILE NOT FOUND => "+JSON.stringify(query));
     
@@ -185,11 +184,13 @@ app.get('/SESSION', (req, res) => {
             session = getSession(sessionId);
             if(session) console.log("\n0820 GET /SESSION FOUND LOADED => "+session.id);
             else console.log("\n0821 GET /SESSION NOT FOUND => FOR EXISTING #"+sessionId);
-        }
+
+
+            if(session && session.id) res.json({ id: session.id, client: session.client, year:session.year });
+            else req.query.code = "Could not signIn()";
+            }
         
 
-        if(session && session.id) res.json({ id: session.id, client: session.client, year:session.year });
-        else req.query.code = "Could not signUp()";
     }
     else res.json({ id: '0123', code : "NO VALID QUERY"})
 });
@@ -497,6 +498,10 @@ app.post("/UPLOAD", (req, res) => {
     res.end();
 });
 
+function signIn(query,remote,res) {
+    //signDown(query,remote,res); // load from Firebase
+    return signUp(query,remote,res); // load from server filesystem
+}
 
 // load JSON file from Firebase storage
 function signDown(query,remote,res) {
@@ -516,7 +521,7 @@ function signDown(query,remote,res) {
 
             if(query.ext && query.ext.length>0) { //} && query.ext == "[a-zA-Z0-9]" ) {
 
-                sheets.fbDownload(startSession,ext,res);
+                Compiler.fbDownload(client,year,startSession,query.ext,res);
                
             } else console.log ( "0025 signDown file no valid file ext for query="+JSON.stringify(query)+",addr="+remote);
                         
@@ -571,13 +576,13 @@ function signUp(query,remote,res) {
     
     } else console.log ( "0029 LATEST file no valid client for query="+JSON.stringify(query)+",addr="+remote);
     
-    return null;
+    return session;
 };
 
 
 function startSession(session, ext, res) {
 
-    console.log("0024 signUp SUCCESS session="+JSON.stringify(Object.keys(session))); 
+    console.log("0024 signIn START session="+JSON.stringify(Object.keys(session))); 
 
     // START A NEW SESSION
     let time = timeSymbol();
@@ -589,6 +594,8 @@ function startSession(session, ext, res) {
     session.ext=ext;
 
     setSession(session);
+
+    console.log("0026 signIn SUCCESS sessionId="+sessionId); 
 
     sendDisplay(session,res);
 }

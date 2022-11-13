@@ -697,8 +697,8 @@ async function save2Server(session,client,year) {
     // FIREBASE
     // async
     session.fireBase = "no response from Firebase";
-    const bpStorage = fbUpload.fbInit();
-    fbUpload.fbWriteJSON(bpStorage,client,year,session)
+    const appStorage = fbUpload.fbInit();
+    fbUpload.fbWriteJSON(appStorage,client,year,session)
         .then((url) => (session.fireBase=url));
 
 
@@ -726,9 +726,9 @@ module.exports['save2Server']=save2Server;
 
 
 
-function fbDownload(callBack,ext,res) {
-    const bpStorage = fbUpload.fbInit();
-    fbUpload.download(bpStorage,client,year,callBack,ext,res);
+function fbDownload(client,year,callBack,ext,res) {
+    const appStorage = fbUpload.fbInit();
+    fbUpload.download(appStorage,client,year,callBack,ext,res);
 }
 module.exports['fbDownload']=fbDownload;
 

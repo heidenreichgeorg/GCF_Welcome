@@ -1582,3 +1582,9 @@ async function send(res,gResponse) {
 }
 
 
+
+function fbDownload(client,year,callBack,ext,res) {
+    Sheets.fbDownload(client,year,callBack,ext,res);
+} 
+module.exports['fbDownload']=fbDownload;
+
