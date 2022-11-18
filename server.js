@@ -499,7 +499,10 @@ app.post("/UPLOAD", (req, res) => {
 });
 
 function signIn(query,remote,res) {
-    //signDown(query,remote,res); // load from Firebase
+    
+    // TEST ONLY
+    signDown(query,remote,res); // load from Firebase
+
     return signUp(query,remote,res); // load from server filesystem
 }
 
