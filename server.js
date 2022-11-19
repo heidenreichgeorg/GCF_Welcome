@@ -1,8 +1,27 @@
 // LOCAL START
 // node server.js root=d:\Privat\ auto=900
 
+/*
+ React routes SESSION SHOW BOOK EXCEL
+ /SESSION takes buffered session, otherwise loads from file
+ /SHOW (by compile module) returns existing buffered session context
+ /BOOK appends session context and then stores it as JSON on server-side storage
+ /EXCEL stores EXCEL on server-side storage and then downloads it
+*/
 
-// SET NEW URL localhost:81/LATEST?client=HGKG&year=2021&ext=JSON
+
+// JS client routes DOWN
+// GET
+// localhost:81/LATEST?client=HGKG&year=2022&ext=JSON 
+// ABSCHLUSS downloads a JSON file
+// generates global-IP QR (but only local-IP QR-code if network off)
+//
+// JS client routes UP
+// GET
+// WelcomeDrop.html allows upload to server
+// POST
+// /UPLOAD with JSON data
+
 
 let debug=1;
 
@@ -160,9 +179,9 @@ app.get("/LATEST", (req, res) => {
 });
 
 
-// PROVIDES SESSION TO SERVER CONSOLE 
-// NO UPDATE AS LONG AS CLIENT/YEAR EXISTS AS A SESSION
-// WITH THAT SERVER HOSTING THE ClientYear.JSON  file
+// responds with session contxt object  
+// uses buffered session context if one exists for that client/year
+// does not refresh buffered session context if external session context has changed
 app.get('/SESSION', (req, res) => {
     if(req && req.query && req.socket) {       
         
@@ -290,6 +309,7 @@ function sendDisplay(session,res) {
 /*
    req.body contains key-value pairs of data submitted in the request body. 
    By default, it is undefined, and is populated when you use body-parsing middleware such as body-parser.
+*/
 
 
 // USER SELECTS MATCHING FILE
@@ -299,6 +319,7 @@ app.get('/welcomedrop', (req, res) => {
     res.sendFile('./WelcomeDrop.html', { root: __dirname })
 })
 
+/*
 // SYSTEM SELECTS LATEST FILE FROM CLIENT FOLDER
 app.get('/loginclient', (req, res) => {
     console.log("\nLoginClient\n");
@@ -475,7 +496,11 @@ app.post("/UPLOAD", (req, res) => {
 
             // INSTEAD OF LOCAL FILE STORAGE
             setSession(sessionData);
-         
+
+
+            // PERSISTENT FB CLOUD FILE STORAGE
+            Compiler.save2Server(sessionData,client,year);
+
             let usrLogin = jLoginURL(sessionData).url;
             let cmdLogin = usrLogin+"&clientSave=JSON";
 

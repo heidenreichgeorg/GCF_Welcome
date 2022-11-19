@@ -228,12 +228,10 @@ function init(app, argv) {
 
     app.get("/favicon.ico", (req, res)  => { res.sendFile(__dirname + "/favicon.jpg"); });
 
-
-
     app.get('/SHOW/', (req, res)    => {     
         // two very different functions here
         // 1. with SESSION-ID: returns normal JSON data structure
-        // 2. with client name: return HTML dialoge with latest session
+        // 2. with client name: return HTML dialog with latest session
         console.log("\n\n");
         console.log(Server.timeSymbol());
         console.log("1910 app.get SHOW sessionId="+ req.query.sessionId);
@@ -246,12 +244,12 @@ function init(app, argv) {
             let balance = session.generated;
             // SERVER FUNCTION INTERPRET1 GH20220918
 
-
             console.dir("1920 app.get SHOW sends Balance ="+JSON.stringify(Object.keys(balance)))
             // .map((element,i)=>(element + Object.keys(balance.element).length))));
             res.writeHead(Sheets.HTTP_OK, {"Content-Type": "text/html"}); 
             send(res,balance); 
         }
+        /*
         else {
             // 20220730
             // SY !!
@@ -263,8 +261,7 @@ function init(app, argv) {
                 let jLogin = Server.jLoginURL(session.year,session.client,session.id);
 
                 res.writeHead(Sheets.HTTP_OK, {"Content-Type": "text/html"}); 
-                
-                
+                                
                 res.write("<HTML><BODY><FORM METHOD='GET' ACTION='LOGIN'><BUTTON TYPE='submit' VALUE='ENTER'>Enter</BUTTON>"
                     +"<INPUT type='text' name='year'  value='"+session.year+"'>"+session.year+"</INPUT>"
                     +"<INPUT type='text' name='client' value='"+session.client+"'>"+session.client+"</INPUT>"
@@ -273,15 +270,14 @@ function init(app, argv) {
                     +"</FORM></BODY></HTML>");
 
             } else {
-
                 // No session known for that client
 
                 res.writeHead(Sheets.HTTP_OK, {"Content-Type": "text/html"}); 
                 res.write("<HTML><BODY>Client "+req.query.client+" not  logged in </BODY></HTML>");
 
-
             }
         }
+        */
         res.end();
     })
 
@@ -330,7 +326,7 @@ function init(app, argv) {
 
 
 
-
+// downloads EXCEL version of current session context
     app.get('/EXCEL', (req, res) => {
         
         console.log("\n"+Server.timeSymbol());
@@ -837,7 +833,10 @@ function compile(sessionData) {
 }
 module.exports['compile']=compile;
 
-
+function save2Server(session,client,year) {
+    Sheets.save2Server(session,client,year);
+}
+module.exports['save2Server']=save2Server
 
 function display(registerLink,sessionId,year,client,clientSave) {
     var vbanner=[];

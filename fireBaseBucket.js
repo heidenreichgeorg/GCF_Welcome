@@ -20,7 +20,7 @@ const MAIN = "main.json";
 const fbApp = require("firebase/app");
 const fbStorage = require("firebase/storage");
 
-function ab2str(buf) { return String.fromCharCode.apply(null, new Uint16Array(buf)); }
+//function ab2str(buf) { return String.fromCharCode.apply(null, new Uint16Array(buf)); }
 
 function str2ab(str) {
   var buf = new ArrayBuffer(str.length*2); // 2 bytes for each char
@@ -66,8 +66,6 @@ function download(bpStorage,client,year,startSession,ext,res) {
   
   const fileRef = fbStorage.ref(bpStorage, strChild);
   console.log('download fileRef='+JSON.stringify(fileRef));
-
-  
 
   fbStorage.getDownloadURL(fileRef)
   .then(function(url) {
