@@ -1,11 +1,9 @@
 /*
 
-
 bookingpages-a0a7c
 storage.rules: ALLE REGELN WERDEN AUSGEWERTET
 CONSOLE Cloud Storage settings -> UID , GID
 https://console.cloud.google.com/welcome?project=bookingpages-a0a7c
-
 
 DOWNLOAD EXCEL (pay per use)
 UPLOAD JSON (Admin only)
@@ -20,7 +18,12 @@ const MAIN = "main.json";
 const fbApp = require("firebase/app");
 const fbStorage = require("firebase/storage");
 
-//function ab2str(buf) { return String.fromCharCode.apply(null, new Uint16Array(buf)); }
+const https = require('https');
+//import Fetch from 'node-fetch'
+/*
+function ab2str(buffer) {
+  return String.fromCharCode.apply(null, Array.from(new Uint16Array(buffer)))
+}
 
 function str2ab(str) {
   var buf = new ArrayBuffer(str.length*2); // 2 bytes for each char
@@ -28,6 +31,7 @@ function str2ab(str) {
   for (var i=0, strLen=str.length; i<strLen; i++) { bufView[i] = str.charCodeAt(i); }
   return buf;
 }
+*/
 
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -43,7 +47,7 @@ const firebaseConfig = {
 };
 
 
-function fbInit() {
+function bucketInit() {
 
   // Initialize Firebase app
   const bpApp = fbApp.initializeApp(firebaseConfig);
@@ -52,86 +56,141 @@ function fbInit() {
   return  fbStorage.getStorage(bpApp);
 
 }
-module.exports['fbInit']=fbInit;
+module.exports['bucketInit']=bucketInit;
 
 
-// gsutil cors set cors.json gs://bookingpapages-a0a7c -
+// ONLY FOR BROWSERS gsutil cors set cors.json gs://bookingpapages-a0a7c -
 
 
-function download(bpStorage,client,year,startSession,ext,res) {
+async function bucketDownload(bpStorage,client,year,startSession,ext,userRes) {
   let sClient = client.replace('.','_');
   let iYear = parseInt(year);
-  const strChild = fbS+sClient+fbS+iYear+fbS+MAIN;
-  //const strPath = firebaseConfig.storageBucket+strChild;
-  
+
+
+  const strChild = fbS+sClient+fbS+iYear+fbS+MAIN;  
   const fileRef = fbStorage.ref(bpStorage, strChild);
-  console.log('download fileRef='+JSON.stringify(fileRef));
+  console.log('Firebase.download fileRef='+JSON.stringify(fileRef));
 
   fbStorage.getDownloadURL(fileRef)
-  .then(function(url) {
-  
-      // This can be downloaded directly:
-      console.log('Firebase.download storage/get '+url);
-      var xhr = new XMLHttpRequest();
-      xhr.responseType = 'text';
-      xhr.onload = function(event) {
-        console.log("Firebase.download ONLOAD");
-        var res = xhr.response;
-        res.getBytes().then(text => {
-          console.log("Firebase.download reads "+text);
-          let jData = JSON.parse(text);
-          //startSession(jData,ext,res);
-          console.log("Firebase.download reads "+JSON.stringify(jData));
-        });
-      };
-      xhr.open('GET', url);
-      xhr.send();
-    }).catch(function(error) {
-      // A full list of error codes is available at
-      // https://firebase.google.com/docs/storage/web/handle-errors
-      switch (error.code) {
-        case 'storage/object-not-found':
-          console.log('storage/object-not-found')
-          break;
+  .then(
+    
+    function(url) {
 
-        case 'storage/unauthorized':
-          console.log('storage/unauthorized')
-          break;
+        console.log('Firebase.download fetch '+url)
 
-        case 'storage/canceled':
-          console.log('storage/canceled')
-          break;
+        /*
+        fetch(url)
+        .then(data => data.json())
+        .then(session => {startSession(session,ext,userRes)})
+        .catch(function(error) {
+         */ 
+          const decoder = new TextDecoder('UTF-8');
 
-        case 'storage/unknown':
-          console.log('storage/unknown')
-          break;
-      }  
-  });
+          const toString = (bytes) => {
+              const array = new Uint8Array(bytes);
+              return decoder.decode(array);
+          };
+          
+        let session = {};
+        https.get(url, res => {
+          let body = '';
+          res.on('data', chunk => {
+            body=body+chunk;
+          });
+          res.on('end', () => {
+
+            try {
+              
+              console.dir("Firebase.download body "+body);
+
+              let buf = toString(body);
+
+              console.dir("Firebase.download buf "+buf);
+
+              session = JSON.parse(body);
+            }
+            catch(err) {
+              console.dir("Firebase.download ERR "+err.toString());
+            }
+
+            console.dir("Firebase.download session "+JSON.stringify(session));
+            // AVOID double HEADERS 
+            startSession(session,ext,userRes);
+          })
+        }).on('error', function(error) {     
+
+          // A full list of error codes is available at
+          // https://firebase.google.com/docs/storage/web/handle-errors
+          switch (error.code) {
+            case 'storage/object-not-found':
+              console.dir('Firebase.download storage/object-not-found')
+            break;
+
+            case 'storage/bucket-not-found':
+              console.dir('Firebase.download storage/bucket-not-found')
+            break;
+
+            case 'storage/project-not-found':
+              console.dir('Firebase.download storage/project-not-found')
+            break;
+      
+            case 'storage/unauthorized':
+              console.dir('Firebase.download storage/unauthorized')
+            break;
+
+            case 'storage/quota-exceeded':
+              console.dir('Firebase.download storage/quota-exceeded')
+              break;
+
+            case 'storage/unauthenticated':
+              console.dir('Firebase.download storage/unauthenticated')
+              break;
+
+            case 'storage/canceled':
+              console.dir('Firebase.download storage/canceled')
+              break;
+
+            case 'storage/invalid-checksum':
+              console.dir('Firebase.download storage/invalid-checksum')
+              break;
+
+            case 'storage/unknown':
+              console.dir('Firebase.download storage/unknown')
+              break;
+
+            default:
+              console.dir("Firebase.download ERROR "+JSON.stringify(error));
+          }  
+      })
+    })
+  /*
+storage/unknown	Ein unbekannter Fehler ist aufgetreten.
+storage/object-not-found	An der gewünschten Referenz existiert kein Objekt.
+storage/bucket-not-found	Für Cloud Storage ist kein Bucket konfiguriert
+storage/project-not-found	Für Cloud Storage ist kein Projekt konfiguriert
+storage/quota-exceeded	Das Kontingent für Ihren Cloud Storage-Bucket wurde überschritten. Wenn Sie sich auf der kostenlosen Stufe befinden, führen Sie ein Upgrade auf einen kostenpflichtigen Plan durch. Wenn Sie einen kostenpflichtigen Plan haben, wenden Sie sich an den Firebase-Support.
+storage/unauthenticated	Der Benutzer ist nicht authentifiziert. Bitte authentifizieren Sie sich und versuchen Sie es erneut.
+storage/unauthorized	Der Benutzer ist nicht berechtigt, die gewünschte Aktion auszuführen. Überprüfen Sie Ihre Sicherheitsregeln, um sicherzustellen, dass sie korrekt sind.
+storage/retry-limit-exceeded	Das maximale Zeitlimit für einen Vorgang (Hochladen, Herunterladen, Löschen usw.) wurde überschritten. Versuchen Sie erneut, hochzuladen.
+storage/invalid-checksum	Datei auf dem Client stimmt nicht mit der Prüfsumme der vom Server empfangenen Datei überein. Versuchen Sie erneut, hochzuladen.
+storage/canceled	Der Benutzer hat den Vorgang abgebrochen.
+storage/invalid-event-name	Ungültiger Ereignisname angegeben. Muss eines von [ `running` , `progress` , `pause` ] sein
+storage/invalid-url	Ungültige URL für refFromURL() . Muss folgende Form haben: gs://bucket/object oder https://firebasestorage.googleapis.com/v0/b/bucket/o/object?token=<TOKEN>
+storage/invalid-argument	Das an put() übergebene Argument muss `File`, `Blob` oder `UInt8` Array sein. Das an putString() übergebene Argument muss ein Raw-, `Base64`- oder `Base64URL`-String sein.
+storage/no-default-bucket	In der Eigenschaft storageBucket Ihrer Konfiguration wurde kein Bucket festgelegt.
+storage/cannot-slice-blob	Tritt häufig auf, wenn sich die lokale Datei geändert hat (gelöscht, erneut gespeichert usw.). Versuchen Sie erneut, hochzuladen, nachdem Sie sich vergewissert haben, dass sich die Datei nicht geändert hat.
+storage/server-file-wrong-size
+  */
+
+  return null; // synch caller gets null value
 }
-module.exports['download']=download;
+module.exports['bucketDownload']=bucketDownload;
 
-
-/*
-
-// Create a reference to 'mountains.jpg'
-const mountainsRef = ref(storage, 'mountains.jpg');
-
-// Create a reference to 'images/mountains.jpg'
-const mountainImagesRef = ref(storage, 'images/mountains.jpg');
-
-// While the file names are the same, the references point to different files
-let compNames = (mountainsRef.name === mountainImagesRef.name);           // true
-let compPath = (mountainsRef.fullPath === mountainImagesRef.fullPath);   // false 
-
-
-Aus einem Blob oder einer File
-Nachdem Sie eine entsprechende Referenz erstellt haben, rufen Sie die Methode uploadBytes() . uploadBytes() nimmt Dateien über die JavaScript- Datei- und Blob -APIs und lädt sie in Cloud Storage hoch.
-*/
 const jMetadata = {
     contentType: 'application/json',
   };
 
-async function fbWriteJSON(bpStorage,client,year,jData) {
+async function bucketUpload(bpStorage,client,year,jData) {
 
   let downloadUrl = "no Firebase Storage";
   if(fbStorage) {
@@ -146,8 +205,9 @@ async function fbWriteJSON(bpStorage,client,year,jData) {
         if(fileRef) {
 
           var jsonString = JSON.stringify(jData);
-          var arr = str2ab(jsonString);
-          const uploadTask = fbStorage.uploadBytesResumable(fileRef, arr);
+          const buffer = Buffer.from(jsonString, 'utf8');     
+          
+          const uploadTask = fbStorage.uploadBytesResumable(fileRef, buffer.buffer);
           
           uploadTask.on("state_changed", // params are: EVENT NEXT ERROR COMPLETE
           (snapshot) => { // NEXT
@@ -207,144 +267,9 @@ if request.auth != null
   }
   return downloadUrl;
 }
-module.exports['fbWriteJSON']=fbWriteJSON;
+module.exports['bucketUpload']=bucketUpload;
 
 
     
-/*      
 
-Dateimetadaten hinzufügen
-Beim Hochladen einer Datei können Sie auch Metadaten für diese Datei angeben. Diese Metadaten enthalten typische Dateimetadateneigenschaften wie name , size und contentType (allgemein als MIME-Typ bezeichnet). Cloud Storage leitet den Inhaltstyp automatisch von der Dateierweiterung ab, in der die Datei auf der Festplatte gespeichert ist, aber wenn Sie einen contentType in den Metadaten angeben, wird der automatisch erkannte Typ überschrieben. Wenn keine contentType -Metadaten angegeben sind und die Datei keine Dateierweiterung hat, verwendet Cloud Storage standardmäßig den Typ application/octet-stream . Weitere Informationen zu Dateimetadaten finden Sie im Abschnitt Dateimetadaten verwenden .
-
-
-// Create file metadata including the content type
-// @type {any} 
-const metadata = {
-  contentType: 'image/jpeg',
-};
-
-
-Uploads verwalten
-Zusätzlich zum Starten von Uploads können Sie Uploads mit den Methoden pause() , resume() und cancel() anhalten, fortsetzen und abbrechen. Das Aufrufen von pause() oder resume() löst pause oder running aus. Der Aufruf der Methode cancel() führt dazu, dass der Upload fehlschlägt und ein Fehler zurückgegeben wird, der darauf hinweist, dass der Upload abgebrochen wurde.
-
-import { uploadBytesResumable } from "firebase/storage";
-
-// Upload the file and metadata
-const uploadTask = uploadBytesResumable(storageRef, file);
-
-// Pause the upload
-uploadTask.pause();
-
-// Resume the upload
-uploadTask.resume();
-
-// Cancel the upload
-uploadTask.cancel();
-
-
-Überwachen Sie den Upload-Fortschritt
-Während des Hochladens kann die Upload-Aufgabe Fortschrittsereignisse im state_changed Beobachter auslösen, wie zum Beispiel:
-
-Ereignistyp	Typische Verwendung
-running	Dieses Ereignis wird ausgelöst, wenn die Aufgabe mit dem Hochladen beginnt oder fortfährt, und wird häufig in Verbindung mit dem pause Ereignis verwendet. Bei größeren Uploads kann dieses Ereignis mehrmals als Fortschrittsaktualisierung ausgelöst werden.
-pause	Dieses Ereignis wird jedes Mal ausgelöst, wenn der Upload angehalten wird, und wird häufig in Verbindung mit dem running Ereignis verwendet.
-Wenn ein Ereignis eintritt, wird ein TaskSnapshot Objekt zurückgegeben. Dieser Snapshot ist eine unveränderliche Ansicht der Aufgabe zum Zeitpunkt des Auftretens des Ereignisses. Dieses Objekt enthält die folgenden Eigenschaften:
-
-Eigentum	Typ	Beschreibung
-bytesTransferred	Number	Die Gesamtzahl der Bytes, die übertragen wurden, als dieser Snapshot erstellt wurde.
-totalBytes	Number	Die Gesamtzahl der Bytes, die hochgeladen werden sollen.
-state	firebase.storage.TaskState	Aktueller Stand des Uploads.
-metadata	firebaseStorage.Metadata	Vor Abschluss des Uploads werden die Metadaten an den Server gesendet. Nach Abschluss des Uploads werden die Metadaten vom Server zurückgesendet.
-task	firebaseStorage.UploadTask	Die Aufgabe ist eine Momentaufnahme, die verwendet werden kann, um die Aufgabe zu „pausieren“, „fortzusetzen“ oder „abzubrechen“.
-ref	firebaseStorage.Reference	Die Referenz, aus der diese Aufgabe stammt.
-Diese Zustandsänderungen bieten in Kombination mit den Eigenschaften des TaskSnapshot eine einfache, aber leistungsstarke Möglichkeit, Upload-Ereignisse zu überwachen.
-
-import { write } from "xlsx";
-
-// Register three observers:
-// 1. 'state_changed' observer, called any time the state changes
-// 2. Error observer, called on failure
-// 3. Completion observer, called on successful completion
-uploadTask.on('state_changed', 
-  (snapshot) => {
-    // Observe state change events such as progress, pause, and resume
-    // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
-    const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-    console.log('Upload is ' + progress + '% done');
-    switch (snapshot.state) {
-      case 'paused':
-        console.log('Upload is paused');
-        break;
-      case 'running':
-        console.log('Upload is running');
-        break;
-    }
-  }, 
-  (error) => {
-    // Handle unsuccessful uploads
-  }, 
-  () => {
-    // Handle successful uploads on complete
-    // For instance, get the download URL: https://firebasestorage.googleapis.com/...
-    getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-      console.log('File available at', downloadURL);
-    });
-  }
-);
-
-Fehlerbehandlung
-Es gibt eine Reihe von Gründen, warum beim Hochladen Fehler auftreten können, darunter die lokale Datei, die nicht vorhanden ist, oder der Benutzer, der keine Berechtigung zum Hochladen der gewünschten Datei hat. Weitere Informationen zu Fehlern finden Sie im Abschnitt Fehler behandeln der Dokumentation.
-
-Vollständiges Beispiel
-Ein vollständiges Beispiel eines Uploads mit Fortschrittsüberwachung und Fehlerbehandlung ist unten dargestellt:
-
-
-
-// Create the file metadata
-
-// Upload file and metadata to the object 'images/mountains.jpg'
-const storageRefB = ref(storage, 'images/' + file.name);
-const uploadTaskB = uploadBytesResumable(storageRefB, file, metadata);
-
-// Listen for state changes, errors, and completion of the upload.
-uploadTaskB.on('state_changed',
-  (snapshot) => {
-    // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
-    const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-    console.log('Upload is ' + progress + '% done');
-    switch (snapshot.state) {
-      case 'paused':
-        console.log('Upload is paused');
-        break;
-      case 'running':
-        console.log('Upload is running');
-        break;
-    }
-  }, 
-  (error) => {
-    // A full list of error codes is available at
-    // https://firebase.google.com/docs/storage/web/handle-errors
-    switch (error.code) {
-      case 'storage/unauthorized':
-        // User doesn't have permission to access the object
-        break;
-      case 'storage/canceled':
-        // User canceled the upload
-        break;
-
-      // ...
-
-      case 'storage/unknown':
-        // Unknown error occurred, inspect error.serverResponse
-        break;
-    }
-  }, 
-  () => {
-    // Upload completed successfully, now we can get the download URL
-    getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-      console.log('File available at', downloadURL);
-    });
-  }
-);
-*/
 

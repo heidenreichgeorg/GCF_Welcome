@@ -34,8 +34,8 @@ const app = express();
 const fs = require('fs');
 const qr = require('qrcode');
 const ejs = require("ejs");
-const path = require('path')
-const cors = require('cors')
+const path = require('path');
+const cors = require('cors');
 
 const bodyParser = require("body-parser");
 
@@ -77,8 +77,9 @@ app.listen(PORT, () => {
     console.log("\n\n");
     console.log(timeSymbol());
     console.log(`Server    started from ${PORT} using files in `+__dirname); 
-    console.log(`Server    http://ec2-A-B-C-D.compute-1.amazonaws.com:${PORT}/welcomedrop`); 
-    console.log(`Local     http://localhost:${PORT}/welcomedrop`); 
+    console.log(`Local     http://localhost:${PORT}/LATEST`); 
+    //console.log(`Server    http://ec2-A-B-C-D.compute-1.amazonaws.com:${PORT}/welcomedrop`); 
+    //console.log(`Local     http://localhost:${PORT}/welcomedrop`); 
 })
 
 
@@ -319,16 +320,6 @@ app.get('/welcomedrop', (req, res) => {
     res.sendFile('./WelcomeDrop.html', { root: __dirname })
 })
 
-/*
-// SYSTEM SELECTS LATEST FILE FROM CLIENT FOLDER
-app.get('/loginclient', (req, res) => {
-    console.log("\nLoginClient\n");
-    console.log(timeSymbol());
-    
-    res.sendFile('./LoginClient.html', { root: __dirname, base: req.params.base })
-})
-*/
-
 
 
 
@@ -525,10 +516,11 @@ app.post("/UPLOAD", (req, res) => {
 
 function signIn(query,remote,res) {
     
-    // TEST ONLY
-    signDown(query,remote,res); // load from Firebase
+    // TEST with UTF-8 
+    return signDown(query,remote,res); // load from Firebase
 
-    return signUp(query,remote,res); // load from server filesystem
+
+    //return signUp(query,remote,res); // load from server filesystem
 }
 
 // load JSON file from Firebase storage
@@ -549,13 +541,15 @@ function signDown(query,remote,res) {
 
             if(query.ext && query.ext.length>0) { //} && query.ext == "[a-zA-Z0-9]" ) {
 
-                Compiler.fbDownload(client,year,startSession,query.ext,res);
+                return Compiler.fbDownload(client,year,startSession,query.ext,res);
                
             } else console.log ( "0025 signDown file no valid file ext for query="+JSON.stringify(query)+",addr="+remote);
                         
         } else console.log ( "0027 signDown file no valid year for query="+JSON.stringify(query)+",addr="+remote);
 
     } else console.log ( "0029 signDown file no valid client for query="+JSON.stringify(query)+",addr="+remote);
+
+    return null;
 }
 
 
@@ -623,7 +617,7 @@ function startSession(session, ext, res) {
 
     setSession(session);
 
-    console.log("0026 signIn SUCCESS sessionId="+sessionId); 
+    console.log("0026 signIn("+client+","+year+") SUCCESS sessionId="+sessionId); 
 
     sendDisplay(session,res);
 }

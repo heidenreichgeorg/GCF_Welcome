@@ -23,8 +23,7 @@ const { FORMERR } = require('dns');
 const fs = require('fs');
 
 // Google Firebase
-const fbUpload = require('./fireBaseBucket.js');
-
+const FB = require('./fireBaseBucket.js');
 
 const Money = require('./money.js');
 
@@ -697,8 +696,8 @@ async function save2Server(session,client,year) {
     // FIREBASE
     // async
     session.fireBase = "no response from Firebase";
-    const appStorage = fbUpload.fbInit();
-    fbUpload.fbWriteJSON(appStorage,client,year,session)
+    const appStorage = FB.bucketInit();
+    FB.bucketUpload(appStorage,client,year,session)
         .then((url) => (session.fireBase=url));
 
 
@@ -727,8 +726,8 @@ module.exports['save2Server']=save2Server;
 
 
 function fbDownload(client,year,callBack,ext,res) {
-    const appStorage = fbUpload.fbInit();
-    fbUpload.download(appStorage,client,year,callBack,ext,res);
+    const appStorage = FB.bucketInit();
+    FB.bucketDownload(appStorage,client,year,callBack,ext,res);
 }
 module.exports['fbDownload']=fbDownload;
 
