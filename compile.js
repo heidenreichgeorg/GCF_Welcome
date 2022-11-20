@@ -205,7 +205,7 @@ function init(app, argv) {
     });
 
 
-        
+/*        
     app.post("/STORE", (req, res) => { 
         // STORE txn into LOG for later use
         // from HistoryList.html       
@@ -223,7 +223,7 @@ function init(app, argv) {
         res.writeHead(Sheets.HTTP_OK, {"Content-Type": "text/html"});    
         res.end("\nSTORED.");
     });
-
+*/
 
 
     app.get("/favicon.ico", (req, res)  => { res.sendFile(__dirname + "/favicon.jpg"); });
