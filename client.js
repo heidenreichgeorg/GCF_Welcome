@@ -825,8 +825,7 @@ function setScreen(targetDocument,htmlPage) {
         let style=' class="dosBorder" ';
       
 
-        if(eHistory) eHistory.innerHTML = '<HEAD><link rel="stylesheet" href="./FBA/mobile_green.css"/>'
-            +'<link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Inconsolata" />'
+        if(eHistory) eHistory.innerHTML = '<HEAD><link rel="stylesheet" href="./FBA/mobile_green.css"/>'            
             +'</HEAD><BODY  onload="getFromServer(putResponse)" '+style+' ><DIV id="windowBorder" class="dosBorder"><DIV class="mTable">'
             
              + panel + arrHTML.join('') 
@@ -883,7 +882,6 @@ function initTerminal(page,target,screenLines,nextFuncName) {
     let body = '<BODY onload="getFromServer(putResponse)" style=" text-shadow: 0px 1px 0px #1EEE1E;">'; 
     
     if(eHistory) eHistory.innerHTML = '<HEAD><link rel="stylesheet" href="./FBA/mobile_green.css"/>'
-        +'<link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Inconsolata" />'
         +'</HEAD>' + body + '<DIV id="windowBorder" class="dosBorder"><DIV class="mTable" id="keyfocus">' + panel + arrHTML.join('') + '</DIV></DIV></BODY>';
 
 

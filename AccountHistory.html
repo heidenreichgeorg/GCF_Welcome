@@ -1,10 +1,6 @@
 <!DOCTYPE html>    
 <HTML content-type='utf-8' lang="de-DE"  id='PageContent'>    
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100;300;400&display=swap" />
-    <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Inconsolata" />
     <link rel="stylesheet" href="./FBA/mobile_green.css" type="text/css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.min.css">
-    
     
     <HEAD>
         <meta charset="ISO-8859-1">
@@ -271,7 +267,7 @@
                     factor=-1;  //console.log(strCredit); 
                 }
                 var saldo = money.cents
-                    + parseInt( strCredit.replace('.','').(',',''));
+                    + parseInt( strCredit.replace('.','').replace(',',''));
 
                 return { 'cents': saldo };
             }

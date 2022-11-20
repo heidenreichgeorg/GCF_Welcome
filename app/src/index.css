@@ -1,18 +1,18 @@
 body {
   margin: 0;
-  font-family:  'Roboto', 'Inconsolata', 'Oxygen', 'Ubuntu',monospace, sans-serif;
+  font-family:  monospace, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-input  { color:#0F0F0F; background-color:inherit; }
+input  { color:#0F0F0F; background-color:inherit; font-family :inherit; font-size: 12px; }
 
 
 input[type="radio"] {
   /* Add if not using autoprefixer */
   -webkit-appearance: none;
   appearance: none;
-  font-family: 'Roboto', 'Inconsolata', 'Oxygen', 'Ubuntu',monospace, sans-serif; font-size: 13px; font-weight:400; text-align: center;
+  font-family: monospace, sans-serif; font-size: 13px; font-weight:400; text-align: center;
   background-color: inherit;
   margin: 0;
 }
@@ -28,7 +28,7 @@ input[type="radio"]::before {content: "#"; }
   background: #F0F0F0;
 }
 
-.key      { width: 70px;  height:16px;  margin: 0px; border: 0px solid inherit; float: left; background-color: #F0F0F0; font-family:  inherit; font-size: inherit; font-weight:600; color: #000; }
+.key      { width: 70px;  height:16px;  margin: 0px; border: 0px 1px 0px 1px solid gray; float: left; background-color:transparent; font-family:  inherit; font-size: inherit; font-weight:600; color: #000; }
 
 .ulliTab  { width:995px;  padding: 1px; border: none;  font-size: 14px; font-weight:400; } 
 .mTable   {                                  height: 18px;             display:table;    }
