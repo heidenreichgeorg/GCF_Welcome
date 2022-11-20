@@ -130,11 +130,11 @@ function sy_findSessionId(client,year) {
     var result=null;
     console.log("\n0802  FIND => ( client="+client+"  year="+year+")");
     arrSession.forEach(session => {
-        console.log("\n0804  CHECK => (SESSION  client="+session.client+"  year="+session.year+")");
+        console.log("0804  CHECK => (SESSION  client="+session.client+"  year="+session.year+")");
         if(session.year===year && session.client===client) {
             result=session;
             let fb=session.fireBase?session.fireBase:" no entry";
-            console.log("\n0806  FOUND => (SESSION  client="+session.client+"  year="+session.year+" fireBase="+fb+")");
+            console.log("0806  FOUND => (SESSION  client="+session.client+"  year="+session.year+" fireBase="+fb+")");
         }
     });
     if(result) return result.id;
@@ -169,8 +169,8 @@ app.get("/LATEST", (req, res) => {
 
     if(req && req.query && req.socket) {        
         session = signIn(req.query,req.socket.remoteAddress,res);
-        console.log("\n0800 GET /LATEST FOUND => "+session.id);
-       
+        if(session) console.log("\n0800 GET /LATEST FOUND => "+session.id);
+        else console.log("\n0801 NO /LATEST SESSION FOUND  ");
         // exits via res.send
     }
     else {
@@ -516,7 +516,7 @@ app.post("/UPLOAD", (req, res) => {
 
 function signIn(query,remote,res) {
     
-    // TEST with UTF-8 
+    // async, return null, so client/browser must retry
     return signDown(query,remote,res); // load from Firebase
 
 
@@ -539,11 +539,13 @@ function signDown(query,remote,res) {
             let year   = parseInt(query.year); // Security sanitize input year
             console.log("0014 signDown for client "+client+"  year "+year);
 
-            if(query.ext && query.ext.length>0) { //} && query.ext == "[a-zA-Z0-9]" ) {
+            let id=null;
+            if(id=sy_findSessionId(client,''+year)) {
+                console.log ( "0016 signDown FOUND WARM id ="+id);
+                sendDisplay( getSession(id), res);
+            }
 
-                return Compiler.fbDownload(client,year,startSession,query.ext,res);
-               
-            } else console.log ( "0025 signDown file no valid file ext for query="+JSON.stringify(query)+",addr="+remote);
+            else Compiler.fbDownload(client,year,startSession,query.ext,res);
                         
         } else console.log ( "0027 signDown file no valid year for query="+JSON.stringify(query)+",addr="+remote);
 
@@ -588,6 +590,8 @@ function signUp(query,remote,res) {
 
                          startSession(session, ext, res); // exit via res.send
 
+                         sendDisplay(session, res);
+
                     } else console.log ( "0017 LATEST client no OK for query="+JSON.stringify(query)+",addr="+remote);
 
                 } else console.log ( "0023 LATEST file no valid fileName for query="+JSON.stringify(query)+",addr="+remote);
@@ -619,6 +623,5 @@ function startSession(session, ext, res) {
 
     console.log("0026 signIn("+client+","+year+") SUCCESS sessionId="+sessionId); 
 
-    sendDisplay(session,res);
 }
 
