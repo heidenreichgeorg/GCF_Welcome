@@ -20,7 +20,7 @@ module.exports['HTTP_WRONG']=HTTP_WRONG;
 const { SSL_OP_NO_SESSION_RESUMPTION_ON_RENEGOTIATION } = require('constants');
 const { FORMERR } = require('dns');
 // File system
-const fs = require('fs');
+//const fs = require('fs');
 
 // Google Firebase
 const FB = require('./fireBaseBucket.js');
@@ -93,7 +93,7 @@ function sy_purgeCell(str) {
 }
 
 
-
+/*
 function getLatestFile(dir,files,lStart,lExt) {
     // log them on console
     // and remember the last match
@@ -117,7 +117,7 @@ function getLatestFile(dir,files,lStart,lExt) {
 }
 
 
-/*
+
 async function __setFileNameS(session,client,year,start,ext) {
 
     // directory path
@@ -149,7 +149,7 @@ async function __setFileNameS(session,client,year,start,ext) {
     });
 // unreached code
 }
-*/
+
 
 var found='';
 function getJSON() {
@@ -185,7 +185,7 @@ async function findLatestJSON(client,year) {
 // unreached code
 }
 module.exports['findLatestJSON']=findLatestJSON;
-
+*/
 
 
 
@@ -248,109 +248,6 @@ async function saveLogT(client,logT) {
 
 
 
-
-
-function readCSVFile(foundPath) {
-    var aoaCells = [];
-    if(foundPath) {
-        if(debug) console.log("sheets.readCSVFile reading "+foundPath);
-        try {
-            // read contents of the file in ISO-8859-1 = latin1
-            const data = fs.readFileSync(foundPath, 'latin1');       
-            // split the contents by new line
-            var csvLines = data.split(/\r?\n/);
-
-            //aoaCells = readEULines(csvLines,Money.setEUMoney); 
-            aoaCells = readNumeric(csvLines,Money.setEUMoney); 
-            
-        }  catch (err) {
-            console.error('sheets.readCSVFile:'+err);
-        }
-    }
-    return aoaCells;
-}
-
-
-
-function readXLSXFile(foundPath,tabName,annualTXN) {
-    var aoaCells = [];
-    if(foundPath) {
-        if(debug) console.log("sheets.readXLSXFile reading "+foundPath);
-        try {
-           // XLSX
-           var workbook = XLSX.readFile(foundPath);
-           
-           var xlData = XLSX.utils.sheet_to_csv(workbook.Sheets[tabName],{ 'FS':CSEP });
-           if(debug) console.log("sheets.readXLSXFile finds sheet "+tabName);    
-
-            // split the contents by new line
-            var numericLines = xlData.split(/\r?\n/);
-
-            if(debug) console.log('sheets.readXLSXFile: #'+numericLines.length);
-
-            aoaCells = readNumeric(numericLines,Money.setENMoney);
-            //aoaCells = readENLines(numericLines,Money.setENMoney);
-
-        }  catch (err) {
-            console.error('sheets.readXLSXFile:'+err);
-        }
-    }
-    return aoaCells;
-}
-
-
-function readNumeric(csvLines,makeMoneyFunc) {
-    var row=0;
-    var aoaCells = [];
-
-    if(csvLines.length>=SY_MAXROWS) console.dir("SECURITY readNumeric SY_MAXROWS exceeded!");
-
-// SECURITY - SANITIZE INPUT
-
-    for(;row<csvLines.length && row<SY_MAXROWS;row++) { 
-        
-        let  rawLine=sy_purgeRow(csvLines[row]);
-        
-        if(rawLine) {
-            var cells = rawLine.split(CSEP);
-            var keep=false;
-            if(cells[0] && cells[0].length>0) keep=true;
-            var jCells=[];
-            var col=0;
-
-            if(parseInt(cells[0])>0) console.log('sheets.readNumeric storeCell '+rawLine);
-
-            // GH20220127
-            // issue with non-existing cells in excel
-            var schemaLen = SY_MAXCOL;
-            for(var col=0; col<schemaLen /*&& col<cells.length*/;col++) {
-                if(cells[col] && cells[col].length>0) {      
-                                                                                
-                    if((schemaLen == SY_MAXCOL) && cells[col].charAt(0)===CEND) { schemaLen=col; }
-                    else {
-                        // GH20220129
-                        var text = sy_purgeCell(   cells[col]  );
-
-                        // GH2021-11-02
-                        if(keep && (parseInt(cells[0])>0  ||  cells[0].charAt(0)==='A') && col>=J_ACCT) {
-                            text=Money.moneyString(makeMoneyFunc(text));
-                        }
-                        jCells[col]= text.trim();
-                    }
-
-                } else jCells[col]='';
-                
-            }  // );
-
-            if(keep) { // avoid empty rows
-                aoaCells[row]=jCells;
-            } else {
-                console.log('sheets.readNumeric('+row+') SKIP '+rawLine);
-            }
-        }
-    }
-    return aoaCells;
-}
 
 
 function bookSheet(sessionId,tBuffer,sessionTime,nextSessionId) {
@@ -687,10 +584,7 @@ module.exports['makeXLTabs']=makeXLTabs;
 async function save2Server(session,client,year) {
     console.log("0032 save2Server Start saving(JSON) to "+SERVEROOT);        
 
-    const data = JSON.stringify(session);
 
-    let sessionId=session.id;
-    let jsonFileName=jsonMain(client,year,sessionId);
 
 
     // FIREBASE
@@ -700,6 +594,11 @@ async function save2Server(session,client,year) {
     FB.bucketUpload(appStorage,client,year,session)
         .then((url) => (session.fireBase=url));
 
+    let jsonFileName = "jsonFileName";
+/*
+    const data = JSON.stringify(session);
+    let sessionId=session.id;
+    let jsonFileName=jsonMain(client,year,sessionId);
 
     // REJECT IF FILE EXISTS
     if(checkExist(getClientDir(client),year)) {
@@ -717,7 +616,7 @@ async function save2Server(session,client,year) {
         
     });
     console.log("0036 save2Server: JSON main save to "+jsonFileName+" started.");
-
+*/
     return jsonFileName;
 }
 module.exports['save2Server']=save2Server;
