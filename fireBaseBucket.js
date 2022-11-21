@@ -10,6 +10,11 @@ UPLOAD JSON (Admin only)
 
 */
 
+const debug=1;
+
+// SETTING THIS WILL VIOLATE PRIVACY AT ADMIN CONSOLE
+const debugReport=null;
+
 const utf8 = require('utf8');
 
 const fbS = "/";
@@ -17,21 +22,12 @@ const MAIN = "main.json";
 
 const fbApp = require("firebase/app");
 const fbStorage = require("firebase/storage");
+const FS = require('firebase/firestore'); 
+const {Datastore} = require('@google-cloud/datastore');
 
 const https = require('https');
-//import Fetch from 'node-fetch'
-/*
-function ab2str(buffer) {
-  return String.fromCharCode.apply(null, Array.from(new Uint16Array(buffer)))
-}
 
-function str2ab(str) {
-  var buf = new ArrayBuffer(str.length*2); // 2 bytes for each char
-  var bufView = new Uint16Array(buf);
-  for (var i=0, strLen=str.length; i<strLen; i++) { bufView[i] = str.charCodeAt(i); }
-  return buf;
-}
-*/
+
 
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -41,10 +37,10 @@ const firebaseConfig = {
   projectId: "bookingpages-a0a7c",
   authDomain: "bookingpages-a0a7c.firebaseapp.com",
   storageBucket: "bookingpages-a0a7c.appspot.com",
-  messagingSenderId: "82673479353",
-  apiKey: "AIzaSyCd9Gk9SNgDx4jagm8A5HO__9-uleUBPTw",
-  appId: "1:82673479353:web:e14098f5dd219252a1f568"
+  messagingSenderId: "82673479353"
 };
+
+const sessionKeys = ["client","year","remote","time","sheetCells","sheetName","id","addrT","sheetFile","sessionId","generated","ext","clientFunction","strTimeSymbol","fireBase"]
 
 
 function bucketInit() {
@@ -69,14 +65,14 @@ async function bucketDownload(bpStorage,client,year,startSession,ext,userRes) {
 
   const strChild = fbS+sClient+fbS+iYear+fbS+MAIN;  
   const fileRef = fbStorage.ref(bpStorage, strChild);
-  console.log('Firebase.download fileRef='+JSON.stringify(fileRef));
+  if(debug) console.log('Firebase.download fileRef='+JSON.stringify(fileRef));
 
   fbStorage.getDownloadURL(fileRef)
   .then(
     
     function(url) {
 
-        console.log('Firebase.download fetch '+url)
+      if(debug) console.log('Firebase.download fetch '+url)
 
         /*
         fetch(url)
@@ -101,11 +97,11 @@ async function bucketDownload(bpStorage,client,year,startSession,ext,userRes) {
 
             try {
               
-              console.dir("Firebase.download body "+body);
+              if(debugReport) console.dir("Firebase.download body "+body);
 
               let buf = toString(body);
 
-              console.dir("Firebase.download buf "+buf);
+              //if(debugReport) console.dir("Firebase.download buf "+buf);
 
               session = JSON.parse(body);
             }
@@ -113,7 +109,9 @@ async function bucketDownload(bpStorage,client,year,startSession,ext,userRes) {
               console.dir("Firebase.download ERR "+err.toString());
             }
 
-            console.dir("Firebase.download session "+JSON.stringify(session));
+            if(debug) console.dir("Firebase.download session "+JSON.stringify(Object.keys(session)));
+
+            if(debugReport) console.log("Firebase.download session "+JSON.stringify(session));
             // AVOID double HEADERS 
             startSession(session,ext,userRes);
           })
@@ -215,13 +213,13 @@ async function bucketUpload(bpStorage,client,year,jData) {
                 Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
               //setProgresspercent(progress);
               
-                console.log("fbWriteJSON "+progress);
+              if(debug) console.log("fbWriteJSON "+progress);
 
             },
           (error) => { // ERROR
           // A full list of error codes is available at
               // https://firebase.google.com/docs/storage/web/handle-errors
-              console.log(error.name +" "+error.code+" "+error._baseMessage);
+              if(debug) console.log(error.name +" "+error.code+" "+error._baseMessage);
               /*
               switch (error.code) {
                 case 'storage/unauthorized':
@@ -243,7 +241,7 @@ async function bucketUpload(bpStorage,client,year,jData) {
             if(uploadTask.snapshot && uploadTask.snapshot.ref && uploadTask.snapshot.ref._location) {
               const loc = uploadTask.snapshot.ref._location;
               downloadUrl = loc.bucket+fbS+loc.path_;
-              console.log("Firebase fbWriteJSON to: "+downloadUrl);          
+              if(debug) console.log("Firebase fbWriteJSON to: "+downloadUrl);          
               //uploadTask.snapshot.ref.getDownloadURL().then((url) => { downloadUrl=url;}); 
               }
             }
@@ -270,6 +268,58 @@ if request.auth != null
 module.exports['bucketUpload']=bucketUpload;
 
 
+
+
+
+
+
+
+
+
+
     
+function fireWrite(session) {
+  
+  if(session && session.client && session.year) {
+    // Add a new document in collection "sessions"
+    let name = "C"+session.client+"Y0"+session.year;
+
+    markActive(name);
+
+      if(debug) console.log("Firebase fireWrite setDoc"+name);
+
+  } else console.dir("Firebase fireWrite SKIP");
+}
+module.exports['fireWrite']=fireWrite;
 
 
+async function markActive(client) {
+  const datastore = new Datastore();
+  const query = datastore
+    .createQuery('session')
+    .filter('client', '=', client);
+
+  datastore
+  .runQuery(query)
+  .then(results => {
+    const matchingSet = results[0];
+    console.log('Results found:', JSON.stringify(matchingSet[0]));
+
+    let session = matchingSet[0];
+    console.log('Session found:', JSON.stringify(session));
+
+    //let client = session[datastore.client].id;
+    let year  =  session[datastore.year].id;
+    console.log('year found2:', JSON.stringify(session[datastore.year]));
+
+    return parseInt(year,10);
+  })
+  .then((client) => {
+    console.log('Calling markDone with task Key ID', taskKeyId);
+    markDone(taskKeyId); // From the original function in the sample
+    console.log('Updated task');
+  })
+  .catch(err => {
+    console.error('ERROR:', err);
+  });
+}

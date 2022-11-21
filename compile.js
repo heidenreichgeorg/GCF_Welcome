@@ -5,11 +5,12 @@
 
 */
 
-let debug=1;
+const debug=null;
 
 
-// THIS WILL VIOLATE PRIVACY AT THE ADMIN CONSOLE !!! 
-let debugReport=1;
+// SETTING THIS WILL VIOLATE PRIVACY AT THE ADMIN CONSOLE !!! 
+let debugReport=null;
+
 
 // table parsing
 const CEND= '|';
@@ -464,7 +465,7 @@ function compile(sessionData) {
         var numLines=aoaCells.length;
 
         let lastLine = aoaCells[numLines-1];
-        console.log("0100 compile.compile() includes "+lastLine[1]+" "+lastLine[3]);
+        if(debug) console.log("0100 compile.compile() includes "+lastLine[1]+" "+lastLine[3]);
 
         if(numLines>J_MINROW) {
 
@@ -819,14 +820,18 @@ function compile(sessionData) {
 
     
         for(let key in result) {
-            console.dir('0200 compile.js compile() -> balance['+key+']'); 
+            if(debug) console.dir('0200 compile.js compile() -> balance['+key+']'); 
         }
 
-    console.log("0210 COMPILED = "+JSON.stringify(Object.keys(result)));
+        if(debug)console.log("0210 COMPILED = "+JSON.stringify(Object.keys(result)));
 
     let balance = sendBalance(result);
 
-    console.log("0220 COMPILED = "+JSON.stringify(Object.keys(balance)));
+    if(debug) console.log("0220 COMPILED = "+JSON.stringify(Object.keys(balance)));
+
+    // GH20221120 write to firestore
+    Sheets.fireWrite(sessionData);
+
 
     return balance;
 

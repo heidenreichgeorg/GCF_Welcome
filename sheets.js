@@ -1,5 +1,5 @@
-const debug=1;
-const debugWrite=1;
+const debug=null;
+const debugWrite=null;
 
 
 const HTTP_OK = 200;
@@ -274,6 +274,9 @@ function bookSheet(sessionId,tBuffer,sessionTime,nextSessionId) {
                     session.id=nextSessionId;
 
                     if(debugWrite) console.log("2020 sheets.bookSheet APPEND  "+JSON.stringify(tBuffer)+" to ("+client+","+year+") #"+numLines);
+
+                    // GH20221120 write to firestore
+                    fireWrite(session);
 
                     Server.setSession(session);
 
@@ -705,6 +708,19 @@ function jsonFile(client,year,sid) {
 function jsonLogf(client) {
     return getClientDir(client)+"logf.json";
 }
+
+
+
+function fireWrite(session) {
+/*
+    if(session) console.log("FIREWRITE");
+    else console.dir("FIRE OFF");
+
+    // GH20221120 write to firestore
+    FB.fireWrite(session);
+*/    
+}
+module.exports['fireWrite']=fireWrite;
 
 
 

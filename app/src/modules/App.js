@@ -197,8 +197,6 @@ export function setEUMoney(strSet) {
 export function cents2EU(cents) {
     var sign=""; if(cents<0) { sign="-"; cents=-cents; }
 
-    
-
     var kiloNum = parseInt(cents/100000);
     var megaNum = parseInt(kiloNum/1000);
     var megaStr = megaNum>0 ? megaNum.toString()+"." : "";

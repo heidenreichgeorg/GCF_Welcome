@@ -23,7 +23,7 @@
 // /UPLOAD with JSON data
 
 
-let debug=1;
+const debug=null;
 
 const HTTP_OK = 200;
 const HTTP_WRONG = 400;
@@ -264,7 +264,7 @@ function sendDisplay(session,res) {
 
     banner = Compiler.display(registerLink,sessionId,year,client,clientSave);
 
-    console.dir("5000 sendDisplay() builds banner="+banner);
+    console.dir("5000 sendDisplay() builds banner#"+banner.length);
     
     // 20220728
     if(sessionId) {
@@ -340,7 +340,7 @@ function localhost() {
                     console.dir ( "OS["+name+"] net info "+net.address);
                     results.push({ 'type':name, 'addr':net.address});
                 }
-                console.dir ( "OS["+name+"]  other  "+JSON.stringify(net));
+                if(debug) console.log ( "OS["+name+"]  other  "+JSON.stringify(net));
             }
         }
         instance = results[0] ? results[0].addr : "127.0.0.1";
