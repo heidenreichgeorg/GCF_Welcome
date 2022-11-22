@@ -8,7 +8,7 @@ module.exports['HTTP_OK']=HTTP_OK;
 const HTTP_WRONG = 400;
 module.exports['HTTP_WRONG']=HTTP_WRONG;
 
-
+// EXCEL interface
 
 
 // ASSETS BEFORE OTHER ACCOUNTS
@@ -22,8 +22,6 @@ const { FORMERR } = require('dns');
 // File system
 //const fs = require('fs');
 
-// Google Firebase
-const FB = require('./fireBaseBucket.js');
 
 const Money = require('./money.js');
 
@@ -92,8 +90,8 @@ function sy_purgeCell(str) {
     //return str.replace(/;\\\'\"/,'');
 }
 
-
 /*
+
 function getLatestFile(dir,files,lStart,lExt) {
     // log them on console
     // and remember the last match
@@ -115,6 +113,7 @@ function getLatestFile(dir,files,lStart,lExt) {
     if(debug) console.log("getLatestFile("+lStart+","+lExt+")     returns  "+found);
     return found;
 }
+
 
 
 
@@ -588,17 +587,6 @@ async function save2Server(session,client,year) {
     console.log("0032 save2Server Start saving(JSON) to "+SERVEROOT);        
 
 
-
-
-    // FIREBASE
-    // async
-    session.fireBase = "no response from Firebase";
-    const appStorage = FB.bucketInit();
-    FB.bucketUpload(appStorage,client,year,session)
-        .then((url) => (session.fireBase=url));
-
-    let jsonFileName = "jsonFileName";
-/*
     const data = JSON.stringify(session);
     let sessionId=session.id;
     let jsonFileName=jsonMain(client,year,sessionId);
@@ -619,19 +607,11 @@ async function save2Server(session,client,year) {
         
     });
     console.log("0036 save2Server: JSON main save to "+jsonFileName+" started.");
-*/
+
     return jsonFileName;
 }
 module.exports['save2Server']=save2Server;
 
-
-
-
-function fbDownload(client,year,callBack,ext,res) {
-    const appStorage = FB.bucketInit();
-    FB.bucketDownload(appStorage,client,year,callBack,ext,res);
-}
-module.exports['fbDownload']=fbDownload;
 
 
 
@@ -666,7 +646,7 @@ function saveSessionLog(sessionId,txn) {
 }
 module.exports['saveSessionLog']=saveSessionLog;
 
-
+/*
 
 // returns YEARmain.json file FOUND
 // also sets found variable as a side-effect
@@ -685,7 +665,7 @@ function checkExist(dir,year) {
 
     return found;
 }
-
+*/
 
 function getClientDir(client) {
     return getRoot()+client+Slash; 
@@ -711,8 +691,11 @@ function jsonLogf(client) {
 
 
 
+// WRITES TO a Firebase Cloud Datastore
 function fireWrite(session) {
 /*
+
+
     if(session) console.log("FIREWRITE");
     else console.dir("FIRE OFF");
 

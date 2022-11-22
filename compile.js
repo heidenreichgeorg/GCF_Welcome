@@ -195,7 +195,7 @@ function init(app, argv) {
             let serverAddr = Server.localhost();
 
             // async
-            Sheets.save2Server(session,client,year)
+            Server.save2Bucket(session,client,year)
                 .then(jFileName => { if(res) res.json({url:serverAddr+'/LATEST', client, year, 'jFileName':jFileName  })
                 });
 
@@ -838,10 +838,12 @@ function compile(sessionData) {
 }
 module.exports['compile']=compile;
 
+/*
 function save2Server(session,client,year) {
     Sheets.save2Server(session,client,year);
 }
 module.exports['save2Server']=save2Server
+*/
 
 function display(registerLink,sessionId,year,client,clientSave) {
     var vbanner=[];
@@ -1585,10 +1587,4 @@ async function send(res,gResponse) {
     res.end(); 
 }
 
-
-
-function fbDownload(client,year,callBack,ext,res) {
-    Sheets.fbDownload(client,year,callBack,ext,res);
-} 
-module.exports['fbDownload']=fbDownload;
 

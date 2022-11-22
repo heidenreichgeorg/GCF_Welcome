@@ -35,9 +35,13 @@ const fs = require('fs');
 const qr = require('qrcode');
 const ejs = require("ejs");
 const path = require('path');
-const cors = require('cors');
+
+// Google Firebase
+const FB = require('./fireBaseBucket.js');
+
 
 const bodyParser = require("body-parser");
+const cors = require('cors');
 
 app.use(bodyParser.json({limit: '900kb'}));
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -439,7 +443,43 @@ function orderRecentFiles(dir,ext) {
         .sort((a, b) => b.mtime.getTime() - a.mtime.getTime());
 };
 
- 
+
+let fbConfig=null;
+
+function loadFBConfig() {
+    var found=null;
+    if(fbConfig==null) {
+        const dir = getRoot();
+        let fileName = getMostRecentFile(dir,"JSON");
+        if(fileName) {
+            console.log("0022 loadFBConfig from "+fileName);
+            fbConfig = JSON.parse(fs.readFileSync(dir+fileName, 'utf8'));
+        } else console.log("0023 loadFBConfig NO JSON in "+dir);
+    }
+    return fbConfig;
+} 
+
+
+
+function fbDownload(client,year,callBack,ext,res) {
+    const appStorage = FB.bucketInit(loadFBConfig());
+    FB.bucketDownload(appStorage,client,year,callBack,ext,res);
+}
+
+
+
+async function save2Bucket(session,client,year) {
+    console.log("0032 save2Bucket Start saving(JSON) to FB");        
+
+    // FIREBASE
+    const appStorage = FB.bucketInit(loadFBConfig());
+    session.fireBase = fbConfig.storageBucket;
+
+    // async
+    FB.bucketUpload(appStorage,client,year,session)
+        .then((url) => (session.fireBase=url));
+}
+
 
 //start session with uploading a session file for a known client
 app.post("/UPLOAD", (req, res) => { 
@@ -490,7 +530,7 @@ app.post("/UPLOAD", (req, res) => {
 
 
             // PERSISTENT FB CLOUD FILE STORAGE
-            Compiler.save2Server(sessionData,client,year);
+            save2Bucket(sessionData,client,year);
 
             let usrLogin = jLoginURL(sessionData).url;
             let cmdLogin = usrLogin+"&clientSave=JSON";
@@ -545,7 +585,7 @@ function signDown(query,remote,res) {
                 sendDisplay( getSession(id), res);
             }
 
-            else Compiler.fbDownload(client,year,startSession,query.ext,res);
+            else fbDownload(client,year,startSession,query.ext,res);
                         
         } else console.log ( "0027 signDown file no valid year for query="+JSON.stringify(query)+",addr="+remote);
 

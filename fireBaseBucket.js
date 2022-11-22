@@ -32,21 +32,17 @@ const https = require('https');
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
-// Your web app's Firebase configuration
-const firebaseConfig = {
-  projectId: "bookingpages-a0a7c",
-  authDomain: "bookingpages-a0a7c.firebaseapp.com",
-  storageBucket: "bookingpages-a0a7c.appspot.com",
-  messagingSenderId: "82673479353"
-};
+
+
 
 const sessionKeys = ["client","year","remote","time","sheetCells","sheetName","id","addrT","sheetFile","sessionId","generated","ext","clientFunction","strTimeSymbol","fireBase"]
 
+let bpApp = null;
 
-function bucketInit() {
+function bucketInit(firebaseConfig) {
 
   // Initialize Firebase app
-  const bpApp = fbApp.initializeApp(firebaseConfig);
+  bpApp = fbApp.initializeApp(firebaseConfig);
   
   // Initialize Cloud Storage and get a reference to the service
   return  fbStorage.getStorage(bpApp);
