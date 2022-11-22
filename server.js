@@ -449,8 +449,8 @@ let fbConfig=null;
 function loadFBConfig() {
     var found=null;
     if(fbConfig==null) {
-        const dir = getRoot();
-        let fileName = getMostRecentFile(dir,"JSON");
+        const dir = Compiler.getRoot(); 
+        let fileName = getMostRecentFile(dir,"json");
         if(fileName) {
             console.log("0022 loadFBConfig from "+fileName);
             fbConfig = JSON.parse(fs.readFileSync(dir+fileName, 'utf8'));
