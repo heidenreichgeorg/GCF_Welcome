@@ -23,7 +23,7 @@
 // /UPLOAD with JSON data
 
 
-const debug=null;
+const debug=5;
 
 const HTTP_OK = 200;
 const HTTP_WRONG = 400;
