@@ -65,20 +65,7 @@ export default function Screen({ children, prevFunc, nextFunc, tabSelector }) {
             document.getElementById('windowBorder').className="dosBorder"; 
         }
     }
-    /*
-    
-            function updateScreen() {
-                let element = document.getElementsByClassName('line3');
-                element.style.color = 'red';
-            }
-
-
-            <div class="L66" onClick={((e) => select('PageContent',-1))}>
-
-            <label class="L66">Plain<input type="radio" name="tabSelector" /></label>
-                    </div>
-        
-    */
+     
     return (
         <div class="mTable">    
             <script  type="text/javascript"  src="/client.js" />

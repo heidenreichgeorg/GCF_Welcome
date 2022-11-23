@@ -18,19 +18,32 @@ export function SessionProvider({ children, createSession=true, location, defaul
     let strSearch = location.search;
     console.log("SessionProvider location="+strSearch)
 
-
     useEffect(() => {
         if(createSession) {
             setStatus('loading')
-            fetch(`${process.env.REACT_APP_API_HOST}/SESSION${strSearch}`)
-            .then(data => data.json())
-            .then(data => {
-                setSession(data)
-                setStatus('success')
-            })
-            .catch(() => {
-                setStatus('error')
-            })
+            let browserItem = sessionStorage.getItem('session');
+            if(browserItem!=null && browserItem.length>256) {
+                try {
+                    let data = JSON.parse(browserItem);
+                    setSession(data);
+                    sessionStorage.setItem('session',JSON.stringify(data));
+                    setStatus('success')
+                }
+                catch(err) {
+                    setStatus('error')
+                }
+            } else {
+                fetch(`${process.env.REACT_APP_API_HOST}/SESSION${strSearch}`)
+                .then(data => data.json())
+                .then(data => {
+                    setSession(data);
+                    sessionStorage.setItem('session',JSON.stringify(data));
+                    setStatus('success')
+                })
+                .catch(() => {
+                    setStatus('error')
+                })
+            }
         }
     }, [])
 

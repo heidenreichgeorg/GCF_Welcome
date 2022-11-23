@@ -19,15 +19,16 @@ export default function History() {
    // const [ year,  setYear] = useState()
    // const [ client,  setClient] = useState()
 
-    useEffect(() => {
+   useEffect(() => {
         if(status !== 'success') return;
-        fetch(`${process.env.REACT_APP_API_HOST}/SHOW?sessionId=${session.id}`)
-        .then(data => data.json())
-        .then(data => { setSheet(data); return data[D_Schema]; })
-       // .then(schema => { setYear(session.year); return schema; })
-       // .then(schema => { setClient(session.client); return schema; });
-      //  console.log("History setSheet for c="+client + ", y="+year);
-    }, [status]) 
+        //setYear(session.year);
+        //setClient(session.client);
+        let state = null;
+        try { state=JSON.parse(sessionStorage.getItem('session')); } catch(err) {}
+        if(state && Object.keys(state).length>5) {
+            setSheet(state.generated);
+        }
+    }, [status])
 
     if(!sheet) return null; //'Loading...';
 

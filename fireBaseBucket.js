@@ -69,20 +69,11 @@ async function bucketDownload(bpStorage,client,year,startSession,ext,userRes) {
     function(url) {
 
       if(debug) console.log('Firebase.download fetch '+url)
-
-        /*
-        fetch(url)
-        .then(data => data.json())
-        .then(session => {startSession(session,ext,userRes)})
-        .catch(function(error) {
-         */ 
           const decoder = new TextDecoder('UTF-8');
-
           const toString = (bytes) => {
               const array = new Uint8Array(bytes);
               return decoder.decode(array);
-          };
-          
+          };          
         let session = {};
         https.get(url, res => {
           let body = '';
@@ -90,22 +81,16 @@ async function bucketDownload(bpStorage,client,year,startSession,ext,userRes) {
             body=body+chunk;
           });
           res.on('end', () => {
-
             try {
-              
               if(debugReport) console.dir("Firebase.download body "+body);
-
               let buf = toString(body);
-
-              //if(debugReport) console.dir("Firebase.download buf "+buf);
-
               session = JSON.parse(body);
             }
             catch(err) {
               console.dir("Firebase.download ERR "+err.toString());
             }
 
-            if(debug) console.dir("Firebase.download session "+JSON.stringify(Object.keys(session)));
+            if(debug) console.dir("0018 Firebase.download session "+JSON.stringify(Object.keys(session)));
 
             if(debugReport) console.log("Firebase.download session "+JSON.stringify(session));
             // AVOID double HEADERS 

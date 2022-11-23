@@ -206,33 +206,13 @@ function init(app, argv) {
     });
 
 
-/*        
-    app.post("/STORE", (req, res) => { 
-        // STORE txn into LOG for later use
-        // from HistoryList.html       
-        if(debug) console.log("\n\n");
-        if(debug) console.log(Server.timeSymbol());
-        if(debug) console.log("0010 app.post STORE LOG txn into log('"+JSON.stringify(req.body)+"')");
-        
-        let delta = req.body.delta;
-
-        if(debug) console.log("0019 app.post STORE LOG with session id=("+req.body.sessionId+")");
-
-        if(delta) Sheets.saveSessionLog(req.body.sessionId,req.body);
-        else console.log("0021 app.post STORE LOG Id=("+req.body.sessionId+") did not save: no transaction!");
-        
-        res.writeHead(Sheets.HTTP_OK, {"Content-Type": "text/html"});    
-        res.end("\nSTORED.");
-    });
-*/
-
 
     app.get("/favicon.ico", (req, res)  => { res.sendFile(__dirname + "/favicon.jpg"); });
 
     app.get('/SHOW/', (req, res)    => {     
         // two very different functions here
-        // 1. with SESSION-ID: returns normal JSON data structure
-        // 2. with client name: return HTML dialog with latest session
+        // with SESSION-ID: returns normal JSON data structure from local server-side session storage
+        
         console.log("\n\n");
         console.log(Server.timeSymbol());
         console.log("1910 app.get SHOW sessionId="+ req.query.sessionId);
@@ -241,44 +221,8 @@ function init(app, argv) {
         let session = null;
         if(req.query.sessionId) session=Server.getSession(req.query.sessionId);
         
-        if(session) {
-            let balance = session.generated;
-            // SERVER FUNCTION INTERPRET1 GH20220918
+        send(res,session);
 
-            console.dir("1920 app.get SHOW sends Balance ="+JSON.stringify(Object.keys(balance)))
-            // .map((element,i)=>(element + Object.keys(balance.element).length))));
-            res.writeHead(Sheets.HTTP_OK, {"Content-Type": "text/html"}); 
-            send(res,balance); 
-        }
-        /*
-        else {
-            // 20220730
-            // SY !!
-            console.dir("1930 app.get SHOW - NO SESSION ID KNOWN");
-            if(req.query.client) session=Server.getClient(req.query.client);
-            
-            if(session && session.year && session.id && session.client) {
-
-                let jLogin = Server.jLoginURL(session.year,session.client,session.id);
-
-                res.writeHead(Sheets.HTTP_OK, {"Content-Type": "text/html"}); 
-                                
-                res.write("<HTML><BODY><FORM METHOD='GET' ACTION='LOGIN'><BUTTON TYPE='submit' VALUE='ENTER'>Enter</BUTTON>"
-                    +"<INPUT type='text' name='year'  value='"+session.year+"'>"+session.year+"</INPUT>"
-                    +"<INPUT type='text' name='client' value='"+session.client+"'>"+session.client+"</INPUT>"
-                    +"<INPUT type= 'hidden' name='mainSid' value='"+jLogin.mainSid+"'></INPUT>"
-                    +"<INPUT type= 'edit' name='postFix'>....</INPUT>"
-                    +"</FORM></BODY></HTML>");
-
-            } else {
-                // No session known for that client
-
-                res.writeHead(Sheets.HTTP_OK, {"Content-Type": "text/html"}); 
-                res.write("<HTML><BODY>Client "+req.query.client+" not  logged in </BODY></HTML>");
-
-            }
-        }
-        */
         res.end();
     })
 
@@ -1571,18 +1515,29 @@ module.exports['getYear']=getYear;
 
 
 
-async function send(res,gResponse) {
+async function send(res,session) {
 
-    if(res && gResponse) {
+    if(session) {
+        let balance = session.generated;
+        // SERVER FUNCTION INTERPRET1 GH20220918
 
-        // send the whole result
-        let payLoad = JSON.stringify(gResponse);    
-        res.write(payLoad);
-        res.write("\n");
-        //if(debug) console.log("send4 WRITE "+JSON.stringify(gResponse));    
-    } else {
-        if(debug) console.log("send NO BALANCE in gResponse: "+JSON.stringify(gResponse));           
-        res.write("\n");
+        console.dir("0400 send() Balance ="+JSON.stringify(Object.keys(balance)))
+        
+        res.writeHead(Sheets.HTTP_OK, {"Content-Type": "text/html"}); 
+
+        if(res && balance) {
+
+            // send the whole result
+            let payLoad = JSON.stringify(balance);    
+            res.write(payLoad);
+            res.write("\n");
+            
+            if(debug) console.log("0410 OK send(balance) in session "+JSON.stringify(Object.keys(balance))); 
+
+        } else {
+            if(debug) console.log("0401 send NO BALANCE in  session "+JSON.stringify(Object.keys(session))); 
+            res.write("\n");
+        }
     }
     res.end(); 
 }

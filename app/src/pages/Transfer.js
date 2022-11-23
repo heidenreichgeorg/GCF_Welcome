@@ -12,12 +12,17 @@ export default function Transfer() {
 
     const { session, status } = useSession()   
     const [ sheet,  setSheet] = useState(null)
+
     useEffect(() => {
         if(status !== 'success') return;
-        fetch(`${process.env.REACT_APP_API_HOST}/SHOW?sessionId=${session.id}`)
-        .then(data => data.json())
-        .then(data => { setSheet(data); })
-    }, [status]) 
+        //setYear(session.year);
+        //setClient(session.client);
+        let state = null;
+        try { state=JSON.parse(sessionStorage.getItem('session')); } catch(err) {}
+        if(state && Object.keys(state).length>5) {
+            setSheet(state.generated);
+        }
+    }, [status])
 
     const [iRow, setIRow] = useState(0)
     function upClick() {setIRow(iRow + 1); if(iRow>=getMax(sheet)) setIRow(1);}

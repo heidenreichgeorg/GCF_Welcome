@@ -2,9 +2,8 @@
 // node server.js root=d:\Privat\ auto=900
 
 /*
- React routes SESSION SHOW BOOK EXCEL
+ React routes SESSION BOOK EXCEL
  /SESSION takes buffered session, otherwise loads from file
- /SHOW (by compile module) returns existing buffered session context
  /BOOK appends session context and then stores it as JSON on server-side storage
  /EXCEL stores EXCEL on server-side storage and then downloads it
 */
@@ -210,7 +209,7 @@ app.get('/SESSION', (req, res) => {
             else console.log("\n0821 GET /SESSION NOT FOUND => FOR EXISTING #"+sessionId);
 
 
-            if(session && session.id) res.json({ id: session.id, client: session.client, year:session.year });
+            if(session && session.id) res.json(session);
             else req.query.code = "Could not signIn()";
             }
         
@@ -481,7 +480,9 @@ async function save2Bucket(session,client,year) {
 }
 
 
-//start session with uploading a session file for a known client
+
+// use WELCOMEDROP instead !!!
+// HIDDEN start session with uploading a session file for a known client
 app.post("/UPLOAD", (req, res) => { 
     let strTimeSymbol = timeSymbol();
     console.log("\n\n"+strTimeSymbol);
@@ -543,10 +544,10 @@ app.post("/UPLOAD", (req, res) => {
             );
             res.end();
 
-        } else console.log ( "0013 UPLOAD client="+client+",year="+year+",time="+time+",addr="+remote+"  ---> "+computed);
+        } else console.log ( "0013 UPLOAD VOID client="+client+",year="+year+",time="+time+",addr="+remote+"  ---> "+computed);
 
         return;
-    }
+    } else console.log ( "0009 UPLOAD EMPTY  addr="+remote);
 
     // send back sessionId to client browser or file
     //res.writeHead(HTTP_WRONG, {"Content-Type": "text/html"});
@@ -554,17 +555,9 @@ app.post("/UPLOAD", (req, res) => {
     res.end();
 });
 
-function signIn(query,remote,res) {
-    
-    // async, return null, so client/browser must retry
-    return signDown(query,remote,res); // load from Firebase
-
-
-    //return signUp(query,remote,res); // load from server filesystem
-}
 
 // load JSON file from Firebase storage
-function signDown(query,remote,res) {
+function signIn(query,remote,res) {
     let base =  Compiler.getRoot();
     console.log("0010 signDown at base "+base+"  for "+JSON.stringify(query));
 
@@ -584,8 +577,7 @@ function signDown(query,remote,res) {
                 console.log ( "0016 signDown FOUND WARM id ="+id);
                 sendDisplay( getSession(id), res);
             }
-
-            else fbDownload(client,year,startSession,query.ext,res);
+            else fbDownload(client,year,startSession,query.ext,res); // avoid double response
                         
         } else console.log ( "0027 signDown file no valid year for query="+JSON.stringify(query)+",addr="+remote);
 
@@ -595,60 +587,9 @@ function signDown(query,remote,res) {
 }
 
 
-// load JSON from server storage
-function signUp(query,remote,res) {
-    let base =  Compiler.getRoot();
-    console.log("0010 signUp at base "+base+"  for "+JSON.stringify(query));
-
-    if(query && query.client && query.client.length>2 ) { // && (query.client == "[a-zA-Z0-9]")) {
-
-        // Security sanitize input client
-        let client = query.client;
-        
-        if(query && query.year && query.year.length>2 && (parseInt(query.year)>1)) {
-
-            // Security sanitize input year
-            let year   = parseInt(query.year); // Security sanitize input year
-            console.log("0014 signUp for client "+client+"  year "+year);
-
-            if(query.ext && query.ext.length>0) { //} && query.ext == "[a-zA-Z0-9]" ) {
-
-
-                // Security sanitize input ext
-                let ext    = query.ext;
-
-                let dir=base+client+"/"+year+"/";
-                console.log("0018 signUp for client "+client+"  year "+year+"  in "+dir+"*."+ext);
-
-                let fileName = getMostRecentFile(dir,ext);
-                if(fileName) {
-                    console.log("0020 signUp for file "+fileName+",addr="+remote);
-        
-                    var session = JSON.parse(fs.readFileSync(dir+fileName, 'utf8'));
-
-                    if(client===session.client) {
-
-                         startSession(session, ext, res); // exit via res.send
-
-                         sendDisplay(session, res);
-
-                    } else console.log ( "0017 LATEST client no OK for query="+JSON.stringify(query)+",addr="+remote);
-
-                } else console.log ( "0023 LATEST file no valid fileName for query="+JSON.stringify(query)+",addr="+remote);
-                        
-            } else console.log ( "0025 LATEST file no valid file ext for query="+JSON.stringify(query)+",addr="+remote);
-                        
-        } else console.log ( "0027 LATEST file no valid year for query="+JSON.stringify(query)+",addr="+remote);
-    
-    } else console.log ( "0029 LATEST file no valid client for query="+JSON.stringify(query)+",addr="+remote);
-    
-    return session;
-};
-
-
 function startSession(session, ext, res) {
 
-    console.log("0024 signIn START session="+JSON.stringify(Object.keys(session))); 
+    console.log("0024 startSession="+JSON.stringify(Object.keys(session))); 
 
     // START A NEW SESSION
     let time = timeSymbol();
@@ -661,7 +602,14 @@ function startSession(session, ext, res) {
 
     setSession(session);
 
-    console.log("0026 signIn("+client+","+year+") SUCCESS sessionId="+sessionId); 
+    console.log("0026 startSession("+client+","+year+") SUCCESS sessionId="+sessionId); 
 
+    /*
+    if(res) {
+        console.log("0028 startSession("+client+","+year+") send RESPONSE="+sessionId); 
+        res.json(session);
+        res.end();
+    }
+    */
 }
 

@@ -11,9 +11,9 @@ import { useSession } from '../modules/sessionmanager';
 
 export default function Status() {
     
-    const [sheet, setSheet] = useState()
-    const [ year, setYear]  = useState()
-    const [client,setClient]  = useState()
+    const [sheet, setSheet]  = useState()
+    const [ year, setYear]   = useState()
+    const [client,setClient] = useState()
 
     const { session, status } = useSession()
 
@@ -21,9 +21,11 @@ export default function Status() {
         if(status !== 'success') return;
         setYear(session.year);
         setClient(session.client);
-        fetch(`${process.env.REACT_APP_API_HOST}/SHOW?sessionId=${session.id}`)
-        .then(data => data.json())
-        .then(data => { setSheet(data)})
+        let state = null;
+        try { state=JSON.parse(sessionStorage.getItem('session')); } catch(err) {}
+        if(state && Object.keys(state).length>5) {
+            setSheet(state.generated);
+        }
     }, [status])
 
     if(!sheet) return null; // 'Loading...';
