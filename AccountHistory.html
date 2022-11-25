@@ -15,7 +15,7 @@
         <DIV class="dosborder">
 			<DIV class="dostable" >
 				<DIV  class="attrLine"> 
-					<DIV class="L22">&nbsp;</DIV>
+					<DIV class="SEP">&nbsp;</DIV>
 					<DIV class="C100"><button id="read-button" onclick="getFromServer(putResponse)" )>Load</button> </DIV>
 				</DIV>         
             </DIV>
@@ -61,7 +61,7 @@
                 let headerInfo = '<DIV class="C280">'+page["AcctHistory"]+'&nbsp;'+page["header"]+'</DIV>';
 
                 // intro asset list on selection screen
-                var htmlPage = createPage( ['L220','L120','L120','L150','R105','R105'],"<DIV class='attrLine'>"+headerInfo+"</DIV>",'PageContent');
+                var htmlPage = createPage( ['LTXT','L120','L120','L150','R105','R105'],"<DIV class='attrLine'>"+headerInfo+"</DIV>",'PageContent');
                 cursor=htmlPage;
             
 
@@ -191,7 +191,7 @@
                 var partin=["Date","Sender","Reason","Ref1","Ref2","Target","Saldo"];
                 partin[J_ACCT-1] =schemaNames[index];
                 let headerInfo = '<DIV class="R105">'+partin.join('</DIV><DIV class="R105">')+'</DIV>';
-                var htmlPage = createPage( ['L40', 'C100','L110','L110','L110','L110','R105','R105'],"<DIV class='attrLine'>"+headerInfo+"</DIV>",'PageContent');
+                var htmlPage = createPage( ['TAG', 'C100','L110','L110','L110','L110','R105','R105'],"<DIV class='attrLine'>"+headerInfo+"</DIV>",'PageContent');
                 var cursor=htmlPage;
 
   

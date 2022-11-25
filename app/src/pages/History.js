@@ -85,16 +85,16 @@ function SigRow(row) {
     return (
         <div class="attrPair">
             <div class="attrLine">
-                <div class="L66">{aRow[0]}</div>
-                <div class="L22">&nbsp;</div>
-                <div class="L175">{aRow[1]}</div>
-                <div class="L175">{aRow[2]}</div>
-                <div class="L175">{aRow[3]}</div>
-                <div class="L175">{aRow[4]}</div>
-                <div class="L175">{aRow[5]}</div>
+                <div class="SYMB">{aRow[0]}</div>
+                <div class="SEP">&nbsp;</div>
+                <div class="LNAM">{aRow[1]}</div>
+                <div class="LNAM">{aRow[2]}</div>
+                <div class="LNAM">{aRow[3]}</div>
+                <div class="LNAM">{aRow[4]}</div>
+                <div class="LNAM">{aRow[5]}</div>
             </div>
             <div class="attrLine">
-                <div class="L22">&nbsp;</div>
+                <div class="SEP">&nbsp;</div>
                 <div class="C100">{mRow[0]}</div>
                 <div class="C100">{mRow[1]}</div>
                 <div class="C100">{mRow[2]}</div>
@@ -150,7 +150,7 @@ function makeHistory(sheet) {
                     let boxNote = "'"+pageGlobal["author"].replace('&nbsp',' ')+"'";                 
                     
                     let iBalance= jPrettyTXN.iBalance;
-                    let balCheck= '<DIV class="L66">'+cents2EU(iBalance)+'</DIV>';
+                    let balCheck= '<DIV class="SYMB">'+cents2EU(iBalance)+'</DIV>';
 
                     let data = (
                         jPrettyTXN.entry.join(CSEP)
@@ -183,12 +183,12 @@ function SearchForm(token) {
     return (
         <div class="attrLine">
             <form onSubmit={(e)=>(console.log("SEARCH "+JSON.stringify(e.target)))} >                
-                <div class='R90'></div>                
+                <div class='MOAM'></div>                
                 <div class='L280'>Line:<input type='edit' name='LPATTERN'/>&nbsp;</div>                
                 <div class='L280'>Acct:<input type='edit' name='APATTERN'/></div>                
                 <input type='hidden' name='client' defaultValue={token.token.client}/>
                 <input type='hidden' name='year' defaultValue={token.token.year}/>
-                <div class='R90'><button autoFocus class='L66 key'>Search</button></div>
+                <div class='MOAM'><button autoFocus class='SYMB key'>Search</button></div>
             </form>
         </div>
     )

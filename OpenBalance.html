@@ -12,7 +12,7 @@
         <DIV class="dosborder">
 			<DIV class="dostable">
 				<DIV  class="attrLine"> 
-					<DIV class="L22">&nbsp;</DIV>
+					<DIV class="SEP">&nbsp;</DIV>
 					<DIV class="C100"><button id="read-button" onclick="getFromServer(putResponse)" )>Load</button> </DIV>
 				</DIV>                
      		</DIV>
@@ -33,7 +33,7 @@
                 let page = response[D_Page];
 
                 let headerInfo = '<DIV class="C280">'+page["AcctOpen"]+'</DIV><DIV class="C280">'+page["header"]+'</DIV>';
-                var htmlPage = createPage(['L175','R105','L22','L280'],"<DIV class='attrLine'>"+headerInfo+"</DIV>",'PageContent');
+                var htmlPage = createPage(['LNAM','R105','SEP','L280'],"<DIV class='attrLine'>"+headerInfo+"</DIV>",'PageContent');
                 var cursor=htmlPage;
 
                 console.log(JSON.stringify(page))

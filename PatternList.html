@@ -17,7 +17,7 @@
                 <DIV ><DIV class="ulliTab" id='PageContent'></DIV></DIV>  
                 <DIV class="attrLine" id="welcome"></DIV>
 				<DIV  class="attrLine"> 
-					<DIV class="L22">&nbsp;</DIV>
+					<DIV class="SEP">&nbsp;</DIV>
 					<DIV class="C100" id="response"><button id="read-button" onclick="getFromServer(putResponse)" )>Load</button> </DIV>
 				</DIV>
      		</DIV>
@@ -166,7 +166,7 @@
             arrTextTXN.unshift(nam1);
 
             fullText.push('<DIV class="attrDash"><DIV class="L120">'+csvHead+'</DIV></DIV>');
-            fullText.push('<DIV class="attrDash"><DIV class="L66">'+arrTextTXN.join('</DIV><DIV class="L66">')+'</DIV></DIV>');
+            fullText.push('<DIV class="attrDash"><DIV class="SYMB">'+arrTextTXN.join('</DIV><DIV class="SYMB">')+'</DIV></DIV>');
             fullText.push('<DIV class="attrDash"><DIV class="L120">'+csvNote+'</DIV></DIV>');
 
             popUpObj.document.write('<HTML><HEAD><TITLE>Mobile Balance '+page['Address']+'</TITLE></HEAD><BODY>'+fullText.join('')+"</BODY></HTML>");
@@ -188,7 +188,7 @@
 
             // GH20220416
             let headerInfo = '<DIV class="L280">'+page["Patterns"]+'</DIV><DIV class="L280">'+page["Transaction"]+'</DIV>';
-            let htmlPage = createPage( ['L220','L120','L120','R105','R105','R105'],"<DIV class='attrLine'>"+headerInfo+"</DIV>",'PageContent');
+            let htmlPage = createPage( ['LTXT','L120','L120','R105','R105','R105'],"<DIV class='attrLine'>"+headerInfo+"</DIV>",'PageContent');
             var cursor=htmlPage;
 
 
@@ -227,21 +227,21 @@
 
             text = ''
                 /*'<DIV class="witBorder"><DIV class="mTable"><DIV class="ulliTab">'
-                  '<DIV class="attrDash"><DIV class="L220">'+arrHead.join('</DIV><DIV class="L120">')+'</DIV></DIV>'*/
+                  '<DIV class="attrDash"><DIV class="LTXT">'+arrHead.join('</DIV><DIV class="L120">')+'</DIV></DIV>'*/
                 +'<DIV class="attrDash">'
-                    +'<DIV class="L220"><input type="date" id="date"></input></DIV>'
-                    +'<DIV class="L220"><input type="submit" id="submitm" value="M" onclick="setMonth()"></input>&nbsp;'
+                    +'<DIV class="LTXT"><input type="date" id="date"></input></DIV>'
+                    +'<DIV class="LTXT"><input type="submit" id="submitm" value="M" onclick="setMonth()"></input>&nbsp;'
                         +'<input type="submit" id="submitq" value="Q" onclick="setQuarter()"></input>&nbsp;'
                         +'<input type="submit" id="submitqq" value="Q+" onclick="setNextQuarter()"></input>&nbsp;'
                         +'<input type="submit" id="submit_y" value="-/Y" onclick="setPrevYear()"></input>&nbsp;'
                         +'<input type="submit" id="submity" value="Y" onclick="setYear()"></input>&nbsp;'
                         +'<input type="submit" id="submityyy" value="Y/+" onclick="setYearNext()"></input>&nbsp;'
                     +'</DIV>'
-                    +'<DIV class="L220"><input type="submit" id="submit" value="'+page['Book']+'" onclick="readNBook('+iAttrs+','+dAttrs+')"></input></DIV>'
+                    +'<DIV class="LTXT"><input type="submit" id="submit" value="'+page['Book']+'" onclick="readNBook('+iAttrs+','+dAttrs+')"></input></DIV>'
                 +'</DIV>'
                 +arrEdit.join('')
                 +arrAmount.join('')
-                +'<DIV class="attrDash"><DIV class="L220">'+arrNote.join('</DIV><DIV class="L120">')+'</DIV></DIV>';
+                +'<DIV class="attrDash"><DIV class="LTXT">'+arrNote.join('</DIV><DIV class="L120">')+'</DIV></DIV>';
 
 
             cursor=printHTML(cursor,text);
@@ -282,7 +282,7 @@
                 var partin=["","Sender","Account","Reason","Ref1","Ref2"];
                 partin[J_ACCT-1] =schemaNames[index];
                 let headerInfo = '<DIV class="R105">'+partin.join('</DIV><DIV class="R105">')+'</DIV>';
-                var htmlPage = createPage( ['L40', 'L150','L150','L150','L150','L150'],"<DIV class='attrLine'>"+headerInfo+"</DIV>",'PageContent');
+                var htmlPage = createPage( ['TAG', 'L150','L150','L150','L150','L150'],"<DIV class='attrLine'>"+headerInfo+"</DIV>",'PageContent');
                 var cursor=htmlPage;
 
 
@@ -383,11 +383,11 @@
 
                                 let entry =  ''
                                 //arrHistory.push('<DIV class="attrLine">'
-                                +'<DIV class="L66"><DIV class="keyPanel" onclick="showAddressPopUp('+boxTitle+','+boxClient+','+boxText+','+boxValues+','+boxAddress+','+boxNote+',readNBook)">Text</DIV></DIV>'
-                                +'<DIV class="L220"><DIV class="keyPanel" onclick="showBookingField('+boxTitle+','+boxClient+','+boxText+','+boxValues+','+boxAccount+','+boxNote+',readNBook)">'+sender+'</DIV></DIV>'
-                                +'<DIV class="L175">'+refAcct+'</DIV>'
-                                +'<DIV class="L175">'+svwz+'</DIV>'
-                                +'<DIV class="L175">'+svwz2+'</DIV>'
+                                +'<DIV class="SYMB"><DIV class="keyPanel" onclick="showAddressPopUp('+boxTitle+','+boxClient+','+boxText+','+boxValues+','+boxAddress+','+boxNote+',readNBook)">Text</DIV></DIV>'
+                                +'<DIV class="LTXT"><DIV class="keyPanel" onclick="showBookingField('+boxTitle+','+boxClient+','+boxText+','+boxValues+','+boxAccount+','+boxNote+',readNBook)">'+sender+'</DIV></DIV>'
+                                +'<DIV class="LNAM">'+refAcct+'</DIV>'
+                                +'<DIV class="LNAM">'+svwz+'</DIV>'
+                                +'<DIV class="LNAM">'+svwz2+'</DIV>'
                                 //+'</DIV>')
                                 ;
                                 

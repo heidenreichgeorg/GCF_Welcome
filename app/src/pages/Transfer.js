@@ -30,16 +30,16 @@ export default function Transfer() {
     function UpDownSubmitRow() {
         return(
             <div class="attrLine">
-                <div class="R90"> {iRow}</div>
-                <div class="L22"> &nbsp;</div>
-                <div class="L66"><div class="key" onClick={upClick}>+ </div></div>
-                <div class="L22"> &nbsp;</div>
-                <div class="R90"> &nbsp;</div>
-                <div class="L22"> &nbsp;</div>
-                <div class="L66"><div class="key" onClick={downClick}>-</div></div>
-                <div class="R90"> &nbsp;</div>
-                <div class="L22"> &nbsp;</div>
-                <div class="L66"><input type="submit" class="key" value="BOOK" onClick={(e)=>onBook(e)}/></div>
+                <div class="MOAM"> {iRow}</div>
+                <div class="SEP"> &nbsp;</div>
+                <div class="SYMB"><div class="key" onClick={upClick}>+ </div></div>
+                <div class="SEP"> &nbsp;</div>
+                <div class="MOAM"> &nbsp;</div>
+                <div class="SEP"> &nbsp;</div>
+                <div class="SYMB"><div class="key" onClick={downClick}>-</div></div>
+                <div class="MOAM"> &nbsp;</div>
+                <div class="SEP"> &nbsp;</div>
+                <div class="SYMB"><input type="submit" class="key" value="BOOK" onClick={(e)=>onBook(e)}/></div>
             </div>
         )
     }
@@ -49,15 +49,15 @@ export default function Transfer() {
     function InputRow({ date,sender,reason,ref1,ref2 }) {
         return(
             <div class="attrLine">
-                <div class="L66"> &nbsp;</div>
+                <div class="SYMB"> &nbsp;</div>
                 <div class="L150"> <input type="edit" id="cDate"   name="cDate"   defaultValue ={date} onDrop={ignore}  ref={refDate} /></div>
-                <div class="L22"> &nbsp;</div>
+                <div class="SEP"> &nbsp;</div>
                 <div class="L150"> <input type="edit" id="cSender" name="cSender" defaultValue ={sender} onDrop={ignore} ref={refSender}/></div>
-                <div class="L22"> &nbsp;</div>
+                <div class="SEP"> &nbsp;</div>
                 <div class="L150"> <input type="edit" id="cReason" name="cReason" defaultValue ={reason} onDrop={ignore}  ref={refReason}/></div>
-                <div class="L22"> &nbsp;</div>
+                <div class="SEP"> &nbsp;</div>
                 <div class="L150"> <input type="edit" id="cRef1"   name="cRef1"   defaultValue ={ref1} onDrop={ignore}   ref={refRef1}/></div>
-                <div class="L22"> &nbsp;</div>
+                <div class="SEP"> &nbsp;</div>
                 <div class="L150"> <input type="edit" id="cRef2"   name="cRef2"   defaultValue ={ref2} onDrop={ignore}   ref={refRef2}/></div>
             </div>)
     }
@@ -76,21 +76,21 @@ export default function Transfer() {
     function AccountRow({ name1,amount1, name2,amount2, name3,amount3, name4,amount4, name5,amount5}) {
         return(
             <div class="attrLine">
-                <div class="L22"> &nbsp;</div>
-                <div class="L66"> <input type="text" id="cNam1" name="cNam1"   ref={rName1} defaultValue={name1} onDragOver={ignore}  onDrop={handleDrop}/></div>
-                <div class="R90"> <input type="edit" id="cAmt1" name="cAmt1"  ref={rAmount1} defaultValue={amount1} onDrop={ignore}  /></div>
-                <div class="L22"> &nbsp;</div>
-                <div class="L66"> <input type="text" id="cNam2" name="cNam2"   ref={rName2} defaultValue={name2} onDragOver={ignore}  onDrop={handleDrop}/></div>
-                <div class="R90"> <input type="edit" id="cAmt2" name="cAmt2"  ref={rAmount2} defaultValue={amount2} onDrop={ignore}  /></div>
-                <div class="L22"> &nbsp;</div>
-                <div class="L66"> <input type="text" id="cNam3" name="cNam3"   ref={rName3} defaultValue={name3} onDragOver={ignore}  onDrop={handleDrop}/></div>
-                <div class="R90"> <input type="edit" id="cAmt3" name="cAmt3"  ref={rAmount3} defaultValue={amount3} onDrop={ignore}  /></div>
-                <div class="L22"> &nbsp;</div>
-                <div class="L66"> <input type="text" id="cNam4" name="cNam4"   ref={rName4} defaultValue={name4} onDragOver={ignore}  onDrop={handleDrop}/></div>
-                <div class="R90"> <input type="edit" id="cAmt4" name="cAmt4"  ref={rAmount4} defaultValue={amount4} onDrop={ignore}  /></div>
-                <div class="L22"> &nbsp;</div>
-                <div class="L66"> <input type="text" id="cNam5" name="cNam5"   ref={rName5} defaultValue={name5} onDragOver={ignore}  onDrop={handleDrop}/></div>
-                <div class="R90"> <input type="edit" id="cAmt5" name="cAmt5"  ref={rAmount5} defaultValue={amount5} onDrop={ignore}  /></div>
+                <div class="SEP"> &nbsp;</div>
+                <div class="TAG"> <input type="text" id="cNam1" name="cNam1"   ref={rName1} defaultValue={name1} onDragOver={ignore}  onDrop={handleDrop}/></div>
+                <div class="MOAM"> <input type="edit" id="cAmt1" name="cAmt1"  ref={rAmount1} defaultValue={amount1} onDrop={ignore}  /></div>
+                <div class="SEP"> &nbsp;</div>
+                <div class="TAG"> <input type="text" id="cNam2" name="cNam2"   ref={rName2} defaultValue={name2} onDragOver={ignore}  onDrop={handleDrop}/></div>
+                <div class="MOAM"> <input type="edit" id="cAmt2" name="cAmt2"  ref={rAmount2} defaultValue={amount2} onDrop={ignore}  /></div>
+                <div class="SEP"> &nbsp;</div>
+                <div class="TAG"> <input type="text" id="cNam3" name="cNam3"   ref={rName3} defaultValue={name3} onDragOver={ignore}  onDrop={handleDrop}/></div>
+                <div class="MOAM"> <input type="edit" id="cAmt3" name="cAmt3"  ref={rAmount3} defaultValue={amount3} onDrop={ignore}  /></div>
+                <div class="SEP"> &nbsp;</div>
+                <div class="TAG"> <input type="text" id="cNam4" name="cNam4"   ref={rName4} defaultValue={name4} onDragOver={ignore}  onDrop={handleDrop}/></div>
+                <div class="MOAM"> <input type="edit" id="cAmt4" name="cAmt4"  ref={rAmount4} defaultValue={amount4} onDrop={ignore}  /></div>
+                <div class="SEP"> &nbsp;</div>
+                <div class="TAG"> <input type="text" id="cNam5" name="cNam5"   ref={rName5} defaultValue={name5} onDragOver={ignore}  onDrop={handleDrop}/></div>
+                <div class="MOAM"> <input type="edit" id="cAmt5" name="cAmt5"  ref={rAmount5} defaultValue={amount5} onDrop={ignore}  /></div>
             </div>)
     }
 
@@ -104,50 +104,50 @@ export default function Transfer() {
         return(
             <div class="attrLine">
             <div class="attrLine">
-                <div class="L22">&nbsp;</div>
-                <div class="C55"><div class="key" draggable="true" id="cNam0" onDragStart={(e) => (setDragging(e,lineA[0]))}>{lineA[0]} </div></div>
-                <div class="L22">&nbsp;</div>
-                <div class="C55"><div class="key"  draggable="true" id="cNam1" onDragStart={(e) => (setDragging(e,lineA[1]))}>{lineA[1]} </div></div>
-                <div class="L22">&nbsp;</div>
-                <div class="C55"><div class="key"  draggable="true" id="cNam2" onDragStart={(e) => (setDragging(e,lineA[2]))}>{lineA[2]} </div></div>
-                <div class="L22">&nbsp;</div>
-                <div class="C55"><div class="key" draggable="true"  id="cNam3" onDragStart={(e) => (setDragging(e,lineA[3]))}>{lineA[3]} </div></div>
-                <div class="L22">&nbsp;</div>
-                <div class="C55"><div class="key" draggable="true"  id="cNam4" onDragStart={(e) => (setDragging(e,lineA[4]))}>{lineA[4]}</div></div>
-                <div class="L22">&nbsp;</div>
-                <div class="C55"><div class="key" draggable="true"  id="cNam5" onDragStart={(e) => (setDragging(e,lineA[5]))}>{lineA[5]} </div></div>
-                <div class="L22">&nbsp;</div>
-                <div class="C55"><div class="key" draggable="true"  id="cNam6" onDragStart={(e) => (setDragging(e,lineA[6]))}>{lineA[6]} </div></div>
-                <div class="L22">&nbsp;</div>
-                <div class="C55"><div class="key" draggable="true"  id="cNam7" onDragStart={(e) => (setDragging(e,lineA[7]))}>{lineA[7]} </div></div>
-                <div class="L22">&nbsp;</div>
-                <div class="C55"><div class="key"  draggable="true" id="cNam8" onDragStart={(e) => (setDragging(e,lineA[8]))}>{lineA[8]} </div></div>
-                <div class="L22">&nbsp;</div>
-                <div class="C55"><div class="key"  draggable="true" id="cNam9" onDragStart={(e) => (setDragging(e,lineA[9]))}>{lineA[9]} </div></div>
-                <div class="L22">&nbsp;</div>
+                <div class="SEP">&nbsp;</div>
+                <div class="TAG"><div class="key" draggable="true" id="cNam0" onDragStart={(e) => (setDragging(e,lineA[0]))}>{lineA[0]} </div></div>
+                <div class="SEP">&nbsp;</div>
+                <div class="TAG"><div class="key"  draggable="true" id="cNam1" onDragStart={(e) => (setDragging(e,lineA[1]))}>{lineA[1]} </div></div>
+                <div class="SEP">&nbsp;</div>
+                <div class="TAG"><div class="key"  draggable="true" id="cNam2" onDragStart={(e) => (setDragging(e,lineA[2]))}>{lineA[2]} </div></div>
+                <div class="SEP">&nbsp;</div>
+                <div class="TAG"><div class="key" draggable="true"  id="cNam3" onDragStart={(e) => (setDragging(e,lineA[3]))}>{lineA[3]} </div></div>
+                <div class="SEP">&nbsp;</div>
+                <div class="TAG"><div class="key" draggable="true"  id="cNam4" onDragStart={(e) => (setDragging(e,lineA[4]))}>{lineA[4]}</div></div>
+                <div class="SEP">&nbsp;</div>
+                <div class="TAG"><div class="key" draggable="true"  id="cNam5" onDragStart={(e) => (setDragging(e,lineA[5]))}>{lineA[5]} </div></div>
+                <div class="SEP">&nbsp;</div>
+                <div class="TAG"><div class="key" draggable="true"  id="cNam6" onDragStart={(e) => (setDragging(e,lineA[6]))}>{lineA[6]} </div></div>
+                <div class="SEP">&nbsp;</div>
+                <div class="TAG"><div class="key" draggable="true"  id="cNam7" onDragStart={(e) => (setDragging(e,lineA[7]))}>{lineA[7]} </div></div>
+                <div class="SEP">&nbsp;</div>
+                <div class="TAG"><div class="key"  draggable="true" id="cNam8" onDragStart={(e) => (setDragging(e,lineA[8]))}>{lineA[8]} </div></div>
+                <div class="SEP">&nbsp;</div>
+                <div class="TAG"><div class="key"  draggable="true" id="cNam9" onDragStart={(e) => (setDragging(e,lineA[9]))}>{lineA[9]} </div></div>
+                <div class="SEP">&nbsp;</div>
             </div>
             <div class="attrLine">
-                <div class="L22">&nbsp;</div>
-                <div class="C55"><div class="key" draggable="true" id="cNam0">{lineB[0]}</div></div>
-                <div class="L22">&nbsp;</div>
-                <div class="C55"><div class="key"  draggable="true" id="cNam1">{lineB[1]}</div></div>
-                <div class="L22">&nbsp;</div>
-                <div class="C55"><div class="key"  draggable="true" id="cNam2">{lineB[2]}</div></div>
-                <div class="L22">&nbsp;</div>
-                <div class="C55"><div class="key" draggable="true"  id="cNam3">{lineB[3]}</div></div>
-                <div class="L22">&nbsp;</div>
-                <div class="C55"><div class="key" draggable="true"  id="cNam4">{lineB[4]}</div></div>
-                <div class="L22">&nbsp;</div>
-                <div class="C55"><div class="key" draggable="true"  id="cNam5">{lineB[5]}</div></div>
-                <div class="L22">&nbsp;</div>
-                <div class="C55"><div class="key" draggable="true"  id="cNam6">{lineB[6]}</div></div>
-                <div class="L22">&nbsp;</div>
-                <div class="C55"><div class="key" draggable="true"  id="cNam7">{lineB[7]}</div></div>
-                <div class="L22">&nbsp;</div>
-                <div class="C55"><div class="key"  draggable="true" id="cNam8">{lineB[8]}</div></div>
-                <div class="L22">&nbsp;</div>
-                <div class="C55"><div class="key"  draggable="true" id="cNam9">{lineB[9]}</div></div>
-                <div class="L22">&nbsp;</div>
+                <div class="SEP">&nbsp;</div>
+                <div class="TAG"><div class="key" draggable="true" id="cNam0">{lineB[0]}</div></div>
+                <div class="SEP">&nbsp;</div>
+                <div class="TAG"><div class="key"  draggable="true" id="cNam1">{lineB[1]}</div></div>
+                <div class="SEP">&nbsp;</div>
+                <div class="TAG"><div class="key"  draggable="true" id="cNam2">{lineB[2]}</div></div>
+                <div class="SEP">&nbsp;</div>
+                <div class="TAG"><div class="key" draggable="true"  id="cNam3">{lineB[3]}</div></div>
+                <div class="SEP">&nbsp;</div>
+                <div class="TAG"><div class="key" draggable="true"  id="cNam4">{lineB[4]}</div></div>
+                <div class="SEP">&nbsp;</div>
+                <div class="TAG"><div class="key" draggable="true"  id="cNam5">{lineB[5]}</div></div>
+                <div class="SEP">&nbsp;</div>
+                <div class="TAG"><div class="key" draggable="true"  id="cNam6">{lineB[6]}</div></div>
+                <div class="SEP">&nbsp;</div>
+                <div class="TAG"><div class="key" draggable="true"  id="cNam7">{lineB[7]}</div></div>
+                <div class="SEP">&nbsp;</div>
+                <div class="TAG"><div class="key"  draggable="true" id="cNam8">{lineB[8]}</div></div>
+                <div class="SEP">&nbsp;</div>
+                <div class="TAG"><div class="key"  draggable="true" id="cNam9">{lineB[9]}</div></div>
+                <div class="SEP">&nbsp;</div>
             </div>
             </div>
             )
@@ -279,15 +279,15 @@ function where(array,key) {
 function TransferRow({ date,sender,reason,ref1,ref2 }) {
     return(
         <div class="attrLine">
-            <div class="L66"> &nbsp;</div>
+            <div class="SYMB"> &nbsp;</div>
             <div class="L150"> {date}</div>
-            <div class="L22"> &nbsp;</div>
+            <div class="SEP"> &nbsp;</div>
             <div class="L150"> {sender}</div>
-            <div class="L22"> &nbsp;</div>
+            <div class="SEP"> &nbsp;</div>
             <div class="L150"> {reason}</div>
-            <div class="L22"> &nbsp;</div>
+            <div class="SEP"> &nbsp;</div>
             <div class="L150"> {ref1}</div>
-            <div class="L22"> &nbsp;</div>
+            <div class="SEP"> &nbsp;</div>
             <div class="L150"> {ref2}</div>
         </div>)
 }

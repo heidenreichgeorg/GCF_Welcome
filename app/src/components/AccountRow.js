@@ -2,7 +2,7 @@
 function AccountRow({lineNum, date, sender, reason, ref1, ref2, amount, saldo}) {
     return (
         <div class="attrLine">
-            <div class="L40">{lineNum}</div>
+            <div class="TAG">{lineNum}</div>
             <div class="C100">{date}</div>
             <div class="L110">{sender}</div>
             <div class="L110">{reason}</div>

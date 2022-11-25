@@ -12,9 +12,9 @@ export const iCpField = 35;
 export function OverviewRow({acct, amount, name1, name2}) { // 
     return (
         <div class="attrLine">
-            <div class="L175">{acct}</div>
+            <div class="LNAM">{acct}</div>
             <div class="R105">{amount}</div>
-            <div class="L22">{name1}</div>
+            <div class="SEP">{name1}</div>
             <div class="L280">{name2}</div>
         </div>
     )
@@ -37,9 +37,9 @@ export function GainLossRow({section,type,acct,xbrl,amount}) {
     return(
         <div class="attrLine">
             <div class="C100">{section}</div>
-            <div class="L175">{type}</div>
+            <div class="LNAM">{type}</div>
             <div class="C140">{acct}</div>
-            <div class="L175">{xbrl}</div>
+            <div class="LNAM">{xbrl}</div>
             <div class="R105">{amount}</div>
         </div>
     )

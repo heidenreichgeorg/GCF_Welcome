@@ -12,7 +12,7 @@
         <DIV class="witBorder">
 			<DIV class="mTable">
 				<DIV  class="attrLine"> 
-					<DIV class="L22">&nbsp;</DIV>
+					<DIV class="SEP">&nbsp;</DIV>
 					<DIV class="C100"><button id="read-button" onclick="getFromServer(putResponse)" )>Load</button> </DIV>
 				</DIV>
                 <DIV ><DIV class="ulliTab" id='PageContent'></DIV></DIV>
@@ -41,12 +41,12 @@
                     var client=gSchema.client;
 
                     var welcome = document.getElementById("welcome");
-                    welcome.innerHTML = "<DIV class='L220'>&nbsp;"
-                        +"</DIV><DIV class='L220'>"+client
-                    +"</DIV><DIV class='L220'>"+register+"&nbsp;"+taxnumber
-                    +"</DIV><DIV class='L220'>&nbsp;"
-                        +"</DIV><DIV class='L220'>"+iban+"&nbsp;"+reportYear
-                    +"</DIV><DIV class='L220'>"+author+"&nbsp;"+residence
+                    welcome.innerHTML = "<DIV class='LTXT'>&nbsp;"
+                        +"</DIV><DIV class='LTXT'>"+client
+                    +"</DIV><DIV class='LTXT'>"+register+"&nbsp;"+taxnumber
+                    +"</DIV><DIV class='LTXT'>&nbsp;"
+                        +"</DIV><DIV class='LTXT'>"+iban+"&nbsp;"+reportYear
+                    +"</DIV><DIV class='LTXT'>"+author+"&nbsp;"+residence
                     +"</DIV>";
                 }
                 var result = [];
@@ -63,7 +63,7 @@
                     if(yearEnd && iName && xbrl) {
                         result.push('<DIV class="attrLine"><DIV class="L120">'+iName
                                         +'</DIV><DIV class="R105">'+yearEnd
-                                        +'</DIV><DIV class="L22">&nbsp'
+                                        +'</DIV><DIV class="SEP">&nbsp'
                                         +'</DIV><DIV class="C280">'+xbrl_pre
                                         +'</DIV></DIV>');
                     } else {

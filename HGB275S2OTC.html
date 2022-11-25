@@ -12,7 +12,7 @@
         <DIV class="dosborder">
 			<DIV class="dostable" >
 				<DIV  class="attrRow"> 
-					<DIV class="L22">&nbsp;</DIV>
+					<DIV class="SEP">&nbsp;</DIV>
 					<DIV class="C100"><button id="read-button" onclick="getFromServer(putResponse)" )>Load</button> </DIV>
 				</DIV>
      		</DIV>
@@ -41,8 +41,8 @@
 
                     var jAccounts = response[D_Balance];
 
-                    let headerInfo = '<DIV class="C280">'+page["GainlossHGB"]+'</DIV><DIV class="L220">'+page["header"]+'</DIV>';
-                    var htmlPage = createPage(['L120','L175','R165','R105'],"<DIV class='attrLine'>"+headerInfo+"</DIV>",'PageContent');
+                    let headerInfo = '<DIV class="C280">'+page["GainlossHGB"]+'</DIV><DIV class="LTXT">'+page["header"]+'</DIV>';
+                    var htmlPage = createPage(['L120','LNAM','R165','R105'],"<DIV class='attrLine'>"+headerInfo+"</DIV>",'PageContent');
                     var cursor=htmlPage;
 
                     var chgb1 = 0; // Umsatz

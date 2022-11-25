@@ -46,9 +46,9 @@
                     <div class="R165" id="credit" ><div>Soll: 0,00</div></div>
                     <div class="C100"  >&nbsp;</div>
                     <div class="R165" id="debit" ><div>Haben 0,00</div></div>
-                    <div class="L22"  >&nbsp;</div>
+                    <div class="SEP"  >&nbsp;</div>
                     <div class="C100" id="buttons" >
-                        <div class="L22"  >&nbsp;</div>
+                        <div class="SEP"  >&nbsp;</div>
                         <DIV class="C100"><button id="read-button" onclick="getFromServer(putResponse)" )>Close</button> </DIV> 
                 </div></div>
             </div>
@@ -121,7 +121,7 @@
                 var jInfo = closing; // { "date":closing[1], "sender":closing[2], "refAcct":closing[3], "svwz":closing[4], "svwz2":closing[5], "credit":[], "debit":[]  };
 
                 txnTable.push('<DIV class="attrLine">'
-                +'<div class="L22" >&nbsp;</div>'
+                +'<div class="SEP" >&nbsp;</div>'
                 +'<div class="C100" id="date" value="'+jInfo.date+'">'+jInfo.date+'</div>'
                 +'<DIV class="L120">'+jInfo.sender+'</DIV>'      
                 +'<DIV class="L120">'+jInfo.refAcct+'</DIV>'

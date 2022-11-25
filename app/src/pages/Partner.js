@@ -67,19 +67,21 @@ function PartnerRow(mRow) {
 
     console.log("PartnerRow mRow="+JSON.stringify(mRow));
 
+    
+
     return (
 
         <div class="attrLine">
-            <div class="L66">{mRow.p.name}</div>
-            <div class="R90">{mRow.p.init}</div>
-            <div class="R90">{mRow.p.credit}</div>
-            <div class="R90">{mRow.p.debit}</div>
-            <div class="R90">{mRow.p.yearEnd}</div>
-            <div class="R90">{mRow.p.netIncomeOTC}</div>
-            <div class="R90">{mRow.p.netIncomeFin}</div>
-            <div class="R90">{mRow.p.close}</div>
-            <div class="R90">{mRow.p.tax}</div>
-            <div class="R90">{mRow.p.next}</div>
+            <div class="SYMB">{mRow.p.name}</div>
+            <div class="MOAM">{mRow.p.init}</div>
+            <div class="MOAM">{mRow.p.credit}</div>
+            <div class="MOAM">{mRow.p.debit}</div>
+            <div class="MOAM">{mRow.p.yearEnd}</div>
+            <div class="MOAM">{mRow.p.netIncomeOTC}</div>
+            <div class="MOAM">{mRow.p.netIncomeFin}</div>
+            <div class="MOAM">{mRow.p.close}</div>
+            <div class="TAX" >{mRow.p.tax}</div>
+            <div class="MOAM">{mRow.p.next}</div>
         </div>
     
     )

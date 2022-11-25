@@ -224,7 +224,7 @@ function validateCD(creditList,debitList) {
         let value=creditList[name];
         saldoC+=value.cents;
         let display=moneyString(value);
-        creditDivs.push("<div class='L66'>"+name+DOUBLE+"</div><div class='R105' onclick='toggleC2D("+'"'+name+'"'+")'>"+display+"</div>");
+        creditDivs.push("<div class='SYMB'>"+name+DOUBLE+"</div><div class='R105' onclick='toggleC2D("+'"'+name+'"'+")'>"+display+"</div>");
     }
  
 
@@ -233,7 +233,7 @@ function validateCD(creditList,debitList) {
         let value=debitList[name];
         saldoD+=value.cents;
         let display=moneyString(value);
-        debitDivs.push("<div class='L66'>"+name+DOUBLE+"</div><div class='R105' onclick='toggleD2C("+'"'+name+'"'+")'>"+display+"</div>");
+        debitDivs.push("<div class='SYMB'>"+name+DOUBLE+"</div><div class='R105' onclick='toggleD2C("+'"'+name+'"'+")'>"+display+"</div>");
     }
 
     var diff=0;
@@ -247,11 +247,11 @@ function validateCD(creditList,debitList) {
 
         var lines=0;
         for(;creditDivs.length>0 || debitDivs.length>0;lines++) {
-            var left=  "<div class='L66'>&nbsp;</DIV><div class='R105'>&nbsp;</DIV>";
-            var right= "<div class='L66'>&nbsp;</DIV><div class='R105'>&nbsp;</DIV>";
+            var left=  "<div class='SYMB'>&nbsp;</DIV><div class='R105'>&nbsp;</DIV>";
+            var right= "<div class='SYMB'>&nbsp;</DIV><div class='R105'>&nbsp;</DIV>";
             if(creditDivs.length>0) { left=creditDivs.pop(); }
             if(debitDivs.length>0)  { right=debitDivs.pop(); }
-            cdPairs.push(left+"<div class='L66'>&nbsp;</DIV>"+right);
+            cdPairs.push(left+"<div class='SYMB'>&nbsp;</DIV>"+right);
         }
     }
 
@@ -362,7 +362,7 @@ function showTransfer(txnForm,commandCent,force) {
 
     let headerInfo = '<DIV class="C280">'+page["Transfer"]+'&nbsp;'+page["header"]+'</DIV>';
 
-    let htmlPage = createPage( ['L220','L120','L120','R105','R105','R105'],"<DIV class='attrLine'>"+headerInfo+"</DIV>",'PageContent');
+    let htmlPage = createPage( ['LTXT','L120','L120','R105','R105','R105'],"<DIV class='attrLine'>"+headerInfo+"</DIV>",'PageContent');
     
     if(!terminal) terminal = initTerminal(page,'PageContent',SCREENLINES);  
 
@@ -403,14 +403,14 @@ function showTransfer(txnForm,commandCent,force) {
 
 
     var bookingHead = 
-     '<DIV class="L175"><input type="date" id="date" value="'+date+'"></input></DIV>'
+     '<DIV class="LNAM"><input type="date" id="date" value="'+date+'"></input></DIV>'
     +'<DIV class="L120"><input type="edit" id="sender" value="'+sender+'"></input></DIV>'      
     +'<DIV class="L120"><input type="edit" id="refAcct" value="'+refAcct+'"></input></DIV>'
     +'<DIV class="L120"><input type="edit" id="info4" value="'+info4+'"></input></DIV>'
     +'<DIV class="L120"><input type="edit" id="info5" value="'+info5+'"></input></DIV>';
     print2Terminal(cursor,bookingHead);
 
-    print2Terminal(cursor,'<DIV class="L175">&nbsp;</DIV>'); // 20220516
+    print2Terminal(cursor,'<DIV class="LNAM">&nbsp;</DIV>'); // 20220516
 
 
     // BOOK button and 'display' for delta = cCent
@@ -425,7 +425,7 @@ function showTransfer(txnForm,commandCent,force) {
         cursor=print2Terminal(cursor,"<div class='C100' >&nbsp;</div><DIV class='R165' id='display'>&nbsp;</DIV>"+cdPairs[c]);
     }
     
-    print2Terminal(cursor,'<DIV class="L175">&nbsp;</DIV>'); // 20220516
+    print2Terminal(cursor,'<DIV class="LNAM">&nbsp;</DIV>'); // 20220516
 
     showTerminal(terminal,htmlPage);
 
@@ -441,7 +441,7 @@ function showClose(txnForm,nextFuncName) {
 
     let headerInfo = '<DIV class="C280">'+page["Closing"]+'&nbsp;'+page["header"]+'</DIV>';
 
-    let htmlPage = createPage( ['L220','L120','L120','R105','R105','R105'],"<DIV class='attrLine'>"+headerInfo+"</DIV>",'PageContent');
+    let htmlPage = createPage( ['LTXT','L120','L120','R105','R105','R105'],"<DIV class='attrLine'>"+headerInfo+"</DIV>",'PageContent');
     
     if(!terminal) terminal = initTerminal(page,'PageContent',SCREENLINES,  nextFuncName); 
 
@@ -453,7 +453,7 @@ function showClose(txnForm,nextFuncName) {
     }
 
     cursor=print2Terminal(cursor,"<div class='C100' >&nbsp;</div>"+
-    "<div class='L66'>Credit</DIV><div class='R105'>"+cents2EU(saldoC)+"</div><div class='L66'>&nbsp;</DIV><div class='L66'>Debit</DIV><div class='R105'>"+cents2EU(saldoD)+"</div>");
+    "<div class='SYMB'>Credit</DIV><div class='R105'>"+cents2EU(saldoC)+"</div><div class='SYMB'>&nbsp;</DIV><div class='SYMB'>Debit</DIV><div class='R105'>"+cents2EU(saldoD)+"</div>");
     
 
     showTerminal(terminal,htmlPage);
@@ -871,7 +871,7 @@ function initTerminal(page,target,screenLines,nextFuncName) {
     let boxFooter2 = "<DIV class='L120' id='box2Footer'>&nbsp;"
     +"</DIV><DIV class='L280'>"+page["reference"]
     +"</DIV><DIV class='L280'>"+page["author"]
-    +"</DIV>" + (nextFuncName==null ? "": "<BUTTON autoFocus class='L40' onclick='"+nextFuncName+"()'> >>> </BUTTON>");
+    +"</DIV>" + (nextFuncName==null ? "": "<BUTTON autoFocus class='TAG' onclick='"+nextFuncName+"()'> >>> </BUTTON>");
     arrHTML.push('<DIV  class="attrLine" id="'+target+'termLine'+l+'">'+boxFooter2+'</DIV>');
     l++;
 

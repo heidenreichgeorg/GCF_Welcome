@@ -13,7 +13,7 @@
         <DIV class="dosborder">
 			<DIV class="dostable">                
 				<DIV  class="attrLine"> 
-					<DIV class="L22">&nbsp;</DIV>
+					<DIV class="SEP">&nbsp;</DIV>
 					<DIV class="C100"><button id="read-button" onclick="getFromServer(putResponse)" )>Load</button> </DIV>
 				</DIV>
      		</DIV>
@@ -45,7 +45,7 @@
                    
                 let headerInfo = '<DIV class="L280">'+pageGlobal["AcctClose"]+'</DIV><DIV class="L280">'+pageGlobal["header"]+'</DIV>';
 
-                var htmlPage = createPage(['L66','R105','L280','L280'],"<DIV class='attrLine'>"+headerInfo+"</DIV>",'PageContent');
+                var htmlPage = createPage(['SYMB','R105','L280','L280'],"<DIV class='attrLine'>"+headerInfo+"</DIV>",'PageContent');
                 var cursor=htmlPage;
 
                 
@@ -98,9 +98,9 @@
                     var yearEnd = account.yearEnd;
                     var iName = account.name;
 
-                    sLeft[iLeft++] = '<DIV class="R90">'+yearEnd+'</DIV><DIV class="L66">'+iName+'</DIV>';
+                    sLeft[iLeft++] = '<DIV class="MOAM">'+yearEnd+'</DIV><DIV class="SYMB">'+iName+'</DIV>';
                 }
-                for (let i=iLeft;i<S_COLUMN;i++) sLeft[i]='<DIV class="R90">&nbsp;</DIV><DIV class="L66">&nbsp;</DIV>';
+                for (let i=iLeft;i<S_COLUMN;i++) sLeft[i]='<DIV class="MOAM">&nbsp;</DIV><DIV class="SYMB">&nbsp;</DIV>';
 
 
                 
@@ -109,9 +109,9 @@
                     var yearEnd = account.yearEnd;
                     var iName = account.name;
 
-                    sMidl[iMidl++] = '<DIV class="R90">'+yearEnd+'</DIV><DIV class="L66">'+iName+'</DIV>';
+                    sMidl[iMidl++] = '<DIV class="MOAM">'+yearEnd+'</DIV><DIV class="SYMB">'+iName+'</DIV>';
                 }
-                for (let i=iMidl;i<S_COLUMN;i++) sMidl[i]='<DIV class="R90">&nbsp;</DIV><DIV class="L66">&nbsp;</DIV>';
+                for (let i=iMidl;i<S_COLUMN;i++) sMidl[i]='<DIV class="MOAM">&nbsp;</DIV><DIV class="SYMB">&nbsp;</DIV>';
 
 
                 for (let name in aRite)   {
@@ -119,9 +119,9 @@
                     var yearEnd = account.yearEnd;
                     var iName = account.name;
 
-                    sRite[iRite++] = '<DIV class="R90">'+yearEnd+'</DIV><DIV class="L66">'+iName+'</DIV>';
+                    sRite[iRite++] = '<DIV class="MOAM">'+yearEnd+'</DIV><DIV class="SYMB">'+iName+'</DIV>';
                 }
-                for (let i=iRite;i<S_COLUMN;i++) sRite[i]='<DIV class="R90">&nbsp;</DIV><DIV class="L66">&nbsp;</DIV>';
+                for (let i=iRite;i<S_COLUMN;i++) sRite[i]='<DIV class="MOAM">&nbsp;</DIV><DIV class="SYMB">&nbsp;</DIV>';
 
 
 
@@ -147,7 +147,7 @@
 
                             let sAmount = (aMount[0]+"  "+aMount[1]+"  "+aMount[2]+"  "+aMount[3]+ " ").slice(0,26);
 
-                            sTran[iTran++]='<DIV class="L66">'+jPrettyTXN.entry[0].slice(2)+'</DIV><DIV class="L66">'+jPrettyTXN.entry[1].slice(0,9)+'</DIV><DIV class="L175">'+sAmount+'</DIV>';                                
+                            sTran[iTran++]='<DIV class="SYMB">'+jPrettyTXN.entry[0].slice(2)+'</DIV><DIV class="SYMB">'+jPrettyTXN.entry[1].slice(0,9)+'</DIV><DIV class="LNAM">'+sAmount+'</DIV>';                                
                         }
                         bLine++;
                     }

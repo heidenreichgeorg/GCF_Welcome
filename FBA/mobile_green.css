@@ -60,10 +60,11 @@ input[type="radio"] {
 button { color:#10E110; background-color:inherit; }
 input  { color:#10E110; background-color:inherit; }
 
-.L22    { width: 22px; overflow:hidden; padding: 2px; border: none; float: left;  font-family: inherit; font-size: inherit; font-weight:inherit; color: inherit; text-align: left;  }		
-.L40    { width: 40px; overflow:hidden; padding: 2px; border: none; float: left;  font-family: inherit; font-size: inherit; font-weight:inherit; color: inherit; text-align: left;  }		
-.L66    { width: 66px; overflow:hidden; padding: 2px; border: none; float: left;  font-family: inherit; font-size: inherit; font-weight:inherit; color: inherit; text-align: left;  }		
-.R90    { width: 90px; overflow:hidden; padding: 2px; border: none; float: left;  font-family: inherit; font-size: inherit; font-weight:inherit; color: inherit; text-align: right; }
+.SEP    { width: 22px; overflow:hidden; padding: 2px; border: none; float: left;  font-family: inherit; font-size: inherit; font-weight:inherit; color: inherit; text-align: left;  }		
+.TAX      { width: 45px; overflow:hidden; padding: 2px; border: none; float: left;  font-family: inherit; font-size: inherit; font-weight:inherit; color: inherit; text-align: right;  }		
+.TAG      { width: 50px; overflow:hidden; padding: 2px; border: none; float: left;  font-family: inherit; font-size: inherit; font-weight:inherit; color: inherit; text-align: left;  }		
+.SYMB   { width: 66px; overflow:hidden; padding: 2px; border: none; float: left;  font-family: inherit; font-size: inherit; font-weight:inherit; color: inherit; text-align: left;  }		
+.MOAM   { width: 99px; overflow:hidden; padding: 2px; border: none; float: left;  font-family: inherit; font-size: inherit; font-weight:inherit; color: inherit; text-align: right; }
 .C100   { width:100px; overflow:hidden; padding: 2px; border: none; float: left;  font-family: inherit; font-size: inherit; font-weight:inherit; color: inherit; }
 .R105   { width:105px; overflow:hidden; padding: 2px; border: none; float: left;  font-family: inherit; font-size: inherit; font-weight:inherit; color: inherit; text-align: right; }
 .L110   { width:110px; overflow:hidden; padding: 2px; border: none; float: left;  font-family: inherit; font-size: inherit; font-weight:inherit; color: inherit; text-align: left;}
@@ -71,11 +72,10 @@ input  { color:#10E110; background-color:inherit; }
 .C140   { width:140px; overflow:hidden; padding: 2px; border: none; float: left;  font-family: inherit; font-size: inherit; font-weight:inherit; color: inherit;}
 .L150   { width:150px; overflow:hidden; padding: 2px; border: none; float: left;  font-family: inherit; font-size: inherit; font-weight:inherit; color: inherit; text-align: left;}
 .R165   { width:165px; overflow:hidden; padding: 2px; border: none; float: left;  font-family: inherit; font-size: inherit; font-weight:inherit; color: inherit; text-align: right; }
-.L175   { width:175px; overflow:hidden; padding: 2px; border: none; float: left;  font-family: inherit; font-size: inherit; font-weight:inherit; color: inherit; text-align: left;}
-.L220   { width:220px; overflow:hidden; padding: 2px; border: none; float: left;  font-family: inherit; font-size: inherit; font-weight:inherit; color: inherit; text-align: left;}
+.LNAM   { width:175px; overflow:hidden; padding: 2px; border: none; float: left;  font-family: inherit; font-size: inherit; font-weight:inherit; color: inherit; text-align: left;}
+.LTXT   { width:220px; overflow:hidden; padding: 2px; border: none; float: left;  font-family: inherit; font-size: inherit; font-weight:inherit; color: inherit; text-align: left;}
 .L280   { width:280px; overflow:hidden; padding: 2px; border: none; float: left;  font-family: inherit; font-size: inherit; font-weight:inherit; color: inherit; text-align: left;} 
 .C280   { width:280px; overflow:hidden; padding: 2px; border: none; float: left;  font-family: inherit; font-size: inherit; font-weight:inherit; color: inherit; } 
-.CFUL   { width:833px; overflow:hidden; padding: 2px; border: none; float: left;  font-family: inherit; font-size: inherit; font-weight:inherit; color: inherit; }
 
 .scalesA{ width:210px;                  padding: 4px; border-style: solid; border-radius: 10px; border-width: 2px; border-color: #AEADAE;  float: left;
           background-color: #000000; background-image: radial-gradient( rgba(0, 90, 0, 0.75), black 120% ); }

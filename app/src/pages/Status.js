@@ -76,8 +76,8 @@ export default function Status() {
     return (
         <Screen prevFunc={prevFunc} nextFunc={nextFunc} tabSelector={aNums} >
             {
-                report.map((row) => (
-                    <StatusRow am1={row.gLeft} tx1={row.nLeft} am2={row.gMidl} tx2={row.nMidl} am3={row.gRite} tx3={row.nRite} d={row.dTran} n={row.nTran} l={row.lTran}/>    
+                report.map((row,l) => (
+                    <StatusRow am1={row.gLeft} tx1={row.nLeft} am2={row.gMidl} tx2={row.nMidl} am3={row.gRite} tx3={row.nRite} d={row.dTran} n={row.nTran} l={row.lTran}/>                       
                 ))
             }
             <div class="attrLine"><div class="key" onClick={handleXLSave}>SAVE</div></div>
@@ -237,19 +237,21 @@ function StatusRow({ am1,tx1, am2, tx2, am3, tx3, d, n, l}) {
 
     return(
         <div class="attrLine">
-            <div class="R90"> {am1}</div>
-            <div class="L66"> {tx1}</div>
-            <div class="L22"> &nbsp;</div>
-            <div class="R90"> {am2}</div>
-            <div class="L66"> {tx2}</div>
-            <div class="L22"> &nbsp;</div>
-            <div class="R90"> {am3}</div>
-            <div class="L66"> {tx3}</div>
-            <div class="L22"> &nbsp;</div>
-            <div class="L66"> {d}</div>
-            <div class="L66"> {n}</div>
-            <div class="L220">{l}</div>
+            <div class="MOAM"> {am1}</div>
+            <div class="SYMB"> {tx1}</div>
+            <div class="SEP"> &nbsp;</div>
+            <div class="MOAM"> {am2}</div>
+            <div class="SYMB"> {tx2}</div>
+            <div class="SEP"> &nbsp;</div>
+            <div class="MOAM"> {am3}</div>
+            <div class="SYMB"> {tx3}</div>
+            <div class="SEP"> &nbsp;</div>
+            <div class="SYMB"> {d}</div>
+            <div class="SYMB"> {n}</div>
+            <div class="LTXT">{l}</div>
+            .
         </div>
+        
     )
 }
 

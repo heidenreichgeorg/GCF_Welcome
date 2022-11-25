@@ -168,15 +168,15 @@ function makeBalance(response,value) {
 function BalanceRow({ jArgs, id }) {
     return(
         <div class={"attrLine line"+id} >
-            <div class="L175"> {jArgs.tw1}</div>
-            <div class="R90"> {jArgs.am3}</div>
-            <div class="R90"> {jArgs.am2}</div>
-            <div class="R90"> {jArgs.am1}</div>
-            <div class="L22">|&nbsp;</div>
-            <div class="L175"> {jArgs.tx1}</div>
-            <div class="R90"> {jArgs.an3}</div>
-            <div class="R90"> {jArgs.an2}</div>
-            <div class="R90"> {jArgs.an1}</div>
+            <div class="LNAM"> {jArgs.tw1}</div>
+            <div class="MOAM"> {jArgs.am3}</div>
+            <div class="MOAM"> {jArgs.am2}</div>
+            <div class="MOAM"> {jArgs.am1}</div>
+            <div class="SEP">|&nbsp;</div>
+            <div class="LNAM"> {jArgs.tx1}</div>
+            <div class="MOAM"> {jArgs.an3}</div>
+            <div class="MOAM"> {jArgs.an2}</div>
+            <div class="MOAM"> {jArgs.an1}</div>
         </div>
     )
 }
