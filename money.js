@@ -21,37 +21,29 @@
    module.exports['setMoney'] = setMoney;
 
 
-    function addEUMoney(strAdd,money) {
-
+    function toMoney(strAdd,factor,money) {
         var euros=0;
         var cents=0;
-        var factor=1;
-        if(strAdd) {
-
-            
+        if(strAdd) {          
             var amount = strAdd.split(',');
             var plain = amount[0].replace('.', '').trim(); 
-            if(plain.startsWith('-')) { factor=-1; plain=plain.slice(1); }
+            if(plain.startsWith('-')) { factor=-1*factor; plain=plain.slice(1); }
             euros = parseInt(('0'+plain),10);
             if(amount.length>1) { // GH 20201117
-                if(euros<0) { euros=Math.abs(euros); factor=-1; }
                 const digits=amount[1]+"00";
                 const strDigits=digits[0]+digits[1];
                 cents=parseInt(strDigits,10);
             }
         }
         cents=euros*100+cents;
-        
-        if(money) {
-            money.cents = money.cents + factor * cents;
-        } else {
-            money=initMoney();
-            money.cents = money.cents + factor * cents;
-        }
-            
+        if(!money) money = { 'cents': 0 };        
+        money.cents = money.cents + factor * cents;
         return money;
     }
-   module.exports['addEUMoney'] = addEUMoney;
+
+    function addEUMoney(strAdd,money) {
+        return toMoney(strAdd,1,money); }
+    module.exports['addEUMoney'] = addEUMoney;
 
 
    function show(money,strCredit) {
@@ -70,28 +62,7 @@
 
 
     function setEUMoney(strSet) {
-        var euros=0;
-        var cents=0;
-        var factor=1;
-        if(strSet && strSet.length>0) {
-
-            var amount = strSet.split(',');
-            var plain = amount[0].replace('.', '').trim(); 
-            if(plain.startsWith('-')) { factor=-1; plain=plain.slice(1); }
-            euros = parseInt(('0'+plain),10);
-            if(amount.length>1) { // GH 20201117
-                if(euros<0) { euros=Math.abs(euros); factor=-1; }
-                const digits=amount[1]+"00";
-                const strDigits=digits[0]+digits[1];
-                cents=parseInt(strDigits,10);
-            }
-        }
-        cents=euros*100+cents;
-        
-        money=setMoney(factor * cents);
-            
-        return money;
-    }
+        return toMoney(strSet,1,null); }
     module.exports['setEUMoney'] = setEUMoney;
 
 
@@ -105,10 +76,10 @@
 
             var amount = strSet.split('.');
             var plain = amount[0].replace(',', '').trim(); 
-            if(plain.startsWith('-')) { factor=-1; plain=plain.slice(1); }
+            if(plain.startsWith('-')) { factor=-1*factor; plain=plain.slice(1); }
             euros = parseInt(('0'+plain),10);
             if(amount.length>1) { // GH 20201117
-                if(euros<0) { euros=Math.abs(euros); factor=-1; }
+                //if(euros<0) { euros=Math.abs(euros); factor=-1; }
                 const digits=amount[1]+"00";
                 const strDigits=digits[0]+digits[1];
                 cents=parseInt(strDigits,10);
@@ -116,9 +87,8 @@
         }
         cents=euros*100+cents;
         
-        money=setMoney(factor * cents);
+        return setMoney(factor * cents);
             
-        return money;
     }
    module.exports['setENMoney'] = setENMoney;
 
@@ -128,77 +98,11 @@
     } 
     module.exports['negMoney'] = negMoney;
 
-
-    function absMoney(money) {
-        var currency=new Object();
-        currency.cents=money.cents;
-        if(money.cents < 0) currency.cents= -money.cents;
-        else currency.cents=money.cents;
-        return currency;
-    } 
-
     function subEUMoney(strSub,money) {
-        var euros=0;
-        var cents=0;
-        var factor=1.0;
-        if(strSub) {
-
-            var amount = strSub.split(',');
-            var plain = amount[0].replace('.', '').trim(); 
-            if(amount[0].startsWith('-')) { factor=-1.0; plain=plain.slice(1); }
-            euros = parseInt(('0'+plain),10);
-            if(amount.length>1) { // GH 20201117
-                if(euros<0) { euros=Math.abs(euros); factor=-1; }
-                const digits=amount[1]+"00";
-                const strDigits=digits[0]+digits[1];
-                cents=parseInt(strDigits,10);
-            }
-        }
-        cents=euros*100+cents;
-        
-        if(money) {
-            money.cents = money.cents - factor * cents;
-        } else {
-            money=initMoney();
-            money.cents = money.cents - factor * cents;
-        }
-            
-        return money;
-    }
-   module.exports['subEUMoney'] = subEUMoney;
+        return toMoney(strSub,-1,money); }
+    module.exports['subEUMoney'] = subEUMoney;
 
 
-
-    function addENMoney(factor,strAddEN,money) {
-    // can do minus as first input
-    // string form input as second input
-        var euros=0;
-        var cents=0;
-        if(strAddEN) {
-
-            var amount = strAddEN.split('.');
-            var plain = amount[0].replace(',', '').trim(); 
-            if(plain.startsWith('-')) { factor=-1 * factor; plain=plain.slice(1); }
-            euros = parseInt(('0'+plain),10);
-            if(amount.length>1) { // GH 20201117
-    
-                const digits=amount[1]+"00";
-                const strDigits=digits[0]+digits[1];
-                cents=parseInt(strDigits,10);
-            }
-        }
-        cents=euros*100+cents;
-        
-        if(money) {
-            
-        } else {
-            money=initMoney();
-            
-        }
-        money.cents = money.cents + factor * cents;
-
-        return money;
-    }
 
     function iScaleMoney(money,intFactor,intScale,fix) {
         if(isNaN(intFactor)) return money;
