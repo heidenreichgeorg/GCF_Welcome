@@ -1,6 +1,8 @@
 
 import { J_ACCT, COLMIN, DOUBLE, D_History, D_Page, D_Schema } from '../terms.js'
 
+import { setEUMoney, cents2EU } from './money'
+
 const HTMLSPACE=" "; 
 
 export const CSEP = ';';
@@ -86,7 +88,7 @@ export function prettyTXN(jHistory,hash,lPattern,aPattern,names,aLen,eLen) {
                     
                     // GH20220307 EU-style numbers
                     let strCents = parts[i].replace('.','').replace(',','');
-                    let item = parseInt(strCents);
+                    let item = parseInt(strCents); // Money
 
                     
                     // GH20220703
@@ -95,11 +97,11 @@ export function prettyTXN(jHistory,hash,lPattern,aPattern,names,aLen,eLen) {
                         && aPattern && aPattern.length>1 
                         && names[i].toLowerCase().includes(aPattern.toLowerCase())) {
                             txnAcct=true;
-                            cSaldo += item;
+                            cSaldo += item; // Money
                         }
 
 
-                    if(item!=0) {
+                    if(item!=0) {// Money
                         delta.push(names[i]+DOUBLE+parts[i]); 
 
                         // GH20220307
@@ -114,15 +116,16 @@ export function prettyTXN(jHistory,hash,lPattern,aPattern,names,aLen,eLen) {
 
                     // POS ASSET
                     if(item>0 && i<aLen && i!=eLen) credit.push(names[i]+DOUBLE+parts[i]);                                        
-                
+                // Money
                     // NEG EQLIAB
                     if(item<0 && i>aLen && i!=eLen) credit.push(names[i]+DOUBLE+parts[i].replace('-',''));
-                
+                // Money
                     // NEG ASSET
                     if(item<0 && i<aLen && i!=eLen) debit.push(names[i]+DOUBLE+parts[i].replace('-',''));
-                
+                // Money
                     // POS EQLIAB
                     if(item>0 && i>aLen && i!=eLen) debit.push(names[i]+DOUBLE+parts[i]);
+                // Money
                 }
             }
         }
@@ -167,49 +170,6 @@ export function buildTXN(schema,flow,name,amount) {
     }
     
     return flow;
-}
-
-function setMoney(iCents) { return { 'cents':iCents }; }
-
-export function setEUMoney(strSet) {
-    var euros=0;
-    var cents=0;
-    var factor=1;
-    if(strSet && strSet.length>0) {
-
-        var amount = strSet.split(',');
-        var plain = amount[0].replace('.', '').trim(); 
-        if(plain.startsWith('-')) { factor=-1; plain=plain.slice(1); }
-        euros = parseInt(('0'+plain),10);
-        if(amount.length>1) { // GH 20201117
-            if(euros<0) { euros=Math.abs(euros); factor=-1; }
-            const digits=amount[1]+"00";
-            const strDigits=digits[0]+digits[1];
-            cents=parseInt(strDigits,10);
-        }
-    }
-    cents=euros*100+cents;
-    
-    return setMoney(factor * cents);
-}
-
-
-export function cents2EU(cents) {
-    var sign=""; if(cents<0) { sign="-"; cents=-cents; }
-
-    var kiloNum = parseInt(cents/100000);
-    var megaNum = parseInt(kiloNum/1000);
-    var megaStr = megaNum>0 ? megaNum.toString()+"." : "";
-
-    var milleNum = kiloNum-(1000*megaNum); 
-    var milleStr = milleNum>0 ? milleNum.toString()+"." : "";
-    cents-=(kiloNum*100000);
-
-    var euroNum = parseInt(cents/100);
-    var euroStr = milleNum>0  ? euroNum.toString().padStart(3,'0') : euroNum.toString();
-    cents-=(euroNum*100);
-
-    return sign + megaStr + milleStr + euroStr+","+(parseInt(cents%100).toString().padStart(2,'0'));
 }
 
 

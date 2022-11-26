@@ -178,33 +178,6 @@ var module = { 'exports':[] }
 
 
 
- // from money.js
- function moneyString(money) {
-    var prefix = "";
-    var value=money.cents;
-    if(value<0) {
-        prefix='-';
-        value=-1 * money.cents;
-    } 
-    var kilos=parseInt(value / 100000);
-    var coins=value - (100000*kilos);
-    
-    var euros=parseInt(coins / 100);	
-    var cents=coins - (100*euros);
-    
-    var strEuros = ''+euros;
-    var strCent = '00'+cents;
-    var lenCent = strCent.length;
-    if(kilos>0) {
-        prefix = prefix + kilos+'.';
-        strEuros = '000'+strEuros;
-        lenEuros = strEuros.length;
-        strEuros = strEuros.slice(lenEuros-3);
-    }
-    return prefix + strEuros + ',' + strCent.slice(lenCent-2);	
-}
-
-
 // defined in calling SCRIPT / HTML
 // var cCent
 // var creditList
@@ -223,7 +196,7 @@ function validateCD(creditList,debitList) {
     for(let name in creditList) {
         let value=creditList[name];
         saldoC+=value.cents;
-        let display=moneyString(value);
+        let display=cents2EU(value.cents);
         creditDivs.push("<div class='SYMB'>"+name+DOUBLE+"</div><div class='R105' onclick='toggleC2D("+'"'+name+'"'+")'>"+display+"</div>");
     }
  
@@ -232,7 +205,7 @@ function validateCD(creditList,debitList) {
     for(let name in debitList) {
         let value=debitList[name];
         saldoD+=value.cents;
-        let display=moneyString(value);
+        let display=cents2EU(value.cents);
         debitDivs.push("<div class='SYMB'>"+name+DOUBLE+"</div><div class='R105' onclick='toggleD2C("+'"'+name+'"'+")'>"+display+"</div>");
     }
 

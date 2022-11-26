@@ -53,13 +53,45 @@ export default function Partner() {
                 { filler.map((row) => (
                     <PartnerRow p={row}/>    
                 ))}    
-                       
+                <div class="attrLine"><div class="key" onClick={handleJSONSave}>_</div></div>       
                 <FooterRow left={page["client"]}  right={page["register"]} prevFunc={prevFunc} nextFunc={nextFunc}/>
                 <FooterRow left={page["reference"]} right={page["author"]} prevFunc={prevFunc} nextFunc={nextFunc}/>
             </div>
             
         </Screen>
     )
+    
+    function handleJSONSave() {
+        console.log("1110 Status.handleJSONSave sessionId = "+session.id);
+        const rqOptions = { method: 'GET', headers: {  'Accept': 'application/json'}};
+        try {
+            
+            fetch(`${process.env.REACT_APP_API_HOST}/DOWNLOAD?sessionId=${session.id}`, rqOptions)
+            .then((response) => response.blob())
+            .then((blob) => URL.createObjectURL(blob))
+            .then((url) => console.log("1120 handleJSONSave URL= "+ makeJSONButton(url)))
+            .catch((err) => console.error("1127 handleJSONSave ERR "+err));
+            
+        } catch(err) { console.log("1117 GET /JSON handleJSONSave:"+err);}
+        console.log("1140 Status.handleJSONSave EXIT");
+    }
+
+    
+    function makeJSONButton(url) { 
+
+        console.log("1196 makeJSONButton XLSX "+url);
+        
+        let a = document.createElement('a');
+        a.href = url
+        a.download = "main.json";
+        a.style.display = 'block'; // was none
+        a.className = "key";
+        a.innerHTML = "Download";
+        document.body.appendChild(a); 
+        console.log("1198 downloadButton make button");
+        
+        return url;
+    };
 }
 
 

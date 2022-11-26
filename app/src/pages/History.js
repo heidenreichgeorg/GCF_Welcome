@@ -5,7 +5,8 @@ import { useEffect, useState, useRef  } from 'react';
 import Screen from '../pages/Screen'
 import FooterRow from '../components/FooterRow'
 import { D_History, D_Page, D_Schema }  from '../terms.js';
-import { cents2EU, CSEP, getParam, prettyTXN}  from '../modules/App';
+import { cents2EU}  from '../modules/money';
+import { CSEP, getParam, prettyTXN}  from '../modules/App';
 import { useSession } from '../modules/sessionmanager';
 
 

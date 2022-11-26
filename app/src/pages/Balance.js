@@ -1,6 +1,6 @@
 import { useEffect, useState  } from 'react';
 
-import { cents2EU } from '../modules/App'
+import { moneyString, setEUMoney,addEUMoney } from '../modules/money'
 import Screen from '../pages/Screen'
 import FooterRow from '../components/FooterRow'
 import { D_Balance, D_History, D_Page, D_Report, D_Schema, X_ASSETS, X_EQLIAB, SCREENLINES }  from '../terms.js';
@@ -14,8 +14,6 @@ export default function Balance() {
     const [ sheet,  setSheet] = useState(null)
     useEffect(() => {
         if(status !== 'success') return;
-        //setYear(session.year);
-        //setClient(session.client);
         let state = null;
         try { state=JSON.parse(sessionStorage.getItem('session')); } catch(err) {}
         if(state && Object.keys(state).length>5) {
@@ -97,8 +95,8 @@ function makeBalance(response,value) {
         }
     }
     
-    var eqliab=0;
-    var income=0;
+    var mEqLiab={};
+    var income="";
 
     let balance = []; 
  
@@ -119,9 +117,9 @@ function makeBalance(response,value) {
 
         if(dispValue && iName && full_xbrl) {
             // collect compute total right side amount
-            if(full_xbrl==='de-gaap-ci_bs.eqLiab') { eqliab=parseInt(dispValue.replace('.','').replace(',',''));  dispValue=cents2EU(eqliab); }
-            if(full_xbrl==='de-gaap-ci_is.netIncome.regular') { income=parseInt(dispValue.replace('.','').replace(',','')); }
-            if(full_xbrl==='de-gaap-ci_bs.eqLiab.income') { dispValue=cents2EU(eqliab+income); }
+            if(full_xbrl==='de-gaap-ci_bs.eqLiab') { mEqLiab=setEUMoney(dispValue);  dispValue=moneyString(mEqLiab); }
+            if(full_xbrl==='de-gaap-ci_is.netIncome.regular') { income=dispValue; }
+            if(full_xbrl==='de-gaap-ci_bs.eqLiab.income') { let mIncome=addEUMoney(income,mEqLiab); dispValue=moneyString(mIncome);}
 
             var xbrl = full_xbrl.split('\.');
             var side = xbrl[1];

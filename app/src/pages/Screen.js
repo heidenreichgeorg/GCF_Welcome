@@ -66,9 +66,14 @@ export default function Screen({ children, prevFunc, nextFunc, tabSelector }) {
         }
     }
      
+
+
+
+
+    //  <script  type="text/javascript"  src="/client.js" />
     return (
         <div class="mTable">    
-            <script  type="text/javascript"  src="/client.js" />
+           
             <div class="attrLine" onLoad="updateScreen()">
                 
                 {tabSelector.map((row,tabNum) => (
