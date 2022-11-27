@@ -249,7 +249,6 @@ function StatusRow({ am1,tx1, am2, tx2, am3, tx3, d, n, l}) {
             <div class="SYMB"> {d}</div>
             <div class="SYMB"> {n}</div>
             <div class="LTXT">{l}</div>
-            .
         </div>
         
     )

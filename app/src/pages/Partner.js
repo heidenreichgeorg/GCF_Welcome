@@ -53,8 +53,8 @@ export default function Partner() {
                 { filler.map((row) => (
                     <PartnerRow p={row}/>    
                 ))}    
-                <div class="attrLine"><div class="key" onClick={handleJSONSave}>_</div></div>       
-                <FooterRow left={page["client"]}  right={page["register"]} prevFunc={prevFunc} nextFunc={nextFunc}/>
+                
+                <FooterRow left={page["client"]}  right={page["register"]} prevFunc={prevFunc} nextFunc={nextFunc} miscFunc={handleJSONSave}/>
                 <FooterRow left={page["reference"]} right={page["author"]} prevFunc={prevFunc} nextFunc={nextFunc}/>
             </div>
             
