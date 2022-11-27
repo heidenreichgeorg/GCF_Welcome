@@ -1,7 +1,9 @@
 /*
 
 bookingpages-a0a7c
-storage.rules: ALLE REGELN WERDEN AUSGEWERTET
+
+storage.rules: Konjunktion: ALLE REGELN WERDEN AUSGEWERTET, EINE EINZIGE SPERRE BLOCKIERT
+
 CONSOLE Cloud Storage settings -> UID , GID
 https://console.cloud.google.com/welcome?project=bookingpages-a0a7c
 

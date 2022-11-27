@@ -13,8 +13,11 @@ service firebase.storage {
     match /{allPaths=**} {
     	allow read,write: if true;
     }
-    match /HGKG/{allYears=*} {
+    match /HGKG/{allYears=*} { // EDITOR project role ID
     	allow read, write: if request.auth.uid == '00b4903a97a9f13d1883090e9064b06638c68dee952229b689c0d1d95e3e4c5d';      
+    }
+    match /HGKG/{allYears=*} { // TEAM project role ID
+    	allow read, write: if request.auth.uid == '00b4903a9778cdbfa3b68ec0c4a003ea347a50a71a471c64ebafe9e3b18074b0';
     }
   }
 }

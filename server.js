@@ -478,7 +478,7 @@ async function save2Bucket(session,client,year) {
     FB.bucketUpload(appStorage,client,year,session)
         .then((url) => (session.fireBase=url));
 }
-
+module.exports['save2Bucket']=save2Bucket;
 
 
 // use WELCOMEDROP instead !!!
