@@ -209,6 +209,9 @@ export default function Transfer() {
 
         book(jTXN,session); 
 
+        // invalidate current session
+        sessionStorage.setItem('session',"");
+
         console.log("BOOK O booked.");
     }    
 

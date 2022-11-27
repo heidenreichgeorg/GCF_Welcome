@@ -45,7 +45,6 @@ const root = ReactDOM.createRoot(document.getElementById('windowBorder'));
 root.render(
     <React.StrictMode>
         <SessionProvider
-            createSession
             onLoading={'Loading session...'}
             location={ router.state.location }
             >

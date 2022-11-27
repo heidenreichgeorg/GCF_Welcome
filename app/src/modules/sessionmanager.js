@@ -7,7 +7,7 @@ export function useSession() {
     return useContext(SessionContext)
 }
 
-export function SessionProvider({ children, createSession=true, location, default_value, onLoading, onError }) {
+export function SessionProvider({ children,  location, default_value, onLoading, onError }) {
 
     const [session, setSession] = useState(default_value)
 
@@ -19,32 +19,36 @@ export function SessionProvider({ children, createSession=true, location, defaul
     console.log("SessionProvider location="+strSearch)
 
     useEffect(() => {
-        if(createSession) {
-            setStatus('loading')
-            let browserItem = sessionStorage.getItem('session');
-            if(browserItem!=null && browserItem.length>256) {
-                try {
-                    let data = JSON.parse(browserItem);
-                    setSession(data);
-                    sessionStorage.setItem('session',JSON.stringify(data));
-                    setStatus('success')
-                }
-                catch(err) {
-                    setStatus('error')
-                }
-            } else {
-                fetch(`${process.env.REACT_APP_API_HOST}/SESSION${strSearch}`)
-                .then(data => data.json())
-                .then(data => {
-                    setSession(data);
-                    sessionStorage.setItem('session',JSON.stringify(data));
-                    setStatus('success')
-                })
-                .catch(() => {
-                    setStatus('error')
-                })
+        
+        setStatus('loading')
+        let browserItem = sessionStorage.getItem('session');
+        if(browserItem!=null && browserItem.length>256) {
+            try {
+                let len=0;
+                let data = JSON.parse(browserItem);
+                setSession(data);
+                sessionStorage.setItem('session',JSON.stringify(data));
+                console.log("COLD "+(data && data.sheetCells && (len=data.sheetCells.length)>2)?(data.sheetCells[len-1].join(" ")):".");
+                setStatus('success');
             }
+            catch(err) {
+                setStatus('error')
+            }
+        } else {
+            fetch(`${process.env.REACT_APP_API_HOST}/SESSION${strSearch}`)
+            .then(data => data.json())
+            .then(data => {
+                let len=0;
+                setSession(data);
+                sessionStorage.setItem('session',JSON.stringify(data));
+                console.log("WARM "+(data && data.sheetCells && (len=data.sheetCells.length)>2)?(data.sheetCells[len-1].join(" ")):".");
+                setStatus('success');
+            })
+            .catch(() => {
+                setStatus('error')
+            })
         }
+    
     }, [])
 
 

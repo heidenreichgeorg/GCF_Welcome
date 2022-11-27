@@ -96,54 +96,71 @@ app.listen(PORT, () => {
 
 
 // session management
-var arrSession = []; // LIFO
-function setSession(aSession) {  arrSession.push(aSession); }
+var allSession = null; // LIFO
+function setSession(aSession) {  allSession=aSession;
+    let prev="";
+    if(aSession && aSession.sheetCells) {
+        let len=aSession.sheetCells.length;
+        let aPrev=aSession.sheetCells[len-1];
+        prev= aPrev[1];
+        aPrev.map((field,i)=>((i>5 && field.length>2) ? (prev=prev+" "+field):""));
+    }
+    if(debug>4) console.log("\n0580  setSession("+showRecent(aSession)+") "+aSession.id); }
 module.exports['setSession']=setSession;
+
+
+function clearSessions() {  allSession = null; 
+    console.log("\n0590  clearSessions() ");
+}
+module.exports['clearSessions']=clearSessions;
+
+function showRecent(aSession) {
+    let prev="";
+    if(aSession && aSession.sheetCells) {
+        let len=aSession.sheetCells.length;
+        let aPrev=aSession.sheetCells[len-1];
+        prev= aPrev[1];
+        aPrev.map((field,i)=>((i>5 && field.length>2) ? (prev=prev+" "+field):""));
+    }
+    return prev;
+}
 
 // FIND most recent SESSION in list of known sessions
 function getSession(id) { 
     let result=null;
+    let arrSession= [ allSession ]; // 20221127
     arrSession.forEach(session => {
-        if(session.id===id) result=session;
+        if(session && session.id===id) result=session;
     });
-    if(result) {
-        console.log("\n0600  getSession() => (SESSION  time="+result.time+"  client="+result.client+"  year="+result.year+")");
+    if(result) {        
+        console.log("\n0600  getSession("+result.client+","+result.year+") => (SESSION  "+showRecent(result)+"  id "+result.id);
     }
 
     return result; 
 }
 module.exports['getSession']=getSession;
 
-// 20220730
-function getClient(client) { 
-    let result=null;
-    arrSession.forEach(session => {
-        if(session.client===client && session.id!=null) result=session;
-    });
-    if(result) {
-        console.log("\n0700  => (SESSION  time="+result.time+"  client="+result.client+"  year="+result.year+")");
-    }
-
-    if(result) return result.id;
-    else return null;
-}
-module.exports['getClient']=getClient;
 
 function sy_findSessionId(client,year) {
     var result=null;
     console.log("\n0802  FIND => ( client="+client+"  year="+year+")");
+    let arrSession= [ allSession ]; // 20221127
     arrSession.forEach(session => {
-        console.log("0804  CHECK => (SESSION  client="+session.client+"  year="+session.year+")");
-        if(session.year===year && session.client===client) {
-            result=session;
-            let fb=session.fireBase?session.fireBase:" no entry";
-            console.log("0806  FOUND => (SESSION  client="+session.client+"  year="+session.year+" fireBase="+fb+")");
+        if(session) {
+            console.log("0804  CHECK => (SESSION  client="+session.client+"  year="+session.year+")");
+            if(session.year===year && session.client===client) {
+                result=session;
+                let fb=session.fireBase?session.fireBase:" no entry";
+                console.log("0806  FOUND => (SESSION  "+showRecent(session)+" client="+session.client+","+session.year+")");
+            }
         }
     });
     if(result) return result.id;
     else return null;
 }
 module.exports['sy_findSessionId']=sy_findSessionId;
+
+
 
 
 
@@ -205,10 +222,10 @@ app.get('/SESSION', (req, res) => {
         // WARM START : FOUND EXISTING ID
         } else {
             session = getSession(sessionId);
-            if(session) console.log("\n0820 GET /SESSION FOUND LOADED => "+session.id);
+            if(session) console.log("\n0820 GET /SESSION FOUND LOADED "+showRecent(session)+" => "+session.id);
             else console.log("\n0821 GET /SESSION NOT FOUND => FOR EXISTING #"+sessionId);
 
-
+            
             if(session && session.id) res.json(session);
             else req.query.code = "Could not signIn()";
             }
@@ -468,14 +485,14 @@ function fbDownload(client,year,callBack,ext,res) {
 
 
 async function save2Bucket(session,client,year) {
-    console.log("0032 save2Bucket Start saving(JSON) to FB");        
+    console.log("0032 save2Bucket Start saving("+JSON.stringify(Object.keys(session))+") to FB for "+client+","+year);        
 
     // FIREBASE
     const appStorage = FB.bucketInit(loadFBConfig());
     session.fireBase = fbConfig.storageBucket;
 
-    // async
-    FB.bucketUpload(appStorage,client,year,session)
+    // async, setSession and compile
+    FB.bucketUpload(appStorage,client,year,session,startSession)
         .then((url) => (session.fireBase=url));
 }
 module.exports['save2Bucket']=save2Bucket;
@@ -527,10 +544,11 @@ app.post("/UPLOAD", (req, res) => {
 
 
             // INSTEAD OF LOCAL FILE STORAGE
-            setSession(sessionData);
+            //  setSession(sessionData);
 
 
             // PERSISTENT FB CLOUD FILE STORAGE
+            // SETS SESSION AFTER WRITE
             save2Bucket(sessionData,client,year);
 
             let usrLogin = jLoginURL(sessionData).url;
@@ -559,7 +577,7 @@ app.post("/UPLOAD", (req, res) => {
 // load JSON file from Firebase storage
 function signIn(query,remote,res) {
     let base =  Compiler.getRoot();
-    console.log("0010 signDown at base "+base+"  for "+JSON.stringify(query));
+    console.log("0010 signIn at base "+base+"  for "+JSON.stringify(query));
 
     if(query && query.client && query.client.length>2 ) { // && (query.client == "[a-zA-Z0-9]")) {
 
@@ -570,24 +588,24 @@ function signIn(query,remote,res) {
 
             // Security sanitize input year
             let year   = parseInt(query.year); // Security sanitize input year
-            console.log("0014 signDown for client "+client+"  year "+year);
+            console.log("0014 signIn for client "+client+"  year "+year);
 
             let id=null;
             if(id=sy_findSessionId(client,''+year)) {
-                console.log ( "0016 signDown FOUND WARM id ="+id);
+                console.log ( "0016 signIn FOUND WARM id ="+id);
                 sendDisplay( getSession(id), res);
             }
-            else fbDownload(client,year,startSession,query.ext,res); // avoid double response
+            else fbDownload(client,year,startSession); // avoid double response
                         
-        } else console.log ( "0027 signDown file no valid year for query="+JSON.stringify(query)+",addr="+remote);
+        } else console.log ( "0027 signIn file no valid year for query="+JSON.stringify(query)+",addr="+remote);
 
-    } else console.log ( "0029 signDown file no valid client for query="+JSON.stringify(query)+",addr="+remote);
+    } else console.log ( "0029 signIn file no valid client for query="+JSON.stringify(query)+",addr="+remote);
 
     return null;
 }
 
 
-function startSession(session, ext, res) {
+function startSession(session) {
 
     console.log("0024 startSession="+JSON.stringify(Object.keys(session))); 
 
@@ -598,18 +616,10 @@ function startSession(session, ext, res) {
     let sessionId = strSymbol(time+client+year+time);
     session.id=sessionId;
     session.generated = Compiler.compile(session);
-    session.ext=ext;
 
     setSession(session);
 
     console.log("0026 startSession("+client+","+year+") SUCCESS sessionId="+sessionId); 
 
-    /*
-    if(res) {
-        console.log("0028 startSession("+client+","+year+") send RESPONSE="+sessionId); 
-        res.json(session);
-        res.end();
-    }
-    */
 }
 

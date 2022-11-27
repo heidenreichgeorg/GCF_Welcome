@@ -177,31 +177,38 @@ function init(app, argv) {
         var result="SERVER BOOKED";
         let sessionId = req.body.sessionId; // OLD
         let oldSession=Server.getSession(sessionId);
-        let client = oldSession.client;
-        let year = oldSession.year;
-        let jFileName = year+client+".json";
-        if(sessionId && client && year) {
+        if(oldSession) {
+            let client = oldSession.client;
+            let year = oldSession.year;
+            let jFileName = year+client+".json";
+            if(sessionId && client && year) {
 
-            // SECURITY SANITIZE req.body
-            let tBuffer = prepareTXN(sessionId,req.body);
-            let sessionTime=Server.timeSymbol();
-            let nextSessionId= Server.strSymbol(sessionTime+client+year+sessionTime);
+                // SECURITY SANITIZE req.body
+                let tBuffer = prepareTXN(sessionId,req.body);
+                let sessionTime=Server.timeSymbol();
+                let nextSessionId= Server.strSymbol(sessionTime+client+year+sessionTime);
 
-            // modifies session object and stores it under new sessionId
-            let session = Sheets.bookSheet(sessionId,tBuffer,sessionTime,nextSessionId);
-            // 20220516 Sheets.xlsxWrite(req.body.sessionId,tBuffer,sessionTime,nextSessionId); 
-            // state change in YYYYCCCC.json
+                // modifies session object and stores it under new sessionId
+                let session = Sheets.bookSheet(sessionId,tBuffer,sessionTime,nextSessionId);
+                // 20220516 Sheets.xlsxWrite(req.body.sessionId,tBuffer,sessionTime,nextSessionId); 
+                // state change in YYYYCCCC.json
 
-            let serverAddr = Server.localhost();
+                let serverAddr = Server.localhost();
 
-            // async
-            Server.save2Bucket(session,client,year)
-                .then(jFileName => { if(res) res.json({url:serverAddr+'/LATEST', client, year, 'jFileName':jFileName  })
-                });
+                
+                // async
+                Server.save2Bucket(session,client,year)
+                    .then(jFileName => { if(res) res.json({url:serverAddr+'/LATEST', client, year, 'jFileName':jFileName  })
+                    });
 
+
+            } else {
+                result="NO SESSION ID";
+                console.log("0015 app.post BOOK NO sessionId");
+            }        
         } else {
-            result="NO SESSION ID";
-            console.log("0015 app.post BOOK NO sessionId");
+            result="NO OLD SESSION";
+            console.log("0015 app.post BOOK NO OLD session");
         }        
     });
 

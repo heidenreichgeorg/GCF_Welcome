@@ -56,7 +56,7 @@ module.exports['bucketInit']=bucketInit;
 // ONLY FOR BROWSERS gsutil cors set cors.json gs://bookingpapages-a0a7c -
 
 
-async function bucketDownload(bpStorage,client,year,startSession,ext,userRes) {
+async function bucketDownload(bpStorage,client,year,startSession) {
   let sClient = client.replace('.','_');
   let iYear = parseInt(year);
 
@@ -96,7 +96,7 @@ async function bucketDownload(bpStorage,client,year,startSession,ext,userRes) {
 
             if(debugReport) console.log("Firebase.download session "+JSON.stringify(session));
             // AVOID double HEADERS 
-            startSession(session,ext,userRes);
+            startSession(session);
           })
         }).on('error', function(error) {     
 
@@ -171,7 +171,7 @@ const jMetadata = {
     contentType: 'application/json',
   };
 
-async function bucketUpload(bpStorage,client,year,jData) {
+async function bucketUpload(bpStorage,client,year,jData,startSession) {
 
   let downloadUrl = "no Firebase Storage";
   if(fbStorage) {
@@ -196,7 +196,7 @@ async function bucketUpload(bpStorage,client,year,jData) {
                 Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
               //setProgresspercent(progress);
               
-              if(debug) console.log("fbWriteJSON "+progress);
+              if(debug) console.log("Firebase fbWriteJSON "+progress+"%");
 
             },
           (error) => { // ERROR
@@ -219,13 +219,17 @@ async function bucketUpload(bpStorage,client,year,jData) {
                   */
               },
 
+
+
               // COMPLETE
           () => { 
             if(uploadTask.snapshot && uploadTask.snapshot.ref && uploadTask.snapshot.ref._location) {
               const loc = uploadTask.snapshot.ref._location;
               downloadUrl = loc.bucket+fbS+loc.path_;
               if(debug) console.log("Firebase fbWriteJSON to: "+downloadUrl);          
-              //uploadTask.snapshot.ref.getDownloadURL().then((url) => { downloadUrl=url;}); 
+              
+              // 20221127
+              startSession(jData);
               }
             }
           );
