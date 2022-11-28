@@ -35,8 +35,12 @@ export default function History() {
 
     function token() { return { client:session.client, year:session.year }}
 
-    function prevFunc() {console.log("CLICK PREVIOUS"); window.location.href="http://localhost:3000/hgb275s?client="+session.client+"&year="+session.year; }
-    function nextFunc() {  console.log("CLICK NEXT");   window.location.href="http://localhost:3000/partner?client="+session.client+"&year="+session.year; }
+    console.log("session.server="+JSON.stringify(session.server));
+
+    function prevFunc() {console.log("CLICK PREVIOUS"); window.location.href="http://"+session.server.addr+":3000/hgb275s?client="+session.client+"&year="+session.year; }
+    function nextFunc() {  console.log("CLICK NEXT");   window.location.href="http://"+session.server.addr+":3000/partner?client="+session.client+"&year="+session.year; }
+
+    
 
     let page = sheet[D_Page];
     let sHistory=makeHistory(sheet);
@@ -55,7 +59,7 @@ export default function History() {
             <SearchForm handleSearch={search} token={strToken} ></SearchForm>
             
             {aPages.map((m,n) => ( 
-                <div class="ulliTab" id={"PageContent"+n} style= {{ 'display': m}} >
+                <div className="ulliTab" id={"PageContent"+n} style= {{ 'display': m}} >
                     { sHistory.slice(n*SCREEN_TXNS,(n+1)*SCREEN_TXNS).map((row) => (  <SigRow row={row}/>  ))}
                     <FooterRow left={page["client"]}  right={page["register"]} prevFunc={prevFunc} nextFunc={nextFunc}/>
                     <FooterRow left={page["reference"]} right={page["author"]} prevFunc={prevFunc} nextFunc={nextFunc}/>
@@ -67,7 +71,7 @@ export default function History() {
 }
 
 function SigRow(row) {
-    {  console.log("SigRow "+JSON.stringify(row.row))  } 
+    //{  console.log("SigRow "+JSON.stringify(row.row))  } 
 
     let aRow = [0,0,0,0,0,0]
     try { let saRow = row.row.sig;
@@ -84,27 +88,27 @@ function SigRow(row) {
     else saldo = cents2EU(row.row.saldo);
 
     return (
-        <div class="attrPair">
-            <div class="attrLine">
-                <div class="SYMB">{aRow[0]}</div>
-                <div class="SEP">&nbsp;</div>
-                <div class="LNAM">{aRow[1]}</div>
-                <div class="LNAM">{aRow[2]}</div>
-                <div class="LNAM">{aRow[3]}</div>
-                <div class="LNAM">{aRow[4]}</div>
-                <div class="LNAM">{aRow[5]}</div>
+        <div className="attrPair">
+            <div className="attrLine">
+                <div className="SYMB">{aRow[0]}</div>
+                <div className="SEP">&nbsp;</div>
+                <div className="LNAM">{aRow[1]}</div>
+                <div className="LNAM">{aRow[2]}</div>
+                <div className="LNAM">{aRow[3]}</div>
+                <div className="LNAM">{aRow[4]}</div>
+                <div className="LNAM">{aRow[5]}</div>
             </div>
-            <div class="attrLine">
-                <div class="SEP">&nbsp;</div>
-                <div class="C100">{mRow[0]}</div>
-                <div class="C100">{mRow[1]}</div>
-                <div class="C100">{mRow[2]}</div>
-                <div class="C100">{mRow[3]}</div>
-                <div class="C100">{mRow[4]}</div>
-                <div class="C100">{mRow[5]}</div>
-                <div class="C100">{mRow[6]}</div>
-                <div class="C100">{mRow[7]}</div>
-                <div class="C100">{saldo}</div>
+            <div className="attrLine">
+                <div className="SEP">&nbsp;</div>
+                <div className="C100">{mRow[0]}</div>
+                <div className="C100">{mRow[1]}</div>
+                <div className="C100">{mRow[2]}</div>
+                <div className="C100">{mRow[3]}</div>
+                <div className="C100">{mRow[4]}</div>
+                <div className="C100">{mRow[5]}</div>
+                <div className="C100">{mRow[6]}</div>
+                <div className="C100">{mRow[7]}</div>
+                <div className="C100">{saldo}</div>
             </div>
         </div>
     )
@@ -151,7 +155,7 @@ function makeHistory(sheet) {
                     let boxNote = "'"+pageGlobal["author"].replace('&nbsp',' ')+"'";                 
                     
                     let iBalance= jPrettyTXN.iBalance;
-                    let balCheck= '<DIV class="SYMB">'+cents2EU(iBalance)+'</DIV>';
+                    let balCheck= '<DIV className="SYMB">'+cents2EU(iBalance)+'</DIV>';
 
                     let data = (
                         jPrettyTXN.entry.join(CSEP)
@@ -182,14 +186,14 @@ function makeHistory(sheet) {
 
 function SearchForm(token) {
     return (
-        <div class="attrLine">
+        <div className="attrLine">
             <form onSubmit={(e)=>(console.log("SEARCH "+JSON.stringify(e.target)))} >                
-                <div class='MOAM'></div>                
-                <div class='L280'>Line:<input type='edit' name='LPATTERN'/>&nbsp;</div>                
-                <div class='L280'>Acct:<input type='edit' name='APATTERN'/></div>                
+                <div className='MOAM'></div>                
+                <div className='L280'>Line:<input type='edit' name='LPATTERN'/>&nbsp;</div>                
+                <div className='L280'>Acct:<input type='edit' name='APATTERN'/></div>                
                 <input type='hidden' name='client' defaultValue={token.token.client}/>
                 <input type='hidden' name='year' defaultValue={token.token.year}/>
-                <div class='MOAM'><button autoFocus class='SYMB key'>Search</button></div>
+                <div className='MOAM'><button autoFocus className='SYMB key'>Search</button></div>
             </form>
         </div>
     )

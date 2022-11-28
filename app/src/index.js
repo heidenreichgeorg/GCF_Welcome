@@ -52,6 +52,7 @@ root.render(
         <SessionProvider
             onLoading={'Loading session...'}
             location={ router.state.location }
+            
             >
             <RouterProvider router={router} />
         </SessionProvider>

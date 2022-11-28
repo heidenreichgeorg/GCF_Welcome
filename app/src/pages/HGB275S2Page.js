@@ -24,12 +24,12 @@ export default function HGB275S2Page() {
     if(!sheet) return null; //'Loading...';
 
     
-    function prevFunc() {console.log("CLICK PREVIOUS"); window.location.href="http://localhost:3000/balance?client="+session.client+"&year="+session.year; }
-    function nextFunc() {  console.log("CLICK NEXT");   window.location.href="http://localhost:3000/history?client="+session.client+"&year="+session.year; }
+    function prevFunc() {console.log("CLICK PREVIOUS"); window.location.href="http://"+session.server.addr+":3000/balance?client="+session.client+"&year="+session.year; }
+    function nextFunc() {  console.log("CLICK NEXT");   window.location.href="http://"+session.server.addr+":3000/history?client="+session.client+"&year="+session.year; }
 
     let page = sheet[D_Page];
     
-    let report = [ makeReport(sheet,'init'), makeReport(sheet,'yearEnd'), makeReport(sheet,'next')  ];
+    let report = [  makeReport(sheet,'yearEnd') ];
 
 
     let aPages = [];
@@ -38,7 +38,7 @@ export default function HGB275S2Page() {
     return (
         <Screen prevFunc={prevFunc} nextFunc={nextFunc} tabSelector={aPages} >
             {report.map((balance,n) => ( 
-                <div class="ulliTab" id={"PageContent"+n} style= {{ 'display': aPages[n]}} >
+                <div className="ulliTab" id={"PageContent"+n} style= {{ 'display': aPages[n]}} >
                     {balance.map((row,i) => (
                         <HGB275Row jArgs={row} id={i} />    
                     ))}
@@ -111,7 +111,7 @@ function makeReport(response,value) {
                 if(full_xbrl.startsWith('de-gaap-ci_is.netIncome.regular.fin.expenses')) { chgbD+=setEUMoney(yearEnd).cents; }
                 if(full_xbrl.startsWith('de-gaap-ci_is.is.netIncome.tax')) { chgbE-=setEUMoney(yearEnd).cents; }
 
-                console.log("READ xbrl="+full_xbrl+" "+chgb5+" "+chgb7+" "+chgb8+" "+chgbA+" "+chgbB+" "+chgbD+" "+chgbE+" "+chgbF);
+               // console.log("READ xbrl="+full_xbrl+" "+chgb5+" "+chgb7+" "+chgb8+" "+chgbA+" "+chgbB+" "+chgbD+" "+chgbE+" "+chgbF);
             }
 
         }
@@ -135,17 +135,17 @@ function makeReport(response,value) {
         // add three additional accounts: ASSETS, EQLIAB, GAINLOSS
         if(jReport["xbrlAssets"].account) { 
             ass = jReport["xbrlAssets"].account; 
-            console.log("ASSET "+JSON.stringify(ass)); 
+            //console.log("ASSET "+JSON.stringify(ass)); 
             jAccounts["xbrlAssets"]=ass;
         }
         if(jReport["xbrlEqLiab"].account) { 
             eql = jReport["xbrlEqLiab"].account; 
-            console.log("EQLIB "+JSON.stringify(eql)); 
+            //console.log("EQLIB "+JSON.stringify(eql)); 
             jAccounts["xbrlEqLiab"]=eql;
         }
         if(jReport["xbrlRegular"].account) { 
             gls = jReport["xbrlRegular"].account; 
-            console.log("GALOS "+JSON.stringify(gls)); 
+            //console.log("GALOS "+JSON.stringify(gls)); 
             jAccounts["xbrlRegular"]=gls;
         }
         console.log("makeReport from response D_Balance"+JSON.stringify(Object.keys(jAccounts)));
@@ -175,7 +175,7 @@ function makeReport(response,value) {
         balance.push({ 'tw1':jReport.xbrlAssets.de_DE, 'tx1':jReport.xbrlEqLiab.de_DE });
 
         for (let tag in jReport)   {
-            console.log("Report "+JSON.stringify(jReport[tag]));
+            //console.log("Report "+JSON.stringify(jReport[tag]));
             
             var element    =  jReport[tag];
             var level     =  element.level;
@@ -192,8 +192,8 @@ function makeReport(response,value) {
 
                 var xbrl = full_xbrl.split('\.');
                 var side = xbrl[1];
-                //var xbrl_pre = xbrl.pop()+'.'+xbrl.pop()+'.'+xbrl.pop();
-                console.log('makeReport side='+side);
+                
+                //console.log('makeReport side='+side);
 
                 if(side==='ass') {
                     if(iLeft<SCREENLINES) {
@@ -205,18 +205,7 @@ function makeReport(response,value) {
                         iLeft++;
                     }
                 } 
-                /*
-                else {
-                    if(iRite<SCREENLINES) {
-                        if(!balance[iRite]) balance[iRite]={};
-                        balance[iRite].tx1=iName;
-                        if(level==1) { balance[iRite].an1=dispValue; }
-                        if(level==2) { balance[iRite].an2=dispValue; }
-                        if(level==3) { balance[iRite].an3=dispValue; }
-                        iRite++;
-                    }
-                }
-                */
+                
 
             } else {
                 // divider line out
@@ -279,16 +268,16 @@ function fillRight(balance,cValue,iName,iRite,level) {
 
 function HGB275Row({ jArgs, id }) {
     return(
-        <div class={"attrLine line"+id} >
-            <div class="LNAM"> {jArgs.tw1}</div>
-            <div class="MOAM"> {jArgs.am3}</div>
-            <div class="MOAM"> {jArgs.am2}</div>
-            <div class="MOAM"> {jArgs.am1}</div>
-            <div class="SEP">|&nbsp;</div>
-            <div class="LNAM"> {jArgs.tx1}</div>
-            <div class="MOAM"> {jArgs.an3}</div>
-            <div class="MOAM"> {jArgs.an2}</div>
-            <div class="MOAM"> {jArgs.an1}</div>
+        <div className={"attrLine line"+id} >
+            <div className="LNAM"> {jArgs.tw1}</div>
+            <div className="MOAM"> {jArgs.am3}</div>
+            <div className="MOAM"> {jArgs.am2}</div>
+            <div className="MOAM"> {jArgs.am1}</div>
+            <div className="SEP">|&nbsp;</div>
+            <div className="LNAM"> {jArgs.tx1}</div>
+            <div className="MOAM"> {jArgs.an3}</div>
+            <div className="MOAM"> {jArgs.an2}</div>
+            <div className="MOAM"> {jArgs.an1}</div>
         </div>
     )
 }

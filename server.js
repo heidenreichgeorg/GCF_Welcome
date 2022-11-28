@@ -72,17 +72,14 @@ app.use(express.static(__dirname));
 const PORT = 81;
 
 
-
-
-
 // show convenience link to create and load a new browser window
 app.listen(PORT, () => { 
     console.log("\n\n");
     console.log(timeSymbol());
     console.log(`Server    started from ${PORT} using files in `+__dirname); 
     console.log(`Local     http://localhost:${PORT}/LATEST`); 
-    //console.log(`Server    http://ec2-A-B-C-D.compute-1.amazonaws.com:${PORT}/welcomedrop`); 
-    //console.log(`Local     http://localhost:${PORT}/welcomedrop`); 
+    console.log(`Global    http://${localhost().addr}:${PORT}/LATEST`); 
+    console.log(`Local     http://localhost:${PORT}/welcomedrop`); 
 })
 
 
@@ -97,12 +94,15 @@ app.listen(PORT, () => {
 
 // session management
 var allSession = null; // LIFO
-function setSession(aSession) {  allSession=aSession;
+function setSession(aSession) {  
+    aSession.server = localhost();
+    allSession=aSession;
     let prev="";
     if(aSession && aSession.sheetCells) {
+
         let len=aSession.sheetCells.length;
         let aPrev=aSession.sheetCells[len-1];
-        prev= aPrev[1];
+        prev= aSession.server + " "+aPrev[1];
         aPrev.map((field,i)=>((i>5 && field.length>2) ? (prev=prev+" "+field):""));
     }
     if(debug>4) console.log("\n0580  setSession("+showRecent(aSession)+") "+aSession.id); }
@@ -357,16 +357,16 @@ function localhost() {
                     if (!results[name]) {
                         results[name] = [];
                     }
-                    console.dir ( "OS["+name+"] net info "+net.address);
+                    if(debug) console.dir ( "OS["+name+"] net info "+net.address);
                     results.push({ 'type':name, 'addr':net.address});
                 }
                 if(debug) console.log ( "OS["+name+"]  other  "+JSON.stringify(net));
             }
         }
         instance = results[0] ? results[0].addr : "127.0.0.1";
-        console.dir ( "OS.address  "+instance);
+        if(debug) console.dir ( "OS.address  "+instance);
     }
-    return instance+ ":"+ PORT ;
+    return { 'addr':instance, 'port':PORT };
 }
 module.exports['localhost']=localhost;
 
@@ -409,7 +409,7 @@ function strSymbol(pat) {
 module.exports['strSymbol']=strSymbol;
 
 
-function timeSymbol() { // same as in client.js
+function timeSymbol() { 
     var u = new Date(Date.now()); 
     return ''+ u.getUTCFullYear()+
       ('0' + (1+u.getUTCMonth())).slice(-2) +

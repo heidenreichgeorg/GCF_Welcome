@@ -1,5 +1,4 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import { createBrowserRouter, RouterProvider, useParams } from 'react-router-dom'
 
 const SessionContext = createContext()
 
@@ -7,16 +6,15 @@ export function useSession() {
     return useContext(SessionContext)
 }
 
-export function SessionProvider({ children,  location, default_value, onLoading, onError }) {
+export function SessionProvider({ children,  location, default_value, onLoading, onError,  }) {
 
     const [session, setSession] = useState(default_value)
 
     const [status, setStatus] = useState('loading')
 
-    //const [ strSearch, setStrSearch ] = useState();
-
     let strSearch = location.search;
-    console.log("SessionProvider location="+strSearch)
+    console.log("SessionProvider location="+JSON.stringify(location))
+   // console.log("SessionProvider state="+JSON.stringify(req))
 
     useEffect(() => {
         
@@ -26,9 +24,8 @@ export function SessionProvider({ children,  location, default_value, onLoading,
             try {
                 let len=0;
                 let data = JSON.parse(browserItem);
-                setSession(data);
-                sessionStorage.setItem('session',JSON.stringify(data));
-                console.log("COLD "+(data && data.sheetCells && (len=data.sheetCells.length)>2)?(data.sheetCells[len-1].join(" ")):".");
+                setSession(data);               
+                console.log("*   COLD      "+(data && data.sheetCells && (len=data.sheetCells.length)>2)?(data.sheetCells[len-1].join(" ")):".");
                 setStatus('success');
             }
             catch(err) {
@@ -41,7 +38,7 @@ export function SessionProvider({ children,  location, default_value, onLoading,
                 let len=0;
                 setSession(data);
                 sessionStorage.setItem('session',JSON.stringify(data));
-                console.log("WARM "+(data && data.sheetCells && (len=data.sheetCells.length)>2)?(data.sheetCells[len-1].join(" ")):".");
+                console.log("*   WARM       "+(data && data.sheetCells && (len=data.sheetCells.length)>2)?(data.sheetCells[len-1].join(" ")):".");
                 setStatus('success');
             })
             .catch(() => {

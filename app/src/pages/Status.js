@@ -31,8 +31,8 @@ export default function Status() {
     if(!sheet) return null; // 'Loading...';
 
     
-    function prevFunc() {console.log("CLICK PREVIOUS"); window.location.href="http://localhost:3000/partner?client="+client+"&year="+year; }
-    function nextFunc() {  console.log("CLICK NEXT");   window.location.href="http://localhost:3000/transfer?client="+client+"&year="+year; }
+    function prevFunc() {console.log("CLICK PREVIOUS"); window.location.href="http://"+session.server.addr+":3000/partner?client="+client+"&year="+year; }
+    function nextFunc() {  console.log("CLICK NEXT");   window.location.href="http://"+session.server.addr+":3000/transfer?client="+client+"&year="+year; }
 
 
     function handleXLSave() {
@@ -80,7 +80,7 @@ export default function Status() {
                     <StatusRow am1={row.gLeft} tx1={row.nLeft} am2={row.gMidl} tx2={row.nMidl} am3={row.gRite} tx3={row.nRite} d={row.dTran} n={row.nTran} l={row.lTran}/>                       
                 ))
             }
-            <div class="attrLine"><div class="key" onClick={handleXLSave}>SAVE</div></div>
+            <div className="attrLine"><div className="key" onClick={handleXLSave}>SAVE</div></div>
             <FooterRow left={page["client"]}  right={page["register"]} prevFunc={prevFunc} nextFunc={nextFunc}/>
             <FooterRow left={page["reference"]} right={page["author"]} prevFunc={prevFunc} nextFunc={nextFunc}/>
         </Screen>
@@ -236,19 +236,19 @@ function makeStatusData(response) {
 function StatusRow({ am1,tx1, am2, tx2, am3, tx3, d, n, l}) {
 
     return(
-        <div class="attrLine">
-            <div class="MOAM"> {am1}</div>
-            <div class="SYMB"> {tx1}</div>
-            <div class="SEP"> &nbsp;</div>
-            <div class="MOAM"> {am2}</div>
-            <div class="SYMB"> {tx2}</div>
-            <div class="SEP"> &nbsp;</div>
-            <div class="MOAM"> {am3}</div>
-            <div class="SYMB"> {tx3}</div>
-            <div class="SEP"> &nbsp;</div>
-            <div class="SYMB"> {d}</div>
-            <div class="SYMB"> {n}</div>
-            <div class="LTXT">{l}</div>
+        <div className="attrLine">
+            <div className="MOAM"> {am1}</div>
+            <div className="SYMB"> {tx1}</div>
+            <div className="SEP"> &nbsp;</div>
+            <div className="MOAM"> {am2}</div>
+            <div className="SYMB"> {tx2}</div>
+            <div className="SEP"> &nbsp;</div>
+            <div className="MOAM"> {am3}</div>
+            <div className="SYMB"> {tx3}</div>
+            <div className="SEP"> &nbsp;</div>
+            <div className="SYMB"> {d}</div>
+            <div className="SYMB"> {n}</div>
+            <div className="LTXT">{l}</div>
         </div>
         
     )

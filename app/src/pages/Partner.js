@@ -25,8 +25,8 @@ export default function Partner() {
     if(!sheet) return null; //'Loading...';
 
     
-    function prevFunc() {console.log("CLICK PREVIOUS"); window.location.href="http://localhost:3000/history?client="+session.client+"&year="+session.year; }
-    function nextFunc() {  console.log("CLICK NEXT");   window.location.href="http://localhost:3000/status?client="+session.client+"&year="+session.year; }
+    function prevFunc() {console.log("CLICK PREVIOUS"); window.location.href="http://"+session.server.addr+":3000/history?client="+session.client+"&year="+session.year; }
+    function nextFunc() {  console.log("CLICK NEXT");   window.location.href="http://"+session.server.addr+":3000/status?client="+session.client+"&year="+session.year; }
     
     let page = sheet[D_Page];
     
@@ -44,7 +44,7 @@ export default function Partner() {
     return (
         <Screen prevFunc={prevFunc} nextFunc={nextFunc} tabSelector={aPages} >
             
-            <div class="ulliTab" id={"PageContent1"} style= {{ 'display': 'block'}} >
+            <div className="ulliTab" id={"PageContent1"} style= {{ 'display': 'block'}} >
             <PartnerRow p={ {'name':'name', 'init':'init', 'credit':'credit', 'debit':'debit', 'yearEnd':'yearEnd', 'netIncomeOTC':'netIncomeOTC', 'netIncomeFin':'netIncomeFin', 'close':'close', 'tax':'tax', 'next':'next'} } />
                 {Object.keys(jReport).map((id) => (
                     <PartnerRow p={jReport[id]}/>    
@@ -103,17 +103,17 @@ function PartnerRow(mRow) {
 
     return (
 
-        <div class="attrLine">
-            <div class="SYMB">{mRow.p.name}</div>
-            <div class="MOAM">{mRow.p.init}</div>
-            <div class="MOAM">{mRow.p.credit}</div>
-            <div class="MOAM">{mRow.p.debit}</div>
-            <div class="MOAM">{mRow.p.yearEnd}</div>
-            <div class="MOAM">{mRow.p.netIncomeOTC}</div>
-            <div class="MOAM">{mRow.p.netIncomeFin}</div>
-            <div class="MOAM">{mRow.p.close}</div>
-            <div class="TAX" >{mRow.p.tax}</div>
-            <div class="MOAM">{mRow.p.next}</div>
+        <div className="attrLine">
+            <div className="SYMB">{mRow.p.name}</div>
+            <div className="MOAM">{mRow.p.init}</div>
+            <div className="MOAM">{mRow.p.credit}</div>
+            <div className="MOAM">{mRow.p.debit}</div>
+            <div className="MOAM">{mRow.p.yearEnd}</div>
+            <div className="MOAM">{mRow.p.netIncomeOTC}</div>
+            <div className="MOAM">{mRow.p.netIncomeFin}</div>
+            <div className="MOAM">{mRow.p.close}</div>
+            <div className="TAX" >{mRow.p.tax}</div>
+            <div className="MOAM">{mRow.p.next}</div>
         </div>
     
     )

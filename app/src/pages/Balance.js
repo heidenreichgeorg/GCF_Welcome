@@ -24,8 +24,8 @@ export default function Balance() {
     if(!sheet) return null; //'Loading...';
 
     
-    function prevFunc() {console.log("CLICK PREVIOUS"); window.location.href="http://localhost:3000/transfer?client="+session.client+"&year="+session.year; }
-    function nextFunc() {  console.log("CLICK NEXT");   window.location.href="http://localhost:3000/hgb275s?client="+session.client+"&year="+session.year; }
+    function prevFunc() {console.log("CLICK PREVIOUS"); window.location.href="http://"+session.server.addr+":3000/transfer?client="+session.client+"&year="+session.year; }
+    function nextFunc() {  console.log("CLICK NEXT");   window.location.href="http://"+session.server.addr+":3000/hgb275s?client="+session.client+"&year="+session.year; }
 
     let page = sheet[D_Page];
     
@@ -38,7 +38,7 @@ export default function Balance() {
     return (
         <Screen prevFunc={prevFunc} nextFunc={nextFunc} tabSelector={aPages} >
             {report.map((balance,n) => ( 
-                <div class="ulliTab" id={"PageContent"+n} style= {{ 'display': aPages[n]}} >
+                <div className="ulliTab" id={"PageContent"+n} style= {{ 'display': aPages[n]}} >
                     {balance.map((row,i) => (
                         <BalanceRow jArgs={row} id={i} />    
                     ))}
@@ -165,16 +165,16 @@ function makeBalance(response,value) {
 
 function BalanceRow({ jArgs, id }) {
     return(
-        <div class={"attrLine line"+id} >
-            <div class="LNAM"> {jArgs.tw1}</div>
-            <div class="MOAM"> {jArgs.am3}</div>
-            <div class="MOAM"> {jArgs.am2}</div>
-            <div class="MOAM"> {jArgs.am1}</div>
-            <div class="SEP">|&nbsp;</div>
-            <div class="LNAM"> {jArgs.tx1}</div>
-            <div class="MOAM"> {jArgs.an3}</div>
-            <div class="MOAM"> {jArgs.an2}</div>
-            <div class="MOAM"> {jArgs.an1}</div>
+        <div className={"attrLine line"+id} >
+            <div className="LNAM"> {jArgs.tw1}</div>
+            <div className="MOAM"> {jArgs.am3}</div>
+            <div className="MOAM"> {jArgs.am2}</div>
+            <div className="MOAM"> {jArgs.am1}</div>
+            <div className="SEP">|&nbsp;</div>
+            <div className="LNAM"> {jArgs.tx1}</div>
+            <div className="MOAM"> {jArgs.an3}</div>
+            <div className="MOAM"> {jArgs.an2}</div>
+            <div className="MOAM"> {jArgs.an1}</div>
         </div>
     )
 }

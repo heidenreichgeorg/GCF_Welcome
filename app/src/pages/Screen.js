@@ -67,18 +67,14 @@ export default function Screen({ children, prevFunc, nextFunc, tabSelector }) {
     }
      
 
-
-
-
-    //  <script  type="text/javascript"  src="/client.js" />
     return (
-        <div class="mTable">    
+        <div className="mTable">    
            
-            <div class="attrLine" onLoad="updateScreen()">
+            <div className="attrLine" onLoad="updateScreen()">
                 
                 {tabSelector.map((row,tabNum) => (
-                    <div class="SYMB" onClick={((e) => select('PageContent',{tabNum}))}>
-                        <label class="SYMB">
+                    <div className="SYMB" onClick={((e) => select('PageContent',{tabNum}))}>
+                        <label className="SYMB">
                             <input type="radio" name="tabSelector" autoFocus={tabNum==0?"1":""}/>                          
                             &nbsp;{tabNum}
                         </label>
