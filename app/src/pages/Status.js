@@ -31,8 +31,8 @@ export default function Status() {
     if(!sheet) return null; // 'Loading...';
 
     
-    function prevFunc() {console.log("CLICK PREVIOUS"); window.location.href="http://"+session.server.addr+":3000/partner?client="+client+"&year="+year; }
-    function nextFunc() {  console.log("CLICK NEXT");   window.location.href="http://"+session.server.addr+":3000/transfer?client="+client+"&year="+year; }
+    function prevFunc() {console.log("CLICK PREVIOUS"); window.location.href="https://"+session.server.addr+":3000/partner?client="+client+"&year="+year; }
+    function nextFunc() {  console.log("CLICK NEXT");   window.location.href="https://"+session.server.addr+":3000/transfer?client="+client+"&year="+year; }
 
 
     function handleXLSave() {

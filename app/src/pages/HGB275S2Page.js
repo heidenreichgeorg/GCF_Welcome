@@ -24,8 +24,8 @@ export default function HGB275S2Page() {
     if(!sheet) return null; //'Loading...';
 
     
-    function prevFunc() {console.log("CLICK PREVIOUS"); window.location.href="http://"+session.server.addr+":3000/balance?client="+session.client+"&year="+session.year; }
-    function nextFunc() {  console.log("CLICK NEXT");   window.location.href="http://"+session.server.addr+":3000/history?client="+session.client+"&year="+session.year; }
+    function prevFunc() {console.log("CLICK PREVIOUS"); window.location.href="https://"+session.server.addr+":3000/balance?client="+session.client+"&year="+session.year; }
+    function nextFunc() {  console.log("CLICK NEXT");   window.location.href="https://"+session.server.addr+":3000/history?client="+session.client+"&year="+session.year; }
 
     let page = sheet[D_Page];
     
