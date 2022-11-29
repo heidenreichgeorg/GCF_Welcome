@@ -46,7 +46,8 @@ export function cents2EU(cents) {
 
 
  // from money.js
-export  function moneyString(money) {
+export  function moneyString(money) { cents2EU(money.cents); }
+/*
     var prefix = "";
     var value=money.cents;
     if(value<0) {
@@ -70,4 +71,4 @@ export  function moneyString(money) {
     }
     return prefix + strEuros + ',' + strCent.slice(lenCent-2);	
 }
-
+*/

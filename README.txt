@@ -77,7 +77,33 @@ D_REPORT = {
 "xbrlEqLiab":{"level":2,"xbrl":"de-gaap-ci_bs.eqLiab","de_DE":"Passiv_oG","account":{"name":"Passiv_oG","desc":"Passiv_oG","xbrl":"de-gaap-ci_bs.eqLiab","credit":"240.306,04","debit":"0,00","init":"241.725,74","min":"0,00","yearEnd":"240.306,04"}},
 "xbrlIncome":{"level":1,"xbrl":"de-gaap-ci_bs.eqLiab.income","de_DE":"Passiva","account":{"name":"Passiva","desc":"Passiva","xbrl":"de-gaap-ci_bs.eqLiab.income","init":"0,00","min":"0,00","credit":"0,00","debit":"0,00","yearEnd":"0,00"}}}
 
-
+# D_Balance {
+"GRSB":{"name":"GRSB","index":6,"desc":"Immo","xbrl":"de-gaap-ci_bs.ass.fixAss.tan.landBuildings.buildingsOnOwnLand","init":"149.850,00","min":"149.850,00","credit":"0,00","debit":"0,00","yearEnd":"149.850,00","next":"149.850,00"},
+"EBKS":{"name":"EBKS","index":7,"desc":"Sachanlage","xbrl":"de-gaap-ci_bs.ass.fixAss.tan.landBuildings.other","init":"282,00","min":"282,00","credit":"0,00","debit":"0,00","yearEnd":"282,00","next":"282,00"},
+"CDAK":{"name":"CDAK","index":8,"desc":"Aktiendepot A","xbrl":"de-gaap-ci_bs.ass.fixAss.fin.securities","credit":"54.541,61","debit":"-40.927,60","init":"85.922,52","min":"53.626,72","yearEnd":"99.536,53","next":"99.536,53"},
+"FSTF":{"name":"FSTF","index":9,"desc":"Forderung steuerfrei","xbrl":"de-gaap-ci_bs.ass.currAss.receiv.trade","credit":"3.000,00","debit":"-3.000,00","init":"0,00","min":"0,00","yearEnd":"0,00","next":"0,00"},
+"COGK":{"name":"COGK","index":10,"desc":"Girokonto A","xbrl":"de-gaap-ci_bs.ass.currAss.cashEquiv.bank","credit":"71.859,67","debit":"-76.433,65","init":"5.516,54","min":"276,39","yearEnd":"942,56","next":"942,56"},
+"SPGE":{"name":"SPGE","index":11,"desc":"Girokonto B","xbrl":"de-gaap-ci_bs.ass.currAss.cashEquiv.bank","init":"0,00","min":"0,00","credit":"0,00","debit":"0,00","yearEnd":"0,00","next":"0,00"},
+"VDKB":{"name":"VDKB","index":12,"desc":"Verrechnung C","xbrl":"de-gaap-ci_bs.ass.currAss.cashEquiv.bank","init":"0,00","min":"0,00","credit":"0,00","debit":"0,00","yearEnd":"0,00","next":"0,00"},
+"NKFO":{"name":"NKFO","index":13,"desc":"Forderung an Mieter aus Nebenkosten","xbrl":"de-gaap-ci_bs.ass.currAss.receiv.trade","credit":"0,00","debit":"-179,68","init":"154,68","min":"129,68","yearEnd":"-25,00","next":"-25,00"},
+"KEST":{"name":"KEST","index":14,"desc":"gezahlte Kapitalertragssteuer","xbrl":"de-gaap-ci_bs.ass.currAss.receiv.other.otherTaxRec.CapTax","credit":"1.963,89","debit":"0,00","init":"0,00","min":"0,00","yearEnd":"1.963,89","next":"0,00"},
+"KESO":{"name":"KESO","index":15,"desc":"gezahlte Soli-Abgabe auf Kapitalertragssteuer","xbrl":"de-gaap-ci_bs.ass.currAss.receiv.other.otherTaxRec.CapTax","credit":"107,98","debit":"0,00","init":"0,00","min":"0,00","yearEnd":"107,98","next":"0,00"},
+"AQST":{"name":"AQST","index":16,"desc":"gezahlte Auslandsquellensteuer","xbrl":"de-gaap-ci_bs.ass.currAss.receiv.other.otherTaxRec.CapTax","init":"0,00","min":"0,00","credit":"0,00","debit":"0,00","yearEnd":"0,00","next":"0,00"},
+"VAVA":{"name":"VAVA","index":17,"desc":"VerlusteAusVkAktien","xbrl":"de-gaap-ci_bs.ass.currAss.receiv.other.CapLoss","credit":"3.187,56","debit":"-3.187,56","init":"0,00","min":"-1.317,46","yearEnd":"0,00","next":"0,00"},
+"MIET":{"name":"MIET","index":19,"desc":"Mieteinnahmen Umsatzsteuerfrei","xbrl":"de-gaap-ci_is.netIncome.regular.operatingTC.grossTradingProfit.totalOutput.netSales.grossSales.untaxable","credit":"14.762,00","debit":"0,00","init":"0,00","min":"0,00","yearEnd":"14.762,00","next":"0,00"},
+"AUFW":{"name":"AUFW","index":20,"desc":"Aufwand Immobilie","xbrl":"de-gaap-ci_is.netIncome.regular.operatingTC.otherCost.fixingLandBuildings","credit":"0,00","debit":"-2.319,35","init":"0,00","min":"-534,35","yearEnd":"-2.319,35","next":"0,00"},
+"ABSC":{"name":"ABSC","index":21,"desc":"Abschreibung der Anlagen am Jahresende","xbrl":"de-gaap-ci_is.netIncome.regular.operatingTC.deprAmort.fixAss.tan","init":"0,00","min":"0,00","credit":"0,00","debit":"0,00","yearEnd":"0,00","next":"0,00"},
+"NKG":{"name":"NKG","index":22,"desc":"Nebenkosten des Geldverkehrs","xbrl":"de-gaap-ci_is.netIncome.regular.operatingTC.otherCost.otherOrdinary","credit":"0,00","debit":"-231,10","init":"0,00","min":"-224,15","yearEnd":"-231,10","next":"0,00"},
+"AZIN":{"name":"AZIN","index":23,"desc":"Zinskosten für Kredite","xbrl":"de-gaap-ci_is.netIncome.regular.fin.expenses.regularInterest","init":"0,00","min":"0,00","credit":"0,00","debit":"0,00","yearEnd":"0,00","next":"0,00"},
+"EZIN":{"name":"EZIN","index":24,"desc":"Zinseinnahmen","xbrl":"de-gaap-ci_is.netIncome.regular.fin.netInterest.income","init":"0,00","min":"0,00","credit":"0,00","debit":"0,00","yearEnd":"0,00","next":"0,00"},
+"EDIV":{"name":"EDIV","index":25,"desc":"Dividende Finanzanlagen","xbrl":"de-gaap-ci_is.netIncome.regular.fin.netParticipation","credit":"4.321,60","debit":"0,00","init":"0,00","min":"0,00","yearEnd":"4.321,60","next":"0,00"},
+"FSAL":{"name":"FSAL","index":26,"desc":"Gewinn aus Verkauf von Finanzanlagen","xbrl":"de-gaap-ci_is.netIncome.regular.fin.sale","credit":"2.148,88","debit":"0,00","init":"0,00","min":"0,00","yearEnd":"2.148,88","next":"0,00"},
+"NKHA":{"name":"NKHA","index":27,"desc":"Nebenkosten der Vermietung","xbrl":"de-gaap-ci_is.netIncome.regular.operatingTC.otherCost.leaseFix.other","credit":"1.101,78","debit":"-1.053,40","init":"0,00","min":"-240,96","yearEnd":"48,38","next":"0,00"},
+"KAUT":{"name":"KAUT","index":29,"desc":"Kaution des Mieters","xbrl":"de-gaap-ci_bs.eqLiab.liab.other.other","init":"3.000,00","min":"3.000,00","credit":"0,00","debit":"0,00","yearEnd":"3.000,00","next":"3.000,00"},
+"G195":{"name":"G195","index":30,"desc":"KREDIT","xbrl":"de-gaap-ci_bs.eqLiab.liab.other.profSharRights","init":"50.000,00","min":"50.000,00","credit":"0,00","debit":"0,00","yearEnd":"50.000,00","next":"50.000,00"},
+"K2xx":{"name":"K2xx","index":31,"desc":"Variables Eigenkapital xx","xbrl":"de-gaap-ci_bs.eqLiab.equity.subscribed.unlimitedLiablePartners.VK","credit":"4.147,99","debit":"-3.600,00","init":"27.343,75","min":"27.343,75","yearEnd":"27.891,74","next":"31.223,45","income":"3.746,09","netIncomeOTC":"2.451,99","netIncomeFin":"1.294,10"},
+"EKxx":{"name":"EKxx","index":42,"desc":"Stammkapital xx","xbrl":"de-gaap-ci_bs.eqLiab.equity.subscribed.limitedLiablePartners.KK","init":"24.000,00","min":"24.000,00","credit":"0,00","debit":"0,00","yearEnd":"24.000,00","next":"24.000,00"},
+"Name":{"name":"Name","index":1,"xbrl":"BALANCE","desc":"Kontonummer","init":"0,00","min":"0,00","credit":"0,00","debit":"0,00","next":"0,00","yearEnd":"0,00"}}
 
 # SCHEMA
  ```json
@@ -120,7 +146,7 @@ D_REPORT = {
         "Variables Eigenkapital4",
         "Variables Eigenkapital5",
         "Variables Eigenkapital6",
-        "Stammkapital1",
+        "Stammkapital 1",
         "Stammkapital 2",
         "Stammkapital Partner1",
         "Stammkapital Partner2",
@@ -184,5 +210,10 @@ D_REPORT = {
     "client": "(entityname))"
 }
 
+D_Partner_NET = {
+i:{"id":i,"vk":"K2xx","gain":n,"denom":z,
+"iVar":31,"iCap":37,"name":name,
+"tax":s,"cyLoss":s,"income":s,"netIncomeFin":s,"netIncomeOTC":s,"init":s,"credit":s,"debit":s,"yearEnd":s,"close":s,"next":s},
+}
 
 

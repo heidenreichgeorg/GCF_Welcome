@@ -91,12 +91,11 @@ export default function Screen({ children, prevFunc, nextFunc, tabSelector }) {
         }
     }
      
-
+// remove () from onload="updateScreen()", added {} instead of "",
+// there is no onLoad={updateScreen} and no     <div className="attrLine" onLoad="updateScreen()">
     return (
-        <div className="mTable">    
-           
-            <div className="attrLine" onLoad="updateScreen()">
-                
+        <div className="mTable">           
+            <div className="attrLine">           
                 {tabSelector.map((row,tabNum) => (
                     <div className="SYMB" onClick={((e) => select('PageContent',{tabNum}))}>
                         <label className="SYMB">
@@ -106,10 +105,8 @@ export default function Screen({ children, prevFunc, nextFunc, tabSelector }) {
                     </div>
                 ))}
             </div>
-            <div>
-                
-                {children}
-                
+            <div>              
+                {children}                
             </div>
         </div>
     )

@@ -53,5 +53,6 @@ input[type="radio"]::before {content: "#"; }
 .LTXT     { width:220px; overflow:hidden; padding: 2px; border: none; float: left;  font-family: inherit; font-size: inherit; font-weight:inherit; color: inherit; text-align: left;}
 .L280     { width:280px; overflow:hidden; padding: 2px; border: none; float: left;  font-family: inherit; font-size: inherit; font-weight:inherit; color: inherit; text-align: left;} 
 .C280     { width:280px; overflow:hidden; padding: 2px; border: none; float: left;  font-family: inherit; font-size: inherit; font-weight:inherit; color: inherit; } 
+.LFUL     { width:999px; overflow:hidden; padding: 2px; border: none; float: left;  font-family: inherit; font-size: inherit; font-weight:inherit; color: inherit; text-align: left;} 
 
 

@@ -1,8 +1,19 @@
+/*
+
+HTTPS
+
+download JSON function
+
+for each account in D_Balance with XBRL=de-gaap-ci_bs.ass.currAss.receiv.other.otherTaxRec.CapTax
+
+    for each partner in D_Partner_NET take gain/denom
+*/
 
 import { useEffect, useState, useRef  } from 'react';
 import Screen from '../pages/Screen'
 import FooterRow from '../components/FooterRow'
 import { useSession } from '../modules/sessionmanager';
+import { cents2EU, setEUMoney } from  '../modules/money'
 
 import { D_Balance, D_Partner_NET, D_Page, D_Report, D_Schema, X_ASSETS, X_EQLIAB, X_INCOME, SCREENLINES }  from '../terms.js';
 
@@ -13,8 +24,6 @@ export default function Partner() {
  
     useEffect(() => {
         if(status !== 'success') return;
-        //setYear(session.year);
-        //setClient(session.client);
         let state = null;
         try { state=JSON.parse(sessionStorage.getItem('session')); } catch(err) {}
         if(state && Object.keys(state).length>5) {
@@ -31,24 +40,71 @@ export default function Partner() {
     let page = sheet[D_Page];
     
     var jReport = JSON.parse(JSON.stringify(sheet[D_Partner_NET]));
-    console.log("Partner() with response D_Report"+JSON.stringify(jReport));
+    var jBalance = sheet[D_Balance];
+
+    
 
     let aPages = [];
 
-    let jLength = Object.keys(jReport).length;
+    function makeTax(partner,index,fix) {
+        let gain=parseInt(partner.gain);
+        let deno=parseInt(partner.denom);               
+        let result= { 'name': partner.name };
+        Object.keys(jBalance).map((name,index) => (jBalance[name].xbrl==='de-gaap-ci_bs.ass.currAss.receiv.other.otherTaxRec.CapTax'?
+                                                    (result[name]=cents2EU(((fix+setEUMoney(jBalance[name].yearEnd).cents)*gain)/deno))
+                                                    :{}));
+
+        console.log("Partner("+index+") with "+gain+"/"+deno+"response D_Report"+JSON.stringify(result));
+        return result;
+    }
+    
+    let  taxHeaders=[];
+    let  taxDetails=[];
+
+    // fix are cents to compensate for rounding when tax is shared among partners
+    let fix = Object.keys(jReport).length-1;
+    let aTax = Object.keys(jReport).map((index) => (taxDetails.push(makeTax(jReport[index],index,fix))));
+    
+
+    let hKeys=Object.keys(taxDetails[0]);
+    taxHeaders.push(  hKeys );
+    
+
+    let jLength = Object.keys(jReport).length  + 1 + Object.keys(aTax).length;
+
     let  filler=[];
     for(let p=jLength;p<SCREENLINES;p++) {
         filler.push({});
     }
+    
+
 
     return (
         <Screen prevFunc={prevFunc} nextFunc={nextFunc} tabSelector={aPages} >
             
             <div className="ulliTab" id={"PageContent1"} style= {{ 'display': 'block'}} >
-            <PartnerRow p={ {'name':'name', 'init':'init', 'credit':'credit', 'debit':'debit', 'yearEnd':'yearEnd', 'netIncomeOTC':'netIncomeOTC', 'netIncomeFin':'netIncomeFin', 'close':'close', 'tax':'tax', 'next':'next'} } />
+            <PartnerRow p={ {'name':'name', 
+                        'init':'init', 
+                        'credit':'credit',
+                        'debit':'debit',
+                        'yearEnd':'yearEnd',
+                        'netIncomeOTC':'netIncomeOTC',
+                        'netIncomeFin':'netIncomeFin',
+                        'close':'close',
+                        'tax':'tax',
+                        'next':'next'} } />
                 {Object.keys(jReport).map((id) => (
                     <PartnerRow p={jReport[id]}/>    
                 ))}           
+
+                <FlexRow p={[]}/>    
+
+                { taxHeaders.map((row) => (
+                    <FlexRow p={row}/>    
+                ))}    
+                { taxDetails.map((row) => (
+                    <FlexRow p={row}/>    
+                ))}    
 
                 { filler.map((row) => (
                     <PartnerRow p={row}/>    
@@ -95,11 +151,22 @@ export default function Partner() {
 }
 
 
+function FlexRow(mRow) {
+    let keys = Object.keys(mRow.p);
+
+    let sPairs = keys.map((kn) => ("  "+mRow.p[kn])).join("");
+
+    return (
+        <div className="attrLine">
+            <div className="LFUL">{sPairs}</div>
+        </div>    
+    )
+}
+
+
 function PartnerRow(mRow) {
 
-    console.log("PartnerRow mRow="+JSON.stringify(mRow));
-
-    
+    // console.log("PartnerRow mRow="+JSON.stringify(mRow));
 
     return (
 
