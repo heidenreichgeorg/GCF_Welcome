@@ -3,6 +3,9 @@
 bookingpages-a0a7c
 
 storage.rules: Konjunktion: ALLE REGELN WERDEN AUSGEWERTET, EINE EINZIGE SPERRE BLOCKIERT
+>> firebase deploy   updates the rules
+
+must use latest root\*.JSON as firebase config 
 
 CONSOLE Cloud Storage settings -> UID , GID
 https://console.cloud.google.com/welcome?project=bookingpages-a0a7c
@@ -24,8 +27,10 @@ const MAIN = "main.json";
 
 const fbApp = require("firebase/app");
 const fbStorage = require("firebase/storage");
+const fbAuth = require("firebase/auth");
 const FS = require('firebase/firestore'); 
-const {Datastore} = require('@google-cloud/datastore');
+
+//const {Datastore} = require('@google-cloud/datastore');
 
 const https = require('https');
 
@@ -46,6 +51,23 @@ function bucketInit(firebaseConfig) {
   // Initialize Firebase app
   bpApp = fbApp.initializeApp(firebaseConfig);
   
+
+  // LOGIN user 
+  const auth = fbAuth.getAuth();
+  console.log("\nFB.bucketInit");
+  fbAuth.signInWithEmailAndPassword(auth, firebaseConfig.usermail, firebaseConfig.userpassword)
+    .then((userCredential) => {
+      // Signed in 
+      const user = userCredential.user;
+      console.log("0028 FB.bucketInit LOGGED IN "+JSON.stringify(user))
+    })
+    .catch((error) => {
+      const errorCode = error.code;
+      const errorMessage = error.message;
+      console.log("0027 FB.bucketInit ("+errorCode+") LOGIN FAILED "+errorMessage)
+    });
+  
+
   // Initialize Cloud Storage and get a reference to the service
   return  fbStorage.getStorage(bpApp);
 

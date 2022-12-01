@@ -70,7 +70,7 @@ export default function Partner() {
     taxHeaders.push(  hKeys );
     
 
-    let jLength = Object.keys(jReport).length  + 1 + Object.keys(aTax).length;
+    let jLength = Object.keys(jReport).length  + 2 + Object.keys(aTax).length;
 
     let  filler=[];
     for(let p=jLength;p<SCREENLINES;p++) {

@@ -5,6 +5,7 @@
     "ejs": "^3.1.8",
     "express": "^4.18.1",
     "firebase": "^9.14.0",
+    "firebase-auth": "^0.1.2",
     "node-fetch": "^3.3.0",
     "qrcode": "^1.5.1",
     "utf8": "^3.0.0",

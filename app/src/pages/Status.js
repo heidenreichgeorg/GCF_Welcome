@@ -141,7 +141,8 @@ function makeStatusData(response) {
     if(maxCom>maxRow) maxRow=maxCom;
     if(maxCor>maxRow) maxRow=maxCor;
 
-    let statusData = []; for(let i=0;i<=maxRow && i<SCREENLINES;i++) statusData[i]={};
+    let statusData = []; for(let i=0;i<=maxRow && i<=SCREENLINES;i++) statusData[i]={};
+    if(maxRow>SCREENLINES) maxRow=SCREENLINES; // 20221201
     
     let iLeft=0;
     statusData[iLeft++].nLeft= "Assets";
@@ -209,6 +210,8 @@ function makeStatusData(response) {
         statusData[0].lTran= "Recent Transactions";
 
         for (let hash in jHistory)  {
+
+            console.log("Recent TXN("+hash+") #iTran="+iTran+ "      #bLine="+bLine+"    #maxRow="+maxRow);
 
             if(bLine<maxRow && iTran>0) {
         

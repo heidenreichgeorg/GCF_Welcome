@@ -1,5 +1,6 @@
 // LOCAL START
 // node server.js root=d:\Privat\ auto=900
+// must use latest root\*.JSON as firebase config 
 
 /*
  React routes SESSION BOOK EXCEL
