@@ -164,16 +164,13 @@ function makeReport(response,value) {
                 if(xbrl_pre===X_EQLIAB) aRite[name]=account;
             }
         }
-        
-        var mEqLiab={};
-        var income="";
 
     
         var iRite=2;
-        var iLeft=2;
-        balance.push({  });
-        balance.push({ 'tw1':jReport.xbrlAssets.de_DE, 'tx1':jReport.xbrlEqLiab.de_DE });
-
+        var iLeft=1;
+        //balance.push({  });
+        balance.push({ 'tw1':jReport.xbrlEqLiab.de_DE, 'tx1':jReport.xbrlEqLiab.de_DE });
+/*
         for (let tag in jReport)   {
             //console.log("Report "+JSON.stringify(jReport[tag]));
             
@@ -195,7 +192,7 @@ function makeReport(response,value) {
                 
                 //console.log('makeReport side='+side);
 
-                if(side==='ass') {
+                if(side==='eqLiab') {
                     if(iLeft<SCREENLINES) {
                         if(!balance[iLeft]) balance[iLeft]={};
                         balance[iLeft].tw1=iName;
@@ -211,6 +208,18 @@ function makeReport(response,value) {
                 // divider line out
                 console.log('makeReport unknown '+JSON.stringify(account));
             }
+        }
+*/
+ 
+        for (let name in aRite)   {
+            var account=aRite[name];
+
+            var iName = account.name;
+            var cBegin= account.init;
+            var cNext = account.next;
+            console.log("EqLiab account ="+JSON.stringify(account));
+    
+            iLeft = fillLeft(balance,cBegin,cNext,iName,iLeft);
         }
 
         fillRight(balance,chgb1,"Umsatz",0,1);
@@ -253,6 +262,19 @@ function makeReport(response,value) {
     return balance;
 }
 
+function fillLeft(balance,dispValue1,dispValue2,iName,iLeft) {
+    if(iLeft<SCREENLINES) {
+        if(!balance[iLeft]) balance[iLeft]={};
+        balance[iLeft].tw1=iName;
+        balance[iLeft].am3=dispValue1; 
+        balance[iLeft].am2=dispValue2; 
+        
+        iLeft++;
+    }
+    return iLeft;
+}
+
+
 function fillRight(balance,cValue,iName,iRite,level) {
     if(iRite<SCREENLINES) {
         if(!balance[iRite]) balance[iRite]={};
@@ -265,6 +287,7 @@ function fillRight(balance,cValue,iName,iRite,level) {
     }
     return iRite;
 }
+
 
 function HGB275Row({ jArgs, id }) {
     return(
