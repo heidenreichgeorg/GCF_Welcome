@@ -170,46 +170,7 @@ function makeReport(response,value) {
         var iLeft=1;
         //balance.push({  });
         balance.push({ 'tw1':jReport.xbrlEqLiab.de_DE, 'tx1':jReport.xbrlEqLiab.de_DE });
-/*
-        for (let tag in jReport)   {
-            //console.log("Report "+JSON.stringify(jReport[tag]));
-            
-            var element    =  jReport[tag];
-            var level     =  element.level;
-            var account  = element.account;
-            var dispValue = account[value]; // account.yearEnd;
-            var iName    =    account.name;
-            var full_xbrl  =  account.xbrl;
 
-            if(dispValue && iName && full_xbrl) {
-                // collect compute total right side amount
-                if(full_xbrl==='de-gaap-ci_bs.eqLiab') { mEqLiab=setEUMoney(dispValue);  dispValue=moneyString(mEqLiab); }
-                if(full_xbrl==='de-gaap-ci_is.netIncome.regular') { income=dispValue; }
-                if(full_xbrl==='de-gaap-ci_bs.eqLiab.income') { let mIncome=addEUMoney(income,mEqLiab); dispValue=moneyString(mIncome);}
-
-                var xbrl = full_xbrl.split('\.');
-                var side = xbrl[1];
-                
-                //console.log('makeReport side='+side);
-
-                if(side==='eqLiab') {
-                    if(iLeft<SCREENLINES) {
-                        if(!balance[iLeft]) balance[iLeft]={};
-                        balance[iLeft].tw1=iName;
-                        if(level==1) { balance[iLeft].am1=dispValue; }
-                        if(level==2) { balance[iLeft].am2=dispValue; }
-                        if(level==3) { balance[iLeft].am3=dispValue; }
-                        iLeft++;
-                    }
-                } 
-                
-
-            } else {
-                // divider line out
-                console.log('makeReport unknown '+JSON.stringify(account));
-            }
-        }
-*/
  
         for (let name in aRite)   {
             var account=aRite[name];

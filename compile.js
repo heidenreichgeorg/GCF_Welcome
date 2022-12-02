@@ -1488,7 +1488,7 @@ function prepareTXN(sessionId,reqBody) {
 
 
 function processArgv(processArgv) {
-    let instance=null;
+    let config=null;
     processArgv.forEach(function (val, index, array) {
         if(debug>1) console.log("0000 Starting server " + index + ': ' + val);
         let attribute=val.split('=');
@@ -1498,9 +1498,9 @@ function processArgv(processArgv) {
                 Sheets.setRoot(attribute[1]);
                 console.log("0004 Starting server SET ROOT TO " + Sheets.getRoot());
             }        
-            else if(attribute[0].toLowerCase()==='inst') {
-                instance = attribute[1];
-                console.log("0006 Starting server SET INSTANCE " + instance);
+            else if(attribute[0].toLowerCase()==='config') {
+                config = attribute[1];
+                console.log("0006 Starting server SET FIREBASE CONFIG " + config);
             }        
             else if(attribute[0].toLowerCase()==='auto') {
                 let autoSec = parseInt(attribute[1]);
@@ -1510,7 +1510,7 @@ function processArgv(processArgv) {
         }
     });
 
-    return instance;
+    return config;
 }
 
 

@@ -5,7 +5,7 @@ bookingpages-a0a7c
 storage.rules: Konjunktion: ALLE REGELN WERDEN AUSGEWERTET, EINE EINZIGE SPERRE BLOCKIERT
 >> firebase deploy   updates the rules
 
-must use latest root\*.JSON as firebase config 
+config=PROJECT must use latest root\PROJECT.JSON as firebase  
 
 CONSOLE Cloud Storage settings -> UID , GID
 https://console.cloud.google.com/welcome?project=bookingpages-a0a7c
@@ -39,8 +39,20 @@ const https = require('https');
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
+/*
+NETWORK REQUEST FAILED
+Firebase: Error (auth/network-request-failed).
+--> fix internet connection, fix server address 
 
 
+CONFIGURATION NOT FOUND
+0027 FB.bucketInit (auth/configuration-not-found) LOGIN FAILED Firebase: Error  (auth/configuration-not-found)
+--> enable email/pwd authentication in the console.firebase.google.com/project/PROJECT
+
+
+USER NOT FOUND
+0027 FB.bucketInit (auth/user-not-found) LOGIN FAILED Firebase: Error (auth/user-not-found)
+*/
 
 const sessionKeys = ["client","year","remote","time","sheetCells","sheetName","id","addrT","sheetFile","sessionId","generated","ext","clientFunction","strTimeSymbol","fireBase"]
 

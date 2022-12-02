@@ -1,6 +1,6 @@
 // LOCAL START
-// node server.js root=d:\Privat\ auto=900
-// must use latest root\*.JSON as firebase config 
+// node server.js root=d:\Privat\ config=PROJECT root\PROJECT.JSON as firebase config 
+// node server.js root=d:\Privat\ config=bookingpages
 
 /*
  React routes SESSION BOOK EXCEL
@@ -60,7 +60,7 @@ const Compiler = require('./compile');
 const clientHead= "<HEAD><meta http-equiv='content-type' content='text/html; charset=utf-8'><LINK REL='stylesheet' HREF='./FBA/mobile_green.css'/><TITLE>Welcome</TITLE></HEAD>";
 
 
-var instance = Compiler.init(app,process.argv); // GH20221003 do that per module
+var config = Compiler.init(app,process.argv); // GH20221003 do that per module
 
 // react app
 app.use(express.static(path.join(__dirname, 'app', 'build')))
@@ -155,6 +155,7 @@ function sy_findSessionId(client,year) {
                 console.log("0806  FOUND => (SESSION  "+showRecent(session)+" client="+session.client+","+session.year+")");
             }
         }
+        else    console.log("0805  FOUND EMPTY SESSION   (client="+client+","+year+")");
     });
     if(result) return result.id;
     else return null;
@@ -349,31 +350,31 @@ app.get('/welcomedrop', (req, res) => {
 
 
 function localhost() {
-    if(!instance) {
-        var results = [];
-        for (const name of Object.keys(nets)) {
-            for (const net of nets[name]) {
-                // Skip over non-IPv4 and internal (i.e. 127.0.0.1) addresses
-                if (net.family === 'IPv4' && !net.internal) {
-                    if (!results[name]) {
-                        results[name] = [];
-                    }
-                    if(debug) console.dir ( "OS["+name+"] net info "+net.address);
-                    results.push({ 'type':name, 'addr':net.address});
+    let instance="127.0.0.1";
+    var results = [];
+    for (const name of Object.keys(nets)) {
+        for (const net of nets[name]) {
+            // Skip over non-IPv4 and internal (i.e. 127.0.0.1) addresses
+            if (net.family === 'IPv4' && !net.internal) {
+                if (!results[name]) {
+                    results[name] = [];
                 }
-                if(debug) console.log ( "OS["+name+"]  other  "+JSON.stringify(net));
+                if(debug) console.dir ( "OS["+name+"] net info "+net.address);
+                results.push({ 'type':name, 'addr':net.address});
             }
+            if(debug) console.log ( "OS["+name+"]  other  "+JSON.stringify(net));
         }
-        instance = results[0] ? results[0].addr : "127.0.0.1";
-        if(debug) console.dir ( "OS.address  "+instance);
     }
+    instance = results[0] ? results[0].addr : "127.0.0.1";
+    if(debug) console.dir ( "OS.address  "+instance);
+    
     return { 'addr':instance, 'port':PORT };
 }
 module.exports['localhost']=localhost;
 
 
 
-
+/*
 // PURE FUNCTIONS
 
 
@@ -387,7 +388,7 @@ function timeSymbol() {
     ':' + ('0' + u.getUTCSeconds()).slice(-2) +
     '.' + (u.getUTCMilliseconds() / 1000).toFixed(3).slice(2, 5) 
 };
-
+*/
 
 
 function strSymbol(pat) {
@@ -464,14 +465,18 @@ function orderRecentFiles(dir,ext) {
 let fbConfig=null;
 
 function loadFBConfig() {
-    var found=null;
-    if(fbConfig==null) {
+    var fbConfig=null;
+    if(config!=null) {
         const dir = Compiler.getRoot(); 
-        let fileName = getMostRecentFile(dir,"json");
+        //let fileName = getMostRecentFile(dir,"json");
+        let fileName = config+".json";
         if(fileName) {
             console.log("0022 loadFBConfig from "+fileName);
             fbConfig = JSON.parse(fs.readFileSync(dir+fileName, 'utf8'));
-        } else console.log("0023 loadFBConfig NO JSON in "+dir);
+        } else {
+            console.log("0023 loadFBConfig NO JSON in "+dir);
+            return null;
+        }
     }
     return fbConfig;
 } 
@@ -479,8 +484,12 @@ function loadFBConfig() {
 
 
 function fbDownload(client,year,callBack,ext,res) {
-    const appStorage = FB.bucketInit(loadFBConfig());
-    FB.bucketDownload(appStorage,client,year,callBack,ext,res);
+    if(config) {
+        let fbConfig=loadFBConfig();
+        const appStorage = FB.bucketInit(fbConfig);
+        FB.bucketDownload(appStorage,client,year,callBack,ext,res);
+        return fbConfig? "fbDownload" : null;
+    } else return null;
 }
 
 
@@ -489,12 +498,18 @@ async function save2Bucket(session,client,year) {
     console.log("0032 save2Bucket Start saving("+JSON.stringify(Object.keys(session))+") to FB for "+client+","+year);        
 
     // FIREBASE
-    const appStorage = FB.bucketInit(loadFBConfig());
-    session.fireBase = fbConfig.storageBucket;
+    const fbConfig = loadFBConfig();
+    if(fbConfig) {
+        const appStorage = FB.bucketInit(fbConfig);
+        session.fireBase = fbConfig.storageBucket;
 
-    // async, setSession and compile
-    FB.bucketUpload(appStorage,client,year,session,startSession)
-        .then((url) => (session.fireBase=url));
+        // async, setSession and compile
+        FB.bucketUpload(appStorage,client,year,session,startSession)
+            .then((url) => (session.fireBase=url));
+
+        return "save2Bucket";
+
+    } else return null;
 }
 module.exports['save2Bucket']=save2Bucket;
 
@@ -552,9 +567,18 @@ app.post("/UPLOAD", (req, res) => {
             // SETS SESSION AFTER WRITE
             save2Bucket(sessionData,client,year);
 
-            let usrLogin = jLoginURL(sessionData).url;
-            let cmdLogin = usrLogin+"&clientSave=JSON";
+            
+            // 20221202 what if config==null and no bucket shall be used?
+            // shortcut for OFFLINE start                
+            startSession(sessionData); 
+            console.dir("0068 app.post UPLOAD starts offline");
+            
 
+            
+            //let usrLogin = jLoginURL(sessionData).url;     
+            //let cmdLogin = usrLogin+"&clientSave=JSON";
+            let cmdLogin = "http://localhost:81/LATEST?client="+client+"&year="+year+"&ext=JSON&clientSave=JSON";
+            // should not set a sesssion.id because id not known while async save2bucket is not finished       
 
             console.dir("0070 app.post UPLOAD rendering QR code");
             res.write('<DIV class="attrRow"><H1>'+year+'&nbsp;'+client+'&nbsp;</H1>'
@@ -562,6 +586,7 @@ app.post("/UPLOAD", (req, res) => {
             +'</DIV>'
             );
             res.end();
+            
 
         } else console.log ( "0013 UPLOAD VOID client="+client+",year="+year+",time="+time+",addr="+remote+"  ---> "+computed);
 
@@ -578,7 +603,7 @@ app.post("/UPLOAD", (req, res) => {
 // load JSON file from Firebase storage
 function signIn(query,remote,res) {
     let base =  Compiler.getRoot();
-    console.log("0010 signIn at base "+base+"  for "+JSON.stringify(query));
+    //console.log("0010 signIn at base "+base+"  for "+JSON.stringify(query));
 
     if(query && query.client && query.client.length>2 ) { // && (query.client == "[a-zA-Z0-9]")) {
 
@@ -589,14 +614,17 @@ function signIn(query,remote,res) {
 
             // Security sanitize input year
             let year   = parseInt(query.year); // Security sanitize input year
-            console.log("0014 signIn for client "+client+"  year "+year);
+            console.log("0010 signIn for client "+client+"  year "+year);
 
             let id=null;
             if(id=sy_findSessionId(client,''+year)) {
-                console.log ( "0016 signIn FOUND WARM id ="+id);
+                console.log ( "0014 signIn FOUND WARM id ="+id);
                 sendDisplay( getSession(id), res);
             }
-            else fbDownload(client,year,startSession); // avoid double response
+            else {
+                console.log ( "0018 signIn READ BUCKET FOR COLD id ="+id);
+                fbDownload(client,year,startSession); // avoid double response
+            }
                         
         } else console.log ( "0027 signIn file no valid year for query="+JSON.stringify(query)+",addr="+remote);
 
