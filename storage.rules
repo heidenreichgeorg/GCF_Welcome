@@ -10,14 +10,11 @@ service firebase.storage {
 
 
   match /b/{bucket}/o {
-    match /{allPaths=**} {
-    	allow read,write: if request.time < timestamp.date(2022, 12, 14);
-    }
-    match /HGKG/{allYears=*} { // EDITOR project role ID
-    	allow read, write: if request.auth.uid == '00b4903a97a9f13d1883090e9064b06638c68dee952229b689c0d1d95e3e4c5d';      
-    }
-    match /HGKG/{allYears=*} { // TEAM project role ID
-    	allow read, write: if request.auth.uid == '00b4903a9778cdbfa3b68ec0c4a003ea347a50a71a471c64ebafe9e3b18074b0';
+    match /HGKG/{allYears=**} { // first user 
+    	allow read, write: if request.auth.uid == 'lm15VGtzfsMpsizta16zj9IAaFu1';      
+    
+      allow read: if
+          request.time < timestamp.date(2022, 12, 12);
     }
   }
 }

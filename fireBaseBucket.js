@@ -52,6 +52,10 @@ CONFIGURATION NOT FOUND
 
 USER NOT FOUND
 0027 FB.bucketInit (auth/user-not-found) LOGIN FAILED Firebase: Error (auth/user-not-found)
+--> edit users and allow storage.rules with UID from console.firebase.google.com/project/bookingpages-a0a7c/authentication/users
+
+UNAUTHORIZED
+Firebase Storage: User does not have permission to access 'HGKG/2022/main.json'. (storage/unauthorized)"
 */
 
 const sessionKeys = ["client","year","remote","time","sheetCells","sheetName","id","addrT","sheetFile","sessionId","generated","ext","clientFunction","strTimeSymbol","fireBase"]

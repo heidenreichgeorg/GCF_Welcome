@@ -170,15 +170,6 @@ module.exports['sy_findSessionId']=sy_findSessionId;
 
 
 
-// CALLBACK for function plugin, registers an ENDPOINT
-function registerLink(command,htmlPage,sessionId) {
-    let pattern = "/"+command;
-    app.get(pattern,  (req, res) => { res.sendFile(__dirname + "/"+htmlPage); });
-    return pattern+"?sessionId="+sessionId; // create a link with sessionId as parameter
-}
-
-
-
 
 
 
@@ -200,6 +191,9 @@ app.get("/LATEST", (req, res) => {
         res.end();
     }
 });
+
+
+app.get("/STATUS",  (req, res) => { res.sendFile(__dirname + "/status.html")});
 
 
 // responds with session contxt object  
@@ -284,9 +278,9 @@ function sendDisplay(session,res) {
     let clientSave = (session.ext==='JSON') ? true:false;
 
 
-    banner = Compiler.display(registerLink,sessionId,year,client,clientSave);
+    //let banner = Compiler.display(registerLink,sessionId,year,client,clientSave);
 
-    console.dir("5000 sendDisplay() builds banner#"+banner.length);
+    //console.dir("5000 sendDisplay() builds banner#"+banner.length);
     
     // 20220728
     if(sessionId) {
@@ -313,7 +307,7 @@ function sendDisplay(session,res) {
                     "<HTML>"+clientHead+"<BODY>"
                     +html
                     +'<DIV class="attrRow"><H1>'+year+'&nbsp;'+client+'&nbsp;'+postFix+'</H1>'
-                    +banner                    
+                    +"<A HREF="+loginInfo.url+">STATUS</A>"
                     +'</DIV></BODY></HTML>'
                 );
                 res.end();
@@ -374,22 +368,8 @@ module.exports['localhost']=localhost;
 
 
 
-/*
+
 // PURE FUNCTIONS
-
-
-function timeSymbol() {
-    var u = new Date(Date.now()); 
-    return u.getUTCFullYear() +
-    '-' + ('0' + (1+u.getUTCMonth())).slice(-2) +
-    '-' + ('0' + u.getUTCDate()).slice(-2) + 
-    ' ' + ('0' + u.getUTCHours()).slice(-2) +
-    ':' + ('0' + u.getUTCMinutes()).slice(-2) +
-    ':' + ('0' + u.getUTCSeconds()).slice(-2) +
-    '.' + (u.getUTCMilliseconds() / 1000).toFixed(3).slice(2, 5) 
-};
-*/
-
 
 function strSymbol(pat) {
     let cypher = "BC0DF1GH2JK3LM4NP5QR6ST7VW8XZ9A";
@@ -429,12 +409,7 @@ function jLoginURL(session) {
     let year=session.year;
     let client=session.client;
     let sessionId=session.id;
-    let cFunction=session.clientFunction;
-
-    let postFix=sessionId.slice(-4);
-    let mainSid=sessionId.slice(0,sessionId.length-4);
-    // console.dir(">>> URL: "+mainSid+"."+postFix+"="+sessionId);
-    return {'url':"/LOGIN?year="+year+"&client="+client+"&cFunction="+cFunction+"&mainSid="+mainSid+"&postFix="+postFix, 'mainSid':mainSid, 'postFix':postFix };
+    return {'url':"/STATUS?year="+year+"&client="+client+"&sessionId="+sessionId };
 }
 module.exports['jLoginURL']=jLoginURL;
 
@@ -575,8 +550,6 @@ app.post("/UPLOAD", (req, res) => {
             
 
             
-            //let usrLogin = jLoginURL(sessionData).url;     
-            //let cmdLogin = usrLogin+"&clientSave=JSON";
             let cmdLogin = "http://localhost:81/LATEST?client="+client+"&year="+year+"&ext=JSON&clientSave=JSON";
             // should not set a sesssion.id because id not known while async save2bucket is not finished       
 

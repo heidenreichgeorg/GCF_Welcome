@@ -789,103 +789,6 @@ function compile(sessionData) {
 }
 module.exports['compile']=compile;
 
-/*
-function save2Server(session,client,year) {
-    Sheets.save2Server(session,client,year);
-}
-module.exports['save2Server']=save2Server
-*/
-
-function display(registerLink,sessionId,year,client,clientSave) {
-    var vbanner=[];
-    
-    if(sessionId) {
-        vbanner.push('<SCRIPT type="text/javascript" src="/client.js"></SCRIPT>');
-
-        vbanner.push('<SCRIPT>localStorage.setItem("mysession",'+`"${sessionId}"`+');</SCRIPT>');
-
-        if(!clientSave) vbanner.push('<DIV class="dosBorder">');
-        
-        vbanner.push('<DIV class="mTable"><DIV class="ulliTab"><DIV class="attrKeys">');
-
-        
-            let strSessionId = "'"+sessionId+"'"; 
-            if(clientSave) {
-                vbanner.push('<SCRIPT>setAutoJSON('+strSessionId+');</SCRIPT>');
-                //  set automatic client-side JSON download
-            }
-
-
-            
-
-            
-            vbanner.push(buttonOpenTile(registerLink("status",    "Status.html",sessionId),'Status',3)); 
-
-            
-            vbanner.push(buttonOpenTile(registerLink("account", "AccountHistory.html",sessionId),'AcctHistory'));
-
-            
-            vbanner.push(buttonOpenTile(registerLink("openbalance","OpenBalance.html",sessionId),'AcctOpen'));
-
-            
-            vbanner.push(buttonOpenTile(registerLink("hgbregular", "HGBRegular.html",sessionId),'BalanceClose'));
-
-            
-           vbanner.push(buttonOpenTile(registerLink("dashboard",  "DashBoard.html",sessionId),'DashBoard',3));
-
-            
-            vbanner.push(buttonOpenTile(registerLink("history",   "HistoryScreen.html",sessionId),'History'));
-
-            
-            vbanner.push(buttonOpenTile(registerLink("gainloss",  "GainLoss.html",sessionId),'GainLoss'));
-
-            vbanner.push('</DIV><DIV class="attrKeys">');            
-
-            
-            vbanner.push(buttonOpenTile(registerLink("assets", "AssetScreen.html",sessionId),'Assets'));
-
-            
-            vbanner.push(buttonOpenTile(registerLink("balance",  "BalanceTable.html",sessionId),'AcctClose'));
-
-            
-            vbanner.push(buttonOpenTile(registerLink("galshgb",  "HGB275S2OTC.html",sessionId),'GainlossHGB'));
-
-            
-            vbanner.push(buttonOpenTile(registerLink("hgbbeginyear", "HGBBeginYear.html",sessionId),'BalanceOpen'));
-
-            if(isSameFY(year)) {
-                
-                vbanner.push(buttonOpenTile(registerLink("transfer","Transfer.html",sessionId),'Transfer'));
-            } else console.log("compile.makeBanner "+year +" PAST YEAR ("+unixYear()+")- NO XFER command");
-
-
-            
-            vbanner.push(buttonOpenTile(registerLink("pattern", "PatternList.html",sessionId),'Patterns'));      
-
-            if(clientSave) { // clientFlag===JSON
-                
-                vbanner.push(buttonOpenTile(registerLink("closeandsave", "CloseAndSave.html",sessionId),'Closing'));
-            }
-            else vbanner.push(labelText(client+" "+year));
-
-//            registerLink("assetl", "AssetList.html"); 
-
-            
-            // fill table
-            vbanner.push('</DIV><DIV class="attrKeys">');
-            vbanner.push('</DIV><DIV class="attrKeys">');
-            vbanner.push('</DIV><DIV class="attrKeys">');
-            vbanner.push('</DIV></DIV></DIV>');
-
-            if(!clientSave) vbanner.push('</DIV>');
-
-        console.log("0300 makeBanner OK for "+client+","+year);
-    
-    } else return  '<DIV class = "mTable"><DIV class = "ulliTab"><DIV class = "attrLine">NO SESSION info</DIV></DIV></DIV>';
-    return vbanner.join('');
-}
-module.exports['display']=display;
-
 
 function isSameFY(year) 
 {
@@ -901,26 +804,6 @@ module.exports['isSameFY']=isSameFY;
 function unixYear() {
     return new Date(Date.now()).getUTCFullYear();
 };
-
-
-function buttonOpenTile(link,command) {
-    let label = de_DE[command];
-    let strLink = "'"+link+"'";
-    let strCommand = "'"+command+"'";
-    let result =  '<DIV class="C100"><A HREF="JavaScript:newPopup('+strLink+','+strCommand+');" ><BUTTON class="largeKey">'+label+'</BUTTON></A></DIV>';
-    if(debug>2) console.log(result);
-    return result;
-}
-
-
-function buttonOpenWide(link,command,lines) {
-    let label = de_DE[command];
-    let strLink = "'"+link+"'";
-    let strCommand = "'"+command+"'";
-    let result =  '<DIV class="C100"><A HREF="JavaScript:newPopup('+strLink+','+strCommand+',1500,'+lines+');" ><BUTTON class="largeKey">'+label+'</BUTTON></A></DIV>';
-    if(debug>2) console.log(result);
-    return result;
-}
 
 
 
