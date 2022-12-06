@@ -62,11 +62,16 @@ const sessionKeys = ["client","year","remote","time","sheetCells","sheetName","i
 
 let bpApp = null;
 
-function bucketInit(firebaseConfig) {
+// FB.accessFirebase(FB.bucketDownload,fbConfig,client,year,null,callBack);
+// FB.accessFirebase(FB.bucketUpload,fbConfig,client,year,session,startSession)
+function accessFirebase(accessMethod,firebaseConfig,client,year,jData,startSessionCB) {
 
   // Initialize Firebase app
-  bpApp = fbApp.initializeApp(firebaseConfig);
-  
+  if(bpApp==null) {
+    bpApp = fbApp.initializeApp(firebaseConfig);
+  }
+  // Initialize Cloud Storage and get a reference to the service
+  let bpStorage = fbStorage.getStorage(bpApp);
 
   // LOGIN user 
   const auth = fbAuth.getAuth();
@@ -75,26 +80,25 @@ function bucketInit(firebaseConfig) {
     .then((userCredential) => {
       // Signed in 
       const user = userCredential.user;
-      console.log("0028 FB.bucketInit LOGGED IN "+JSON.stringify(user))
+      if(debug) console.log("\n0028 FB.bucketInit LOGGED IN "+JSON.stringify(user));
+      accessMethod(bpStorage,client,year,jData,startSessionCB);
     })
     .catch((error) => {
       const errorCode = error.code;
       const errorMessage = error.message;
-      console.log("0027 FB.bucketInit ("+errorCode+") LOGIN FAILED "+errorMessage)
+      if(debug) console.log("0027 FB.bucketInit ("+errorCode+") LOGIN FAILED "+errorMessage)
     });
   
 
-  // Initialize Cloud Storage and get a reference to the service
-  return  fbStorage.getStorage(bpApp);
 
 }
-module.exports['bucketInit']=bucketInit;
+module.exports['accessFirebase']=accessFirebase;
 
 
 // ONLY FOR BROWSERS gsutil cors set cors.json gs://bookingpapages-a0a7c -
 
 
-async function bucketDownload(bpStorage,client,year,startSession) {
+async function bucketDownload(bpStorage,client,year,jData,startSession) {
   let sClient = client.replace('.','_');
   let iYear = parseInt(year);
 

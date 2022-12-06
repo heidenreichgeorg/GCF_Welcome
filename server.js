@@ -23,7 +23,7 @@
 // /UPLOAD with JSON data
 
 
-const debug=5;
+const debug=null;
 
 const HTTP_OK = 200;
 const HTTP_WRONG = 400;
@@ -460,30 +460,41 @@ function loadFBConfig() {
 
 function fbDownload(client,year,callBack,ext,res) {
     if(config) {
-        let fbConfig=loadFBConfig();
-        const appStorage = FB.bucketInit(fbConfig);
-        FB.bucketDownload(appStorage,client,year,callBack,ext,res);
-        return fbConfig? "fbDownload" : null;
+        // FIREBASE
+        const fbConfig = loadFBConfig();
+        if(fbConfig) {        
+            FB.accessFirebase(FB.bucketDownload,fbConfig,client,year,null,callBack);
+            return "fbDownload";
+        } else {
+            console.log("0033 server.fbDownload NO FIREBASE CONFIG")
+            return null;
+        }
     } else return null;
 }
 
 
 
 async function save2Bucket(session,client,year) {
-    console.log("0032 save2Bucket Start saving("+JSON.stringify(Object.keys(session))+") to FB for "+client+","+year);        
 
-    // FIREBASE
-    const fbConfig = loadFBConfig();
-    if(fbConfig) {
-        const appStorage = FB.bucketInit(fbConfig);
-        session.fireBase = fbConfig.storageBucket;
+    if(config) {
+        console.log("0032 save2Bucket Start saving("+JSON.stringify(Object.keys(session))+") to FB for "+client+","+year);        
 
-        // async, setSession and compile
-        FB.bucketUpload(appStorage,client,year,session,startSession)
-            .then((url) => (session.fireBase=url));
+        // FIREBASE
+        const fbConfig = loadFBConfig();
+        if(fbConfig) {
+            // 20221206
+            // session.fireBase = fbConfig.storageBucket;
 
-        return "save2Bucket";
+            // async, setSession and compile
+            FB.accessFirebase(FB.bucketUpload,fbConfig,client,year,session,startSession)
+                .then((url) => (session.fireBase=url));
 
+            return "save2Bucket";
+
+        } else {
+            console.log("0033 save2Bucket NO FIREBASE CONFIG")
+            return null;
+        }
     } else return null;
 }
 module.exports['save2Bucket']=save2Bucket;
