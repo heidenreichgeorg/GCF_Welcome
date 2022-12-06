@@ -105,6 +105,9 @@ D_REPORT = {
 "EKxx":{"name":"EKxx","index":42,"desc":"Stammkapital xx","xbrl":"de-gaap-ci_bs.eqLiab.equity.subscribed.limitedLiablePartners.KK","init":"24.000,00","min":"24.000,00","credit":"0,00","debit":"0,00","yearEnd":"24.000,00","next":"24.000,00"},
 "Name":{"name":"Name","index":1,"xbrl":"BALANCE","desc":"Kontonummer","init":"0,00","min":"0,00","credit":"0,00","debit":"0,00","next":"0,00","yearEnd":"0,00"}}
 
+# D_FixAss =
+{"NAME":{"date":"2016-01-01","type":"WKN","init":"162.000,00","nmbr":"1","idnt":"NAME","rest":"149.850,00","cost":"162.000,00"} }
+
 # SCHEMA
  ```json
  {

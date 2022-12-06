@@ -5,6 +5,7 @@ import './index.css';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 
 import Balance from './pages/Balance'
+import FixedAssets from './pages/FixedAssets'
 import HGB275SPage from './pages/HGB275S2Page'
 import History from './pages/History'
 import Partner from './pages/Partner'
@@ -18,6 +19,10 @@ const router = createBrowserRouter([
     {
         path: '/balance',
         element: <Balance />
+    },
+    {
+        path: '/fixedAssets',
+        element: <FixedAssets />
     },
     {
         path: '/hgb275s',
