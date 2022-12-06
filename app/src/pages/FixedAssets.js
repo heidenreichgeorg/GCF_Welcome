@@ -52,12 +52,12 @@ export default function FixedAssets() {
         <Screen prevFunc={prevFunc} nextFunc={nextFunc} tabSelector={aPages} >
             
             <div className="ulliTab" id={"PageContent1"} style= {{ 'display': 'block'}} >
-            <FixedAssetsRow p={ {'name':'name', 'wkn':'wkn', 
-                        'init':'init', 
-                        'number':'number',
-                        'current':'current',
-                        'deprec':'deprec',
-                        'unitPrice':'unitPrice'} } />
+            <FixedAssetsRow p={ {'idnt':'Name', 'type':'WKN/Typ', 'date':"Anschaffung",
+                        'init':'Anschaffungsk', 
+                        'nmbr':'Anzahl',
+                        'rest':'Zeitwert',
+                        'current':'Anzahl',
+                        'cost':'Stückpreis'} } />
                 {Object.keys(jAssets).map((id) => (
                     <FixedAssetsRow p={jAssets[id]}/>    
                 ))}           
@@ -68,8 +68,7 @@ export default function FixedAssets() {
                 
                 <FooterRow left={page["client"]}  right={page["register"]} prevFunc={prevFunc} nextFunc={nextFunc}/>
                 <FooterRow left={page["reference"]} right={page["author"]} prevFunc={prevFunc} nextFunc={nextFunc}/>
-            </div>
-            
+            </div>            
         </Screen>
     )
     
@@ -79,22 +78,18 @@ export default function FixedAssets() {
 
 
     function FixedAssetsRow(mRow) {
-
         console.log("FixedAssetsRow mRow="+JSON.stringify(mRow));
-
+        //let unitPrice = (mRow.p.nmbr && mRow.p.nmbr>0)?cents2EU(setEUMoney(mRow.p.cost).cents/parseInt(mRow.p.nmbr)):"--";
         return (
-
             <div className="attrLine">
                 <div className="LNAM">{mRow.p.idnt}</div>
-                <div className="SYMB">{mRow.p.date}</div>
-                <div className="SYMB">{mRow.p.type}</div>
+                <div className="SNAM">{mRow.p.type}</div>
+                <div className="SNAM">{mRow.p.date}</div>
                 <div className="MOAM">{mRow.p.init}</div>
                 <div className="MOAM">{mRow.p.nmbr}</div>
                 <div className="MOAM">{mRow.p.rest}</div>
                 <div className="MOAM">{mRow.p.cost}</div>
-                <div className="MOAM">{mRow.p.unitPrice}</div>
-            </div>
-        
+            </div>        
         )
     }
 
