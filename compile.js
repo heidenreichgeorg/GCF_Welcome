@@ -180,7 +180,6 @@ function init(app, argv) {
         if(oldSession) {
             let client = oldSession.client;
             let year = oldSession.year;
-            let jFileName = year+client+".json";
             if(sessionId && client && year) {
 
                 // SECURITY SANITIZE req.body
@@ -198,7 +197,7 @@ function init(app, argv) {
                 
                 // async
                 Server.save2Bucket(session,client,year)
-                    .then(jFileName => { if(res) res.json({url:serverAddr+'/LATEST', client, year, 'jFileName':jFileName  })
+                    .then(result => { if(res) res.json({url:serverAddr+'/LATEST', client, year, 'result':result  })
                     });
 
 

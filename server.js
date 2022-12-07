@@ -486,16 +486,16 @@ async function save2Bucket(session,client,year) {
             // session.fireBase = fbConfig.storageBucket;
 
             // async, setSession and compile
-            FB.accessFirebase(FB.bucketUpload,fbConfig,client,year,session,startSession)
-                .then((url) => (session.fireBase=url));
+            FB.accessFirebase(FB.bucketUpload,fbConfig,client,year,session,startSession);
+                
 
-            return "save2Bucket";
+            return "save2Bucket OK";
 
         } else {
-            console.log("0033 save2Bucket NO FIREBASE CONFIG")
-            return null;
+            console.log("0033 save2Bucket NO FIREBASE CONFIG");
+            return "save2Bucket NO FIREBASE CONFIG";
         }
-    } else return null;
+    } else return "save2Bucket NO CONFIG PARAMETER";
 }
 module.exports['save2Bucket']=save2Bucket;
 

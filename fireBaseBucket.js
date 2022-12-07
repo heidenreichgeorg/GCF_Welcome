@@ -66,6 +66,8 @@ let bpApp = null;
 // FB.accessFirebase(FB.bucketUpload,fbConfig,client,year,session,startSession)
 function accessFirebase(accessMethod,firebaseConfig,client,year,jData,startSessionCB) {
 
+  let url = "sync";
+
   // Initialize Firebase app
   if(bpApp==null) {
     bpApp = fbApp.initializeApp(firebaseConfig);
@@ -81,7 +83,8 @@ function accessFirebase(accessMethod,firebaseConfig,client,year,jData,startSessi
       // Signed in 
       const user = userCredential.user;
       if(debug) console.log("\n0028 FB.bucketInit LOGGED IN "+JSON.stringify(user));
-      accessMethod(bpStorage,client,year,jData,startSessionCB);
+      url = accessMethod(bpStorage,client,year,jData,startSessionCB);
+      if(jData) jData.firebase = url;    
     })
     .catch((error) => {
       const errorCode = error.code;
