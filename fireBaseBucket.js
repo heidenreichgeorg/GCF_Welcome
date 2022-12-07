@@ -62,9 +62,9 @@ const sessionKeys = ["client","year","remote","time","sheetCells","sheetName","i
 
 let bpApp = null;
 
-// FB.accessFirebase(FB.bucketDownload,fbConfig,client,year,null,callBack);
-// FB.accessFirebase(FB.bucketUpload,fbConfig,client,year,session,startSession)
-function accessFirebase(accessMethod,firebaseConfig,client,year,jData,startSessionCB) {
+// FB.accessFirebase(FB.bucketDownload,fbConfig,client,year,null,startSessionCB);
+// FB.accessFirebase(FB.bucketUpload,fbConfig,client,year,session,startSessionCB)
+function accessFirebase(accessMethod,firebaseConfig,client,year,jData,startSessionCB,res) {
 
   let url = "sync";
 
@@ -83,7 +83,7 @@ function accessFirebase(accessMethod,firebaseConfig,client,year,jData,startSessi
       // Signed in 
       const user = userCredential.user;
       if(debug) console.log("\n0028 FB.bucketInit LOGGED IN "+JSON.stringify(user));
-      url = accessMethod(bpStorage,client,year,jData,startSessionCB);
+      url = accessMethod(bpStorage,client,year,jData,startSessionCB,res);
       if(jData) jData.firebase = url;    
     })
     .catch((error) => {
@@ -101,7 +101,7 @@ module.exports['accessFirebase']=accessFirebase;
 // ONLY FOR BROWSERS gsutil cors set cors.json gs://bookingpapages-a0a7c -
 
 
-async function bucketDownload(bpStorage,client,year,jData,startSession) {
+async function bucketDownload(bpStorage,client,year,jData,startSessionCB,callRes) {
   let sClient = client.replace('.','_');
   let iYear = parseInt(year);
 
@@ -137,11 +137,11 @@ async function bucketDownload(bpStorage,client,year,jData,startSession) {
               console.dir("Firebase.download ERR "+err.toString());
             }
 
-            if(debug) console.dir("0018 Firebase.download session "+JSON.stringify(Object.keys(session)));
+            if(debug) console.dir("0016 Firebase.download session "+JSON.stringify(Object.keys(session)));
 
             if(debugReport) console.log("Firebase.download session "+JSON.stringify(session));
             // AVOID double HEADERS 
-            startSession(session);
+            startSessionCB(session,callRes);
           })
         }).on('error', function(error) {     
 
@@ -216,7 +216,7 @@ const jMetadata = {
     contentType: 'application/json',
   };
 
-async function bucketUpload(bpStorage,client,year,jData,startSession) {
+async function bucketUpload(bpStorage,client,year,jData,startSessionCB,callRes) {
 
   let downloadUrl = "no Firebase Storage";
   if(fbStorage) {
@@ -274,7 +274,7 @@ async function bucketUpload(bpStorage,client,year,jData,startSession) {
               if(debug) console.log("Firebase fbWriteJSON to: "+downloadUrl);          
               
               // 20221127
-              startSession(jData);
+              startSessionCB(jData,callRes);
               }
             }
           );

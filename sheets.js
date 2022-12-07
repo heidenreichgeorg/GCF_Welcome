@@ -584,7 +584,7 @@ module.exports['makeXLTabs']=makeXLTabs;
 
 
 async function save2Server(session,client,year) {
-    console.log("0032 save2Server Start saving(JSON) to "+SERVEROOT);        
+    console.log("1560 save2Server Start saving(JSON) to "+SERVEROOT);        
 
 
     const data = JSON.stringify(session);
@@ -593,7 +593,7 @@ async function save2Server(session,client,year) {
 
     // REJECT IF FILE EXISTS
     if(checkExist(getClientDir(client),year)) {
-        console.log("0033 sheets.save2Server: DETECTS COLLISION ");   
+        console.log("1561 sheets.save2Server: DETECTS COLLISION ");   
         return null;
     }
 
@@ -601,12 +601,12 @@ async function save2Server(session,client,year) {
     // WRITE SESSION   1st PARAMETER
     fs.writeFileSync(jsonFileName, data, {'encoding':'utf8'}, (err) => { // was latin1 GH20211120
         if (err) {
-            console.log("0035 sheets.save2Server: "+err);          
+            console.log("1563 sheets.save2Server: "+err);          
             //throw err;
         }
         
     });
-    console.log("0036 save2Server: JSON main save to "+jsonFileName+" started.");
+    console.log("1564 save2Server: JSON main save to "+jsonFileName+" started.");
 
     return jsonFileName;
 }

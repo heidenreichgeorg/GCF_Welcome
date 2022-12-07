@@ -172,7 +172,7 @@ function init(app, argv) {
         if(debug) console.log("\n\n");
         // from TransferForm.html       
         if(debug) console.log(Server.timeSymbol());
-        if(debugReport) console.log("0010 app.post BOOK prepareTXN('"+JSON.stringify(req.body)+"')");
+        if(debugReport) console.log("0610 app.post BOOK prepareTXN('"+JSON.stringify(req.body)+"')");
 
         var result="SERVER BOOKED";
         let sessionId = req.body.sessionId; // OLD
@@ -203,11 +203,11 @@ function init(app, argv) {
 
             } else {
                 result="NO SESSION ID";
-                console.log("0015 app.post BOOK NO sessionId");
+                console.log("0615 app.post BOOK NO sessionId");
             }        
         } else {
             result="NO OLD SESSION";
-            console.log("0015 app.post BOOK NO OLD session");
+            console.log("0617 app.post BOOK NO OLD session");
         }        
     });
 

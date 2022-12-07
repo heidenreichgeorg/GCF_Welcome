@@ -8,7 +8,7 @@
  /BOOK appends session context and then stores it as JSON on server-side storage
  /EXCEL stores EXCEL on server-side storage and then downloads it
 */
-
+const ReactPort = 3000;
 
 // JS client routes DOWN
 // GET
@@ -181,10 +181,8 @@ module.exports['sy_findSessionId']=sy_findSessionId;
 app.get("/LATEST", (req, res) => { 
 
     if(req && req.query && req.socket) {        
-        session = signIn(req.query,req.socket.remoteAddress,res);
-        if(session) console.log("\n0800 GET /LATEST FOUND => "+session.id);
-        else console.log("\n0801 NO /LATEST SESSION FOUND  ");
-        // exits via res.send
+        signIn(req.query,req.socket.remoteAddress,res,startSessionDisplay);
+        // exit via startSession and sendDisplay
     }
     else {
         res.write("\n<HTML><HEAD><link rel='stylesheet' href='./FBA/mobile_green.css'/></HEAD><TITLE>LATEST</TITLE>INVALID SESSION FILE 'client' and/or 'base' and/or 'ext' missing</HTML>\n\n"); 
@@ -210,11 +208,9 @@ app.get('/SESSION', (req, res) => {
 
         //COLD START: LOAD FROM LATEST FILE
         if(!(sessionId=sy_findSessionId(query.client,query.year))) {
-            session = signIn(query,req.socket.remoteAddress,res); 
-            if(session) console.log("\n0810 GET /SESSION FOUND FILE => "+session.id);
-            else console.log("\n0811 GET /SESSION FILE NOT FOUND => "+JSON.stringify(query));
-    
-
+            signIn(query,req.socket.remoteAddress,res,startSessionJSON); 
+            // exit via startSession and res.JSON
+            
         // WARM START : FOUND EXISTING ID
         } else {
             session = getSession(sessionId);
@@ -224,9 +220,7 @@ app.get('/SESSION', (req, res) => {
             
             if(session && session.id) res.json(session);
             else req.query.code = "Could not signIn()";
-            }
-        
-
+        }
     }
     else res.json({ id: '0123', code : "NO VALID QUERY"})
 });
@@ -241,7 +235,7 @@ app.get("/LOGIN", (req, res) => {
 
     console.log("\n\n");
     console.log(timeSymbol());
-    console.log("0020 app.get LOGIN "+JSON.stringify(req.query));
+    console.log("0024 app.get LOGIN "+JSON.stringify(req.query));
 
 
     let remote  =  req.socket.remoteAddress;
@@ -254,7 +248,7 @@ app.get("/LOGIN", (req, res) => {
     let postFix = req.query.postFix; 
     let sessionId= mainSid+postFix; 
 
-    console.dir("0030 app.get "+remote+" LOGIN with client="+client+",year="+year+",postFix="+postFix); 
+    console.dir("0026 app.get "+remote+" LOGIN with client="+client+",year="+year+",postFix="+postFix); 
 
     if(!sessionId) sessionId=sy_findSessionId(client,year);
 
@@ -262,11 +256,11 @@ app.get("/LOGIN", (req, res) => {
     if(sessionId)  {
 
         let session = getSession(sessionId);
-        console.log("0040 login() with sessionId="+sessionId);
+        console.log("0028 login() with sessionId="+sessionId);
 
         if(session) sendDisplay(session,res);
     }
-    console.dir("0060 app.get LOGIN responded: "+banner);
+    console.dir("0030 app.get LOGIN responded: "+banner);
 
 });
 
@@ -285,10 +279,16 @@ function sendDisplay(session,res) {
     // 20220728
     if(sessionId) {
 
+        let localHost = localhost();
+        /*
         let loginInfo = jLoginURL(session);
         let usrLogin = loginInfo.url;
         let postFix = loginInfo.postFix;
-        let url = localhost() + usrLogin;
+         OLD SERVER let url = localHost.addr + ":" + localHost.port + usrLogin;
+         */
+        let url = "https://"+localHost.addr + ":" + ReactPort + "/status?client="+client+"&year="+year;
+
+        
         console.dir("5010 sendDisplay() rendering url="+url);
 
         if(res) {
@@ -306,8 +306,8 @@ function sendDisplay(session,res) {
                 res.write(
                     "<HTML>"+clientHead+"<BODY>"
                     +html
-                    +'<DIV class="attrRow"><H1>'+year+'&nbsp;'+client+'&nbsp;'+postFix+'</H1>'
-                    +"<A HREF="+loginInfo.url+">STATUS</A>"
+                    +'<DIV class="attrRow"><H1>'+year+'&nbsp;'+client+'&nbsp;</H1>'
+                    +"<A HREF="+url+">STATUS</A>"
                     +'</DIV></BODY></HTML>'
                 );
                 res.end();
@@ -458,12 +458,12 @@ function loadFBConfig() {
 
 
 
-function fbDownload(client,year,callBack,ext,res) {
+function fbDownload(client,year,callBack,res) {
     if(config) {
         // FIREBASE
         const fbConfig = loadFBConfig();
         if(fbConfig) {        
-            FB.accessFirebase(FB.bucketDownload,fbConfig,client,year,null,callBack);
+            FB.accessFirebase(FB.bucketDownload,fbConfig,client,year,null,callBack,res);
             return "fbDownload";
         } else {
             console.log("0033 server.fbDownload NO FIREBASE CONFIG")
@@ -486,7 +486,7 @@ async function save2Bucket(session,client,year) {
             // session.fireBase = fbConfig.storageBucket;
 
             // async, setSession and compile
-            FB.accessFirebase(FB.bucketUpload,fbConfig,client,year,session,startSession);
+            FB.accessFirebase(FB.bucketUpload,fbConfig,client,year,session,startSessionDisplay,null);
                 
 
             return "save2Bucket OK";
@@ -511,7 +511,7 @@ app.post("/UPLOAD", (req, res) => {
     //var signup = "NO SESSION";
 
     let remote = req.socket.remoteAddress;
-    console.log("0010 app.post UPLOAD from "+remote);
+    console.log("0810 app.post UPLOAD from "+remote);
 
     let rawData = req.body;
 
@@ -526,7 +526,7 @@ app.post("/UPLOAD", (req, res) => {
 
         if(sessionId===computed) { } 
         else {
-            console.dir("0011 app.post UPLOAD  client="+client+",year="+year+",time="+time+",r="+remote+"  ---> "+computed);
+            console.dir("0811 app.post UPLOAD  client="+client+",year="+year+",time="+time+",r="+remote+"  ---> "+computed);
             rawData.id=computed;
             sessionId=computed;
         }
@@ -534,7 +534,7 @@ app.post("/UPLOAD", (req, res) => {
 
         if(sessionId!=null && computed!=null && year!=null && client!=null) {
             // save file on server, not on client and forward to LOGIN page
-            console.dir("0012 app.post UPLOAD with function="+clientFunction+",client="+client+",year="+year+",time="+time+",r="+remote+"  ---> "+computed);
+            console.dir("0812 app.post UPLOAD with function="+clientFunction+",client="+client+",year="+year+",time="+time+",r="+remote+"  ---> "+computed);
          
             let sessionData = rawData;
             sessionData.strTimeSymbol=strTimeSymbol;
@@ -555,16 +555,17 @@ app.post("/UPLOAD", (req, res) => {
 
             
             // 20221202 what if config==null and no bucket shall be used?
-            // shortcut for OFFLINE start                
-            startSession(sessionData); 
-            console.dir("0068 app.post UPLOAD starts offline");
+            // shortcut for OFFLINE start  
+            // 20221207 DO NOT call sendDisplay              
+            startSessionDisplay(sessionData,null); 
+            console.dir("0818 app.post UPLOAD starts offline");
             
 
             
             let cmdLogin = "http://localhost:81/LATEST?client="+client+"&year="+year+"&ext=JSON&clientSave=JSON";
             // should not set a sesssion.id because id not known while async save2bucket is not finished       
 
-            console.dir("0070 app.post UPLOAD rendering QR code");
+            console.dir("0820 app.post UPLOAD rendering QR code");
             res.write('<DIV class="attrRow"><H1>'+year+'&nbsp;'+client+'&nbsp;</H1>'
             +'<DIV class="attrRow"><DIV class="C100"><A HREF="'+cmdLogin+'"><BUTTON class="largeKey">LOGIN</BUTTON></A></DIV></DIV>'
             +'</DIV>'
@@ -572,10 +573,10 @@ app.post("/UPLOAD", (req, res) => {
             res.end();
             
 
-        } else console.log ( "0013 UPLOAD VOID client="+client+",year="+year+",time="+time+",addr="+remote+"  ---> "+computed);
+        } else console.log ( "0813 UPLOAD VOID client="+client+",year="+year+",time="+time+",addr="+remote+"  ---> "+computed);
 
         return;
-    } else console.log ( "0009 UPLOAD EMPTY  addr="+remote);
+    } else console.log ( "0809 UPLOAD EMPTY  addr="+remote);
 
     // send back sessionId to client browser or file
     //res.writeHead(HTTP_WRONG, {"Content-Type": "text/html"});
@@ -585,7 +586,7 @@ app.post("/UPLOAD", (req, res) => {
 
 
 // load JSON file from Firebase storage
-function signIn(query,remote,res) {
+function signIn(query,remote,res,startSessionCB) {
     let base =  Compiler.getRoot();
     //console.log("0010 signIn at base "+base+"  for "+JSON.stringify(query));
 
@@ -602,12 +603,12 @@ function signIn(query,remote,res) {
 
             let id=null;
             if(id=sy_findSessionId(client,''+year)) {
-                console.log ( "0014 signIn FOUND WARM id ="+id);
+                console.log ( "0012 signIn FOUND WARM id ="+id);
                 sendDisplay( getSession(id), res);
             }
             else {
-                console.log ( "0018 signIn READ BUCKET FOR COLD id ="+id);
-                fbDownload(client,year,startSession); // avoid double response
+                console.log ( "0014 signIn READ BUCKET FOR COLD id ="+id);
+                fbDownload(client,year,startSessionCB,res); // avoid double response
             }
                         
         } else console.log ( "0027 signIn file no valid year for query="+JSON.stringify(query)+",addr="+remote);
@@ -618,9 +619,9 @@ function signIn(query,remote,res) {
 }
 
 
-function startSession(session) {
+function startSessionDisplay(session,res) {
 
-    console.log("0024 startSession="+JSON.stringify(Object.keys(session))); 
+    console.log("0018 startSessionDisplay="+JSON.stringify(Object.keys(session))); 
 
     // START A NEW SESSION
     let time = timeSymbol();
@@ -632,7 +633,35 @@ function startSession(session) {
 
     setSession(session);
 
-    console.log("0026 startSession("+client+","+year+") SUCCESS sessionId="+sessionId); 
+    console.log("0020 startSessionDisplay("+client+","+year+") SUCCESS sessionId="+sessionId); 
 
+    // 20221207
+    if(res) {
+        console.log("0022 startSessionDisplay("+client+","+year+") sendDisplay"); 
+        sendDisplay(session,res);
+    }
+}
+
+function startSessionJSON(session,res) {
+
+    console.log("0018 startSessionJSON="+JSON.stringify(Object.keys(session))); 
+
+    // START A NEW SESSION
+    let time = timeSymbol();
+    let year=session.year;
+    let client = session.client;
+    let sessionId = strSymbol(time+client+year+time);
+    session.id=sessionId;
+    session.generated = Compiler.compile(session);
+
+    setSession(session);
+
+    console.log("0020 startSessionJSON("+client+","+year+") SUCCESS sessionId="+sessionId); 
+
+    // 20221207
+    if(res) {
+        console.log("0022 startSessionJSON("+client+","+year+")  res.JSON"); 
+        res.json(session);
+    }
 }
 
