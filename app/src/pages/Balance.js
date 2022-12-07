@@ -1,6 +1,6 @@
 import { useEffect, useState  } from 'react';
 
-import { moneyString, setEUMoney,addEUMoney } from '../modules/money'
+import { moneyString, cents2EU, setEUMoney,addEUMoney } from '../modules/money.mjs'
 import Screen from '../pages/Screen'
 import FooterRow from '../components/FooterRow'
 import { D_Balance, D_History, D_Page, D_Report, D_Schema, X_ASSETS, X_EQLIAB, SCREENLINES }  from '../terms.js';
@@ -56,8 +56,8 @@ function makeBalance(response,value) {
     var jReport = response[D_Report];
     console.log("makeBalance from response D_Report"+JSON.stringify(Object.keys(jReport)));
 
-    var jHistory = response[D_History];
-    var gSchema = response[D_Schema];
+   // var jHistory = response[D_History];
+   // var gSchema = response[D_Schema];
 
     var jAccounts = response[D_Balance];
 
@@ -117,14 +117,18 @@ function makeBalance(response,value) {
 
         if(dispValue && iName && full_xbrl) {
             // collect compute total right side amount
-            if(full_xbrl==='de-gaap-ci_bs.eqLiab') { mEqLiab=setEUMoney(dispValue);  dispValue=moneyString(mEqLiab); }
+            if(full_xbrl==='de-gaap-ci_bs.eqLiab') { mEqLiab=setEUMoney(dispValue);  /*dispValue=moneyString(mEqLiab);*/ }
             if(full_xbrl==='de-gaap-ci_is.netIncome.regular') { income=dispValue; }
-            if(full_xbrl==='de-gaap-ci_bs.eqLiab.income') { let mIncome=addEUMoney(income,mEqLiab); dispValue=moneyString(mIncome);}
+            if(full_xbrl==='de-gaap-ci_bs.eqLiab.income') { 
+                let mIncome=addEUMoney(income,mEqLiab); 
+                console.log("INCOME = "+mIncome.cents);
+                dispValue=cents2EU(mIncome.cents);
+            }
 
             var xbrl = full_xbrl.split('\.');
             var side = xbrl[1];
-            //var xbrl_pre = xbrl.pop()+'.'+xbrl.pop()+'.'+xbrl.pop();
-            console.log('makeBalance side='+side);
+           
+            console.log('makeBalance side='+side + "  in "+full_xbrl + "= "+dispValue);
 
             if(side==='ass') {
                 if(iLeft<SCREENLINES) {
