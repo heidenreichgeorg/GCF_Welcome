@@ -38,7 +38,6 @@ export default function Status() {
     function handleXLSave() {
         console.log("1110 Status.handleXLSave sessionId = "+session.id);
         const rqOptions = { method: 'GET', headers: {  'Accept': 'application/octet-stream'}};
-        // for the POST body : , 'Content-Type': 'application/octet-stream'
         try {
             
             fetch(`${process.env.REACT_APP_API_HOST}/EXCEL?sessionId=${session.id}`, rqOptions)
@@ -79,9 +78,11 @@ export default function Status() {
                 report.map((row,l) => (
                     <StatusRow am1={row.gLeft} tx1={row.nLeft} am2={row.gMidl} tx2={row.nMidl} am3={row.gRite} tx3={row.nRite} d={row.dTran} n={row.nTran} l={row.lTran}/>                       
                 ))
+
+//<div className="attrLine"><div className="key" onClick={handleXLSave}>SAVE</div></div>                
             }
-            <div className="attrLine"><div className="key" onClick={handleXLSave}>SAVE</div></div>
-            <FooterRow left={page["client"]}  right={page["register"]} prevFunc={prevFunc} nextFunc={nextFunc}/>
+            
+            <FooterRow left={page["client"]}  right={page["register"]} prevFunc={prevFunc} nextFunc={nextFunc} miscFunc={handleXLSave}/>
             <FooterRow left={page["reference"]} right={page["author"]} prevFunc={prevFunc} nextFunc={nextFunc}/>
         </Screen>
     )

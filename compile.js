@@ -23,9 +23,9 @@ const fs = require('fs');
 
 const Account = require('./account');
 const Money = require('./money');
-const Sheets = require('./sheets');
+const Sheets = require('./sheets'); // setting root attribute
 const Server = require('./server');
-const { stringify } = require('querystring');
+//const { stringify } = require('querystring');
 
 
 const D_Page = "Seite";   // client register reference author

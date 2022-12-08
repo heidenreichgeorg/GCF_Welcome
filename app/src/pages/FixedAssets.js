@@ -6,9 +6,7 @@ import { useEffect, useState, useRef  } from 'react';
 import Screen from '../pages/Screen'
 import FooterRow from '../components/FooterRow'
 import { useSession } from '../modules/sessionmanager';
-import { cents2EU, setEUMoney } from  '../modules/money'
-
-import { D_FixAss, D_Partner_NET, D_Page, D_Report, D_Schema, X_ASSETS, X_EQLIAB, X_INCOME, SCREENLINES }  from '../terms.js';
+import { D_FixAss, D_Partner_NET, D_Page, SCREENLINES }  from '../terms.js';
 
 export default function FixedAssets() {
 
@@ -42,11 +40,10 @@ export default function FixedAssets() {
     let jLength = Object.keys(jAssets).length  + 2;
 
     let  filler=[];
-    for(let p=jLength;p<SCREENLINES;p++) {
+    for(let p=jLength;p<=SCREENLINES+1;p++) {
         filler.push({});
     }
     
-
 
     return (
         <Screen prevFunc={prevFunc} nextFunc={nextFunc} tabSelector={aPages} >
@@ -63,9 +60,11 @@ export default function FixedAssets() {
                 ))}           
 
                 { filler.map((row) => (
-                    <FixedAssetsRow p={row}/>    
+                                        <FixedAssetsRow p={row}/>    
                 ))}    
                 
+
+
                 <FooterRow left={page["client"]}  right={page["register"]} prevFunc={prevFunc} nextFunc={nextFunc}/>
                 <FooterRow left={page["reference"]} right={page["author"]} prevFunc={prevFunc} nextFunc={nextFunc}/>
             </div>            

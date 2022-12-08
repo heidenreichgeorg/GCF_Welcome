@@ -44,31 +44,3 @@ export function cents2EU(cents) {
     return sign + megaStr + milleStr + euroStr+","+(parseInt(cents%100).toString().padStart(2,'0'));
 }
 
-
- // from money.js
-export  function moneyString(money) { cents2EU(money.cents); }
-/*
-    var prefix = "";
-    var value=money.cents;
-    if(value<0) {
-        prefix='-';
-        value=-1 * money.cents;
-    } 
-    var kilos=parseInt(value / 100000);
-    var coins=value - (100000*kilos);
-    
-    var euros=parseInt(coins / 100);	
-    var cents=coins - (100*euros);
-    
-    var strEuros = ''+euros;
-    var strCent = '00'+cents;
-    var lenCent = strCent.length;
-    if(kilos>0) {
-        prefix = prefix + kilos+'.';
-        strEuros = '000'+strEuros;
-        var lenEuros = strEuros.length;
-        strEuros = strEuros.slice(lenEuros-3);
-    }
-    return prefix + strEuros + ',' + strCent.slice(lenCent-2);	
-}
-*/

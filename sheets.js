@@ -1,4 +1,4 @@
-const debug=null;
+const debug=1;
 const debugWrite=null;
 
 
@@ -26,7 +26,8 @@ const { FORMERR } = require('dns');
 const Money = require('./money.js');
 
 
-const D_Schema = "Schema"; // includes .Names .total
+//const D_Schema = "Schema"; // includes .Names .total
+const Compiler=require("./compile.js");
 
 const CSEP = ';';
 const CEND = '|';
@@ -90,101 +91,6 @@ function sy_purgeCell(str) {
     //return str.replace(/;\\\'\"/,'');
 }
 
-/*
-
-function getLatestFile(dir,files,lStart,lExt) {
-    // log them on console
-    // and remember the last match
-    var found=null;
-    var recent=null;
-    try {
-        files.forEach(file => {
-            var lFile=file.toLowerCase();
-            if(lFile.startsWith(lStart) && lFile.endsWith(lExt)) {
-                const { mtimeMs, ctimeMs } = fs.statSync(dir+file);
-                if(!recent || mtimeMs>recent) {
-                    recent=mtimeMs;
-                    found=dir+file;
-                }
-                
-            } //else console.log("getLatestFile("+lStart+","+lExt+") skips "+file);
-        });
-    } catch(err) { console.dir("getLatestFile from dir="+dir+"  files="+files+":"+err); }
-    if(debug) console.log("getLatestFile("+lStart+","+lExt+")     returns  "+found);
-    return found;
-}
-
-
-
-
-async function __setFileNameS(session,client,year,start,ext) {
-
-    // directory path
-    var result=null;
-    var dir = getClientDir(client); // GH20220430
-
-    var lStart =year; // =start.toLowerCase();   // GH20220430
-    var lExt= ext.toLowerCase();
-
-    if(debug) console.log("sheet.setFileNameS SEARCH in "+dir+" for "+lStart+"*"+lExt);
-
-
-
-    result = await new Promise((resolve) => {
-        // GH20211231
-        // list all files in the directory
-        fs.readdir(dir, (err, files) => {
-
-            if (err) { console.dir(err);  }        
-            // files object contains all files names
-            session.sheetFile=dir+"BOOK"+lStart+'.'+lExt;
-            let sFile=getLatestFile(dir,files,lStart,lExt);
-            if(sFile && sFile.length>session.sheetFile.length) {
-                session.sheetFile=sFile;
-                if(debug) console.log("sheet.setFileNameS fs.readDir in "+dir+" FOUND: sets default "+session.sheetFile);
-                
-            } else if(debug) console.log("sheet.setFileNameS fs.readDir in "+dir+" NOT FOUND: sets default "+session.sheetFile);
-        })
-    });
-// unreached code
-}
-
-
-var found='';
-function getJSON() {
-    return found;
-}
-module.exports['getJSON']=getJSON;
-
-
-async function findLatestJSON(client,year) {
-    // directory path
-    var result=null;
-    var dir = getClientDir(client); // GH20220430
-    var lStart =year; 
-    var lExt= ".json";
-
-    if(debug) console.log("sheet.getLatestJSON SEARCH in "+dir+" for "+lStart+"*"+lExt);
-
-    result = await new Promise((resolve) => {
-        // GH20211231
-        // list all files in the directory
-        fs.readdir(dir, (err, files) => {
-            if (err) { console.dir(err);  }        
-            // files object contains all files names
-            //session.sheetFile=dir+"BOOK"+lStart+'.'+lExt;
-            let sFile=getLatestFile(dir,files,lStart,lExt);
-            if(sFile && sFile.length>10) {
-                found=sFile;
-                console.log("getLatestJSON fs.readDir in "+dir+" finds "+found);
-
-            } else if(debug) console.log("getLatestJSON fs.readDir in "+dir+" finds NO LATEST ");
-        })
-    });
-// unreached code
-}
-module.exports['findLatestJSON']=findLatestJSON;
-*/
 
 
 
@@ -299,7 +205,7 @@ module.exports['bookSheet']=bookSheet;
 function getNLine(aoaCells) {
     // redundant, subset of Server.phaseOne, processes N line only
     var result = [];
-    result[D_Schema]= {};
+    result[Compiler.D_Schema]= {};
     
 
     // digest aoaCells and write into balance object
@@ -330,7 +236,7 @@ function getNLine(aoaCells) {
                     var key=row[0];
                     if(key && key==='N') {
                         const aNames=row;
-                        result[D_Schema]["Names"]=aNames;
+                        result[Compiler.D_Schema]["Names"]=aNames;
                         var column;
                         for(column=0;column<aNames.length && !(aNames[column].length>0 && aNames[column].length<4 && aNames[column].includes(CEND));column++) {
                             var rawName=aNames[column];
@@ -338,14 +244,14 @@ function getNLine(aoaCells) {
                                 var aName=rawName.trim();
                                 if(debug>1) console.log("N "+aName);
                                 if(aName==='ASSETS') { iAssets=column;
-                                    result[D_Schema].assets=column;
+                                    result[Compiler.D_Schema].assets=column;
                                 } else if(aName==='EQLIAB') { iEqLiab=column;
-                                    result[D_Schema].eqliab=column;
+                                    result[Compiler.D_Schema].eqliab=column;
                                 } 
                             }                    
                         }
                         iTotal=column;
-                        result[D_Schema].total=column;
+                        result[Compiler.D_Schema].total=column;
                     }
                 });
             } catch (err) {
@@ -380,13 +286,19 @@ function xlsxWrite(sessionId,tBuffer,sessionTime,nextSessionId) {
                 if(client && year) {
                         if(debugWrite) console.log("1400 sheets.xlsxWrite ENTER "+sheetName+ " for ("+client+","+year+") in file "+sheetFile);
 
-                        let jExcel = makeXLTabs(sheetName,client,year,session.sheetCells,session.logT,session.addrT,tBuffer,sessionTime,nextSessionId);
+                        if(debug) console.log("1402 sheets.xlsxWrite jAssets "+sheetName+ " = "+Object.keys(session).join(", "));
+
+                        let balance = session.generated;
+                        if(debug) console.log("1404 sheets.xlsxWrite jAssets "+sheetName+ " = "+Object.keys(balance).join(", "));
+
+                        var jAssets =balance.Anlagen; //balance[Compiler.D_FixAss];
+
+                        if(debug) console.log("1406 sheets.xlsxWrite jAssets "+sheetName+ " = "+JSON.stringify(jAssets));
+
+                        let jExcel = makeXLTabs(sheetName,client,year,session.sheetCells,jAssets,session.addrT,tBuffer,sessionTime,nextSessionId);
                         // and write JSON file synchronously if there is a tBuffer
 
                         let workBook = makeWorkBook(jExcel);
-
-                        //csv = XLSX.stream.to_csv(jExcel.sheetName);
-                        //if(debugWrite)  console.log("1528 sheets.xlsxWriteMAKE CSV "+csv);
 
                         XLSX.writeFile(workBook, sheetFile);
                         
@@ -462,7 +374,7 @@ function makeWorkBook(jExcel) {
 module.exports['makeWorkBook']=makeWorkBook;
 
 // and write JSON file syncvhronously if there is a tBuffer
-function makeXLTabs(sheetName,client,year,sheetCells,logT,addrT,tBuffer,sessionTime,nextSessionId) {
+function makeXLTabs(sheetName,client,year,sheetCells,jAssets,addrT,tBuffer,sessionTime,nextSessionId) {
     // putrs three arrays into an array EXCEL-formatted tabs
     var excelData=[];            
     var numLines = 0;
@@ -475,8 +387,8 @@ function makeXLTabs(sheetName,client,year,sheetCells,logT,addrT,tBuffer,sessionT
         schemaLen = sheetCells[H_LEN].length;
         // GH20220131
         let response = getNLine(sheetCells);
-        let aLen = parseInt(response[D_Schema].assets);
-        let eLen = parseInt(response[D_Schema].eqliab);
+        let aLen = parseInt(response[Compiler.D_Schema].assets);
+        let eLen = parseInt(response[Compiler.D_Schema].eqliab);
         console.dir("1410 sheets.makeXLTabs using aLen "+aLen+" schemaLen "+schemaLen+" for #"+numLines);
 
         var aCentsTotal=0;
@@ -518,17 +430,15 @@ function makeXLTabs(sheetName,client,year,sheetCells,logT,addrT,tBuffer,sessionT
     console.dir("1416 sheets.makeXLTabs "+numLines+" lines with ASSETS "+Money.cents2EU(aCentsTotal)+"  and GALS+EQLIAB="+Money.cents2EU(eCentsTotal));
 
 
-    var excelLogT=[];            
-    var numLogs = 0;
+    var excelAssetT=[];            
     try {
-        if(logT) {
-            for(let id in logT) {
-                let logLine = title.concat(logT[id]);
-                excelLogT.push(arrLine);
-                numLogs++;
-            }                       
-        } else console.dir("1425 sheets.makeXLTabs NO LOGT");
-    } catch(err) {console.dir("1427 sheets.makeXLTabs LOGT "+err);}
+        if(jAssets) {
+            excelAssetT.push ( Object.keys(jAssets[Object.keys(jAssets)[0]])); // title row            
+            let assets = Object.keys(jAssets).map((p) => ( Object.keys(jAssets[p]).map((key,i)=>(jAssets[p][key]))));           
+            assets.forEach(line => excelAssetT.push(line)); 
+        
+        } else console.dir("1425 sheets.makeXLTabs NO ASSETS");
+    } catch(err) {console.dir("1427 sheets.makeXLTabs ASSETS "+err);}
 
 
     var excelAddrT=[];            
@@ -572,7 +482,7 @@ function makeXLTabs(sheetName,client,year,sheetCells,logT,addrT,tBuffer,sessionT
 
     // make a TAB-structure
     let fileName = client+year;
-    let excelTabs = {  'LOGT':excelLogT, 'ADDR':excelAddrT, 'sheetFile':fileName, 'sheetName':fileName };
+    let excelTabs = {  'ASSETS':excelAssetT, 'ADDR':excelAddrT, 'sheetFile':fileName, 'sheetName':fileName };
     excelTabs[fileName] = excelData;
 
     console.log("1470 sheets.makeXLTabs RESULT  "+JSON.stringify(Object.keys(excelTabs)));
