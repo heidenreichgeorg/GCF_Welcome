@@ -73,7 +73,7 @@ export default function Partner() {
     let jLength = Object.keys(jReport).length  + 2 + Object.keys(aTax).length;
 
     let  filler=[];
-    for(let p=jLength;p<SCREENLINES;p++) {
+    for(let p=jLength;p<SCREENLINES+1;p++) {
         filler.push({});
     }
     
@@ -99,11 +99,19 @@ export default function Partner() {
 
                 <FlexRow p={[]}/>    
 
-                { taxHeaders.map((row) => (
+                {/* taxHeaders.map((row) => (
                     <FlexRow p={row}/>    
-                ))}    
+                )) */}    
+
+                { taxDetails.map((row) =>(console.log(JSON.stringify(taxDetails)))) }
+                
+
                 { taxDetails.map((row) => (
-                    <FlexRow p={row}/>    
+                    
+                    <div className='attrLine'>                      
+                        {Object.keys(row).map((fieldName) => <NamedAmount p={{'name':fieldName==='name'?'':fieldName,'amnt':row[fieldName]}}/>
+                        )}                       
+                    </div>
                 ))}    
 
                 { filler.map((row) => (
@@ -163,6 +171,15 @@ function FlexRow(mRow) {
     )
 }
 
+function NamedAmount(mRow) {
+    console.log("NamedRow "+JSON.stringify(mRow));
+    return(
+        <div>
+        <div className="MOAM">{mRow.p.amnt}</div>
+        <div className="SYMB">{mRow.p.name}</div>
+        </div>
+    )
+}
 
 function PartnerRow(mRow) {
 
