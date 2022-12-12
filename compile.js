@@ -219,9 +219,9 @@ function init(app, argv) {
         // two very different functions here
         // with SESSION-ID: returns normal JSON data structure from local server-side session storage
         
-        console.log("\n\n");
-        console.log(Server.timeSymbol());
-        console.log("1910 app.get SHOW sessionId="+ req.query.sessionId);
+        if(debug) console.log("\n\n");
+        if(debug) console.log(Server.timeSymbol());
+        if(debug) console.log("1910 app.get SHOW sessionId="+ req.query.sessionId);
 
         // load session via id
         let session = null;
@@ -238,10 +238,10 @@ function init(app, argv) {
     app.get("/DOWNLOAD", (req, res) => { 
         // DOWNLOAD JSON to client     
 
-        console.log("\n\n");
-        console.log(Server.timeSymbol());
+        if(debug) console.log("\n\n");
+        if(debug) console.log(Server.timeSymbol());
         let sessionId = req.query.sessionId;
-        console.log("1500 app.post DOWNLOAD JSON for with session id=("+sessionId+")");
+        if(debug) console.log("1500 app.post DOWNLOAD JSON for with session id=("+sessionId+")");
 
         let session = Server.getSession(sessionId);
 
@@ -252,19 +252,19 @@ function init(app, argv) {
 
 
             // 20220520 server-side XLSX
-            console.log("1510 app.post DOWNLOAD XLSX for year"+session.year);
+            if(debug) console.log("1510 app.post DOWNLOAD XLSX for year"+session.year);
 
             let sessionTime=Server.timeSymbol();
             let monthYearHour = sessionTime.slice(4,10);
 
             // no state change, because no tBuffer is given
             Sheets.xlsxWrite(sessionId,null,sessionTime,sessionId); 
-            console.log("1530 app.post DOWNLOAD writing XLSX");
+            if(debug) console.log("1530 app.post DOWNLOAD writing XLSX");
 
 
             // download JSON
             let fileName = session.year+session.client+monthYearHour+'.json';
-            console.log("1540 app.post DOWNLOAD download JSON as "+fileName);
+            if(debug) console.log("1540 app.post DOWNLOAD download JSON as "+fileName);
             res.set('Content-Disposition', 'attachment; fileName='+fileName);
             res.json(session);    
 
@@ -280,14 +280,14 @@ function init(app, argv) {
 // downloads EXCEL version of current session context
     app.get('/EXCEL', (req, res) => {
         
-        console.log("\n"+Server.timeSymbol());
-        console.log("1600 GET EXCEL");
+        if(debug) console.log("\n"+Server.timeSymbol());
+        if(debug) console.log("1600 GET EXCEL");
         let session = null;
 
         if(req.query.sessionId) {
             session=Server.getSession(req.query.sessionId);
             if(session) {
-                console.log("1610 GET EXCEL FOR "+session.id.slice(-4));
+                if(debug) console.log("1610 GET EXCEL FOR "+session.id.slice(-4));
         
                 if(session.sheetName) {
                     let client = session.client;
@@ -334,9 +334,9 @@ async function sendFile(sig, response) {
             //    "Content-Type": "application/octet-stream",
             //    "Content-Disposition": "attachment; filename=" + sig.serverFile
             //});
-            console.log("1650 TRANSFER "+sig.serverFile);
+            if(debug) console.log("1650 TRANSFER "+sig.serverFile);
             fs.createReadStream(sig.serverFile).pipe(response);
-            console.log("1660 PIPING "+sig.serverFile);
+            if(debug) console.log("1660 PIPING "+sig.serverFile);
             return;
         }
         response.writeHead(400, { "Content-Type": "text/plain" });
@@ -463,7 +463,7 @@ function compile(sessionData) {
 
 
                         // GH20211015 result[D_Schema]={ "Names": aNames }; crashes                        
-                        console.dir("0114 SCHEMA N assets="+iAssets+ " eqLiab="+iEqLiab+ " Total="+iTotal);
+                        if(debug) console.dir("0114 SCHEMA N assets="+iAssets+ " eqLiab="+iEqLiab+ " Total="+iTotal);
                         
                     }
                     else if(key && key==='C') {
@@ -547,7 +547,7 @@ function compile(sessionData) {
 
                             var column=0;
                             aLine.forEach(strAmount => {
-                                if(debug>1) console.log("init "+strAmount);
+                                if(debug>2) console.log("init "+strAmount);
                                 if(column>=J_ACCT && strAmount && strAmount.length>0) {
                                     var acName = gNames[column];
                                     if(acName && acName.length>1) {
@@ -561,13 +561,13 @@ function compile(sessionData) {
                                             
                                             if(firstLine) {
                                                 result[D_Balance][acName] = Account.openAccount(account,strAmount);
-                                                if(debug>1) console.log("open "+strAmount
+                                                if(debug>2) console.log("open "+strAmount
                                                     +" for "+gNames[column]
                                                     +"  = "+JSON.stringify(result[D_Balance][acName])
                                                 );
                                             } else { 
                                                 result[D_Balance][acName] = Account.addEUMoney(account,strAmount);
-                                                if(debug>1) console.log("add  "+strAmount
+                                                if(debug>2) console.log("add  "+strAmount
                                                 +" to  "+gNames[column]
                                                 +"  = "+JSON.stringify(result[D_Balance][acName]));
                                             }
@@ -792,7 +792,7 @@ module.exports['compile']=compile;
 function isSameFY(year) 
 {
     let numYear=unixYear();
-    console.log("isSameFY"+numYear);
+    if(debug) console.log("isSameFY"+numYear);
     if(parseInt(year)>numYear-1) return true;
     return (parseInt(year)==numYear) 
 }
@@ -1260,7 +1260,7 @@ function makePage(balance) {
             balance[D_Page] = page;
             // side-effect AND return value
 
-            console.log();
+            if(debug) console.log();
             if(debug>1) console.log("compile makePage "+JSON.stringify(Object.keys(page)));
 
         } else console.error("compile makePage:  NO schema");
@@ -1305,7 +1305,7 @@ function labelText(strText) {
 function prepareTXN(sessionId,reqBody) {
 
     //if(debugBook) 
-    console.dir("compile.js prepareTXN("+sessionId+") book "+JSON.stringify(reqBody));
+    if(debug) console.dir("compile.js prepareTXN("+sessionId+") book "+JSON.stringify(reqBody));
 
     var jFlag  = reqBody.flag; if(!jFlag) jFlag=0;
     var jDate  = reqBody.date;
@@ -1319,7 +1319,7 @@ function prepareTXN(sessionId,reqBody) {
 
     let session = Server.getSession(sessionId);
     if(session) {
-        console.dir("compile.js prepareTXN("+sessionId+") book "+JSON.stringify(reqBody));
+        if(debug) console.dir("compile.js prepareTXN("+sessionId+") book "+JSON.stringify(reqBody));
 
         var balance = session.generated;
 
@@ -1410,7 +1410,7 @@ async function send(res,session) {
         let balance = session.generated;
         // SERVER FUNCTION INTERPRET1 GH20220918
 
-        console.dir("0400 send() Balance ="+JSON.stringify(Object.keys(balance)))
+        if(debug) console.dir("0400 send() Balance ="+JSON.stringify(Object.keys(balance)))
         
         res.writeHead(Sheets.HTTP_OK, {"Content-Type": "text/html"}); 
 
