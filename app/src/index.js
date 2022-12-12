@@ -51,13 +51,12 @@ const router = createBrowserRouter([
 ]);
 
 const root = ReactDOM.createRoot(document.getElementById('windowBorder'));
-
 root.render(
     <React.StrictMode>
         <SessionProvider
             onLoading={'Loading session...'}
             location={ router.state.location }
-            
+            server={ window.location.origin.replace('3000','81')} //.split('//')[1]
             >
             <RouterProvider router={router} />
         </SessionProvider>

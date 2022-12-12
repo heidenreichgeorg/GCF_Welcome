@@ -5,8 +5,7 @@ const SessionContext = createContext()
 export function useSession() {
     return useContext(SessionContext)
 }
-
-export function SessionProvider({ children,  location, default_value, onLoading, onError,  }) {
+export function SessionProvider({ children,  location, default_value, onLoading, onError, server }) {
 
     const [session, setSession] = useState(default_value)
 
@@ -14,7 +13,8 @@ export function SessionProvider({ children,  location, default_value, onLoading,
 
     let strSearch = location.search;
     console.log("SessionProvider location="+JSON.stringify(location))
-   // console.log("SessionProvider state="+JSON.stringify(req))
+    console.log("SessionProvider server="+JSON.stringify(server));
+    //console.log("SessionProvider process="+process.env.REACT_APP_API_HOST);
 
     useEffect(() => {
         
@@ -25,20 +25,22 @@ export function SessionProvider({ children,  location, default_value, onLoading,
                 let len=0;
                 let data = JSON.parse(browserItem);
                 setSession(data);               
-                console.log("*   COLD      "+(data && data.sheetCells && (len=data.sheetCells.length)>2)?(data.sheetCells[len-1].join(" ")):".");
+                //console.log("*   COLD      "+(data && data.sheetCells && (len=data.sheetCells.length)>2)?(data.sheetCells[len-1].join(" ")):".");
                 setStatus('success');
             }
             catch(err) {
                 setStatus('error')
             }
-        } else {
+        } else { 
             fetch(`${process.env.REACT_APP_API_HOST}/SESSION${strSearch}`)
+            //fetch(`${server}/SESSION${strSearch}`)
+            // CORS wrong
             .then(data => data.json())
             .then(data => {
                 let len=0;
                 setSession(data);
                 sessionStorage.setItem('session',JSON.stringify(data));
-                console.log("*   WARM       "+(data && data.sheetCells && (len=data.sheetCells.length)>2)?(data.sheetCells[len-1].join(" ")):".");
+                //console.log("*   WARM       "+(data && data.sheetCells && (len=data.sheetCells.length)>2)?(data.sheetCells[len-1].join(" ")):".");
                 setStatus('success');
             })
             .catch(() => {
@@ -47,7 +49,6 @@ export function SessionProvider({ children,  location, default_value, onLoading,
         }
     
     }, [])
-
 
 
 
