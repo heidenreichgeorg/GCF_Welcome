@@ -181,7 +181,7 @@ function bookSheet(sessionId,tBuffer,sessionTime,nextSessionId) {
                     if(debugWrite) console.log("2020 sheets.bookSheet APPEND  "+JSON.stringify(tBuffer)+" to ("+client+","+year+") #"+numLines);
 
                     // GH20221120 write to firestore
-                    fireWrite(session);
+                    //fireWrite(session);
 
                     Server.setSession(session);
 
@@ -266,68 +266,6 @@ function getNLine(aoaCells) {
 
 
 
-// skip tBuffer ??
-function xlsxWrite(sessionId,tBuffer,sessionTime,nextSessionId) {
-
-    let sheetFile = "BOOKING.xlsx"
-    let client="client";
-    let year="YYYY";
-    var session = Server.getSession(sessionId);
-    if(session) {
-       
-
-        // ignore session.sheetFile
-        sheetFile = getClientDir(session.client) + session.year + session.client + ".xlsx"
-        if(sheetFile) {
-            if(session.sheetName) {
-                client = session.client;
-                year = session.year;
-                let sheetName = session.sheetName;
-                if(client && year) {
-                        if(debugWrite) console.log("1400 sheets.xlsxWrite ENTER "+sheetName+ " for ("+client+","+year+") in file "+sheetFile);
-
-                        if(debug) console.log("1402 sheets.xlsxWrite jAssets "+sheetName+ " = "+Object.keys(session).join(", "));
-
-                        let balance = session.generated;
-                        if(debug) console.log("1404 sheets.xlsxWrite jAssets "+sheetName+ " = "+Object.keys(balance).join(", "));
-
-                        var jAssets = balance.Anlagen; // balance[Compiler.D_FixAss];
-                        if(debug) console.log("1406 sheets.xlsxWrite jAssets "+sheetName+ " = "+JSON.stringify(jAssets));
-                        
-                        var jHistory = balance.Historie; // balance[Compiler.D_History];
-                        if(debug) console.log("1408 sheets.xlsxWrite jHistory "+sheetName+ " = "+JSON.stringify(jHistory));
-
-                        var jSchema = balance.Schema;
-                        if(debug) console.log("1410 sheets.xlsxWrite jHistory "+sheetName+ " = "+JSON.stringify(jSchema));
-
-
-                        let jExcel = makeXLTabs(sheetName,client,year,session.sheetCells,jAssets,jHistory,jSchema,session.addrT,tBuffer,sessionTime,nextSessionId);
-                        // and write JSON file synchronously if there is a tBuffer
-
-                        let workBook = makeWorkBook(jExcel);
-
-                        XLSX.writeFile(workBook, sheetFile);
-                        
-                        if(debugWrite)  console.log("1530 sheets.xlsxWrite WRITE FILE "+sheetFile);
-                        
-                    } else {
-                        console.dir("1535 sheets.xlsxWrite() NO client / year "+JSON.stringify(session));
-                    }   
-                } else {
-                    console.dir("1545 sheets.xlsxWrite() NO sheetName and NOT writing "+JSON.stringify(session));
-                }
-            } else {
-                console.dir("1555 sheets.xlsxWrite NO sheetFile and NOT writing "+JSON.stringify(session));
-            }
-        } else {
-            console.dir("1565 sheets.xlsxWrite NO SESSION "+sessionId);
-        }
-
-        // return csv;
-        return {'serverFile':sheetFile, 'localFile': (client+year+".xlsx"),'id':sessionId};
-    }
-module.exports['xlsxWrite']=xlsxWrite;
-
 
 
 
@@ -378,147 +316,6 @@ function makeWorkBook(jExcel) {
     return workBook;
 }
 module.exports['makeWorkBook']=makeWorkBook;
-
-// and write JSON file syncvhronously if there is a tBuffer
-function makeXLTabs(sheetName,client,year,sheetCells,jAssets,jHistory,jSchema,addrT,tBuffer,sessionTime,nextSessionId) {
-    // putrs three arrays into an array EXCEL-formatted tabs
-    var excelData=[];            
-    var numLines = 0;
-    var schemaLen = 0;
-
-    if(sheetCells) {
-        var r=0;
-
-        numLines = sheetCells.length;
-        schemaLen = sheetCells[H_LEN].length;
-        // GH20220131
-        let response = getNLine(sheetCells);
-        let arrSchema = response[Compiler.D_Schema];
-        let aLen = parseInt(response[Compiler.D_Schema].assets);
-        let eLen = parseInt(response[Compiler.D_Schema].eqliab);
-        console.dir("1414 sheets.makeXLTabs using schemaLen "+schemaLen+"("+aLen+","+eLen+") for #"+numLines+" = "+JSON.stringify(arrSchema));
-
-        var aCentsTotal=0;
-        var eCentsTotal=0;
-        for(;r<numLines;r++) {
-            let arrNum = sheetCells[r];
-
-            if(parseInt(arrNum[0])>0) {
-            
-                // 20220627 add all-String ASSET sum to arrTransaction
-                var centsSum=0;
-                for(var col=J_ACCT;col<aLen;col++) {
-                    let cVal = Money.setEUMoney(arrNum[col]).cents;
-                    if(cVal!=0) centsSum = cVal+centsSum;
-                }
-                arrNum[aLen]=Money.cents2EU(centsSum);
-                if(centsSum!=0) {
-                    aCentsTotal=aCentsTotal+centsSum;
-                }
-
-                // 20220628 add all-String GALS,EQLIAB sum to arrTransaction
-                centsSum=0;
-                for(var col=aLen+1;col<schemaLen;col++) {
-                    let cVal = Money.setEUMoney(arrNum[col]).cents;
-                    if(cVal!=0 && col!=eLen) centsSum = cVal+centsSum;
-                }
-                arrNum[eLen]=Money.cents2EU(centsSum);
-                if(centsSum!=0) {
-                    eCentsTotal=eCentsTotal+centsSum;
-                }
-            }
-            
-            var arrTransaction = numericSheet(arrNum,schemaLen);
-            arrTransaction.push(CEND);
-            excelData.push(arrTransaction);
-        }
-
-
-
-        var excelAuxT=[];            
-        try {
-            if(jHistory) {
-                excelAuxT.push ( Object.keys(jHistory[ Object.keys(jHistory)[0]])); // title row            
-                let txns = Object.keys(jHistory).map((p) => ( Object.keys(jHistory[p]).map((key,i)=>(jHistory[p][key])))); 
-                for(let column=aLen+1;column<eLen;column++) {
-                    let aux = txns.filter(function(booking) { /*console.log("FILTER "+JSON.stringify(booking));*/
-                            let auxTXN = booking[column]; return (auxTXN && auxTXN.length>1); })
-                    aux.forEach(line => excelAuxT.push(line));        
-                }
-            } else console.dir("1429 sheets.makeXLTabs NO AUX");
-        } catch(err) {console.dir("1431 sheets.makeXLTabs AUX "+err);}
-    
-    
-    
-
-
-    } else console.error("1415 sheets.makeXLTabs NO sheetCells");
-
-    console.dir("1416 sheets.makeXLTabs "+numLines+" lines with ASSETS "+Money.cents2EU(aCentsTotal)+"  and GALS+EQLIAB="+Money.cents2EU(eCentsTotal));
-
-
-
-    var excelAssetT=[];            
-    try {
-        if(jAssets) {
-            excelAssetT.push ( Object.keys(jAssets[Object.keys(jAssets)[0]])); // title row            
-            let assets = Object.keys(jAssets).map((p) => ( Object.keys(jAssets[p]).map((key,i)=>(jAssets[p][key]))));           
-            assets.forEach(line => excelAssetT.push(line));         
-        } else console.dir("1425 sheets.makeXLTabs NO ASSETS");
-    } catch(err) {console.dir("1427 sheets.makeXLTabs ASSETS "+err);}
-
-
-    var excelAddrT=[];            
-    var numAddrs = 0;
-    try {
-        if(addrT) {
-            for(let id in addrT) {
-                let title = [ id ];
-                let arrLine = title.concat(addrT[id]);
-                excelAddrT.push(arrLine);
-                numAddrs++;
-            }                       
-        } else console.dir("1435 sheets.makeXLTabs NO ADDRT");
-    } catch(err) {console.dir("1437 sheets.makeXLTabs ADDRT "+err);}
-
-
-
-    if(tBuffer) {
-        // add hash
-        if(tBuffer[0]>0) tBuffer[0]=symbolic(tBuffer.join('')); 
-
-        var arrTransaction = numericSheet(tBuffer,schemaLen);
-        numLines = session.sheetCells.push(tBuffer); 
-        arrTransaction.push(CEND);
-        excelData.push(arrTransaction); 
-
-        session.time=sessionTime;
-        session.id=nextSessionId;
-
-        // add new txn to JSON and WRITE JSON file synchronously !!!
-        let len=sheetName.length;
-        if(len>6) {
-
-            if(debugWrite) console.log("1450 sheets.makeXLTabs JSON save2Server("+arrTransaction+") to "+client+","+year);
-            save2Server(session,client,year);
-            
-        } else console.dir("1455 sheets.makeXLTabs can't write to "+sheetName);
-
-        if(debugWrite) console.log("1460 sheets.makeXLTabs APPEND  "+JSON.stringify(tBuffer)+" to ("+client+","+year+") #"+numLines);
-    }
-    else if(debugWrite) console.log("1465 sheets.makeXLTabs SAVE NO TRANSACTION ("+client+","+year+") #"+numLines);
-
-    // make a TAB-structure
-    let fileName = client+year;
-    let excelTabs = { 'AUX':excelAuxT,  'ASSETS':excelAssetT,  'ADDR':excelAddrT,  'sheetFile':fileName,  'sheetName':fileName  };
-    excelTabs[fileName] = excelData;
-
-    console.log("1470 sheets.makeXLTabs RESULT  "+JSON.stringify(Object.keys(excelTabs)));
-    return excelTabs;
-}
-module.exports['makeXLTabs']=makeXLTabs;
-
-
 
 
 
@@ -585,26 +382,6 @@ function saveSessionLog(sessionId,txn) {
 }
 module.exports['saveSessionLog']=saveSessionLog;
 
-/*
-
-// returns YEARmain.json file FOUND
-// also sets found variable as a side-effect
-function checkExist(dir,year) {
-    console.log("sheets.checkExist fs.readDir in "+dir+" for file '"+year+"main.json'");
-    var found=null;
-    fs.readdir(dir, (err, files) => {
-        if (err) { console.dir(err);  }        
-        // files object contains all files names
-    
-        found=getLatestFile(dir,files,year+"main",".json");
-        if(found && found.length>8) {
-            console.log("sheets.checkExist fs.readDir in "+dir+" FINDS EXISTING '"+found+"'");
-        } else if(debug) console.log("sheets.checkExist fs.readDir in "+dir+" CLEARED "+year+"main.json");
-    })
-
-    return found;
-}
-*/
 
 function getClientDir(client) {
     return getRoot()+client+Slash; 
@@ -617,32 +394,10 @@ function jsonMain(client,year,sid) {
     return getClientDir(client)+Slash+year+Slash+year+"main.json";
 }
 
-/*
-function jsonFile(client,year,sid) {
-    return getClientDir(client)+year+fileFromSession(sid)+".json";
-    // return root+client+Slash+year+Slash+fileFromSession(sid)+".json"; 
-}
-*/
 
 function jsonLogf(client) {
     return getClientDir(client)+"logf.json";
 }
-
-
-
-// WRITES TO a Firebase Cloud Datastore
-function fireWrite(session) {
-/*
-
-
-    if(session) console.log("FIREWRITE");
-    else console.dir("FIRE OFF");
-
-    // GH20221120 write to firestore
-    FB.fireWrite(session);
-*/    
-}
-module.exports['fireWrite']=fireWrite;
 
 
 
@@ -658,5 +413,238 @@ function symbolic(pat) {
     return res & 0x3FFFFFF;
 }
 module.exports['symbolic']=symbolic;
+
+
+function xlsxWrite(sessionId,tBuffer,sessionTime,nextSessionId) {
+
+    let sheetFile = "BOOKING.xlsx"
+    let client="client";
+    let year="YYYY";
+    var session = Server.getSession(sessionId);
+    if(session) {
+       
+
+        // ignore session.sheetFile
+        sheetFile = getClientDir(session.client) + session.year + session.client + ".xlsx"
+        if(sheetFile) {
+            if(session.sheetName) {
+                client = session.client;
+                year = session.year;
+                let sheetName = session.sheetName;
+                if(client && year) {
+                        if(debugWrite) console.log("1400 sheets.xlsxWrite ENTER "+sheetName+ " for ("+client+","+year+") in file "+sheetFile);
+
+                        if(debug) console.log("1402 sheets.xlsxWrite jAssets "+sheetName+ " = "+Object.keys(session).join(", "));
+
+                        let balance = session.generated;
+                        if(debug) console.log("1404 sheets.xlsxWrite jAssets "+sheetName+ " = "+Object.keys(balance).join(", "));
+
+                        var jAssets = balance.Anlagen; // balance[Compiler.D_FixAss];
+                        if(debug) console.log("1406 sheets.xlsxWrite jAssets "+sheetName+ " = "+JSON.stringify(jAssets));
+                        
+                        var strHistory = JSON.stringify(balance.Historie); // balance[Compiler.D_History];
+                        if(debug) console.log("1408 sheets.xlsxWrite jHistory "+sheetName+ " = "+strHistory);
+
+                        var jSchema = balance.Schema;
+                        if(debug) console.log("1410 sheets.xlsxWrite jHistory "+sheetName+ " = "+JSON.stringify(jSchema));
+
+
+                        let jExcel = makeXLTabs(
+                            sheetName,
+                            client,year,session.sheetCells,
+                            jAssets,
+                            JSON.parse(strHistory), // all bookings of a year
+                            jSchema,        // account schema
+                            session.addrT, // address list
+                            tBuffer,    // booking line
+                            sessionTime,
+                            nextSessionId);
+                        // and write JSON file synchronously if there is a tBuffer
+
+                        let workBook = makeWorkBook(jExcel);
+
+                        XLSX.writeFile(workBook, sheetFile);
+                        
+                        if(debugWrite)  console.log("1530 sheets.xlsxWrite WRITE FILE "+sheetFile);
+                        
+                    } else {
+                        console.dir("1535 sheets.xlsxWrite() NO client / year "+JSON.stringify(session));
+                    }   
+                } else {
+                    console.dir("1545 sheets.xlsxWrite() NO sheetName and NOT writing "+JSON.stringify(session));
+                }
+            } else {
+                console.dir("1555 sheets.xlsxWrite NO sheetFile and NOT writing "+JSON.stringify(session));
+            }
+        } else {
+            console.dir("1565 sheets.xlsxWrite NO SESSION "+sessionId);
+        }
+
+        // return csv;
+        return {'serverFile':sheetFile, 'localFile': (client+year+".xlsx"),'id':sessionId};
+    }
+module.exports['xlsxWrite']=xlsxWrite;
+
+
+// and write JSON file synchronously if there is a tBuffer
+function makeXLTabs(sheetName,client,year,sheetCells,jAssets,jHistory,jSchema,addrT,tBuffer,sessionTime,nextSessionId) {
+    // puts an array for ADDR, (ALL), and each (GAIN/LOSS) account into an array EXCEL-formatted tabs
+    var excelData=[];            
+    var numLines = 0;
+    var schemaLen = 0;
+
+    var excelAssetT=[];            
+    var excelAddrT=[];            
+    // make a TAB-structure
+    let fileName = client+year;
+    let excelTabs = { 'ASSETS':excelAssetT,  'ADDR':excelAddrT,  'sheetFile':fileName,  'sheetName':fileName  };
+    if(sheetCells) {
+        var r=0;
+
+        numLines = sheetCells.length;
+        schemaLen = sheetCells[H_LEN].length;
+        // GH20220131
+        let response = getNLine(sheetCells);
+        let arrSchema = response[Compiler.D_Schema];
+        let aLen = parseInt(response[Compiler.D_Schema].assets);
+        let eLen = parseInt(response[Compiler.D_Schema].eqliab);
+        console.dir("1414 sheets.makeXLTabs using schemaLen "+schemaLen+"("+aLen+","+eLen+") for #"+numLines+" = "+JSON.stringify(arrSchema));
+
+        var aCentsTotal=0;
+        var eCentsTotal=0;
+        for(;r<numLines;r++) {
+            let arrNum = sheetCells[r];
+
+            if(parseInt(arrNum[0])>0) {
+            
+                // 20220627 add all-String ASSET sum to arrTransaction
+                var centsSum=0;
+                for(var col=J_ACCT;col<aLen;col++) {
+                    let cVal = Money.setEUMoney(arrNum[col]).cents;
+                    if(cVal!=0) centsSum = cVal+centsSum;
+                }
+                arrNum[aLen]=Money.cents2EU(centsSum);
+                if(centsSum!=0) {
+                    aCentsTotal=aCentsTotal+centsSum;
+                }
+
+                // 20220628 add all-String GALS,EQLIAB sum to arrTransaction
+                centsSum=0;
+                for(var col=aLen+1;col<schemaLen;col++) {
+                    let cVal = Money.setEUMoney(arrNum[col]).cents;
+                    if(cVal!=0 && col!=eLen) centsSum = cVal+centsSum;
+                }
+                arrNum[eLen]=Money.cents2EU(centsSum);
+                if(centsSum!=0) {
+                    eCentsTotal=eCentsTotal+centsSum;
+                }
+            }
+            
+            var arrTransaction = numericSheet(arrNum,schemaLen);
+            arrTransaction.push(CEND);
+            excelData.push(arrTransaction);
+        }
+
+
+        
+        try {
+            if(jHistory) {
+                let aNames = jSchema.Names;
+                console.dir("1428 sheets.makeXLTabs ACCOUNT NAMES("+aLen+"-"+eLen+") "+aNames.join(",  "));
+
+                let txns = Object.keys(jHistory).map((p) => ( Object.keys(jHistory[p]).map((key,i)=>(jHistory[p][key])))); 
+                for(let column=aLen+1;column<eLen;column++) {
+                
+                    let name = aNames[column];
+                    var excelAuxT=[];            
+                    let cSaldo=0;
+                    //excelAuxT.push ( Object.keys(jHistory[ Object.keys(jHistory)[0]])); // title row            
+
+                    // select relevant bookings for that current account
+                    let aux = txns.filter(function(booking) {
+                            let auxTXN = booking[column]; 
+                            return (auxTXN && auxTXN.length>1); })
+
+                    // transform all bookings into eight columns
+                    aux.forEach(line => {
+                        let txn =line.filter(function(field,i) { return (i<J_ACCT || i==column); }); 
+                        excelAuxT.push(txn);
+                        cSaldo+=Money.setEUMoney(txn[J_ACCT]).cents;
+                        txn[J_ACCT+1]=Money.cents2EU(cSaldo);
+                    });      
+                    
+                    // append one more sheet for the current account
+                    excelTabs[name]=excelAuxT;
+                }
+            } else console.dir("1429 sheets.makeXLTabs NO AUX");
+        } catch(err) {console.dir("1431 sheets.makeXLTabs AUX "+err);}
+    
+    
+    
+
+
+    } else console.error("1415 sheets.makeXLTabs NO sheetCells");
+
+    console.dir("1416 sheets.makeXLTabs "+numLines+" lines with ASSETS "+Money.cents2EU(aCentsTotal)+"  and GALS+EQLIAB="+Money.cents2EU(eCentsTotal));
+
+
+
+    try {
+        if(jAssets) {
+            excelAssetT.push ( Object.keys(jAssets[Object.keys(jAssets)[0]])); // title row            
+            let assets = Object.keys(jAssets).map((p) => ( Object.keys(jAssets[p]).map((key,i)=>(jAssets[p][key]))));           
+            assets.forEach(line => excelAssetT.push(line));         
+        } else console.dir("1425 sheets.makeXLTabs NO ASSETS");
+    } catch(err) {console.dir("1427 sheets.makeXLTabs ASSETS "+err);}
+
+
+    var numAddrs = 0;
+    try {
+        if(addrT) {
+            for(let id in addrT) {
+                let title = [ id ];
+                let arrLine = title.concat(addrT[id]);
+                excelAddrT.push(arrLine);
+                numAddrs++;
+            }                       
+        } else console.dir("1435 sheets.makeXLTabs NO ADDRT");
+    } catch(err) {console.dir("1437 sheets.makeXLTabs ADDRT "+err);}
+
+
+
+    if(tBuffer) {
+        // add hash
+        if(tBuffer[0]>0) tBuffer[0]=symbolic(tBuffer.join('')); 
+
+        var arrTransaction = numericSheet(tBuffer,schemaLen);
+        numLines = session.sheetCells.push(tBuffer); 
+        arrTransaction.push(CEND);
+        excelData.push(arrTransaction); 
+
+        session.time=sessionTime;
+        session.id=nextSessionId;
+
+        // add new txn to JSON and WRITE JSON file synchronously !!!
+        let len=sheetName.length;
+        if(len>6) {
+
+            if(debugWrite) console.log("1450 sheets.makeXLTabs JSON save2Server("+arrTransaction+") to "+client+","+year);
+            save2Server(session,client,year);
+            
+        } else console.dir("1455 sheets.makeXLTabs can't write to "+sheetName);
+
+        if(debugWrite) console.log("1460 sheets.makeXLTabs APPEND  "+JSON.stringify(tBuffer)+" to ("+client+","+year+") #"+numLines);
+    }
+    else if(debugWrite) console.log("1465 sheets.makeXLTabs SAVE NO TRANSACTION ("+client+","+year+") #"+numLines);
+
+    
+    excelTabs[fileName] = excelData;
+
+    console.log("1470 sheets.makeXLTabs RESULT  "+JSON.stringify(Object.keys(excelTabs)));
+    return excelTabs;
+}
+module.exports['makeXLTabs']=makeXLTabs;
+
+
 
 

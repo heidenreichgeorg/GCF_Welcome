@@ -780,7 +780,7 @@ function compile(sessionData) {
     if(debug) console.log("0220 COMPILED = "+JSON.stringify(Object.keys(balance)));
 
     // GH20221120 write to firestore
-    Sheets.fireWrite(sessionData);
+    //Sheets.fireWrite(sessionData);
 
 
     return balance;
