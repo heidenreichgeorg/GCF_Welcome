@@ -258,7 +258,7 @@ function init(app, argv) {
             let monthYearHour = sessionTime.slice(4,10);
 
             // no state change, because no tBuffer is given
-            Sheets.xlsxWrite(sessionId,null,sessionTime,sessionId); 
+            Sheets.xlsxWrite(sessionId,sessionTime,sessionId); 
             if(debug) console.log("1530 app.post DOWNLOAD writing XLSX");
 
 
@@ -302,7 +302,7 @@ function init(app, argv) {
                         if(debugReport) console.log("1630 GET /EXCEL "+sheetName+ " for ("+client+","+year+")");
 
                         // may use same time and id because no tBuffer is given
-                        let fileSig = Sheets.xlsxWrite(session.id,null,sessionTime,nextSessionId);
+                        let fileSig = Sheets.xlsxWrite(session.id,sessionTime,nextSessionId);
 
                         if(debugReport) console.log("1640 GET /EXCEL JSON "+JSON.stringify(fileSig));
 
