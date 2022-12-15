@@ -258,7 +258,7 @@ function init(app, argv) {
             let monthYearHour = sessionTime.slice(4,10);
 
             // no state change, because no tBuffer is given
-            Sheets.xlsxWrite(sessionId,sessionTime,sessionId); 
+            Sheets.xlsxWrite(sessionId); 
             if(debug) console.log("1530 app.post DOWNLOAD writing XLSX");
 
 
