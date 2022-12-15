@@ -369,6 +369,10 @@ const D_Partner_OTC= "OTCPartner";
                         var jBalance = balance.Bilanz;
                         if(debug) console.log("1414 sheets.xlsxWrite jBalance "+sheetName+ " = "+JSON.stringify(jBalance));
 
+                        var jXBRL = balance.XBRL;
+                        if(debug) console.log("1416 sheets.xlsxWrite jXBRL "+sheetName+ " = "+JSON.stringify(jXBRL));
+
+
                         let jExcel = makeXLTabs(                            
                             client,year,session.sheetCells,
                             jAssets,
@@ -376,6 +380,7 @@ const D_Partner_OTC= "OTCPartner";
                             jSchema,        // account schema
                             jPartner, // NET results
                             jBalance,  // account values
+                            jXBRL,
                             session.addrT);
                         
 
@@ -405,7 +410,7 @@ module.exports['xlsxWrite']=xlsxWrite;
 
 
 // and write JSON file synchronously if there is a tBuffer
-function makeXLTabs(client,year,sheetCells,jAssets,jHistory,jSchema,jPartner,jBalance,addrT) {
+function makeXLTabs(client,year,sheetCells,jAssets,jHistory,jSchema,jPartner,jBalance,jXBRL,addrT) {
 
 
 
@@ -427,9 +432,12 @@ function makeXLTabs(client,year,sheetCells,jAssets,jHistory,jSchema,jPartner,jBa
         
             let response = getNLine(sheetCells);
             let arrSchema = response[Compiler.D_Schema];
-            let aLen = parseInt(response[Compiler.D_Schema].assets);
-            let eLen = parseInt(response[Compiler.D_Schema].eqliab);
-            console.dir("1420 sheets.makeXLTabs using schemaLen "+schemaLen+"("+aLen+","+eLen+") = "+JSON.stringify(arrSchema));
+            let arrXBRL = jXBRL;
+            let aLen = parseInt(arrSchema.assets);
+            let eLen = parseInt(arrSchema.eqliab);
+            console.dir("1420 sheets.makeXLTabs using schemaLen "+schemaLen+"("+aLen+","+eLen+")");
+            console.dir("     Schema = "+JSON.stringify(arrSchema));
+            console.dir("     XBRL = "+JSON.stringify(arrXBRL));
 
             if(jHistory) {
                 let aNames = jSchema.Names;
@@ -445,27 +453,27 @@ function makeXLTabs(client,year,sheetCells,jAssets,jHistory,jSchema,jPartner,jBa
                     let tab = accountSheet(column,txns,caSaldo);
                     excelTabs["AS_"+aNames[column]]=tab.page;
                     caSaldo=tab.saldo;
-                    excelCloseT.push([aNames[column],tab.close])
+                    excelCloseT.push([arrXBRL[column],aNames[column],tab.close])
                 }
-                excelCloseT.push(['Assets',Money.cents2EU(caSaldo)])
+                excelCloseT.push([ 'de-gaap-ci_bs.ass','Assets',Money.cents2EU(caSaldo)])
 
                 // append one more sheet for GALS account
                 for(let column=aLen+1;column<eLen;column++) {
                     let tab = accountSheet(column,txns,ceSaldo);
                     excelTabs["GL_"+aNames[column]]=tab.page;
                     ceSaldo=tab.saldo;
-                    excelCloseT.push([aNames[column],tab.close])
+                    excelCloseT.push([arrXBRL[column],aNames[column],tab.close])
                 }
-                excelCloseT.push(['Gain/Loss',Money.cents2EU(ceSaldo)])
+                excelCloseT.push(['de-gaap-ci_bs.eqLiab.income','Gain/Loss',Money.cents2EU(ceSaldo)])
 
                 // append one more sheet for EQ/LIAB account
                 for(let column=eLen+1;column<aNames.length;column++) {
                     let tab = accountSheet(column,txns,ceSaldo);
                     excelTabs["EL_"+aNames[column]]=tab.page;
                     ceSaldo=tab.saldo;
-                    excelCloseT.push([aNames[column],tab.close])
+                    excelCloseT.push([arrXBRL[column],aNames[column],tab.close])
                 }
-                excelCloseT.push(['Equity/Liab',Money.cents2EU(ceSaldo)])
+                excelCloseT.push(['de-gaap-ci_bs.eqLiab','Equity/Liab',Money.cents2EU(ceSaldo)])
 
 
             } else console.dir("1425 sheets.makeXLTabs NO AUX");
@@ -501,16 +509,24 @@ function makeXLTabs(client,year,sheetCells,jAssets,jHistory,jSchema,jPartner,jBa
     let hKeys=Object.keys(taxDetails[0]);
     taxHeaders.push(  hKeys );
     
-    partner.push( {'name':'name', 
-                        'init':'init', 
-                        'credit':'credit',
-                        'debit':'debit',
-                        'yearEnd':'yearEnd',
-                        'netIncomeOTC':'netIncomeOTC',
-                        'netIncomeFin':'netIncomeFin',
-                        'close':'close',
-                        'tax':'tax',
-                        'next':'next'} );
+    partner.push( { 'count':'count', 
+                    'name':'name', 
+                    'share':'share',
+                    'denom':'denom',
+                    'cap2':'cap2',
+                    'equity':'equity',
+                    'partner':'partner',
+                    'tax':'tax',
+                    'loss':'loss',
+                    'gain':'gain',
+                    'netOTC':'netOTC',
+                    'netFIN':'netFIN',
+                    'init':'init', 
+                    'credit':'credit',
+                    'debit':'debit',
+                    'yearEnd':'yearEnd',
+                    'close':'close',
+                    'next':'next'} );
 
     Object.keys(jReport).map((id) => (partner.push( jReport[id] )))
 
@@ -550,9 +566,9 @@ function makeXLTabs(client,year,sheetCells,jAssets,jHistory,jSchema,jPartner,jBa
 module.exports['makeXLTabs']=makeXLTabs;
 
 
+
 function accountSheet(column,txns,saldo) {
-    
-    
+      
     var excelaccTab=[];            
     let cSaldo=0;
 
