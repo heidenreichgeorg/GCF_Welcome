@@ -483,13 +483,19 @@ function compile(sessionData) {
                         if(assetInfo.length>J_ACCT) {
                             var date = assetInfo[1];
                             var type = assetInfo[2];
-                            var init = bigENMoney(assetInfo[3]); // parse huge EN format string
+                            var init = bigENMoney(assetInfo[3]); // AnschaffungsK parse huge EN format string
                             var nmbr = assetInfo[4];
                             var idnt = assetInfo[5];
                             if(idnt && idnt.length>COLMIN && nmbr && nmbr.length>0) {
                                 var irest =bigAsset(assetInfo,iAssets);
                                 var icost =bigCost(idnt,nmbr,init);
-                                result[D_FixAss][idnt]={ "date":date, "type":type, "init":""+init,  "nmbr":nmbr, "idnt":idnt, "rest":""+irest, "cost":""+icost };
+                                result[D_FixAss][idnt]={ "date":date, 
+                                                         "type":type,
+                                                         "init":""+init,
+                                                         "nmbr":nmbr,
+                                                         "idnt":idnt,
+                                                         "rest":""+irest,
+                                                         "cost":""+icost };
                                 if(debug>1) console.log("0280 BOOK  "+idnt+" = "+result[D_FixAss][idnt].init+ "for #"+nmbr+" at "+icost);                                
                             }
                         }
@@ -595,7 +601,7 @@ function compile(sessionData) {
                                                             "idnt":idnt,
                                                             "rest":""+init,
                                                             "cost":""+icost};
-                                    if(debug>1) console.log("0372 INVEST "+idnt+" = "+result[D_FixAss][idnt].rest+ "for #"+nmbr+" at "+icost);
+                                    if(debug>1) console.log("0372 INVEST "+idnt+" = "+result[D_FixAss][idnt].rest+ " for #"+nmbr+" at "+icost);
                                 }
 
                                 if(aLine[3] && aLine[3].trim()==='SELL') {
@@ -611,8 +617,8 @@ function compile(sessionData) {
                                     // sales reduce number of assets and amount of asset value
                                     var iNum = parseInt(result[D_FixAss][idnt].nmbr);
                                     var nmbr = iNum-iSel;
-                                    var rest = result[D_FixAss][idnt].rest;
-                                    var iremn = rest+bigEUMoney(amnt);
+                                    var irest = BigInt(result[D_FixAss][idnt].rest);
+                                    var iremn = irest+iamnt;
 
                                     var icost =bigCost(idnt,nmbr,init);
                                     // OPEN
@@ -624,7 +630,7 @@ function compile(sessionData) {
                                                             "idnt":idnt,
                                                             "rest":""+iremn,
                                                             "cost":""+icost };
-                                    if(debug>1) console.log("0374 SELL "+idnt+" = "+result[D_FixAss][idnt].rest);
+                                    if(debug>1) console.log("0374 SELL "+idnt+" = "+irest+"+"+iamnt+" =  "+result[D_FixAss][idnt].rest);
                                 }
 
                                 if(aLine[3] && aLine[3].trim()==='YIELD') {
@@ -632,7 +638,7 @@ function compile(sessionData) {
                                     var idnt = aLine[5].trim();
                                     var iamnt = bigAsset(aLine,iAssets);
 
-                                    //console.log("YIELD "+amnt+" for "+idnt+" in "+aLine.join(';'));
+                                    if(debug>0) console.log("YIELD "+iamnt+" for "+idnt+" in "+aLine.join(';'));
 
                                     if(result[D_FixAss]) {
                                         if(result[D_FixAss][idnt]) {
@@ -644,15 +650,21 @@ function compile(sessionData) {
 
                                             // yield type of devidend payment reduces the INIT value
                                             // GH20220108  amount reduces the CURRent value
-                                            var rest = icurr+iamnt;
+                                            var irest = icurr+iamnt;
 
                                             // GH20220108 NEW cost is calculated as the INIT price per number of units
-                                            var cost = bigCost(idnt,nmbr,rest);
+                                            var icost = bigCost(idnt,nmbr,irest);
 
                                             // OPEN
                                             // MUST VERIFY existing identifier
-                                            result[D_FixAss][idnt]={ "date":date, "type":type, "init":iVal,  "nmbr":nmbr, "idnt":idnt, "rest":rest, "cost":cost  };
-                                            if(debug>1) console.log("0376 YIELD amount="+amnt+" changes "+idnt+" from "+cuur+" to "+result[D_FixAss][idnt].rest);
+                                            result[D_FixAss][idnt]={ "date":date,
+                                                                     "type":type,
+                                                                     "init":iVal,
+                                                                     "nmbr":nmbr,
+                                                                     "idnt":idnt,
+                                                                     "rest":""+irest,
+                                                                     "cost":""+icost  };
+                                            if(debug>1) console.log("0376 YIELD amount="+iamnt+" changes "+idnt+" from "+icurr+" to "+result[D_FixAss][idnt].rest);
 
                                             } else  console.log("0371 YIELD UNKNOWN "+idnt+" ASSET");
                                     } else {
@@ -1317,16 +1329,16 @@ function makePage(balance) {
 
 function bigAsset(row,iAssets) {
     var column=J_ACCT;
-    var value = row[column];
+    var iValue = 0n;
     var run=true;
     try {
-        while(run && value.length<COLMIN && column<iAssets) {
+        while(run && iValue<1n && column<iAssets) {
             var test = row[column];
-            if(test && test.length > 0 && bigEUMoney(test)!=0n) {value=""+bigEUMoney(test); run=false;}
+            if(test && test.length > 0 && bigEUMoney(test)!=0n) {iValue=bigEUMoney(test); run=false;}
             column++;
         } // shares before cash / account
-    } catch(err) { console.dir("asset value("+row+")="+value+"   ERROR "+err); }
-    return value;
+    } catch(err) { console.dir("asset value("+row+")="+iValue+"   ERROR "+err); }
+    return iValue;
 }
 
 
@@ -1512,14 +1524,14 @@ function bigEUMoney(strSet) {
 
 
 function bigCost(idnt,nmbr,init) {
-    var units = parseInt(nmbr);
-    var iCost = bigEUMoney(init);
+    var units = BigInt(nmbr);
+    var iCost = BigInt(init);
     try {
         if(units>0) {
             iCost = BigInt(iCost / units);
         }
     } catch(err) { console.dir("0480 bigCost "+idnt+"COST("+init+"):"+iCost+" each of "+units); }
-    return ""+iCost;
+    return iCost;
 
 }
 

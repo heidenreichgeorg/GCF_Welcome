@@ -23,12 +23,12 @@ function toMoney(strAdd,factor,money) {
 export function addEUMoney(strAdd,money) {
         return toMoney(strAdd,1,money); }
 
-export function setEUMoney(strSet) {
+export function bigEUMoney(strSet) {
     return toMoney(strSet,1,null); }
 
 export function cents2EU(cents) {
     var sign=""; if(cents<0) { sign="-"; cents=-cents; }
-
+    if(isNaN(cents)) return cents;
     var kiloNum = parseInt(cents/100000);
     var megaNum = parseInt(kiloNum/1000);
     var megaStr = megaNum>0 ? megaNum.toString()+"." : "";

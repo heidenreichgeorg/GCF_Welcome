@@ -6,6 +6,7 @@ import { useEffect, useState, useRef  } from 'react';
 import Screen from '../pages/Screen'
 import FooterRow from '../components/FooterRow'
 import { useSession } from '../modules/sessionmanager';
+import { cents2EU } from '../modules/money';
 import { D_FixAss, D_Partner_NET, D_Page, SCREENLINES }  from '../terms.js';
 
 export default function FixedAssets() {
@@ -63,8 +64,6 @@ export default function FixedAssets() {
                                         <FixedAssetsRow p={row}/>    
                 ))}    
                 
-
-
                 <FooterRow left={page["client"]}  right={page["register"]} prevFunc={prevFunc} nextFunc={nextFunc}/>
                 <FooterRow left={page["reference"]} right={page["author"]} prevFunc={prevFunc} nextFunc={nextFunc}/>
             </div>            
@@ -78,16 +77,16 @@ export default function FixedAssets() {
 
     function FixedAssetsRow(mRow) {
         console.log("FixedAssetsRow mRow="+JSON.stringify(mRow));
-        //let unitPrice = (mRow.p.nmbr && mRow.p.nmbr>0)?cents2EU(setEUMoney(mRow.p.cost).cents/parseInt(mRow.p.nmbr)):"--";
+        //let unitPrice = (mRow.p.nmbr && mRow.p.nmbr>0)?cents2EU(bigEUMoney(mRow.p.cost).cents/parseInt(mRow.p.nmbr)):"--";
         return (
             <div className="attrLine">
                 <div className="LNAM">{mRow.p.idnt}</div>
                 <div className="SNAM">{mRow.p.type}</div>
                 <div className="SNAM">{mRow.p.date}</div>
-                <div className="MOAM">{mRow.p.init}</div>
+                <div className="MOAM">{cents2EU(mRow.p.init)}</div>
                 <div className="MOAM">{mRow.p.nmbr}</div>
-                <div className="MOAM">{mRow.p.rest}</div>
-                <div className="MOAM">{mRow.p.cost}</div>
+                <div className="MOAM">{cents2EU(mRow.p.rest)}</div>
+                <div className="MOAM">{cents2EU(mRow.p.cost)}</div>
             </div>        
         )
     }
