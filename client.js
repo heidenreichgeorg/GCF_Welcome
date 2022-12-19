@@ -54,7 +54,7 @@ function getFromServer(responseHandler) {
   
 
     request.open('GET',url, true);				
-    console.dir("client.getFromServer GET url="+url);
+    console.log("client.getFromServer GET url="+url);
 
     request.onreadystatechange = function() {
         if(debug) console.log("getFromServer response state changed");
@@ -491,7 +491,7 @@ function newPopup(url,command,width,lines) {
     let leftPos=(tile%2)==0 ? 30 :890;
     let verticalPos=(tile>1?470:-10);
     
-    if(debug) console.dir("NEW POPUP "+command+ "  Width="+width + " Tile="+tile + "  X="+leftPos+"  Y="+verticalPos);
+    if(debug) console.log("NEW POPUP "+command+ "  Width="+width + " Tile="+tile + "  X="+leftPos+"  Y="+verticalPos);
 
     let panel = window.open(url, 'window'+command,'height='+(240*pLines)+',width='+pWidth+', top='+verticalPos+', left='+leftPos+',resizable=no ,scrollbars=no ,toolbar=no ,menubar=no ,location=no ,directories=no ,status=no ');
 
@@ -727,7 +727,7 @@ function setTrailer(page,cursor) {
         for(var j=0;j<arrClock.length;j++) {
             let data = arrClock[j];
             
-            console.dir(JSON.stringify(data));
+            console.log(JSON.stringify(data));
             
             let factor =data.factor;
             let range =data.range;
@@ -893,7 +893,7 @@ function showTerminal(terminal,htmlPage) {
 
 function prettyTXN(jHistory,hash,lPattern,aPattern,names,aLen,eLen) {
 
-    var iBalance=0;
+    var iBalance=0n;
 
     var entry = [];
     var credit = ['&nbsp;'];
@@ -941,10 +941,10 @@ function prettyTXN(jHistory,hash,lPattern,aPattern,names,aLen,eLen) {
                         delta.push(names[i]+DOUBLE+parts[i]); 
 
                         // GH20220307
-                        let value = setEUMoney(parts[i]);
-                        if(i<aLen) iBalance += value.cents;
-                        else if(i!=aLen && i!=eLen) iBalance -= value.cents;
-                        console.dir("ADD "+parts[i]+ " --> "+value.cents+"  --> "+iBalance);
+                        let iValue = bigEUMoney(parts[i]);
+                        if(i<aLen) iBalance += iValue;
+                        else if(i!=aLen && i!=eLen) iBalance -= iValue;
+                        console.log("ADD "+parts[i]+ " --> "+iValue+"  --> "+iBalance);
                     }
 
                     // POS ASSET
@@ -970,7 +970,7 @@ function prettyTXN(jHistory,hash,lPattern,aPattern,names,aLen,eLen) {
     result.delta=delta;
     result.credit=credit;
     result.debit=debit;
-    result.iBalance=iBalance;
+    result.iBalance=""+iBalance;
 
     return result;
 }

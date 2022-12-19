@@ -1,30 +1,29 @@
+// manages an account with BigInt for cents
 const debug=null;
 
-const Money = require('./money.js');
-
-function makeAccount(n,x,d,c) { return { "name":n, "index":c, "xbrl":x, "desc":(d?d:n), "init":"0,00", "min":"0,00",  "credit":"0,00", "debit":"0,00", "next":"0,00" }; }
+function makeAccount(n,x,d,c) { return { "name":n, "index":c, "xbrl":x, "desc":(d?d:n), "init":"0", "min":"00", "credit":"000", "debit":"0000", "next":"000000" }; }
 module.exports['makeAccount']=makeAccount;
 
 
 function openAccount(a,openVal) { 
     if(debug) console.log("OPEN "+a+":"+openVal);
-
-    return { "name":a.name, "index":a.index, "desc":a.desc, "xbrl":a.xbrl, "init":openVal, "min":openVal, "credit":"0,00", "debit":"0,00" }; }
+    return { "name":a.name, "index":a.index, "desc":a.desc, "xbrl":a.xbrl, "init":""+BigInt(openVal), "min":""+BigInt(openVal), "credit":"0", "debit":"0", "next":"0000000" }; }
 module.exports['openAccount']=openAccount;
 
 
-function addEUMoney(account,strEuro) { 
-    if(debug) console.log("addEUMoney "+account+":"+strEuro);
-    var monEuro=Money.setEUMoney(strEuro);
- 
+function add(account,strCents) { 
+    if(debug) console.log("add "+account+":"+strCents);
+    if(!strCents || strCents.length<2) return account;
+    
+    var iCents=BigInt(strCents);
+    
+    var iSum=BigInt(account.debit)+BigInt(account.credit)+BigInt(account.init)+iCents;
+    
+    var iMin=BigInt(account.min);    
+    if(iSum<iMin) iMin=iSum;
 
-    // GH20220410
-    var cMin=Money.setEUMoney(account.min).cents;    
-    var init=Money.setEUMoney(account.init);    
-    var sum=Money.addEUMoney(account.credit,init);    
-    var cSum=Money.addEUMoney(account.debit,sum).cents; 
-    if(cSum<cMin) cMin=cSum;
- 
+    var sCredit = ""+(BigInt(account.credit)+iCents);
+    var sDebit  = ""+(BigInt(account.debit) +iCents);
 
     return{ 
         "name":account.name,
@@ -32,49 +31,36 @@ function addEUMoney(account,strEuro) {
         "desc":account.desc, 
         "xbrl":account.xbrl, 
 
-        "credit":(monEuro.cents>0)?Money.moneyString(Money.addEUMoney(account.credit,monEuro)):account.credit, 
-        "debit" :(monEuro.cents<0)?Money.moneyString(Money.addEUMoney( account.debit,monEuro)):account.debit,
+        "credit":(iCents>0n) ? sCredit : account.credit, 
+        "debit" :(iCents<0n) ? sDebit  : account.debit,
 
         "init":account.init, 
-        "min":Money.moneyString({'cents':cMin})
+        "min":""+iMin,
+
+        "next":"00000000"
     }; 
 }
-module.exports['addEUMoney']=addEUMoney;
+module.exports['add']=add;
 
 
 function getNextYear(account) {
-    var init=Money.setEUMoney(account.init);    
-    var credit=Money.addEUMoney(account.credit,init);    
-    var sum=Money.addEUMoney(account.debit,credit);    
+    var init=BigInt(account.init);    
+    var credit=BigInt(account.credit)+init;    
+    var sum=BigInt(account.debit)+credit;    
     var next=sum;
-    if(account.income && parseFloat(account.income)!=0.0) {
-        next=Money.addEUMoney(account.income,sum);
-        console.log("getNexYear("+account.name+") = "+next);
+    if(account.income && parseInt(account.income)!=0) {
+        next=BigInt(account.income)+sum;
     }
-    return Money.moneyString(next);
+    if(debug) console.log("getNextYear("+account.name+") = "+next);
+    return ""+next;
 }
 module.exports['getNextYear']=getNextYear;
 
 
-function getChange(account) {
-    var credit=Money.setEUMoney(account.credit);    
-    var sum=Money.addEUMoney(account.debit,credit);    
-    return Money.moneyString(sum);
-}
-module.exports['getChange']=getChange;
+function bigChange(account) { return BigInt(account.debit)+BigInt(account.credit);}
+module.exports['bigChange']=bigChange;
 
 
-function getSaldo(account) {
-    var init=Money.setEUMoney(account.init);    
-    var credit=Money.addEUMoney(account.credit,init);    
-    var sum=Money.addEUMoney(account.debit,credit);    
-    return Money.moneyString(sum);
-}
-module.exports['getSaldo']=getSaldo;
+function bigSaldo(account) { return BigInt(account.init)+BigInt(account.debit)+BigInt(account.credit); }
+module.exports['bigSaldo']=bigSaldo;
 
-function getTransient(account) {
-    var credit=Money.setEUMoney(account.credit);    
-    var sum=Money.addEUMoney(account.debit,credit);    
-    return Money.moneyString(sum);
-}
-module.exports['getTransient']=getTransient;

@@ -20,11 +20,11 @@
 		</DIV>
         
         <!--  SCRIPT type="module">
-            import { setEUMoney } from "/app/src/modules/money.mjs";
+            import { bigEUMoney } from "/app/src/modules/money.mjs";
         </SCRIPT   -->   
 
         <SCRIPT type="text/javascript" src="/client.js"></SCRIPT>
-        <SCRIPT type="text/javascript" src="/money.js"></SCRIPT>
+        
       
 
         <SCRIPT type="text/javascript">
@@ -128,6 +128,8 @@
                 }
                 for (let i=iRite;i<S_COLUMN;i++) sRite[i]='<DIV class="MOAM">&nbsp;</DIV><DIV class="SYMB">&nbsp;</DIV>';
 
+                
+console.log(JSON.stringify(response));
 
 
                 if(jHistory && gSchema.Names && gSchema.Names.length>0) {

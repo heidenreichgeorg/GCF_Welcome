@@ -1,6 +1,7 @@
 // LOCAL START
 // node server.js root=d:\Privat\ config=PROJECT root\PROJECT.JSON as firebase config 
 // node server.js root=d:\Privat\ config=bookingpages
+// node server.js root=c:\Privat config=bookingpage
 
 /*
  React routes SESSION BOOK EXCEL
@@ -214,7 +215,8 @@ app.get('/SESSION', (req, res) => {
         // WARM START : FOUND EXISTING ID
         } else {
             session = getSession(sessionId);
-            if(session) console.log("\n0820 GET /SESSION FOUND LOADED "+showRecent(session)+" => "+session.id);
+//            if(session) console.log("\n0820 GET /SESSION FOUND LOADED "+showRecent(session)+" => "+session.id);
+            if(session) console.log("\n0820 GET /SESSION FOUND LOADED "+JSON.stringify(session));
             else console.log("\n0821 GET /SESSION NOT FOUND => FOR EXISTING #"+sessionId);
 
             

@@ -352,6 +352,6 @@ async function markActive(client) {
     console.log('Updated task');
   })
   .catch(err => {
-    console.error('ERROR:', err);
+    console.dir('ERROR:', err);
   });
 }

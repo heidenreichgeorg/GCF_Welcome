@@ -5,6 +5,7 @@ const debugWrite=null;
 const HTTP_OK = 200;
 module.exports['HTTP_OK']=HTTP_OK;
 
+
 const HTTP_WRONG = 400;
 module.exports['HTTP_WRONG']=HTTP_WRONG;
 
@@ -22,8 +23,6 @@ const { FORMERR } = require('dns');
 // File system
 //const fs = require('fs');
 
-
-const Money = require('./money.js');
 
 
 //const D_Schema = "Schema"; // includes .Names .total
@@ -119,10 +118,8 @@ function numericSheet(tBuffer,schemaLen) {
                 
                 if(typeof value === 'number' && !Number.isNaN(value)) result[i]=value;
                 
-
                 //GH20211026 side-effect: clean tBuffer
-                var amount = Money.setEUMoney(cell);
-                tBuffer[i]  = Money.moneyString(amount);
+                tBuffer[i] = cell;
 
             } else result[i]=cell;
 
@@ -455,7 +452,7 @@ function makeXLTabs(client,year,sheetCells,jAssets,jHistory,jSchema,jPartner,jBa
                     caSaldo=tab.saldo;
                     excelCloseT.push([arrXBRL[column],aNames[column],tab.close])
                 }
-                excelCloseT.push([ 'de-gaap-ci_bs.ass','Assets',Money.cents2EU(caSaldo)])
+                excelCloseT.push([ 'de-gaap-ci_bs.ass','Assets',caSaldo])
 
                 // append one more sheet for GALS account
                 for(let column=aLen+1;column<eLen;column++) {
@@ -464,7 +461,7 @@ function makeXLTabs(client,year,sheetCells,jAssets,jHistory,jSchema,jPartner,jBa
                     ceSaldo=tab.saldo;
                     excelCloseT.push([arrXBRL[column],aNames[column],tab.close])
                 }
-                excelCloseT.push(['de-gaap-ci_bs.eqLiab.income','Gain/Loss',Money.cents2EU(ceSaldo)])
+                excelCloseT.push(['de-gaap-ci_bs.eqLiab.income','Gain/Loss',ceSaldo])
 
                 // append one more sheet for EQ/LIAB account
                 for(let column=eLen+1;column<aNames.length;column++) {
@@ -473,7 +470,7 @@ function makeXLTabs(client,year,sheetCells,jAssets,jHistory,jSchema,jPartner,jBa
                     ceSaldo=tab.saldo;
                     excelCloseT.push([arrXBRL[column],aNames[column],tab.close])
                 }
-                excelCloseT.push(['de-gaap-ci_bs.eqLiab','Equity/Liab',Money.cents2EU(ceSaldo)])
+                excelCloseT.push(['de-gaap-ci_bs.eqLiab','Equity/Liab',ceSaldo])
 
 
             } else console.dir("1425 sheets.makeXLTabs NO AUX");
@@ -583,8 +580,8 @@ function accountSheet(column,txns,saldo) {
     aux.forEach(line => {
         let txn =line.filter(function(field,i) { return (i<J_ACCT || i==column); }); 
         excelaccTab.push(txn);
-        cSaldo+=Money.setEUMoney(txn[J_ACCT]).cents;
-        final=Money.cents2EU(cSaldo);
+        cSaldo = cSaldo +txn[J_ACCT];
+        final=cSaldo;
         txn[J_ACCT+1]=final;
     });      
 
@@ -599,8 +596,8 @@ function makeTax(jBalance,partner,index,fix) {
     let deno=parseInt(partner.denom);               
     let result= { 'name': partner.name };
     Object.keys(jBalance).map((name,index) => (jBalance[name].xbrl==='de-gaap-ci_bs.ass.currAss.receiv.other.otherTaxRec.CapTax'?
-                                                (result[name]=Money.cents2EU(((fix+Money.setEUMoney(jBalance[name].yearEnd).cents)*gain)/deno))
-                                                :{}));
+                                                (result[name]=(fix+(BigInt(jBalance[name].yearEnd)*gain)/deno))
+                                                :0n));
 
     console.log("Partner("+index+") with "+gain+"/"+deno+"response D_Report"+JSON.stringify(result));
     return result;
