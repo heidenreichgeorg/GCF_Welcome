@@ -1060,7 +1060,7 @@ function sendBalance(balance) {
                     var element=gReport[rxbrl];
                     var collect=element.account;
                     if(collect && axbrl.startsWith(element.xbrl)) {
-                        element.account.next = element.account.next+account.next; 
+                        element.account.next = ""+(BigInt(element.account.next)+BigInt(account.next)); 
                     }
                 }
             }

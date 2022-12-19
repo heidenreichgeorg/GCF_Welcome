@@ -1,46 +1,82 @@
+/* global BigInt */
 
+function bigMoney(strAdd,factor,money) {
+    if(money==null) money = 0n;
+    money=BigInt(money);
+    factor=BigInt(factor);
+    var euros=0n;
+    var cents=0n;
+    if(strAdd) {          
+        var amount = strAdd.split(',');
+        var plain = amount[0].replace('.', '').trim(); 
+        if(plain.startsWith('-')) { factor=-1n * factor; plain=plain.slice(1); }
+        euros = BigInt(('0'+plain));
+        if(amount.length>1) { // GH 20201117
+            const digits=amount[1]+"00";
+            const strDigits=digits[0]+digits[1];
+            cents=BigInt(strDigits);
+        }
+    }
+    cents=(euros*100n)+cents;
+    money = money + (factor * cents);
+    return money;
+}
 
 function toMoney(strAdd,factor,money) {
-        var euros=0;
-        var cents=0;
-        if(strAdd) {          
-            var amount = strAdd.split(',');
-            var plain = amount[0].replace('.', '').trim(); 
-            if(plain.startsWith('-')) { factor=-1*factor; plain=plain.slice(1); }
-            euros = parseInt(('0'+plain),10);
-            if(amount.length>1) { // GH 20201117
-                const digits=amount[1]+"00";
-                const strDigits=digits[0]+digits[1];
-                cents=parseInt(strDigits,10);
-            }
+    var euros=0;
+    var cents=0;
+    if(strAdd) {          
+        var amount = strAdd.split(',');
+        var plain = amount[0].replace('.', '').trim(); 
+        if(plain.startsWith('-')) { factor=-1*factor; plain=plain.slice(1); }
+        euros = parseInt(('0'+plain),10);
+        if(amount.length>1) { // GH 20201117
+            const digits=amount[1]+"00";
+            const strDigits=digits[0]+digits[1];
+            cents=parseInt(strDigits,10);
         }
-        cents=euros*100+cents;
-        if(!money) money = { 'cents': 0 };        
-        money.cents = money.cents + factor * cents;
-        return money;
     }
+    cents=euros*100+cents;
+    if(!money) money = 0;        
+    money = money + (factor * cents);
+    return money;
+}
 
 export function addEUMoney(strAdd,money) {
-        return toMoney(strAdd,1,money); }
+        return bigMoney(strAdd,1n,money); }
 
 export function bigEUMoney(strSet) {
-    return toMoney(strSet,1,null); }
+    return BigInt(strSet); }
 
-export function cents2EU(cents) {
-    var sign=""; if(cents<0) { sign="-"; cents=-cents; }
-    if(isNaN(cents)) return cents;
-    var kiloNum = parseInt(cents/100000);
-    var megaNum = parseInt(kiloNum/1000);
-    var megaStr = megaNum>0 ? megaNum.toString()+"." : "";
+    
 
-    var milleNum = kiloNum-(1000*megaNum); 
-    var milleStr = milleNum>0 ? milleNum.toString()+"." : "";
-    cents-=(kiloNum*100000);
+export function cents2EU(amount) { 
+    let cents=amount; 
+    
+    if(!cents) return "0,00";
+    let result=cents;
+    
+    if(typeof(cents)==="string") {
+        cents=BigInt(cents); 
+    } // fixedAssets: some cents are strings with plain int format
+    try {
 
-    var euroNum = parseInt(cents/100);
-    var euroStr = milleNum>0  ? euroNum.toString().padStart(3,'0') : euroNum.toString();
-    cents-=(euroNum*100);
+        var sign=""; if(cents<0n) { sign="-"; cents= -cents; }
+        var kiloNum = BigInt(cents/100000n);
 
-    return sign + megaStr + milleStr + euroStr+","+(parseInt(cents%100).toString().padStart(2,'0'));
+        var megaNum = BigInt(kiloNum/1000n);
+        var megaStr = (megaNum>0n) ? megaNum.toString()+"." : "";
+
+        var milleNum = kiloNum-(1000n*megaNum); 
+        var milleStr = (milleNum>0n) ? milleNum.toString()+"." : "";
+        cents = cents - (kiloNum*100000n);
+
+        var euroNum = BigInt(cents/100n);
+        var euroStr = (milleNum>0n)  ? euroNum.toString().padStart(3,'0') : euroNum.toString();
+        cents = cents - (euroNum*100n);
+
+        result =  sign + megaStr + milleStr + euroStr+"," +(BigInt(cents%100n).toString().padStart(2,'0'));
+    } catch(err) { result=typeof(cents); }
+    return result;
 }
 

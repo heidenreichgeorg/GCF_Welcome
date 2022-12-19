@@ -50,7 +50,7 @@ export default function FixedAssets() {
         <Screen prevFunc={prevFunc} nextFunc={nextFunc} tabSelector={aPages} >
             
             <div className="ulliTab" id={"PageContent1"} style= {{ 'display': 'block'}} >
-            <FixedAssetsRow p={ {'idnt':'Name', 'type':'WKN/Typ', 'date':"Anschaffung",
+            <FixedTitleRow p={ {'idnt':'Name', 'type':'WKN/Typ', 'date':"Anschaffung",
                         'init':'Anschaffungsk', 
                         'nmbr':'Anzahl',
                         'rest':'Zeitwert',
@@ -75,6 +75,24 @@ export default function FixedAssets() {
 
 
 
+    function FixedTitleRow(mRow) {
+        console.log("FixedAssetsRow mRow="+JSON.stringify(mRow));
+        //let unitPrice = (mRow.p.nmbr && mRow.p.nmbr>0)?cents2EU(bigEUMoney(mRow.p.cost).cents/parseInt(mRow.p.nmbr)):"--";
+        return (
+            <div className="attrLine">
+                <div className="LNAM">{mRow.p.idnt}</div>
+                <div className="SNAM">{mRow.p.type}</div>
+                <div className="SNAM">{mRow.p.date}</div>
+                <div className="MOAM">{(mRow.p.init)}</div>
+                <div className="MOAM">{mRow.p.nmbr}</div>
+                <div className="MOAM">{(mRow.p.rest)}</div>
+                <div className="MOAM">{(mRow.p.cost)}</div>
+            </div>        
+        )
+    }
+
+
+
     function FixedAssetsRow(mRow) {
         console.log("FixedAssetsRow mRow="+JSON.stringify(mRow));
         //let unitPrice = (mRow.p.nmbr && mRow.p.nmbr>0)?cents2EU(bigEUMoney(mRow.p.cost).cents/parseInt(mRow.p.nmbr)):"--";
@@ -90,4 +108,3 @@ export default function FixedAssets() {
             </div>        
         )
     }
-

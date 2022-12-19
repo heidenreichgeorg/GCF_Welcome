@@ -13,7 +13,7 @@ import { useEffect, useState, useRef  } from 'react';
 import Screen from '../pages/Screen'
 import FooterRow from '../components/FooterRow'
 import { useSession } from '../modules/sessionmanager';
-import { cents2EU, setEUMoney } from  '../modules/money'
+import { cents2EU, bigEUMoney } from  '../modules/money'
 
 import { D_Balance, D_Partner_NET, D_Page, D_Report, D_Schema, X_ASSETS, X_EQLIAB, X_INCOME, SCREENLINES }  from '../terms.js';
 
@@ -51,7 +51,7 @@ export default function Partner() {
         let deno=parseInt(partner.denom);               
         let result= { 'name': partner.name };
         Object.keys(jBalance).map((name,index) => (jBalance[name].xbrl==='de-gaap-ci_bs.ass.currAss.receiv.other.otherTaxRec.CapTax'?
-                                                    (result[name]=cents2EU(((fix+setEUMoney(jBalance[name].yearEnd).cents)*gain)/deno))
+                                                    (result[name]=cents2EU(((fix+bigEUMoney(jBalance[name].yearEnd).cents)*gain)/deno))
                                                     :{}));
 
         console.log("Partner("+index+") with "+gain+"/"+deno+"response D_Report"+JSON.stringify(result));

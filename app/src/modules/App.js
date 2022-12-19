@@ -1,7 +1,9 @@
 
 import { J_ACCT, COLMIN, DOUBLE, D_History, D_Page, D_Schema } from '../terms.js'
 
-import { setEUMoney, cents2EU } from './money'
+import { bigEUMoney, cents2EU } from './money'
+
+import 'BigInt';
 
 const HTMLSPACE=" "; 
 
@@ -83,12 +85,12 @@ export function prettyTXN(jHistory,hash,lPattern,aPattern,names,aLen,eLen) {
                 else entry.push(' ');
                 
             }
-            for(var i=J_ACCT;i<parts.length;i++) {
-                if(parts[i] && parts[i].length>0 && i!=aLen && i!=eLen) { 
+            for(var j=J_ACCT;i<parts.length;j++) {
+                if(parts[j] && parts[j].length>0 && j!=aLen && j!=eLen) { 
                     
                     // GH20220307 EU-style numbers
-                    let strCents = parts[i].replace('.','').replace(',','');
-                    let item = parseInt(strCents); // Money
+                    let strCents = parts[j].replace('.','').replace(',','');
+                    let item = bigEUMoney(strCents); 
 
                     
                     // GH20220703
@@ -105,9 +107,9 @@ export function prettyTXN(jHistory,hash,lPattern,aPattern,names,aLen,eLen) {
                         delta.push(names[i]+DOUBLE+parts[i]); 
 
                         // GH20220307
-                        let value = setEUMoney(parts[i]);
+                        let value = bigEUMoney(parts[i]);
                         if(i<aLen) iBalance += value.cents;
-                        else if(i!=aLen && i!=eLen) iBalance -= value.cents;
+                        else if(i!=aLen && i!=eLen) iBalance -= value;
                         //console.dir("ADD "+parts[i]+ " --> "+value.cents+"  --> "+iBalance);
                     }
 
@@ -160,7 +162,7 @@ export function buildTXN(schema,flow,name,amount) {
         for(var i=J_ACCT;i<balanceNames.length;i++) {
             if(balanceNames[i] && balanceNames[i].length>0 && i!=aLen && i!=eLen && balanceNames[i]===name) { 
                 
-                let entry = { index:i, cents:setEUMoney(amount).cents}
+                let entry = { index:i, cents:bigEUMoney(amount).cents}
 
                 if(i<aLen && i!=eLen) credit[name]=entry;
             

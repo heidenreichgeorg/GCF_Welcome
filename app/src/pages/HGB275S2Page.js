@@ -1,9 +1,11 @@
+/* global BigInt */
+
 import { useEffect, useState  } from 'react';
 
-import { moneyString, cents2EU, setEUMoney,addEUMoney } from '../modules/money'
+import {  cents2EU, bigEUMoney } from '../modules/money'
 import Screen from '../pages/Screen'
 import FooterRow from '../components/FooterRow'
-import { D_Balance, D_History, D_Page, D_Report, D_Schema, X_ASSETS, X_EQLIAB, SCREENLINES }  from '../terms.js';
+import { D_Balance, D_Page, D_Report, D_Schema, X_ASSETS, X_EQLIAB, SCREENLINES }  from '../terms.js';
 import { useSession } from '../modules/sessionmanager';
 
 
@@ -60,25 +62,25 @@ function makeReport(response,value) {
     let page = response[D_Page];
               
     if(page) {           
-        var chgb1 = 0; // Umsatz
-        var chgb5 = 0; // MAT+RHB+Leistungen direkter Aufwand
+        var chgb1 = 0n; // Umsatz
+        var chgb5 = 0n; // MAT+RHB+Leistungen direkter Aufwand
         // Bruttoergebnis
 
-        var chgb7 = 0; // Abschreibungen Sachanlagen
-        var chgb8 = 0; // sonstige betr. Aufwand
+        var chgb7 = 0n; // Abschreibungen Sachanlagen
+        var chgb8 = 0n; // sonstige betr. Aufwand
         // Ergebnis
 
-        var chgb9 = 0; // Ertrag aus Beteiligungen
-        var chgbA = 0; // Wertpapierertrag
-        var chgbB = 0; // Zinseinnahmen
-        var chgbD = 0; // Zinsaufwand
-        var chgbE = 0; // gezahlte Steuern v Einkommen und Ertrag
-        var chgbF = 0; // Steuerforderung d Gesellschafter
+        var chgb9 = 0n; // Ertrag aus Beteiligungen
+        var chgbA = 0n; // Wertpapierertrag
+        var chgbB = 0n; // Zinseinnahmen
+        var chgbD = 0n; // Zinsaufwand
+        var chgbE = 0n; // gezahlte Steuern v Einkommen und Ertrag
+        var chgbF = 0n; // Steuerforderung d Gesellschafter
         // Jahresueberschuss
 
-        var cAvgFix = 0; // betriebsnotwendiges Vermoegen
-        var cAvgCur = 0; // mittleres Umlaufvermoegen
-        var cReceiv = 0; // Forderungen
+        var cAvgFix = 0n; // betriebsnotwendiges Vermoegen
+        var cAvgCur = 0n; // mittleres Umlaufvermoegen
+        var cReceiv = 0n; // Forderungen
 
 
 
@@ -92,26 +94,28 @@ function makeReport(response,value) {
 
 
             if(yearEnd && iName && full_xbrl) {
-                if(full_xbrl.startsWith('de-gaap-ci_bs.ass.fixAss'))  { cAvgFix+=(setEUMoney(init).cents+setEUMoney(yearEnd).cents)/2; console.log("BNV  "+name+"="+cAvgFix); }
-                if(full_xbrl.startsWith('de-gaap-ci_bs.ass.currAss')) { cAvgCur+=(setEUMoney(init).cents+setEUMoney(yearEnd).cents)/2; console.log("DUV  "+name+"="+cAvgCur); }
-                if(full_xbrl.startsWith('de-gaap-ci_bs.ass.currAss.receiv')) { cReceiv-=setEUMoney(yearEnd).cents;                     console.log("FOR  "+name+"="+cReceiv); }
-                if(full_xbrl.startsWith('de-gaap-ci_bs.ass.currAss.receiv.other.otherTaxRec')) { chgbF+=setEUMoney(yearEnd).cents; console.log("TAX  "+name+"("+yearEnd+")="+chgbF);  } // 20220521 keep tax claims separately
+                
+                if(full_xbrl.startsWith('de-gaap-ci_bs.ass.fixAss'))  { cAvgFix = cAvgFix +(bigEUMoney(init)+bigEUMoney(yearEnd))/2n; console.log("BNV  "+name+"="+cAvgFix); }  
+                if(full_xbrl.startsWith('de-gaap-ci_bs.ass.currAss')) { cAvgCur+=(bigEUMoney(init)+bigEUMoney(yearEnd))/2n; console.log("DUV  "+name+"="+cAvgCur); }
+                if(full_xbrl.startsWith('de-gaap-ci_bs.ass.currAss.receiv')) { cReceiv-=bigEUMoney(yearEnd);                     console.log("FOR  "+name+"="+cReceiv); }
+                if(full_xbrl.startsWith('de-gaap-ci_bs.ass.currAss.receiv.other.otherTaxRec')) { chgbF+=bigEUMoney(yearEnd); console.log("TAX  "+name+"("+yearEnd+")="+chgbF);  } // 20220521 keep tax claims separately
 
                 // MIET / rent was 'de-gaap-ci_is.netIncome.regular.operatingTC.yearEndTradingProfit'
-                if(full_xbrl.startsWith('de-gaap-ci_is.netIncome.regular.operatingTC.grossTradingProfit')) { chgb1+=setEUMoney(yearEnd).cents; }
-                if(full_xbrl.startsWith('de-gaap-ci_is.netIncome.regular.operatingTC.otherCost.fixingLandBuildings')) { chgb5+=setEUMoney(yearEnd).cents; }
+                if(full_xbrl.startsWith('de-gaap-ci_is.netIncome.regular.operatingTC.grossTradingProfit')) { chgb1+=bigEUMoney(yearEnd); }
+                if(full_xbrl.startsWith('de-gaap-ci_is.netIncome.regular.operatingTC.otherCost.fixingLandBuildings')) { chgb5+=bigEUMoney(yearEnd); }
 
-                if(full_xbrl.startsWith('de-gaap-ci_is.netIncome.regular.operatingTC.deprAmort.fixAss.tan')) { chgb7+=setEUMoney(yearEnd).cents; }
-                if(full_xbrl.startsWith('de-gaap-ci_is.netIncome.regular.operatingTC.otherCost.otherOrdinary')) { chgb8+=setEUMoney(yearEnd).cents; }
+                if(full_xbrl.startsWith('de-gaap-ci_is.netIncome.regular.operatingTC.deprAmort.fixAss.tan')) { chgb7+=bigEUMoney(yearEnd); }
+                if(full_xbrl.startsWith('de-gaap-ci_is.netIncome.regular.operatingTC.otherCost.otherOrdinary')) { chgb8+=bigEUMoney(yearEnd); }
                 
                 // EZIN = de-gaap-ci_is.netIncome.regular.fin.netInterest.income
-                if(full_xbrl.startsWith('de-gaap-ci_is.netIncome.regular.fin.netParticipation')) { chgb9+=setEUMoney(yearEnd).cents; }
-                if(full_xbrl.startsWith('de-gaap-ci_is.netIncome.regular.fin.sale')) { chgbA+=setEUMoney(yearEnd).cents; }
-                if(full_xbrl.startsWith('de-gaap-ci_is.netIncome.regular.fin.netInterest')) { chgbB+=setEUMoney(yearEnd).cents;  console.log("EZIN = "+yearEnd+ " from "+JSON.stringify(account)); }
-                if(full_xbrl.startsWith('de-gaap-ci_is.netIncome.regular.fin.expenses')) { chgbD+=setEUMoney(yearEnd).cents; }
-                if(full_xbrl.startsWith('de-gaap-ci_is.is.netIncome.tax')) { chgbE-=setEUMoney(yearEnd).cents; }
+                if(full_xbrl.startsWith('de-gaap-ci_is.netIncome.regular.fin.netParticipation')) { chgb9+=bigEUMoney(yearEnd); }
+                if(full_xbrl.startsWith('de-gaap-ci_is.netIncome.regular.fin.sale')) { chgbA+=bigEUMoney(yearEnd); }
+                if(full_xbrl.startsWith('de-gaap-ci_is.netIncome.regular.fin.netInterest')) { chgbB+=bigEUMoney(yearEnd);  console.log("EZIN = "+yearEnd+ " from "+JSON.stringify(account)); }
+                if(full_xbrl.startsWith('de-gaap-ci_is.netIncome.regular.fin.expenses')) { chgbD+=bigEUMoney(yearEnd); }
+                if(full_xbrl.startsWith('de-gaap-ci_is.is.netIncome.tax')) { chgbE-=bigEUMoney(yearEnd); }
 
                // console.log("READ xbrl="+full_xbrl+" "+chgb5+" "+chgb7+" "+chgb8+" "+chgbA+" "+chgbB+" "+chgbD+" "+chgbE+" "+chgbF);
+               
             }
 
         }
@@ -176,11 +180,11 @@ function makeReport(response,value) {
             var account=aRite[name];
 
             var iName = account.name;
-            var cBegin= account.init;
-            var cNext = account.next;
+            var cBegin= BigInt(account.init);
+            var cNext = BigInt(account.next);
             console.log("EqLiab account ="+JSON.stringify(account));
     
-            iLeft = fillLeft(balance,cBegin,cNext,iName,iLeft);
+           iLeft = fillLeft(balance,cBegin,cNext,iName,iLeft);
         }
 
         fillRight(balance,chgb1,"Umsatz",0,1);
@@ -210,7 +214,7 @@ function makeReport(response,value) {
         fillRight(balance,cReceiv,"Forderungen",17,1);
         let opCap = cAvgFix+cAvgCur+cReceiv;
         fillRight(balance,opCap,"betriebsnotwendiges Kap.",18,2);
-        let performanceBP = (10000*gain)/opCap;
+        let performanceBP = (10000n*gain)/opCap;
         iRite=fillRight(balance,performanceBP,"Kapitalrendite",19,3);
         
         }
@@ -227,8 +231,10 @@ function fillLeft(balance,dispValue1,dispValue2,iName,iLeft) {
     if(iLeft<SCREENLINES) {
         if(!balance[iLeft]) balance[iLeft]={};
         balance[iLeft].tw1=iName;
-        balance[iLeft].am3=dispValue1; 
-        balance[iLeft].am2=dispValue2; 
+        let cValue1=cents2EU(dispValue1);
+        let cValue2=cents2EU(dispValue2);
+        balance[iLeft].am3=cValue1; 
+        balance[iLeft].am2=cValue2; 
         
         iLeft++;
     }
@@ -254,14 +260,14 @@ function HGB275Row({ jArgs, id }) {
     return(
         <div className={"attrLine line"+id} >
             <div className="LNAM"> {jArgs.tw1}</div>
-            <div className="MOAM"> {jArgs.am3}</div>
-            <div className="MOAM"> {jArgs.am2}</div>
-            <div className="MOAM"> {jArgs.am1}</div>
+            <div className="MOAM"> {(jArgs.am3)}</div>
+            <div className="MOAM"> {(jArgs.am2)}</div>
+            <div className="MOAM"> {(jArgs.am1)}</div>
             <div className="SEP">|&nbsp;</div>
             <div className="LNAM"> {jArgs.tx1}</div>
-            <div className="MOAM"> {jArgs.an3}</div>
-            <div className="MOAM"> {jArgs.an2}</div>
-            <div className="MOAM"> {jArgs.an1}</div>
+            <div className="MOAM"> {(jArgs.an3)}</div>
+            <div className="MOAM"> {(jArgs.an2)}</div>
+            <div className="MOAM"> {(jArgs.an1)}</div>
         </div>
     )
 }

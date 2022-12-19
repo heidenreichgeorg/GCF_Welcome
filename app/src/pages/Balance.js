@@ -1,9 +1,11 @@
+/* global BigInt */
+
 import { useEffect, useState  } from 'react';
 
-import { moneyString, cents2EU, setEUMoney,addEUMoney } from '../modules/money.mjs'
+import { cents2EU, bigEUMoney,addEUMoney } from '../modules/money.mjs'
 import Screen from '../pages/Screen'
 import FooterRow from '../components/FooterRow'
-import { D_Balance, D_History, D_Page, D_Report, D_Schema, X_ASSETS, X_EQLIAB, SCREENLINES }  from '../terms.js';
+import { D_Balance, D_Page, D_Report, D_Schema, X_ASSETS, X_EQLIAB, SCREENLINES }  from '../terms.js';
 import { useSession } from '../modules/sessionmanager';
 
 
@@ -95,8 +97,8 @@ function makeBalance(response,value) {
         }
     }
     
-    var mEqLiab={};
-    var income="";
+    var iEqLiab=0n;
+    var income=0n;
 
     let balance = []; 
  
@@ -117,12 +119,12 @@ function makeBalance(response,value) {
 
         if(dispValue && iName && full_xbrl) {
             // collect compute total right side amount
-            if(full_xbrl==='de-gaap-ci_bs.eqLiab') { mEqLiab=setEUMoney(dispValue);  /*dispValue=moneyString(mEqLiab);*/ }
-            if(full_xbrl==='de-gaap-ci_is.netIncome.regular') { income=dispValue; }
+            if(full_xbrl==='de-gaap-ci_bs.eqLiab') { iEqLiab=BigInt(dispValue);  /*bigEUMoney  dispValue=moneyString(mEqLiab);*/ }
+            if(full_xbrl==='de-gaap-ci_is.netIncome.regular') { income=BigInt(dispValue); }
             if(full_xbrl==='de-gaap-ci_bs.eqLiab.income') { 
-                let mIncome=addEUMoney(income,mEqLiab); 
-                console.log("INCOME = "+mIncome.cents);
-                dispValue=cents2EU(mIncome.cents);
+                let bIncome=(income+iEqLiab); 
+                console.log("INCOME = "+bIncome);
+                dispValue=bIncome;
             }
 
             var xbrl = full_xbrl.split('\.');
@@ -134,18 +136,20 @@ function makeBalance(response,value) {
                 if(iLeft<SCREENLINES) {
                     if(!balance[iLeft]) balance[iLeft]={};
                     balance[iLeft].tw1=iName;
-                    if(level==1) { balance[iLeft].am1=dispValue; }
-                    if(level==2) { balance[iLeft].am2=dispValue; }
-                    if(level==3) { balance[iLeft].am3=dispValue; }
+                    let cValue=cents2EU(dispValue);
+                    if(level==1) { balance[iLeft].am1=cValue; }
+                    if(level==2) { balance[iLeft].am2=cValue; }
+                    if(level==3) { balance[iLeft].am3=cValue; }
                     iLeft++;
                 }
             } else {
                 if(iRite<SCREENLINES) {
                     if(!balance[iRite]) balance[iRite]={};
+                    let cValue=cents2EU(dispValue);
                     balance[iRite].tx1=iName;
-                    if(level==1) { balance[iRite].an1=dispValue; }
-                    if(level==2) { balance[iRite].an2=dispValue; }
-                    if(level==3) { balance[iRite].an3=dispValue; }
+                    if(level==1) { balance[iRite].an1=cValue; }
+                    if(level==2) { balance[iRite].an2=cValue; }
+                    if(level==3) { balance[iRite].an3=cValue; }
                     iRite++;
                 }
             }

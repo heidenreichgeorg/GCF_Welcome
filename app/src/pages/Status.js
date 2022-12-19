@@ -117,6 +117,7 @@ function makeStatusData(response) {
     }
     console.log("makeStatusData from response D_Balance"+JSON.stringify(Object.keys(jAccounts)));
 
+    console.log(JSON.stringify(response));
     
     // build three columns
     let aLeft={};
