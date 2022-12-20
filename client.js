@@ -390,12 +390,12 @@ function showTransfer(txnForm,commandCent,force) {
     if(txnForm.diff || txnForm.diff==0) cCent = txnForm.diff; // 20220516
     var bookingAmount =  // inner control was button
       "<div class='C100' ><div class='key' id='book-button' onclick='book()' )>Book</div></div>"
-    + "<DIV id='display'>"+cents2EU(cCent)+"</DIV>";
+    + "<DIV id='displayA'>"+cents2EU(cCent)+"</DIV>";
     print2Terminal(cursor,bookingAmount);
 
 
     for(var c=0;c<cdPairs.length;c++) {
-        cursor=print2Terminal(cursor,"<div class='C100' >&nbsp;</div><DIV class='R165' id='display'>&nbsp;</DIV>"+cdPairs[c]);
+        cursor=print2Terminal(cursor,"<div class='C100' >&nbsp;</div><DIV class='R165' id='displayP'"+c+">&nbsp;</DIV>"+cdPairs[c]);
     }
     
     print2Terminal(cursor,'<DIV class="LNAM">&nbsp;</DIV>'); // 20220516
@@ -827,7 +827,7 @@ function initTerminal(page,target,screenLines,nextFuncName) {
     // create main HTML area
     var  arrHTML =[  ];
     var l=0
-    arrHTML.push('<DIV class="ulliTab" id='+target+num+'>');
+    arrHTML.push('<DIV class="ulliTab" id=u'+target+num+'>');
     for(;l<screenLines;l++) {
         arrHTML.push('<DIV class="attrLine" id="'+target+'termLine'+l+'">&nbsp;</DIV>');
     }
@@ -902,6 +902,7 @@ function prettyTXN(jHistory,hash,lPattern,aPattern,names,aLen,eLen) {
     var txnAcct = false;
 
     let parts = jHistory[hash];
+    /*
     if(parts && parts.length>2) {
 
 
@@ -962,7 +963,7 @@ function prettyTXN(jHistory,hash,lPattern,aPattern,names,aLen,eLen) {
             }
         }
     }
-
+    */
     let result={};
 
     result.txnAcct=txnAcct;

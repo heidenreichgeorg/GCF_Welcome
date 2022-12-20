@@ -44,8 +44,8 @@ export default function Balance() {
                     {balance.map((row,i) => (
                         <BalanceRow jArgs={row} id={i} />    
                     ))}
-                    <FooterRow  id={"21"}  left={page["client"]}   right={page["register"]} prevFunc={prevFunc} nextFunc={nextFunc}/>
-                    <FooterRow  id={"22"}  left={page["reference"]}  right={page["author"]} prevFunc={prevFunc} nextFunc={nextFunc}/>
+                    <FooterRow  id={"F1"}  left={page["client"]}   right={page["register"]} prevFunc={prevFunc} nextFunc={nextFunc}/>
+                    <FooterRow  id={"F2"}  left={page["reference"]}  right={page["author"]} prevFunc={prevFunc} nextFunc={nextFunc}/>
                 </div>
             ))}
         </Screen>

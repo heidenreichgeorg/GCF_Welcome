@@ -49,7 +49,7 @@ export default function FixedAssets() {
     return (
         <Screen prevFunc={prevFunc} nextFunc={nextFunc} tabSelector={aPages} >
             
-            <div className="ulliTab" id={"PageContent1"} style= {{ 'display': 'block'}} >
+            <div className="ulliTab" id={"faPageContent1"} style= {{ 'display': 'block'}} >
             <FixedTitleRow p={ {'idnt':'Name', 'type':'WKN/Typ', 'date':"Anschaffung",
                         'init':'Anschaffungsk', 
                         'nmbr':'Anzahl',

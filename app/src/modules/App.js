@@ -16,11 +16,11 @@ export const iCpField = 35;
 // openbalance.html
 export function OverviewRow({acct, amount, name1, name2}) { // 
     return (
-        <div class="attrLine">
-            <div class="LNAM">{acct}</div>
-            <div class="R105">{amount}</div>
-            <div class="SEP">{name1}</div>
-            <div class="L280">{name2}</div>
+        <div className="attrLine">
+            <div className="LNAM">{acct}</div>
+            <div className="R105">{amount}</div>
+            <div className="SEP">{name1}</div>
+            <div className="L280">{name2}</div>
         </div>
     )
 }
@@ -28,24 +28,24 @@ export function OverviewRow({acct, amount, name1, name2}) { //
 // hgbregular.html
 export function BalanceRow({text,level4,level3,level2,level1}) { 
     return (
-        <div class="attrLine">
-            <div class="L280">{text}</div>
-            <div class="R105">{level4}</div>
-            <div class="R105">{level3}</div>
-            <div class="R105">{level2}</div>
-            <div class="R105">{level1}</div>
+        <div className="attrLine">
+            <div className="L280">{text}</div>
+            <div className="R105">{level4}</div>
+            <div className="R105">{level3}</div>
+            <div className="R105">{level2}</div>
+            <div className="R105">{level1}</div>
         </div>
     )
 }
 
 export function GainLossRow({section,type,acct,xbrl,amount}) {
     return(
-        <div class="attrLine">
-            <div class="C100">{section}</div>
-            <div class="LNAM">{type}</div>
-            <div class="C140">{acct}</div>
-            <div class="LNAM">{xbrl}</div>
-            <div class="R105">{amount}</div>
+        <div className="attrLine">
+            <div className="C100">{section}</div>
+            <div className="LNAM">{type}</div>
+            <div className="C140">{acct}</div>
+            <div className="LNAM">{xbrl}</div>
+            <div className="R105">{amount}</div>
         </div>
     )
 }
@@ -57,8 +57,6 @@ export function prettyTXN(jHistory,hash,lPattern,aPattern,names,aLen,eLen) {
     var iSaldo=0n;
     var result={};
 
-    
-
     var entry = [];
     var credit = [HTMLSPACE];
     var debit = ['','AN'];
@@ -66,7 +64,7 @@ export function prettyTXN(jHistory,hash,lPattern,aPattern,names,aLen,eLen) {
     var aAmount = [];
     var delta = [];
     var txnAcct = false;
-/*
+
     let parts = jHistory[hash];
     if(parts && parts.length>2) {
 
@@ -83,63 +81,59 @@ export function prettyTXN(jHistory,hash,lPattern,aPattern,names,aLen,eLen) {
 
             // skip hash or index
             for(var i=1;i<J_ACCT && i<parts.length;i++) {
-
                 if(parts[i] && parts[i].length>COLMIN) 
                     entry.push(parts[i].substring(0,iCpField)); 
-                else entry.push(' ');
-                
+                else entry.push(' ');                
             }
-            for(var j=J_ACCT;i<parts.length;j++) {
+            
+            for(var j=J_ACCT;j<parts.length;j++) {
                 if(parts[j] && parts[j].length>0 && j!=aLen && j!=eLen) { 
                     
                     // GH20220307 EU-style numbers with two decimal digits
                     let strCents = parts[j].replace('.','').replace(',','');
-                    
+                    console.log("strCents="+strCents);
+                    let item = BigInt(strCents); 
 
-                    let item=1n;
-                    //let item = BigInt(strCents); 
-
-                    
                     // GH20220703
                     if(    !txnAcct
-                        && names[i] && names[i].length>1 
+                        && names[j] && names[j].length>1 
                         && aPattern && aPattern.length>1 
-                        && names[i].toLowerCase().includes(aPattern.toLowerCase())) {
+                        && names[j].toLowerCase().includes(aPattern.toLowerCase())) {
                             txnAcct=true;
                             iSaldo += item; // BigInt
                         }
 
 
 //                    if(item!=0) {// Money
-//                        delta.push(names[i]+DOUBLE+parts[i]); 
+//                        delta.push(names[j]+DOUBLE+parts[j]); 
 //
 //                        // GH20220307
-//                        let value = bigEUMoney(parts[i]);
-//                        if(i<aLen) iBalance += value;
-//                        else if(i!=aLen && i!=eLen) iBalance -= value;
-//                        //console.dir("ADD "+parts[i]+ " --> "+value.cents+"  --> "+iBalance);
+//                        let value = bigEUMoney(parts[j]);
+//                        if(j<aLen) iBalance += value;
+//                        else if(j!=aLen && j!=eLen) iBalance -= value;
+//                        //console.dir("ADD "+parts[j]+ " --> "+value.cents+"  --> "+iBalance);
 //                    }
 
-                    aNames.push(names[i]);   
-                    aAmount.push(parts[i]);   
+                    aNames.push(names[j]);   
+                    aAmount.push(parts[j]);   
 
                     // POS ASSET
-                    if(item>0n && i<aLen && i!=eLen) credit.push(names[i]+DOUBLE+parts[i]);                                        
+                    if(item>0n && j<aLen && j!=eLen) credit.push(names[j]+DOUBLE+parts[j]);                                        
                 // Money
                     // NEG EQLIAB
-                    if(item<0n && i>aLen && i!=eLen) credit.push(names[i]+DOUBLE+parts[i].replace('-',''));
+                    if(item<0n && j>aLen && j!=eLen) credit.push(names[j]+DOUBLE+parts[j].replace('-',''));
                 // Money
                     // NEG ASSET
-                    if(item<0n && i<aLen && i!=eLen) debit.push(names[i]+DOUBLE+parts[i].replace('-',''));
+                    if(item<0n && j<aLen && j!=eLen) debit.push(names[j]+DOUBLE+parts[j].replace('-',''));
                 // Money
                     // POS EQLIAB
-                    if(item>0n && i>aLen && i!=eLen) debit.push(names[i]+DOUBLE+parts[i]);
+                    if(item>0n && j>aLen && j!=eLen) debit.push(names[j]+DOUBLE+parts[j]);
                 // Money
-                }
+                
+                }                
             }
         }
     }
-    */
 
     result.txnAcct=txnAcct;
     result.entry=entry;

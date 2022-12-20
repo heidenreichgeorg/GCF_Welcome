@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import Screen from '../pages/Screen'
 import FooterRow from '../components/FooterRow'
 import { iCpField, prettyTXN}  from '../modules/App';
+import { cents2EU}  from '../modules/money';
 
 import { D_Balance, D_Page, D_Report, D_History, D_Schema, X_ASSETS, X_INCOME, X_EQLIAB, SCREENLINES } from '../terms.js'
 import { useSession } from '../modules/sessionmanager';
@@ -161,7 +162,7 @@ function makeStatusData(response) {
         }
         iLeft++;
     }
-    for (let i=iLeft;i<maxRow && i<SCREENLINES;i++) { statusData[i]={ "gLeft":" ", "nLeft": " " }; }
+    for (let i=iLeft;i<maxRow && i<SCREENLINES;i++) { statusData[i]={ "gLeft":null, "nLeft": " " }; }
 
 
     let iMidl=0;
@@ -176,7 +177,7 @@ function makeStatusData(response) {
         statusData[iMidl].nMidl = iName;
         iMidl++;
     }
-    for (let i=iMidl;i<maxRow && i<SCREENLINES;i++) { statusData[i].gMidl=' '; statusData[i].nMidl=' '; }
+    for (let i=iMidl;i<maxRow && i<SCREENLINES;i++) { statusData[i].gMidl=null; statusData[i].nMidl=' '; }
 
 
     let iRite=0;
@@ -194,11 +195,11 @@ function makeStatusData(response) {
         }
         
     }
-    for (let i=iRite;i<maxRow && i<SCREENLINES;i++) { statusData[i].gRite=' '; statusData[i].nRite=' '; }
+    for (let i=iRite;i<maxRow && i<SCREENLINES;i++) { statusData[i].gRite=null; statusData[i].nRite=' '; }
 
     // build fourth column with recent transactions
 
-    let iHistory=Object.keys(jHistory).map((x) => (x));
+   // let iHistory=Object.keys(jHistory).map((x) => (x));
 
     if(jHistory && gSchema.Names && gSchema.Names.length>0) {
         var names=gSchema.Names;
@@ -242,13 +243,13 @@ function StatusRow({ am1,tx1, am2, tx2, am3, tx3, d, n, l}) {
 
     return(
         <div className="attrLine">
-            <div className="MOAM"> {am1}</div>
+            <div className="MOAM"> {cents2EU(am1)}</div>
             <div className="SYMB"> {tx1}</div>
             <div className="SEP"> &nbsp;</div>
-            <div className="MOAM"> {am2}</div>
+            <div className="MOAM"> {cents2EU(am2)}</div>
             <div className="SYMB"> {tx2}</div>
             <div className="SEP"> &nbsp;</div>
-            <div className="MOAM"> {am3}</div>
+            <div className="MOAM"> {cents2EU(am3)}</div>
             <div className="SYMB"> {tx3}</div>
             <div className="SEP"> &nbsp;</div>
             <div className="SYMB"> {d}</div>

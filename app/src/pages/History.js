@@ -47,7 +47,7 @@ export default function History() {
     let sHistory=makeHistory(sheet);
     let sPages = sHistory.length / SCREEN_TXNS;    
     let strToken=token();
-    console.log("strToken="+strToken);
+    console.log("strToken="+JSON.stringify(strToken));
 
     let aPages = [];
     for(let p=1;p<sPages-1;p++) aPages[p]='none'; 
@@ -74,19 +74,19 @@ export default function History() {
 function SigRow(row) {
     //{  console.log("SigRow "+JSON.stringify(row.row))  } 
 
-    let aRow = [0,0,0,0,0,0]
+    let aRow = [0n,0n,0n,0n,0n,0n]
     try { let saRow = row.row.sig;
         aRow = saRow.split(CSEP);
      } catch(err) {}
     
-    let mRow =  [0,0,0,0,0,0]
+    let mRow =  [0n,0n,0n,0n,0n,0n]
     try { let smRow = row.row.money;
         mRow = smRow.split(CSEP);
     } catch(err) {}
 
     let saldo="";
     if(isNaN(row.row.saldo)) saldo="-,--";
-    else saldo = (row.row.saldo); // cents2EU
+    else saldo = cents2EU(row.row.saldo); // cents2EU
 
     return (
         <div className="attrPair">
@@ -123,8 +123,8 @@ function makeHistory(sheet) {
     const arrHistory = [];                
     //const response = JSON.parse(strText);
     const jHistory  = sheet[D_History];
-    const aLen = sheet[D_Schema].assets;
-    const eLen = sheet[D_Schema].eqliab;
+    let aLen = parseInt(sheet[D_Schema].assets);
+    let eLen = parseInt(sheet[D_Schema].eqliab);
     const gSchema = sheet[D_Schema];
     const pageGlobal = sheet[D_Page];
 
@@ -148,15 +148,16 @@ function makeHistory(sheet) {
             for (let hash in jHistory)  {
 
                 let jPrettyTXN = prettyTXN(jHistory,hash,lPattern,aPattern,names,aLen,eLen);
-/*
+
 
                 // GH 20220703
                 if(jPrettyTXN.txnAcct) {
+                   
                     let deltaText = "'"+jPrettyTXN.delta.join(CSEP)+"'";
                     let boxNote = "'"+pageGlobal["author"].replace('&nbsp',' ')+"'";                 
                     
                     let iBalance= BigInt(jPrettyTXN.strBalance);
-                    //let balCheck= '<DIV className="SYMB">'+cents2EU(iBalance)+'</DIV>';
+                    let balCheck= '<DIV className="SYMB">'+cents2EU(iBalance)+'</DIV>';
 
                     let data = (
                         jPrettyTXN.entry.join(CSEP)
@@ -173,9 +174,9 @@ function makeHistory(sheet) {
 
                     iSaldo += BigInt(jPrettyTXN.strSaldo);
                     
-                    arrHistory.push({'sig':sigLine.join(CSEP),'money':moneyLine.join(CSEP), 'saldo':""+iSaldo});                                        
+                    arrHistory.push({'sig':sigLine.join(CSEP),'money':moneyLine.join(CSEP), 'saldo':""+(iSaldo) });
+                                 
                 }
-                    */                
             }
             let rHistory=arrHistory.reverse();
 
