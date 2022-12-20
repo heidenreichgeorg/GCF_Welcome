@@ -1,10 +1,12 @@
-// CAN ONLY SERVER UP TO SIX PARTNERS
 
-const debug=3;
+
+
+// CAN ONLY DOCUMENT UP TO SIX PARTNERS
+const debug=null;
 
 
 // SETTING THIS WILL VIOLATE PRIVACY AT THE ADMIN CONSOLE !!! 
-let debugReport=3;
+let debugReport=null;
 
 
 // table parsing
@@ -345,7 +347,8 @@ function initBalance() {
     var balance = [];
 
     balance[D_Balance]={};
-    balance[D_History]={};
+    balance[D_History]={'0':[1,"01.01.1900","Illuminati","NKG","Test","Silvester",7,8,9,10,11,12,13,14,15,16,17,18,19,20,
+                         21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,4,41,42,43,44,45 ]};
     balance[D_Schema]= {};
     balance[D_FixAss]= {};
     balance[D_Partner_NET]= {};
@@ -801,11 +804,13 @@ function compile(sessionData) {
 
     let balance = sendBalance(result);
 
-    if(debug) console.log("0390 COMPILED = "+JSON.stringify(Object.keys(balance)));
+    
+    if(debug) console.log("0390 COMPILED         = "+JSON.stringify(Object.keys(balance)));
+    if(debug) console.log("0390 COMPILED HISTORY = "+JSON.stringify(Object.keys(balance[D_History])));
 
-    // GH20221120 write to firestore
-    //Sheets.fireWrite(sessionData);
-
+    if(debugReport) { 
+        let jHistory=balance[D_History];
+        Object.keys(jHistory).map((lineNo) => (console.log("0390 #"+lineNo+"= "+JSON.stringify(jHistory[lineNo])))) }
 
     return balance;
 
@@ -1198,19 +1203,23 @@ function distribute(iMoney,bPartner,target) {
 
 
         // init with raw share
+        let index1=0;
         for (var n in bPartner) {
             var p=bPartner[n];
-            let iShare = (iMoney * BigInt(p.gain)) / BigInt(p.denom);
-            result.push(iShare);
-            cents.push(0n);
-            if(debug>2) console.log('0134 Sender.distribute '+sign+'*'+iShare+' to '+ p.vk+ " with "+p.gain+"/"+p.denom);
+            if(p) {
+                let iShare = (iMoney * BigInt(p.gain)) / BigInt(p.denom);
+                result[index1]=iShare;
+                cents[index1]=0n;
+                if(debug>2) console.log('0134 Sender.distribute #'+n+'='+index1+': '+sign+'*'+iShare+' to '+ p.vk+ " with "+p.gain+"/"+p.denom);
+                index1++;
+            }
         }
 
       
 
         // skip one-man show
         if(bPartner.length<2) {
-            console.log('0136 Sender.distributeMoney('+iMoney+') PRE-LOOP NO PARTNERS IN BALANCE'); 
+            if(debug==4) console.log('0136 Sender.distributeMoney('+iMoney+') PRE-LOOP NO PARTNERS IN BALANCE'); 
             result[0]=iMoney;
         }
         else while(check<iMoney){
@@ -1223,7 +1232,7 @@ function distribute(iMoney,bPartner,target) {
             check=0n;
             for(var q=0;q<result.length;q++) {
                 check = check + result[q] + cents[q];
-                console.log("0138 distribute  "+q+"="+result[q]+"+"+cents[q])
+                if(debug==4) console.log("0138 distribute  "+q+"="+result[q]+"+"+cents[q])
             }
             let err = iMoney-check;
 
@@ -1240,7 +1249,7 @@ function distribute(iMoney,bPartner,target) {
 
                 // increment cents' miminum
                 cents[mIndex]=min+1n;                
-                console.log("0140 cents["+mIndex+"]="+cents[mIndex]+" G"+result[0]+" E"+result[1]+" A"+result[2]+" K"+result[3]+" T"+result[5]);
+                if(debug==4) console.log("0140 cents["+mIndex+"]="+cents[mIndex]+" G"+result[0]+" E"+result[1]+" A"+result[2]+" K"+result[3]+" T"+result[5]);
                 
 
             }
@@ -1272,15 +1281,19 @@ function distribute(iMoney,bPartner,target) {
             var p=bPartner[id];
             if(p) {
                 p[target]= ""+result[index];
+
+                if(debug==4) console.log('0142 distributeMoney('+result[index]+') to '+JSON.stringify(p)+"["+target+"]");
+
                 index++;
+
             }
         }
 
     } else console.log('0133 Sender.distributeMoney('+JSON.stringify(iMoney)+') NO PARTNERS IN BALANCE');
 
     
-    if(debug && result && result.length>5) console.log('0142 Sender.distributeMoney '+iMoney + " G"+result[0]+" E"+result[1]+" A"+result[2]+" K"+result[3]+" T"+result[4]+" L"+result[5]);
-    if(debug && cents && cents.length>5)   console.log('0142 Sender.distributeMoney '+iMoney + " G"+cents[0]+"  E"+cents[1] +" A"+ cents[2]+" K"+ cents[3]+" T"+ cents[4]+" L"+ cents[5]);
+    if(debug && result && result.length>5) console.log('0144 Sender.distributeMoney '+iMoney + " G"+result[0]+" E"+result[1]+" A"+result[2]+" K"+result[3]+" T"+result[4]+" L"+result[5]);
+    if(debug && cents && cents.length>5)   console.log('0146 Sender.distributeMoney '+iMoney + " G"+cents[0]+"  E"+cents[1] +" A"+ cents[2]+" K"+ cents[3]+" T"+ cents[4]+" L"+ cents[5]);
     return result;
 }
 

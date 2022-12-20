@@ -1,3 +1,4 @@
+/* global BigInt */
 
 import { J_ACCT, COLMIN, DOUBLE, D_History, D_Page, D_Schema } from '../terms.js'
 
@@ -52,7 +53,11 @@ export function GainLossRow({section,type,acct,xbrl,amount}) {
 
 export function prettyTXN(jHistory,hash,lPattern,aPattern,names,aLen,eLen) {
 
-    var iBalance=0;
+    var iBalance=0n;
+    var iSaldo=0n;
+    var result={};
+
+    
 
     var entry = [];
     var credit = [HTMLSPACE];
@@ -61,8 +66,7 @@ export function prettyTXN(jHistory,hash,lPattern,aPattern,names,aLen,eLen) {
     var aAmount = [];
     var delta = [];
     var txnAcct = false;
-    var cSaldo=0;
-
+/*
     let parts = jHistory[hash];
     if(parts && parts.length>2) {
 
@@ -88,9 +92,12 @@ export function prettyTXN(jHistory,hash,lPattern,aPattern,names,aLen,eLen) {
             for(var j=J_ACCT;i<parts.length;j++) {
                 if(parts[j] && parts[j].length>0 && j!=aLen && j!=eLen) { 
                     
-                    // GH20220307 EU-style numbers
+                    // GH20220307 EU-style numbers with two decimal digits
                     let strCents = parts[j].replace('.','').replace(',','');
-                    let item = bigEUMoney(strCents); 
+                    
+
+                    let item=1n;
+                    //let item = BigInt(strCents); 
 
                     
                     // GH20220703
@@ -99,51 +106,50 @@ export function prettyTXN(jHistory,hash,lPattern,aPattern,names,aLen,eLen) {
                         && aPattern && aPattern.length>1 
                         && names[i].toLowerCase().includes(aPattern.toLowerCase())) {
                             txnAcct=true;
-                            cSaldo += item; // Money
+                            iSaldo += item; // BigInt
                         }
 
 
-                    if(item!=0) {// Money
-                        delta.push(names[i]+DOUBLE+parts[i]); 
-
-                        // GH20220307
-                        let value = bigEUMoney(parts[i]);
-                        if(i<aLen) iBalance += value.cents;
-                        else if(i!=aLen && i!=eLen) iBalance -= value;
-                        //console.dir("ADD "+parts[i]+ " --> "+value.cents+"  --> "+iBalance);
-                    }
+//                    if(item!=0) {// Money
+//                        delta.push(names[i]+DOUBLE+parts[i]); 
+//
+//                        // GH20220307
+//                        let value = bigEUMoney(parts[i]);
+//                        if(i<aLen) iBalance += value;
+//                        else if(i!=aLen && i!=eLen) iBalance -= value;
+//                        //console.dir("ADD "+parts[i]+ " --> "+value.cents+"  --> "+iBalance);
+//                    }
 
                     aNames.push(names[i]);   
                     aAmount.push(parts[i]);   
 
                     // POS ASSET
-                    if(item>0 && i<aLen && i!=eLen) credit.push(names[i]+DOUBLE+parts[i]);                                        
+                    if(item>0n && i<aLen && i!=eLen) credit.push(names[i]+DOUBLE+parts[i]);                                        
                 // Money
                     // NEG EQLIAB
-                    if(item<0 && i>aLen && i!=eLen) credit.push(names[i]+DOUBLE+parts[i].replace('-',''));
+                    if(item<0n && i>aLen && i!=eLen) credit.push(names[i]+DOUBLE+parts[i].replace('-',''));
                 // Money
                     // NEG ASSET
-                    if(item<0 && i<aLen && i!=eLen) debit.push(names[i]+DOUBLE+parts[i].replace('-',''));
+                    if(item<0n && i<aLen && i!=eLen) debit.push(names[i]+DOUBLE+parts[i].replace('-',''));
                 // Money
                     // POS EQLIAB
-                    if(item>0 && i>aLen && i!=eLen) debit.push(names[i]+DOUBLE+parts[i]);
+                    if(item>0n && i>aLen && i!=eLen) debit.push(names[i]+DOUBLE+parts[i]);
                 // Money
                 }
             }
         }
     }
-    
-    let result={};
+    */
 
     result.txnAcct=txnAcct;
     result.entry=entry;
     result.delta=delta;
     result.credit=credit;
     result.debit=debit;
-    result.iBalance=iBalance;
+    result.strBalance=""+iBalance;
     result.aNames=aNames;
     result.aAmount=aAmount;
-    result.cSaldo=cSaldo;
+    result.strSaldo=""+iSaldo;
     return result;
 }
 

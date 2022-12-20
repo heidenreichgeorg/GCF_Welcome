@@ -1,3 +1,4 @@
+/* global BigInt */
 
 import { useEffect, useState, useRef  } from 'react';
 
@@ -85,7 +86,7 @@ function SigRow(row) {
 
     let saldo="";
     if(isNaN(row.row.saldo)) saldo="-,--";
-    else saldo = cents2EU(row.row.saldo);
+    else saldo = (row.row.saldo); // cents2EU
 
     return (
         <div className="attrPair">
@@ -142,20 +143,20 @@ function makeHistory(sheet) {
 
         if(gSchema.Names && gSchema.Names.length>0) {
             var names=gSchema.Names;
-            var cSaldo=0;
+            var iSaldo=0n;
 
             for (let hash in jHistory)  {
 
                 let jPrettyTXN = prettyTXN(jHistory,hash,lPattern,aPattern,names,aLen,eLen);
+/*
 
                 // GH 20220703
                 if(jPrettyTXN.txnAcct) {
-
                     let deltaText = "'"+jPrettyTXN.delta.join(CSEP)+"'";
                     let boxNote = "'"+pageGlobal["author"].replace('&nbsp',' ')+"'";                 
                     
-                    let iBalance= jPrettyTXN.iBalance;
-                    let balCheck= '<DIV className="SYMB">'+cents2EU(iBalance)+'</DIV>';
+                    let iBalance= BigInt(jPrettyTXN.strBalance);
+                    //let balCheck= '<DIV className="SYMB">'+cents2EU(iBalance)+'</DIV>';
 
                     let data = (
                         jPrettyTXN.entry.join(CSEP)
@@ -170,10 +171,11 @@ function makeHistory(sheet) {
                     var moneyLine=[];
                     for (i=6;i<14;i++) { moneyLine.push(data[i]); }  
 
-                    cSaldo += jPrettyTXN.cSaldo;
+                    iSaldo += BigInt(jPrettyTXN.strSaldo);
                     
-                    arrHistory.push({'sig':sigLine.join(CSEP),'money':moneyLine.join(CSEP), 'saldo':cSaldo});                                        
+                    arrHistory.push({'sig':sigLine.join(CSEP),'money':moneyLine.join(CSEP), 'saldo':""+iSaldo});                                        
                 }
+                    */                
             }
             let rHistory=arrHistory.reverse();
 

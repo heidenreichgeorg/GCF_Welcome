@@ -6,7 +6,7 @@ function bigMoney(strAdd,factor,money) {
     factor=BigInt(factor);
     var euros=0n;
     var cents=0n;
-    if(strAdd) {          
+    if(strAdd && strAdd.length>0) {          
         var amount = strAdd.split(',');
         var plain = amount[0].replace('.', '').trim(); 
         if(plain.startsWith('-')) { factor=-1n * factor; plain=plain.slice(1); }
@@ -46,20 +46,20 @@ export function addEUMoney(strAdd,money) {
         return bigMoney(strAdd,1n,money); }
 
 export function bigEUMoney(strSet) {
-    return BigInt(strSet); }
+    return bigMoney(strSet,1n,null); }
 
     
 
 export function cents2EU(amount) { 
     let cents=amount; 
     
-    if(!cents) return "0,00";
+    if(!cents) return "";
     let result=cents;
     
-    if(typeof(cents)==="string") {
-        cents=BigInt(cents); 
-    } // fixedAssets: some cents are strings with plain int format
     try {
+        if(typeof(cents)==="string") {
+            cents=BigInt(cents); 
+        } // fixedAssets: some cents are strings with plain int format
 
         var sign=""; if(cents<0n) { sign="-"; cents= -cents; }
         var kiloNum = BigInt(cents/100000n);
@@ -76,7 +76,7 @@ export function cents2EU(amount) {
         cents = cents - (euroNum*100n);
 
         result =  sign + megaStr + milleStr + euroStr+"," +(BigInt(cents%100n).toString().padStart(2,'0'));
-    } catch(err) { result=typeof(cents); }
+    } catch(err) { /*result=typeof(cents);*/ }
     return result;
 }
 

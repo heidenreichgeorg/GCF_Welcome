@@ -9,6 +9,8 @@ for each account in D_Balance with XBRL=de-gaap-ci_bs.ass.currAss.receiv.other.o
     for each partner in D_Partner_NET take gain/denom
 */
 
+/* global BigInt */
+
 import { useEffect, useState, useRef  } from 'react';
 import Screen from '../pages/Screen'
 import FooterRow from '../components/FooterRow'
@@ -46,15 +48,15 @@ export default function Partner() {
 
     let aPages = [];
 
-    function makeTax(partner,index,fix) {
-        let gain=parseInt(partner.gain);
-        let deno=parseInt(partner.denom);               
+    function makeTax(partner,index,ifix) {
+        let igain=BigInt(partner.gain);
+        let ideno=BigInt(partner.denom);               
         let result= { 'name': partner.name };
         Object.keys(jBalance).map((name,index) => (jBalance[name].xbrl==='de-gaap-ci_bs.ass.currAss.receiv.other.otherTaxRec.CapTax'?
-                                                    (result[name]=cents2EU(((fix+bigEUMoney(jBalance[name].yearEnd).cents)*gain)/deno))
+                                                    (result[name]=cents2EU(((ifix+BigInt(jBalance[name].yearEnd))*igain)/ideno))
                                                     :{}));
 
-        console.log("Partner("+index+") with "+gain+"/"+deno+"response D_Report"+JSON.stringify(result));
+        console.log("Partner("+index+") with "+igain+"/"+ideno+"response D_Report"+JSON.stringify(result));
         return result;
     }
     
@@ -63,7 +65,7 @@ export default function Partner() {
 
     // fix are cents to compensate for rounding when tax is shared among partners
     let fix = Object.keys(jReport).length-1;
-    let aTax = Object.keys(jReport).map((index) => (taxDetails.push(makeTax(jReport[index],index,fix))));
+    let aTax = Object.keys(jReport).map((index) => (taxDetails.push(makeTax(jReport[index],index,BigInt(fix)))));
     
 
     let hKeys=Object.keys(taxDetails[0]);
@@ -189,15 +191,15 @@ function PartnerRow(mRow) {
 
         <div className="attrLine">
             <div className="SYMB">{mRow.p.name}</div>
-            <div className="MOAM">{mRow.p.init}</div>
-            <div className="MOAM">{mRow.p.credit}</div>
-            <div className="MOAM">{mRow.p.debit}</div>
-            <div className="MOAM">{mRow.p.yearEnd}</div>
-            <div className="MOAM">{mRow.p.netIncomeOTC}</div>
-            <div className="MOAM">{mRow.p.netIncomeFin}</div>
-            <div className="MOAM">{mRow.p.close}</div>
-            <div className="TAX" >{mRow.p.tax}</div>
-            <div className="MOAM">{mRow.p.next}</div>
+            <div className="MOAM">{cents2EU(mRow.p.init)}</div>
+            <div className="MOAM">{cents2EU(mRow.p.credit)}</div>
+            <div className="MOAM">{cents2EU(mRow.p.debit)}</div>
+            <div className="MOAM">{cents2EU(mRow.p.yearEnd)}</div>
+            <div className="MOAM">{cents2EU(mRow.p.netIncomeOTC)}</div>
+            <div className="MOAM">{cents2EU(mRow.p.netIncomeFin)}</div>
+            <div className="MOAM">{cents2EU(mRow.p.close)}</div>
+            <div className="TAX" >{cents2EU(mRow.p.tax)}</div>
+            <div className="MOAM">{cents2EU(mRow.p.next)}</div>
         </div>
     
     )

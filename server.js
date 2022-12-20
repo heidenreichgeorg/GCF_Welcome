@@ -25,6 +25,7 @@ const ReactPort = 3000;
 
 
 const debug=null;
+const debugReport = null; // will violate data privacy of reporting subject
 
 const HTTP_OK = 200;
 const HTTP_WRONG = 400;
@@ -215,8 +216,8 @@ app.get('/SESSION', (req, res) => {
         // WARM START : FOUND EXISTING ID
         } else {
             session = getSession(sessionId);
-//            if(session) console.log("\n0820 GET /SESSION FOUND LOADED "+showRecent(session)+" => "+session.id);
-            if(session) console.log("\n0820 GET /SESSION FOUND LOADED "+JSON.stringify(session));
+//            if(session) console.log("\n 0820 GET /SESSION FOUND LOADED "+showRecent(session)+" => "+session.id);
+            if(session && debugReport>3) console.log("\n 0820 GET /SESSION FOUND LOADED "+JSON.stringify(session));
             else console.log("\n0821 GET /SESSION NOT FOUND => FOR EXISTING #"+sessionId);
 
             
@@ -567,7 +568,7 @@ app.post("/UPLOAD", (req, res) => {
             let cmdLogin = "http://localhost:81/LATEST?client="+client+"&year="+year+"&ext=JSON&clientSave=JSON";
             // should not set a sesssion.id because id not known while async save2bucket is not finished       
 
-            console.dir("0820 app.post UPLOAD rendering QR code");
+            console.dir("0822 app.post UPLOAD rendering QR code");
             res.write('<DIV class="attrRow"><H1>'+year+'&nbsp;'+client+'&nbsp;</H1>'
             +'<DIV class="attrRow"><DIV class="C100"><A HREF="'+cmdLogin+'"><BUTTON class="largeKey">LOGIN</BUTTON></A></DIV></DIV>'
             +'</DIV>'
