@@ -6,7 +6,7 @@ const debug=null;
 
 
 // SETTING THIS WILL VIOLATE PRIVACY AT THE ADMIN CONSOLE !!! 
-let debugReport=null;
+let debugReport=1;
 
 
 // table parsing
@@ -169,7 +169,7 @@ function init(app, argv) {
         if(debug) console.log("\n\n");
         // from TransferForm.html       
         if(debug) console.log(Server.timeSymbol());
-        if(debugReport) console.log("0610 app.post BOOK prepareTXN('"+JSON.stringify(req.body)+"')");
+        if(debugReport) console.log("0610 app.post BOOK formatTXN('"+JSON.stringify(req.body)+"')");
 
         var result="SERVER BOOKED";
         let sessionId = req.body.sessionId; // OLD
@@ -180,7 +180,7 @@ function init(app, argv) {
             if(sessionId && client && year) {
 
                 // SECURITY SANITIZE req.body
-                let tBuffer = prepareTXN(sessionId,req.body);
+                let tBuffer = formatTXN(sessionId,req.body);
                 let sessionTime=Server.timeSymbol();
                 let nextSessionId= Server.strSymbol(sessionTime+client+year+sessionTime);
 
@@ -358,7 +358,8 @@ function initBalance() {
         xbrlFixed  : { level:2, xbrl: "de-gaap-ci_bs.ass.fixAss", de_DE:'Anlagevermögen'},
         abrlABank: {   level:4, xbrl: "de-gaap-ci_bs.ass.currAss.cashEquiv.bank", de_DE:'Bankkonto'},
         abrlAmoney: {  level:3, xbrl: "de-gaap-ci_bs.ass.currAss.cashEquiv", de_DE:'Geldinstr.'},
-        xbrlPaidTax: { level:4, xbrl: "de-gaap-ci_bs.ass.currAss.receiv.other.otherTaxRec", de_DE:'gezahlte Steuer'},      
+        xbrlPaidTax: { level:4, xbrl: "de-gaap-ci_bs.ass.currAss.receiv.other.otherTaxRec", de_DE:'gezahlte Steuer'},     
+                    // KESO KEST AQST= de-gaap-ci_bs.ass.currAss.receiv.other.otherTaxRec.CapTax 
         xbrlArec:  {   level:3, xbrl: "de-gaap-ci_bs.ass.currAss.receiv", de_DE:'Forderungen'},
         xbrlAcurr:  {  level:2, xbrl: "de-gaap-ci_bs.ass.currAss", de_DE:'Umlaufvermögen'},
         xbrlAssets :{  level:1, xbrl: "de-gaap-ci_bs.ass", de_DE:'Aktiva'},
@@ -1073,7 +1074,6 @@ function sendBalance(balance) {
 
 
     // reverse or nor GH20221107
-    //Object.keys(bHistory).reverse().map((hash,i) => {txns[i] = bHistory[hash]});
     Object.keys(bHistory).map((hash,i) => {txns[i] = bHistory[hash]});
     
     
@@ -1354,9 +1354,9 @@ function bigAsset(row,iAssets) {
 }
 
 
-function prepareTXN(sessionId,reqBody) {
+function formatTXN(sessionId,reqBody) {
 
-    if(debug) console.log("compile.js prepareTXN("+sessionId+") book "+JSON.stringify(reqBody));
+    if(debug) console.log("compile.js formatTXN("+sessionId+") book "+JSON.stringify(reqBody));
 
     var jFlag  = reqBody.flag; if(!jFlag) jFlag=0;
     var jDate  = reqBody.date;
@@ -1370,7 +1370,7 @@ function prepareTXN(sessionId,reqBody) {
 
     let session = Server.getSession(sessionId);
     if(session) {
-        if(debug) console.dir("compile.js prepareTXN("+sessionId+") book "+JSON.stringify(reqBody));
+        if(debug) console.dir("compile.js formatTXN("+sessionId+") book "+JSON.stringify(reqBody));
 
         var balance = session.generated;
 
@@ -1380,11 +1380,11 @@ function prepareTXN(sessionId,reqBody) {
     
             if(isSameFY(year) || jFlag) {
 
-                if(debug>0) console.log("compile.js prepareTXN() "+JSON.stringify(jCredit)+"/ "+JSON.stringify(jDebit));
+                if(debug>0) console.log("compile.js formatTXN() "+JSON.stringify(jCredit)+"/ "+JSON.stringify(jDebit));
 
 
                 var total = balance[D_Schema].total;
-                var aLen = balance[D_Schema].assets;
+                var aLen = parseInt(balance[D_Schema].assets);
 
                 bookingForm = (CSEP.repeat(total)).split(CSEP);
 
@@ -1395,25 +1395,23 @@ function prepareTXN(sessionId,reqBody) {
                 bookingForm[4]=jSVWZ;
                 bookingForm[5]=jSVWZ2;
                 
+                // jCredit,jDebit { index:45, value:66266262 }
+
                 for(let money in jCredit) {
-                    var factor=1n;
                     var i=jCredit[money].index;
-                    if(i>aLen) factor=-1n;
-                    bookingForm[i] = factor * jCredit[money];
+                    bookingForm[i] = jCredit[money].value;
                 }
 
                 for(let money in jDebit) {
-                    var factor=-1n;
                     var i=jDebit[money].index;
-                    if(i>aLen) factor=1n;
-                    bookingForm[i] = factor * jDebit[money];
+                    bookingForm[i] = jDebit[money].value;
                 }
-            } else { console.log("compile.js prepareTXN() rejects other fiscal year:"+year);
+            } else { console.log("compile.js formatTXN() rejects other fiscal year:"+year);
                 return null;
             }
-        } else console.log("compile.js prepareTXN("+sessionId+") no BALANCE table ");
+        } else console.log("compile.js formatTXN("+sessionId+") no BALANCE table ");
 
-    } else console.log("compile.js prepareTXN("+sessionId+") no SESSION ");
+    } else console.log("compile.js formatTXN("+sessionId+") no SESSION ");
     // receiver will append this to sheetCells
     return bookingForm;
 

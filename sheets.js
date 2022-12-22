@@ -501,7 +501,7 @@ function makeXLTabs(client,year,sheetCells,jAssets,jHistory,jSchema,jPartner,jBa
     let  taxDetails=[];
 
     // fix are cents to compensate for rounding when tax is shared among partners
-    let fix = Object.keys(jReport).length-1;
+    let fix = BigInt(Object.keys(jReport).length-1);
     let aTax = Object.keys(jReport).map((index) => (taxDetails.push(makeTax(jBalance,jReport[index],index,fix))));
     let hKeys=Object.keys(taxDetails[0]);
     taxHeaders.push(  hKeys );
@@ -592,13 +592,13 @@ function accountSheet(column,txns,saldo) {
 
 
 function makeTax(jBalance,partner,index,fix) {
-    let gain=parseInt(partner.gain);
-    let deno=parseInt(partner.denom);               
+    let igain=BigInt(partner.gain);
+    let ideno=BigInt(partner.denom);               
     let result= { 'name': partner.name };
     Object.keys(jBalance).map((name,index) => (jBalance[name].xbrl==='de-gaap-ci_bs.ass.currAss.receiv.other.otherTaxRec.CapTax'?
-                                                (result[name]=(fix+(BigInt(jBalance[name].yearEnd)*gain)/deno))
-                                                :0n));
+                                                (result[name]=(""+(fix+(BigInt(jBalance[name].yearEnd)*igain)/ideno)))
+                                                :"0,00"));
 
-    console.log("Partner("+index+") with "+gain+"/"+deno+"response D_Report"+JSON.stringify(result));
+    console.log("Partner("+index+") with "+igain+"/"+ideno+"response D_Report"+JSON.stringify(result));
     return result;
 }

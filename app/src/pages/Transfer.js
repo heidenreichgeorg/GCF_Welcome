@@ -2,7 +2,7 @@ import { useEffect, useState, useRef  } from 'react';
 
 import FooterRow from '../components/FooterRow'
 import Screen from '../pages/Screen'
-import { prettyTXN, buildTXN }  from '../modules/App';
+import { prettyTXN, prepareTXN }  from '../modules/App';
 import { J_ACCT, D_Page, D_History, D_Schema, CSEP } from '../terms.js'
 import { useSession } from '../modules/sessionmanager';
 import e from 'cors';
@@ -190,7 +190,7 @@ export default function Transfer() {
         console.log("BOOK A "+JSON.stringify(cAmounts));
         
         let flow = { 'credit': {}, 'debit':{} }
-        for(let i=0;i<5;i++) buildTXN(sheet[D_Schema],flow,cNames[i],cAmounts[i]);
+        for(let i=0;i<5;i++) prepareTXN(sheet[D_Schema],flow,cNames[i],cAmounts[i]);
 
         console.log("BOOK F "+JSON.stringify(flow));
         

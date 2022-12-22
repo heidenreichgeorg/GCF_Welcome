@@ -119,7 +119,7 @@ function makeBalance(response,value) {
 
         if(dispValue && iName && full_xbrl) {
             // collect compute total right side amount
-            if(full_xbrl==='de-gaap-ci_bs.eqLiab') { iEqLiab=BigInt(dispValue);  /*bigEUMoney  dispValue=moneyString(mEqLiab);*/ }
+            if(full_xbrl==='de-gaap-ci_bs.eqLiab') { iEqLiab=BigInt(dispValue);  }
             if(full_xbrl==='de-gaap-ci_is.netIncome.regular') { income=BigInt(dispValue); }
             if(full_xbrl==='de-gaap-ci_bs.eqLiab.income') { 
                 let bIncome=(income+iEqLiab); 

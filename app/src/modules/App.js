@@ -4,8 +4,6 @@ import { J_ACCT, COLMIN, DOUBLE, D_History, D_Page, D_Schema } from '../terms.js
 
 import { bigEUMoney, cents2EU } from './money'
 
-import 'BigInt';
-
 const HTMLSPACE=" "; 
 
 export const CSEP = ';';
@@ -147,11 +145,11 @@ export function prettyTXN(jHistory,hash,lPattern,aPattern,names,aLen,eLen) {
     return result;
 }
 
-export function buildTXN(schema,flow,name,amount) {
+export function prepareTXN(schema,flow,name,amount) {
     
-    var balanceNames =schema.Names;
-    var aLen = schema.assets;
-    var eLen =  schema.eqliab;
+    var balanceNames=schema.Names;
+    var aLen =       schema.assets;
+    var eLen =       schema.eqliab;
 
 
     let credit=flow.credit;
@@ -162,7 +160,9 @@ export function buildTXN(schema,flow,name,amount) {
         for(var i=J_ACCT;i<balanceNames.length;i++) {
             if(balanceNames[i] && balanceNames[i].length>0 && i!=aLen && i!=eLen && balanceNames[i]===name) { 
                 
-                let entry = { index:i, cents:bigEUMoney(amount).cents}
+                let iValue = bigEUMoney(amount);
+
+                let entry = { index:i, value: cents2EU(iValue) }
 
                 if(i<aLen && i!=eLen) credit[name]=entry;
             
