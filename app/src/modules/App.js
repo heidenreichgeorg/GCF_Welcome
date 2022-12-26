@@ -23,18 +23,7 @@ export function OverviewRow({acct, amount, name1, name2}) { //
     )
 }
 
-// hgbregular.html
-export function BalanceRow({text,level4,level3,level2,level1}) { 
-    return (
-        <div className="attrLine">
-            <div className="L280">{text}</div>
-            <div className="R105">{level4}</div>
-            <div className="R105">{level3}</div>
-            <div className="R105">{level2}</div>
-            <div className="R105">{level1}</div>
-        </div>
-    )
-}
+
 
 export function GainLossRow({section,type,acct,xbrl,amount}) {
     return(

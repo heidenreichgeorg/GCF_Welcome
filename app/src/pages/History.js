@@ -3,10 +3,13 @@
 import { useEffect, useState } from 'react';
 
 import Screen from '../pages/Screen'
+
 import FooterRow from '../components/FooterRow'
+
 import { D_History, D_Page, D_Schema }  from '../terms.js';
-import { cents2EU}  from '../modules/money';
-import { CSEP, getParam, prettyTXN}  from '../modules/App';
+
+import { cents2EU }  from '../modules/money';
+import { CSEP, getParam, prettyTXN }  from '../modules/App';
 import { useSession } from '../modules/sessionmanager';
 
 /* REACT-BOOTSTRAP
@@ -69,18 +72,12 @@ export default function History() {
     aPages[0]='block';
    
      return (
-        <Screen prevFunc={prevFunc} nextFunc={nextFunc} tabSelector={aPages} >
+        <Screen prevFunc={prevFunc} nextFunc={nextFunc} tabSelector={isOpen ? [] : aPages } >
 
             {isOpen && (
                 <div>                    
                     <button onClick={() => funcHideReceipt()}>CLOSE</button>
-                    { Object.keys(aSelText).map((sym,i) => (
-                       // '<div className="ulliTab" id="PageContentReceipt">'+
-                       //     '<div className="attrLine">'+
-                                "RECEIPT #"+i+"   "+aSelText[sym].join(' ')+"\n"+aSelMoney[sym].join(' ')
-                       //     +'</div>'+
-                       // '</div>'
-                    ))}            
+                    { Object.keys(aSelText).map((sym,i) => ( aSelText[sym] ? TXNReceipt(sym,i) : "")) }
                 </div>
             )}
 
@@ -239,7 +236,6 @@ function makeHistory(sheet) {
             for (let i=1;i<SCREEN_TXNS;i++) arrHistory.push({sig:CSEP+CSEP+CSEP+CSEP+CSEP,money:CSEP+CSEP+CSEP+CSEP+CSEP+CSEP});
         }
     }
-    //console.log("makeHistory="+JSON.stringify(arrHistory))
     return arrHistory;
 }  
 
@@ -259,3 +255,53 @@ function SearchForm(token) {
         </div>
     )
 }
+
+function TXNReceipt(sym,i) {
+    let amounts = aSelMoney[sym];
+    let level6="";
+    let level5="";
+    let level4="";
+    let level3="";
+    let level2="";
+    let level1="";
+    let level0="";
+    if(amounts) { 
+        if(amounts.length>0) { level6=amounts[0];
+            if(amounts.length>0) { level5=amounts[1];
+                if(amounts.length>0) { level4=amounts[2];
+                    if(amounts.length>1) { level3=amounts[3];
+                        if(amounts.length>2) { level2=amounts[4];
+                            if(amounts.length>3) { level1=amounts[5];
+                                if(amounts.length>4) { level0=amounts[6];
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    return(
+        <div className="ulliTab" id="PageContentReceipt">
+            <div className="attrPair">
+                <BalanceRow text={aSelText[sym].join(' ')} level6={level6} level5={level5} level4={level4} level3={level3} level2={level2} level1={level1} level0={level0}/>
+            </div>
+        </div>
+)}      
+
+function BalanceRow({text,level6,level5,level4,level3,level2,level1,level0}) { 
+    return (
+        <div className="attrLine">
+            <div className="L280">{text}</div>
+            <div className="MOAM">{level6}</div>
+            <div className="MOAM">{level5}</div>
+            <div className="MOAM">{level4}</div>
+            <div className="MOAM">{level3}</div>
+            <div className="MOAM">{level2}</div>
+            <div className="MOAM">{level1}</div>
+            <div className="MOAM">{level0}</div>
+        </div>
+    )
+}
+
