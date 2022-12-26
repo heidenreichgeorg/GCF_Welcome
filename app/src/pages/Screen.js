@@ -29,7 +29,7 @@ import { useState, useEffect } from "react";
 
 export default function Screen({ children, prevFunc, nextFunc, tabSelector }) {
 
-    //const [isControl, setIsControl] = useState();
+    
     let isControl=false;
     function setIsControl(pressed) { isControl=pressed; }
 
@@ -97,8 +97,8 @@ export default function Screen({ children, prevFunc, nextFunc, tabSelector }) {
         <div className="mTable">           
             <div className="attrLine">           
                 {tabSelector.map((row,tabNum) => (
-                    <div className="SYMB" onClick={((e) => select('PageContent',{tabNum}))}>
-                        <label className="SYMB">
+                    <div className="TAG" onClick={((e) => select('PageContent',{tabNum}))}>
+                        <label className="TAG">
                             <input type="radio" name="tabSelector" autoFocus={tabNum==0?"1":""}/>                          
                             &nbsp;{tabNum}
                         </label>

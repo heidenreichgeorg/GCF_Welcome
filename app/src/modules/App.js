@@ -161,11 +161,8 @@ export function prepareTXN(schema,flow,name,amount) {
             if(balanceNames[i] && balanceNames[i].length>0 && i!=aLen && i!=eLen && balanceNames[i]===name) { 
                 
                 let iValue = bigEUMoney(amount);
-
                 let entry = { index:i, value: cents2EU(iValue) }
-
                 if(i<aLen && i!=eLen) credit[name]=entry;
-            
                 if(i>aLen && i!=eLen) debit[name]= entry;
             }
         }

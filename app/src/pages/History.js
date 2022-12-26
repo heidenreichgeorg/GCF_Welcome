@@ -1,7 +1,6 @@
 /* global BigInt */
 
-import { useEffect, useState, useRef  } from 'react';
-
+import { useEffect, useState } from 'react';
 
 import Screen from '../pages/Screen'
 import FooterRow from '../components/FooterRow'
@@ -10,21 +9,39 @@ import { cents2EU}  from '../modules/money';
 import { CSEP, getParam, prettyTXN}  from '../modules/App';
 import { useSession } from '../modules/sessionmanager';
 
+/* REACT-BOOTSTRAP
+Accordion, AccordionButton, AccordionCollapse, AccordionContext, Alert, Anchor, Badge, Breadcrumb, BreadcrumbItem,
+Button,ButtonGroup, ButtonToolbar, Card, CardGroup, CardImg, Carousel, CarouselItem, CloseButton, Col, Collapse, 
+Container, Dropdown,DropdownButton, Fade, Figure, FloatingLabel, Form, FormCheck, FormControl, FormFloating, FormGroup, 
+FormLabel, FormSelect, FormText, Image, InputGroup, ListGroup, ListGroupItem, Modal, ModalBody, ModalDialog, ModalFooter,
+ModalHeader, ModalTitle, Nav, NavDropdown, NavItem, NavLink, Navbar, NavbarBrand, Offcanvas, OffcanvasBody, OffcanvasHeader,
+OffcanvasTitle, Overlay, OverlayTrigger, PageItem,Pagination, Placeholder, PlaceholderButton, Popover, PopoverBody, PopoverHeader,
+ProgressBar, Ratio, Row, SSRProvider, Spinner, SplitButton, Stack, Tab, TabContainer, TabContent, TabPane, Table, Tabs,
+ ThemeProvider, Toast, ToastBody, ToastContainer, ToastHeader, ToggleButton, ToggleButtonGroup, Tooltip, useAccordionButton)
+*/
 
 const SCREEN_TXNS=8;
+
+var funcShowReceipt=null;
+var funcHideReceipt=null;
+var aSelText = {};
+var aSelMoney = {};
+
 
 export default function History() {
 
     const { session, status } = useSession()   
     const [ sheet,  setSheet] = useState(null)
+    const [isOpen, setIsOpen] = useState(false);
+ 
+    funcShowReceipt = (() => setIsOpen(true));
+    funcHideReceipt = (() => setIsOpen(false));
 
-   // const [ year,  setYear] = useState()
-   // const [ client,  setClient] = useState()
-
-   useEffect(() => {
-        if(status !== 'success') return;
-        //setYear(session.year);
-        //setClient(session.client);
+    useEffect(() => {
+    // run each rendering and re-rendering
+    aSelText = {};
+    aSelMoney = {};
+    if(status !== 'success') return;
         let state = null;
         try { state=JSON.parse(sessionStorage.getItem('session')); } catch(err) {}
         if(state && Object.keys(state).length>5) {
@@ -41,8 +58,6 @@ export default function History() {
     function prevFunc() {console.log("CLICK PREVIOUS"); window.location.href="https://"+session.server.addr+":3000/hgb275s?client="+session.client+"&year="+session.year; }
     function nextFunc() {  console.log("CLICK NEXT");   window.location.href="https://"+session.server.addr+":3000/partner?client="+session.client+"&year="+session.year; }
 
-    
-
     let page = sheet[D_Page];
     let sHistory=makeHistory(sheet);
     let sPages = sHistory.length / SCREEN_TXNS;    
@@ -53,15 +68,27 @@ export default function History() {
     for(let p=1;p<sPages-1;p++) aPages[p]='none'; 
     aPages[0]='block';
    
-    var search = ((e) => console.log(JSON.stringify(e.target)));
-
-    return (
+     return (
         <Screen prevFunc={prevFunc} nextFunc={nextFunc} tabSelector={aPages} >
-            <SearchForm handleSearch={search} token={strToken} ></SearchForm>
+
+            {isOpen && (
+                <div>                    
+                    <button onClick={() => funcHideReceipt()}>CLOSE</button>
+                    { Object.keys(aSelText).map((sym,i) => (
+                       // '<div className="ulliTab" id="PageContentReceipt">'+
+                       //     '<div className="attrLine">'+
+                                "RECEIPT #"+i+"   "+aSelText[sym].join(' ')+"\n"+aSelMoney[sym].join(' ')
+                       //     +'</div>'+
+                       // '</div>'
+                    ))}            
+                </div>
+            )}
+
+            { !isOpen && (<SearchForm token={strToken} ></SearchForm>) }
             
             {aPages.map((m,n) => ( 
                 <div className="ulliTab" id={"PageContent"+n} style= {{ 'display': m}} >
-                    { sHistory.slice(n*SCREEN_TXNS,(n+1)*SCREEN_TXNS).map((row) => (  <SigRow row={row}/>  ))}
+                    { !isOpen && (sHistory.slice(n*SCREEN_TXNS,(n+1)*SCREEN_TXNS).map((row) => (  <SigRow row={row}/>  )))}
                     <FooterRow left={page["client"]}  right={page["register"]} prevFunc={prevFunc} nextFunc={nextFunc}/>
                     <FooterRow left={page["reference"]} right={page["author"]} prevFunc={prevFunc} nextFunc={nextFunc}/>
                 </div>
@@ -71,8 +98,43 @@ export default function History() {
     )
 }
 
+
+function symbolic(aRow) {
+    let pat = aRow.join('');
+    var res = 0;
+    if(pat) {
+        var sequence = ' '+pat+pat+pat;
+        var base=71;
+        for(let p=0;p<sequence.length && p<80;p++) {
+            res = (res + sequence.charCodeAt(p) & 0x1FFFFFEF)*base;  
+        }
+    }
+    return res & 0x3FFFFFF;
+}
+
+
+function handleChange(target,aRow,mRow) {
+    
+    // SY sy
+    let id= symbolic(aRow);
+    console.log("click "+id+"="+JSON.stringify(aRow));
+    
+    if(aSelText) {    
+        if(aSelText && aSelText[id] && aSelText[id].length>0) {
+            console.log("DESELECT "+id);
+            aSelText[id]=null;
+            aSelMoney[id]=null;
+            target.value='';
+        } else  {
+            console.log("SELECT "+id);
+            aSelText[id]=aRow;
+            aSelMoney[id]=mRow;
+        }
+    }
+}
+
 function SigRow(row) {
-    //{  console.log("SigRow "+JSON.stringify(row.row))  } 
+    console.log("SigRow "+JSON.stringify(row.row))  
 
     let aRow = [0n,0n,0n,0n,0n,0n]
     try { let saRow = row.row.sig;
@@ -90,7 +152,8 @@ function SigRow(row) {
 
     return (
         <div className="attrPair">
-            <div className="attrLine">
+            <div className="attrLine" id="{id}">
+                <div className="SYMB"><label><input TYPE="CHECKBOX" onChange={event => handleChange(event.target,aRow,mRow)}/></label></div>
                 <div className="SYMB">{aRow[0]}</div>
                 <div className="SEP">&nbsp;</div>
                 <div className="LNAM">{aRow[1]}</div>
@@ -149,16 +212,9 @@ function makeHistory(sheet) {
 
                 let jPrettyTXN = prettyTXN(jHistory,hash,lPattern,aPattern,names,aLen,eLen);
 
-
                 // GH 20220703
                 if(jPrettyTXN.txnAcct) {
                    
-                    let deltaText = "'"+jPrettyTXN.delta.join(CSEP)+"'";
-                    let boxNote = "'"+pageGlobal["author"].replace('&nbsp',' ')+"'";                 
-                    
-                    let iBalance= BigInt(jPrettyTXN.strBalance);
-                    let balCheck= '<DIV className="SYMB">'+cents2EU(iBalance)+'</DIV>';
-
                     let data = (
                         jPrettyTXN.entry.join(CSEP)
                         +CSEP+jPrettyTXN.credit.join(CSEP)
@@ -178,7 +234,7 @@ function makeHistory(sheet) {
                                  
                 }
             }
-            let rHistory=arrHistory.reverse();
+//            let rHistory=arrHistory.reverse();
 
             for (let i=1;i<SCREEN_TXNS;i++) arrHistory.push({sig:CSEP+CSEP+CSEP+CSEP+CSEP,money:CSEP+CSEP+CSEP+CSEP+CSEP+CSEP});
         }
@@ -187,16 +243,18 @@ function makeHistory(sheet) {
     return arrHistory;
 }  
 
+
 function SearchForm(token) {
     return (
         <div className="attrLine">
             <form onSubmit={(e)=>(console.log("SEARCH "+JSON.stringify(e.target)))} >                
                 <div className='MOAM'></div>                
-                <div className='L280'>Line:<input type='edit' name='LPATTERN'/>&nbsp;</div>                
-                <div className='L280'>Acct:<input type='edit' name='APATTERN'/></div>                
-                <input type='hidden' name='client' defaultValue={token.token.client}/>
-                <input type='hidden' name='year' defaultValue={token.token.year}/>
+                <div className='LTXT'>Line:<input type='edit' name='LPATTERN'/>&nbsp;</div>                
+                <div className='LTXT'>Acct:<input type='edit' name='APATTERN'/></div>                
+                <input type='hidden' name='client' defaultValue={token.client}/>
+                <input type='hidden' name='year' defaultValue={token.year}/>
                 <div className='MOAM'><button autoFocus className='SYMB key'>Search</button></div>
+                <div className='MOAM'><input type='button' name='SELECT' value='SELECT' onClick={(event) => (funcShowReceipt())}/></div>                
             </form>
         </div>
     )

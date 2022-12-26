@@ -8,6 +8,10 @@
     "firebase-auth": "^0.1.2",
     "node-fetch": "^3.3.0",
     "qrcode": "^1.5.1",
+    "react-bootstrap": "^2.7.0",
+    "react-modal": "^3.16.1",
+    "react-popup": "^0.11.0",
+    "reactjs-popup": "^2.0.5",
     "utf8": "^3.0.0",
     "xlsx": "^0.18.5"
   },
