@@ -2,14 +2,11 @@
 
 import { useEffect, useState } from 'react';
 
-import Screen from '../pages/Screen'
-
-import FooterRow from '../components/FooterRow'
-
 import { D_History, D_Page, D_Schema }  from '../terms.js';
-
+import Screen from '../pages/Screen'
+import FooterRow from '../components/FooterRow'
 import { cents2EU }  from '../modules/money';
-import { CSEP, getParam, prettyTXN }  from '../modules/App';
+import { CSEP, getParam, prettyTXN, symbolic }  from '../modules/App';
 import { useSession } from '../modules/sessionmanager';
 
 /* REACT-BOOTSTRAP
@@ -42,14 +39,14 @@ export default function History() {
 
     useEffect(() => {
     // run each rendering and re-rendering
-    aSelText = {};
-    aSelMoney = {};
-    if(status !== 'success') return;
-        let state = null;
-        try { state=JSON.parse(sessionStorage.getItem('session')); } catch(err) {}
-        if(state && Object.keys(state).length>5) {
-            setSheet(state.generated);
-        }
+        aSelText = {};
+        aSelMoney = {};
+        if(status !== 'success') return;
+            let state = null;
+            try { state=JSON.parse(sessionStorage.getItem('session')); } catch(err) {}
+            if(state && Object.keys(state).length>5) {
+                setSheet(state.generated);
+            }
     }, [status])
 
     if(!sheet) return null; //'Loading...';
@@ -76,7 +73,7 @@ export default function History() {
 
             {isOpen && (
                 <div>                    
-                    <button onClick={() => funcHideReceipt()}>CLOSE</button>
+                    <button onClick={() => funcHideReceipt()}>Belege</button>
                     { Object.keys(aSelText).map((sym,i) => ( aSelText[sym] ? TXNReceipt(sym,i) : "")) }
                 </div>
             )}
@@ -96,24 +93,9 @@ export default function History() {
 }
 
 
-function symbolic(aRow) {
-    let pat = aRow.join('');
-    var res = 0;
-    if(pat) {
-        var sequence = ' '+pat+pat+pat;
-        var base=71;
-        for(let p=0;p<sequence.length && p<80;p++) {
-            res = (res + sequence.charCodeAt(p) & 0x1FFFFFEF)*base;  
-        }
-    }
-    return res & 0x3FFFFFF;
-}
-
-
 function handleChange(target,aRow,mRow) {
     
-    // SY sy
-    let id= symbolic(aRow);
+    let id= ((aRow[0].substring(4).replace(/\D/g, ""))+symbolic(aRow.join('')+mRow.join('')));
     console.log("click "+id+"="+JSON.stringify(aRow));
     
     if(aSelText) {    
@@ -131,7 +113,7 @@ function handleChange(target,aRow,mRow) {
 }
 
 function SigRow(row) {
-    console.log("SigRow "+JSON.stringify(row.row))  
+    //console.log("SigRow "+JSON.stringify(row.row))  
 
     let aRow = [0n,0n,0n,0n,0n,0n]
     try { let saRow = row.row.sig;

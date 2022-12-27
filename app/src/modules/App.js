@@ -1,6 +1,6 @@
 /* global BigInt */
 
-import { J_ACCT, COLMIN, DOUBLE, D_History, D_Page, D_Schema } from '../terms.js'
+import { J_ACCT, COLMIN, DOUBLE } from '../terms.js'
 
 import { bigEUMoney, cents2EU } from './money'
 
@@ -9,34 +9,6 @@ const HTMLSPACE=" ";
 export const CSEP = ';';
 export const S_COLUMN = 15;
 export const iCpField = 35;
-
-
-// openbalance.html
-export function OverviewRow({acct, amount, name1, name2}) { // 
-    return (
-        <div className="attrLine">
-            <div className="LNAM">{acct}</div>
-            <div className="R105">{amount}</div>
-            <div className="SEP">{name1}</div>
-            <div className="L280">{name2}</div>
-        </div>
-    )
-}
-
-
-
-export function GainLossRow({section,type,acct,xbrl,amount}) {
-    return(
-        <div className="attrLine">
-            <div className="C100">{section}</div>
-            <div className="LNAM">{type}</div>
-            <div className="C140">{acct}</div>
-            <div className="LNAM">{xbrl}</div>
-            <div className="R105">{amount}</div>
-        </div>
-    )
-}
-
 
 export function prettyTXN(jHistory,hash,lPattern,aPattern,names,aLen,eLen) {
 
@@ -165,4 +137,16 @@ export function getParam(strParam) {
     
     var searchParams = new URL(window.location.href).searchParams;
     return searchParams.get(strParam);
+}
+
+export function symbolic(pat) {   
+    var res = 0;
+    if(pat) {
+        var sequence = ' '+pat+pat+pat;
+        var base=71;
+        for(let p=0;p<sequence.length && p<80;p++) {
+            res = (res + sequence.charCodeAt(p) & 0x1FFFFFFEF)*base;  
+        }
+    }
+    return res & 0x3FFFFFFFF;
 }
