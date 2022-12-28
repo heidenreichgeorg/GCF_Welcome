@@ -53,7 +53,8 @@ export default function Partner() {
         let ideno=BigInt(partner.denom);               
         let result= { 'name': partner.name };
         Object.keys(jBalance).map((name,index) => (jBalance[name].xbrl==='de-gaap-ci_bs.ass.currAss.receiv.other.otherTaxRec.CapTax'?
-                                                    (result[name]=cents2EU(((ifix+BigInt(jBalance[name].yearEnd))*igain)/ideno))
+ //                                                   (result[name]=cents2EU(((ifix+BigInt(jBalance[name].yearEnd))*igain)/ideno))
+                                                    (result[name]=cents2EU((5n+BigInt(jBalance[name].yearEnd+"0"))*igain/ideno/10n))
                                                     :{}));
 
         console.log("Partner("+index+") with "+igain+"/"+ideno+"response D_Report"+JSON.stringify(result));

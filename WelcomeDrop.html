@@ -17,12 +17,16 @@
   </div>
   
 
-  <SCRIPT type="text/javascript" src="/client.js"></SCRIPT>
-  <SCRIPT type="text/javascript" src="/sheets.js"></SCRIPT>
+  <!--SCRIPT type="text/javascript" src="/client.js"></SCRIPT -->
+  <!--SCRIPT type="text/javascript" src="/sheets.js"></SCRIPT -->
 
 
 
 <SCRIPT type="text/javascript" >
+        
+   const HTTP_OK = 200;
+   const HTTP_WRONG = 400;
+   const PORT = 81;
 
   var reader;
   var content;
@@ -86,6 +90,37 @@ function dropHandler(ev) {
      if(display)
         if(response) display.innerHTML=response;
   }
+
+  function callServer(cmd,strTarget,strParams,callBack) {
+    // cmd = GET or POST
+    let strServerDNS = 'http://'+self.location.hostname+':'+PORT+'/';     
+    if(strTarget) {
+        var request = new XMLHttpRequest();       
+        console.log('\n'+cmd+' '+strServerDNS+strTarget+"?"+strParams+"\n");			
+        request.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status>=HTTP_OK) {
+                if(callBack) {                   
+                    if(this.status==HTTP_WRONG) callBack( ""+this.status+" ERROR " );
+                    else {
+                        callBack( request.responseText );
+                        console.log("callServer callback(responseText)");
+                    }
+                }
+            }
+        };
+        request.open(cmd,strServerDNS+strTarget, true);						
+        request.addEventListener('error', handleEvent);
+        request.setRequestHeader('Cache-control', 'no-cache, must-revalidate, post-check=0, pre-check=0');
+        request.setRequestHeader('Cache-control', 'max-age=0');
+        request.setRequestHeader( 'Content-Type', 'application/json;charset=UTF-8'); //("Content-type", "text/json");			
+        request.send(strParams);
+    } else alert('callServer: no target:  '+cmd+' '+strServerDNS+strTarget+"?"+strParams+"\n");
+}
+
+function handleEvent(event) { 
+    if(event) console.log(timeSymbol()+'--'+event.type+': '+event.message+' '+event.filename+'\n'); 
+    else console.log(timeSymbol()+'--EMPTY');
+}
 
      
    </SCRIPT>

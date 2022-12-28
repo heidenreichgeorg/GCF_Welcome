@@ -194,6 +194,7 @@ function makeHistory(sheet) {
                 // GH 20220703
                 if(jPrettyTXN.txnAcct) {
                    
+                    // GH20221228 see ['','AN'] in App.js turened to ['AN'] 
                     let data = (
                         jPrettyTXN.entry.join(CSEP)
                         +CSEP+jPrettyTXN.credit.join(CSEP)

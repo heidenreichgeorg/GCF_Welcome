@@ -18,7 +18,7 @@ export function prettyTXN(jHistory,hash,lPattern,aPattern,names,aLen,eLen) {
 
     var entry = [];
     var credit = [HTMLSPACE];
-    var debit = ['','AN'];
+    var debit = ['AN'];//['','AN'];
     var aNames = [];
     var aAmount = [];
     var delta = [];
