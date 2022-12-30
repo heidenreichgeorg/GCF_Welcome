@@ -33,7 +33,7 @@ export const  HTTP_OK = 200;
 export const  HTTP_WRONG = 400;
 export const  PORT = 81;
 
-export const  SCREENLINES=20;
+export const  SCREENLINES=22;
 
 
 

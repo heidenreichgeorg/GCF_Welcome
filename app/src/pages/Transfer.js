@@ -15,8 +15,6 @@ export default function Transfer() {
 
     useEffect(() => {
         if(status !== 'success') return;
-        //setYear(session.year);
-        //setClient(session.client);
         let state = null;
         try { state=JSON.parse(sessionStorage.getItem('session')); } catch(err) {}
         if(state && Object.keys(state).length>5) {
@@ -221,7 +219,7 @@ export default function Transfer() {
 
     
     function prevFunc() {console.log("CLICK PREVIOUS"); window.location.href="https://"+session.server.addr+":3000/status?client="+session.client+"&year="+session.year; }
-    function nextFunc() {  console.log("CLICK NEXT");   window.location.href="https://"+session.server.addr+":3000/balance?client="+session.client+"&year="+session.year; }
+    function nextFunc() {  console.log("CLICK NEXT");   window.location.href="https://"+session.server.addr+":3000/accounts?client="+session.client+"&year="+session.year; }
 
     let page = sheet[D_Page];
 
@@ -357,9 +355,4 @@ function book(jTXN,session) {
                     fetch(urlCommand)
                     .then(res => {console.log("BOOK REFRESH "+JSON.stringify(res.body))})
         });
-
-    /*
-    BOOK RESULT 
-    {"url":"192.168.178.28:81/LATEST","client":"HGKG","year":"2021","result":"save2bucket"}
-    */
 }

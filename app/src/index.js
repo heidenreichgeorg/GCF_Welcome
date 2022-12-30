@@ -4,6 +4,7 @@ import './index.css';
 
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 
+import Accounts from './pages/Accounts'
 import Balance from './pages/Balance'
 import FixedAssets from './pages/FixedAssets'
 import HGB275SPage from './pages/HGB275S2Page'
@@ -16,6 +17,10 @@ import { SessionProvider } from './modules/sessionmanager';
 
 
 const router = createBrowserRouter([
+    {
+        path: '/accounts',
+        element: <Accounts />
+    },
     {
         path: '/balance',
         element: <Balance />
