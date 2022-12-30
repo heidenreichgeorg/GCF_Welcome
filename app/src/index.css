@@ -20,8 +20,8 @@ input[type="radio"] {
 input[type="radio"]::before {content: "#"; }
 
 
-.attrLine { width:990px; padding: 1px; float: left;               min-height: 16px; height: 16px; font-family :inherit; font-size: 12px;font-weight:400; text-align: center;}
-.attrPair {              padding: 1px; float: left; color:inherit;min-height: 43px;               font-family: inherit; font-size: 14px; font-weight:400; text-align: center; background-color: inherit; } 
+.attrLine { width:990px; padding: 1px; float: left;               min-height: 16px; height: 16px; font-family :inherit; font-size: 12px; font-weight:400; text-align: center;}
+.attrPair {              padding: 1px; float: left; color:inherit;min-height: 48px;               font-family: inherit; font-size: 14px; font-weight:400; text-align: center; background-color: inherit; } 
 
 
 .attrLine:nth-child(even) {

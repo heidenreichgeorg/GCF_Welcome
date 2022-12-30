@@ -3,7 +3,6 @@ import { useEffect, useState } from 'react';
 
 import Screen from '../pages/Screen'
 import FooterRow from '../components/FooterRow'
-import { iCpField, prettyTXN}  from '../modules/App';
 import { cents2EU}  from '../modules/money';
 
 import { D_Balance, D_Page, D_Report, X_ASSETS, X_INCOME, X_EQLIAB, SCREENLINES } from '../terms.js'

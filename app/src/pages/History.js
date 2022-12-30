@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 
-import { D_History, D_Page, D_Schema }  from '../terms.js';
+import { D_History, D_Page, D_Schema, SCREENLINES }  from '../terms.js';
 import Screen from '../pages/Screen'
 import FooterRow from '../components/FooterRow'
 import { cents2EU }  from '../modules/money';
@@ -20,7 +20,7 @@ ProgressBar, Ratio, Row, SSRProvider, Spinner, SplitButton, Stack, Tab, TabConta
  ThemeProvider, Toast, ToastBody, ToastContainer, ToastHeader, ToggleButton, ToggleButtonGroup, Tooltip, useAccordionButton)
 */
 
-const SCREEN_TXNS=8;
+const SCREEN_TXNS=1+parseInt(SCREENLINES/3);
 
 var funcShowReceipt=null;
 var funcHideReceipt=null;
@@ -83,6 +83,7 @@ export default function History() {
             {aPages.map((m,n) => ( 
                 <div className="ulliTab" id={"PageContent"+n} style= {{ 'display': m}} >
                     { !isOpen && (sHistory.slice(n*SCREEN_TXNS,(n+1)*SCREEN_TXNS).map((row) => (  <SigRow row={row}/>  )))}
+                    <div className="attrline">&nbsp;</div>
                     <FooterRow left={page["client"]}  right={page["register"]} prevFunc={prevFunc} nextFunc={nextFunc}/>
                     <FooterRow left={page["reference"]} right={page["author"]} prevFunc={prevFunc} nextFunc={nextFunc}/>
                 </div>
