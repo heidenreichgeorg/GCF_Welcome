@@ -22,7 +22,6 @@ const Account = require('./account');
 
 const Sheets = require('./sheets'); // setting root attribute
 const Server = require('./server');
-//const { stringify } = require('querystring');
 
 
 const D_Page = "Seite";   // client register reference author
@@ -565,7 +564,7 @@ function compile(sessionData) {
                                             try {
                                                 var account = result[D_Balance][acName];
                                                 if(account && account.xbrl) {
-                                                    const iAmount = bigEUMoney(strAmount);
+                                                    const iAmount = Sheets.bigEUMoney(strAmount);
                                                     if(firstLine) {
                                                         result[D_Balance][acName] = Account.openAccount(account,iAmount);
                                                         if(debug>2) console.log("0366 open "+strAmount+"("+iAmount+")"
@@ -1346,7 +1345,7 @@ function bigAsset(row,iAssets) {
     try {
         while(run && iValue<1n && column<iAssets) {
             var test = row[column];
-            if(test && test.length > 0 && bigEUMoney(test)!=0n) {iValue=bigEUMoney(test); run=false;}
+            if(test && test.length > 0 && Sheets.bigEUMoney(test)!=0n) {iValue=Sheets.bigEUMoney(test); run=false;}
             column++;
         } // shares before cash / account
     } catch(err) { console.dir("asset value("+row+")="+iValue+"   ERROR "+err); }
@@ -1505,32 +1504,6 @@ function bigENMoney(strSet) {
 }
 
 
-function bigEUMoney(strSet) {
-    var euros=0n;
-    var cents=0n;
-    var factor=1n;
-    var result=0n;
-
-    if(strSet && strSet.length>0) {
-        try {
-            var amount = strSet.split(',');
-            var plain = amount[0].replace('.', '').trim(); 
-            if(plain.startsWith('-')) { factor=-1n; plain=plain.slice(1); }
-            try {
-                euros = BigInt(('0'+plain));
-                if(amount.length>1) {                 
-                    const digits=amount[1]+"00";
-                    const strDigits=digits[0]+digits[1];
-                    cents=BigInt(strDigits);
-                }
-            } catch(err) { console.dir("0475 bigEUMoney("+plain+"=>"+factor+"*("+euros+",$"+srDigits+")"); }
-            try {
-                result = factor * ( euros * 100n + cents );
-            } catch(err) { console.dir("0477 bigEUMoney("+plain+"=>"+factor+"*("+euros+",$"+srDigits+")"); }
-        } catch(err) { console.dir("0479 bigEUMoney("+strSet+"=>"+factor+"*("+euros+","+cents+")"); }
-    }
-    return result;        
-}
 
 
 function bigCost(idnt,nmbr,init) {

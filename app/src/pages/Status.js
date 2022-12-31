@@ -47,7 +47,7 @@ export default function Status() {
             .then((url) => console.log("1120 handleXLSave URL= "+ makeXLSButton(url)))
             .catch((err) => console.error("1127 handleXLSave ERR "+err));
             
-        } catch(err) { console.log("1117 GET /ECEL handleXLSave:"+err);}
+        } catch(err) { console.log("1117 GET /EXCEL handleXLSave:"+err);}
         console.log("1140 Status.handleXLSave EXIT");
     }
 
