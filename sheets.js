@@ -1,5 +1,8 @@
 const debug=1;
-const debugWrite=null;
+
+
+// setting this will violate privacy 
+const debugWrite=3;
 
 
 const HTTP_OK = 200;
@@ -10,7 +13,6 @@ const HTTP_WRONG = 400;
 module.exports['HTTP_WRONG']=HTTP_WRONG;
 
 // EXCEL interface
-
 
 // ASSETS BEFORE OTHER ACCOUNTS
 // NO NEGATIVE RESULTS in distribute()
@@ -267,21 +269,24 @@ function makeWorkBook(jExcel) {
                 let numLines = jSheet.length;
                 if(tabName==='sheetFile') {
                 } else if(tabName==='sheetName') {
-                } else if(numLines>0 && jSheet.forEach!=null) {                    
-                    var  xSheet = XLSX.utils.json_to_sheet(jSheet,{skipHeader:true });
-                    if(xSheet) {
-                        if(workBook.Sheets && workBook.Sheets[sheetName]) {
-                            workBook.Sheets[sheetName]=xSheet;   
-                            if(debugWrite) console.log("1482 sheets.makeWorkBook UPDATE SHEET ("+tabName+") #"+numLines);
+                } else if(numLines>0 && jSheet.forEach!=null) {        
+                    try {
+                        if(debugWrite>2) console.dir("JSON2SHEET "+JSON.stringify(jSheet));
+                        var  xSheet = XLSX.utils.aoa_to_sheet(jSheet,{skipHeader:true });
+                        //var  xSheet = XLSX.utils.json_to_sheet(jSheet,{skipHeader:true });
+                        if(xSheet) {
+                            if(workBook.Sheets && workBook.Sheets[sheetName]) {
+                                workBook.Sheets[sheetName]=xSheet;   
+                                if(debugWrite) console.log("1482 sheets.makeWorkBook UPDATE SHEET ("+tabName+") #"+numLines);
 
-                        } else {
-                            // append did not work, so make a new one
-                            XLSX.utils.book_append_sheet(workBook, xSheet, tabName);
-                            if(debugWrite) console.log("1484 sheets.makeWorkBook CREATE SHEET "+sheetName+" for ("+tabName+") #"+numLines);
-                        }
-                        if(debugWrite) console.log("1486 sheets.makeWorkBook SHEET ("+tabName+")  OK ");
-                        
-                    } else console.log("1489 sheets.makeWorkBook SHEET ("+tabName+") BULDING X-SHEET FAILED");
+                            } else {
+                                // append did not work, so make a new one
+                                XLSX.utils.book_append_sheet(workBook, xSheet, tabName);
+                                if(debugWrite) console.log("1484 sheets.makeWorkBook CREATE SHEET "+sheetName+" for ("+tabName+") #"+numLines);
+                            }
+                            if(debugWrite) console.log("1486 sheets.makeWorkBook SHEET ("+tabName+")  OK ");
+                        } else console.log("1489 sheets.makeWorkBook SHEET ("+tabName+") BULDING X-SHEET FAILED");
+                    } catch(err) { console.log("1491 sheets.makeWorkBook SHEET ("+tabName+") BULDING X-SHEET FAILED "+err); }
                 } else console.log("1487 sheets.makeWorkBook SHEET ("+tabName+") NO DATA IN PARAMETER");
             } else console.log("1485 sheets.makeWorkBook SHEET ("+tabName+") NO TAB");
         } // for
@@ -363,7 +368,8 @@ const D_Partner_OTC= "OTCPartner";
 
 
                         let jExcel = makeXLTabs(                            
-                            client,year,session.sheetCells,
+                            client,year,
+                            session.sheetCells,
                             jAssets,
                             JSON.parse(strHistory), // all bookings of a year
                             jSchema,        // account schema
@@ -407,10 +413,17 @@ function makeXLTabs(client,year,sheetCells,jAssets,jHistory,jSchema,jPartner,jBa
     var excelCloseT=[];            
     var excelAssetT=[];            
     var excelAddrT=[];            
-    var excelPartnerT=[];            
+    var excelPartnerT=[];  
+    var excelTransactionT=[];          
     // make a TAB-structure
     let fileName = client+year;
-    let excelTabs = { 'CLOSE':excelCloseT,  'ASSETS':excelAssetT,  'PARTNER':excelPartnerT,  'ADDR':excelAddrT,  'sheetFile':fileName,  'sheetName':fileName  };
+    let excelTabs = {   'TXN':excelTransactionT,  //20230101
+                        'CLOSE':excelCloseT,  
+                        'ASSETS':excelAssetT,  
+                        'PARTNER':excelPartnerT,  
+                        'ADDR':excelAddrT,  
+                        'sheetFile':fileName,  
+                        'sheetName':fileName  };
     var schemaLen = 0;
 
 
@@ -418,7 +431,15 @@ function makeXLTabs(client,year,sheetCells,jAssets,jHistory,jSchema,jPartner,jBa
 
     if(sheetCells) {
         try {        
-        
+            
+            //20230101
+            let allTXN = sheetCells.filter(function(booking) {
+                let indicator = booking[0]; 
+                return (parseInt(indicator)>0); });
+            allTXN.map(function(txn) { let numericTXN = txn.map((cell,i) =>((i>=J_ACCT)?parseFloat(bigEUMoney(cell))/100.0:cell)); 
+                                        excelTransactionT.push(numericTXN) });
+
+
             let response = getNLine(sheetCells);
             let arrSchema = response[Compiler.D_Schema];
             let arrXBRL = jXBRL;
@@ -442,27 +463,27 @@ function makeXLTabs(client,year,sheetCells,jAssets,jHistory,jSchema,jPartner,jBa
                     let tab = accountSheet(column,txns,saSaldo);
                     excelTabs["AS_"+aNames[column]]=tab.page;
                     saSaldo=tab.saldo;
-                    push3(excelCloseT,arrXBRL[column],aNames[column],tab.close)
+                    pushClose(excelCloseT,arrXBRL[column],aNames[column],tab.close)
                 }
-                push3(excelCloseT, 'de-gaap-ci_bs.ass','Assets',saSaldo)
+                pushClose(excelCloseT, 'de-gaap-ci_bs.ass','Assets',saSaldo)
 
                 // append one more sheet for GALS account
                 for(let column=aLen+1;column<eLen;column++) {
                     let tab = accountSheet(column,txns,seSaldo);
                     excelTabs["GL_"+aNames[column]]=tab.page;
                     seSaldo=tab.saldo;
-                    push3(excelCloseT,arrXBRL[column],aNames[column],tab.close)
+                    pushClose(excelCloseT,arrXBRL[column],aNames[column],tab.close)
                 }
-                push3(excelCloseT,'de-gaap-ci_bs.eqLiab.income','Gain/Loss',seSaldo)
+                pushClose(excelCloseT,'de-gaap-ci_bs.eqLiab.income','Gain/Loss',seSaldo)
 
                 // append one more sheet for EQ/LIAB account
                 for(let column=eLen+1;column<aNames.length;column++) {
                     let tab = accountSheet(column,txns,seSaldo);
                     excelTabs["EL_"+aNames[column]]=tab.page;
                     seSaldo=tab.saldo;
-                    push3(excelCloseTarrXBRL[column],aNames[column],tab.close)
+                    pushClose(excelCloseTarrXBRL[column],aNames[column],tab.close)
                 }
-                push3(excelCloseT,'de-gaap-ci_bs.eqLiab','Equity/Liab',seSaldo)
+                pushClose(excelCloseT,'de-gaap-ci_bs.eqLiab','Equity/Liab',seSaldo)
 
 
             } else console.dir("1425 sheets.makeXLTabs NO AUX");
@@ -575,7 +596,7 @@ function accountSheet(column,txns,saldo) {
             excelaccTab.push(txn);
             cSaldo = cSaldo + bigEUMoney(txn[J_ACCT]);
             sFinal=""+cSaldo;
-            txn[J_ACCT+1]=cents2EU(cSaldo);
+            txn[J_ACCT+1]=parseFloat(""+cSaldo)/100.0;
         });      
     } catch(err) { console.dir("accountSheet READ "+err)}
     iSaldo=BigInt(saldo);
@@ -590,8 +611,8 @@ function makeTax(jBalance,partner,index,fix) {
     let ideno=BigInt(partner.denom);               
     let result= { 'name': partner.name };
     Object.keys(jBalance).map((name,index) => (jBalance[name].xbrl==='de-gaap-ci_bs.ass.currAss.receiv.other.otherTaxRec.CapTax'?
-                                                (result[name]=cents2EU(fix+(BigInt(jBalance[name].yearEnd)*igain)/ideno))
-                                                :"0,00"));
+                                                (result[name]=parseFloat(fix+(BigInt(jBalance[name].yearEnd)*igain)/ideno)/100.0)
+                                                :0.0));
 
     console.log("Partner("+index+") with "+igain+"/"+ideno+"response D_Report"+JSON.stringify(result));
     return result;
@@ -627,44 +648,15 @@ function bigEUMoney(strSet) {
 module.exports['bigEUMoney']=bigEUMoney;
 
 
-function cents2EU(amount) { 
-    let cents=amount; 
-    
-    if(!cents) return "";
-    let result=cents;
-    
-    try {
-        if(typeof(cents)==="string") {
-            cents=BigInt(cents); 
-        } // fixedAssets: some cents are strings with plain int format
 
-        var sign=""; if(cents<0n) { sign="-"; cents= -cents; }
-        var kiloNum = BigInt(cents/100000n);
-
-        var megaNum = BigInt(kiloNum/1000n);
-        var megaStr = (megaNum>0n) ? megaNum.toString()+"." : "";
-
-        var milleNum = kiloNum-(1000n*megaNum); 
-        var milleStr = (milleNum>0n) ? milleNum.toString()+"." : "";
-        cents = cents - (kiloNum*100000n);
-
-        var euroNum = BigInt(cents/100n);
-        var euroStr = (milleNum>0n)  ? euroNum.toString().padStart(3,'0') : euroNum.toString();
-        cents = cents - (euroNum*100n);
-
-        result =  sign + megaStr + milleStr + euroStr+"," +(BigInt(cents%100n).toString().padStart(2,'0'));
-    } catch(err) { /*result=typeof(cents);*/ }
-    return result;
-}
-
-function push3(arr,s1,s2,s3) {
-    arr.push([s1,s2,cents2EU(s3)])
+function pushClose(arr,s1,s2,s3) {
+    arr.push([s1,s2,parseFloat(s3)/100.0]);
 }
 
 function pushAsset(arr,line){
-    arr.push([line[0],line[1],cents2EU(BigInt(line[2])),parseInt(line[3]),line[4],cents2EU(BigInt(line[5])),cents2EU(BigInt(line[6]))]);
+    arr.push([line[0],line[1],parseFloat(line[2])/100.0,parseInt(line[3]),line[4],parseFloat(line[5])/100.0,parseFloat(line[6])/100.0]);
 }
 
 function pushNET(arr,line){
-    arr.push(Object.keys(line).map((key,i)=>(i>J_ACCT?cents2EU(BigInt(line[key])):line[key])));
+    arr.push(Object.keys(line).map((key,i)=>(i>J_ACCT?parseFloat(line[key])/100.0:line[key])));
 }

@@ -44,26 +44,28 @@ export default function Status() {
             fetch(`${process.env.REACT_APP_API_HOST}/EXCEL?sessionId=${session.id}`, rqOptions)
             .then((response) => response.blob())
             .then((blob) => URL.createObjectURL(blob))
-            .then((url) => console.log("1120 handleXLSave URL= "+ makeXLSButton(url)))
+            .then((url) => console.log("1120 handleXLSave URL= "+ makeXLSButton(url,session.client,session.year)))
             .catch((err) => console.error("1127 handleXLSave ERR "+err));
             
         } catch(err) { console.log("1117 GET /EXCEL handleXLSave:"+err);}
         console.log("1140 Status.handleXLSave EXIT");
     }
 
-    function makeXLSButton(url) { 
+    function makeXLSButton(url,client,year) { 
 
         console.log("1196 makeXLSButton XLSX "+url);
-        
-        let a = document.createElement('a');
-        a.href = url
-        a.download = "CLIENT.XLSX";
-        a.style.display = 'block'; // was none
-        a.className = "key";
-        a.innerHTML = "Download";
-        document.body.appendChild(a); 
-        console.log("1198 downloadButton make button");
-        
+        if(client) {
+            if(year) {
+                let a = document.createElement('a');
+                a.href = url
+                a.download = "REPORT"+client+year+".XLSX";
+                a.style.display = 'block'; // was none
+                a.className = "key";
+                a.innerHTML = "Download";
+                document.body.appendChild(a); 
+                console.log("1198 downloadButton make button");
+            } console.log("1197 makeXLSButton XLSX client("+client+"), NO year");
+        } console.log("1195 makeXLSButton XLSX NO client");
         return url;
     };
       
