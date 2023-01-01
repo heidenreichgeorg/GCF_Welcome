@@ -1,8 +1,8 @@
-const debug=1;
+const debug=null;
 
 
 // setting this will violate privacy 
-const debugWrite=3;
+const debugWrite=null;
 
 
 const HTTP_OK = 200;
@@ -240,7 +240,7 @@ function getNLine(aoaCells) {
 
 
 
-function makeWorkBook(jExcel,sheetName,year) {
+function makeWorkBook(jExcel,sheetName,year,aLen,eLen) {
 
     var  workBook = null;
     if(jExcel) {
@@ -267,7 +267,8 @@ function makeWorkBook(jExcel,sheetName,year) {
 
                     if(tabName=='TXN') {
                         let prefix = [' ',year+'-12-31','CLOSE','ACCOUNTS','WITH','GAIN/LOSS'];
-                        formulae=jSheet.map((_,i)=>i>=J_ACCT?0.0:prefix[i]);                        
+                        let dummy = jSheet[0]; // first row
+                        formulae=dummy.map((_,i)=>i>=J_ACCT?0.0:prefix[i]);                        
                         cols= formulae.length;
                         jSheet.push(formulae);
                         rows = jSheet.length;
@@ -280,30 +281,39 @@ function makeWorkBook(jExcel,sheetName,year) {
                         if(xSheet) {
 
                             if(tabName=='TXN') {
+                                try {
+                                    var colNames=[];                                
+                                    for(let j=J_ACCT;j<cols;j++) { colNames.push(getA1(j)); }
+                                    console.dir("1482 sheets.makeWorkBook TXN sums ("+JSON.stringify(colNames)+") #"+cols);
+                                    
+                                    // account-column sums
+                                    colNames.map(function(col) {
+                                        makeSum(xSheet, col+rows, col+1, col+(rows-1));
+                                    })
+                                } catch(err) { console.error("1473 sheets.makeWorkBook TXN sums "+err);}
+                                    
+                                try {
+                                    // horizontal asset sum
+                                    makeSum(xSheet, getA1(aLen)+rows, getA1(J_ACCT)+rows, getA1(aLen-1)+rows );
+                                } catch(err) { console.error("1475 sheets.makeWorkBook ASSET("+aLen+") sum "+err);}
 
-                                var colNames=['G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X'];
-                                /*
-                                const A = "A".charCodeAt();
-                                for(let i=J_ACCT;i<26;i++) { colNames.push(fromCharCode())}
-                                */
-                                colNames.map(function(col) {
-                                    let cell = xSheet[col+rows];
-                                    cell.v=null;
-                                    cell.t='n';
-                                    cell.f='sum('+col+'1:'+col+(rows-1)+')';
-                                })
+                                try {
+                                    // horizontal eqLiab sum
+                                    makeSum(xSheet, getA1(eLen)+rows, getA1(eLen+1)+rows, getA1(cols-1)+rows );
+                                } catch(err) { console.error("1475 sheets.makeWorkBook EQLIAB("+eLen+") sum "+err);}
+
                             }
 
                             if(workBook.Sheets && workBook.Sheets[sheetName]) {
                                 workBook.Sheets[sheetName]=xSheet;   
-                                if(debugWrite) console.dir("1482 sheets.makeWorkBook UPDATE SHEET ("+tabName+") #"+numLines);
+                                if(debugWrite) console.dir("1484 sheets.makeWorkBook UPDATE SHEET ("+tabName+") #"+numLines);
 
                             } else {
                                 // append did not work, so make a new one
                                 XLSX.utils.book_append_sheet(workBook, xSheet, tabName);
-                                if(debugWrite) console.dir("1484 sheets.makeWorkBook CREATE SHEET "+sheetName+" for ("+tabName+") #"+numLines);
+                                if(debugWrite) console.dir("1486 sheets.makeWorkBook CREATE SHEET "+sheetName+" for ("+tabName+") #"+numLines);
                             }
-                            if(debugWrite) console.dir("1486 sheets.makeWorkBook SHEET ("+tabName+")  OK ");
+                            if(debugWrite) console.dir("1488 sheets.makeWorkBook SHEET ("+tabName+")  OK ");
                         } else console.dir("1489 sheets.makeWorkBook SHEET ("+tabName+") BULDING X-SHEET FAILED");
                     } catch(err) { console.error("1491 sheets.makeWorkBook SHEET ("+tabName+") BULDING X-SHEET FAILED "+err); }
                 } else console.dir("1487 sheets.makeWorkBook SHEET ("+tabName+") NO DATA IN PARAMETER");
@@ -397,7 +407,11 @@ const D_Partner_OTC= "OTCPartner";
                             session.addrT);
                         
 
-                        let workBook = makeWorkBook(jExcel,sheetName,year);
+                        let workBook = makeWorkBook(jExcel,
+                                                    sheetName,
+                                                    year,
+                                                    parseInt(jSchema.assets),
+                                                    parseInt(jSchema.eqliab));
 
                         XLSX.writeFile(workBook, sheetFile);
                         
@@ -679,3 +693,18 @@ function pushAsset(arr,line){
 function pushNET(arr,line){
     arr.push(Object.keys(line).map((key,i)=>(i>J_ACCT?parseFloat(line[key])/100.0:line[key])));
 }
+
+const alpha=['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'];
+function getA1(j) {
+    let primo = (j<26)?'':alpha[parseInt(j/26)-1];
+    let secundo = alpha[j%26];
+    return primo+secundo;       
+}
+
+function makeSum(xSheet,a1Cell,a1From,a1To) {
+    let cell = xSheet[a1Cell]; // A1 access index
+    cell.v=null;
+    cell.t='n';
+    cell.f='sum('+a1From+':'+a1To+')';
+}
+
