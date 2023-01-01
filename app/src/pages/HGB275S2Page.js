@@ -5,7 +5,7 @@ import { useEffect, useState  } from 'react';
 import {  cents2EU } from '../modules/money'
 import Screen from '../pages/Screen'
 import FooterRow from '../components/FooterRow'
-import { D_Balance, D_Page, D_Report, D_Schema, X_ASSETS, X_EQLIAB, SCREENLINES }  from '../terms.js';
+import { D_Balance, D_Page, D_Report, D_Term, X_ASSETS, X_EQLIAB, SCREENLINES }  from '../terms.js';
 import { useSession } from '../modules/sessionmanager';
 
 
@@ -57,6 +57,7 @@ function makeReport(response,value) {
     let balance = []; 
 
     var jReport = response[D_Report];
+    var jTerms = response[D_Term];
     console.log("makeReport from response D_Report"+JSON.stringify(Object.keys(jReport)));
     var jAccounts = response[D_Balance];
     let page = response[D_Page];
@@ -173,7 +174,7 @@ function makeReport(response,value) {
         var iRite=2;
         var iLeft=1;
         //balance.push({  });
-        balance.push({ 'tw1':jReport.xbrlEqLiab.de_DE, 'tx1':jReport.xbrlEqLiab.de_DE });
+        balance.push({ 'tw1':jReport.xbrlEqLiab.de_DE, 'am3':jTerms.init.de_DE, 'am2':jTerms.next.de_DE });
 
  
         for (let name in aRite)   {

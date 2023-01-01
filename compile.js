@@ -25,6 +25,7 @@ const Server = require('./server');
 
 
 const D_Page = "Seite";   // client register reference author
+const D_Term = "Terme";   // language file
 const HTMLSPACE=" "; 
 
 
@@ -350,7 +351,11 @@ function initBalance() {
     balance[D_Schema]= {};
     balance[D_FixAss]= {};
     balance[D_Partner_NET]= {};
-
+    balance[D_Term]={ 
+        init:  { de_DE:'Eröffnung' },
+        close: { de_DE:'Abschluss' },
+        next : { de_DE:'Folgejahr' },
+    };
     balance[D_Report]={
         xbrlTanFix : { level:3, xbrl: "de-gaap-ci_bs.ass.fixAss.tan", de_DE:'Sachanlagen'},
         xbrlFinFix : { level:3, xbrl: "de-gaap-ci_bs.ass.fixAss.fin", de_DE:'Finanzanlagen'},
@@ -1167,6 +1172,7 @@ function sendBalance(balance) {
     // transfer txn pattern information
     gResponse[D_Muster] = balance[D_Muster];
     gResponse[D_Adressen] = balance[D_Adressen];
+    gResponse[D_Term] = balance[D_Term];
 
     // transfer page header footer information
     var page = makePage(balance); // side-effect

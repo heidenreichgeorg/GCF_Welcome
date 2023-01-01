@@ -9,6 +9,7 @@ export const  D_Partner_CAP= "CAPPartner";
 export const  D_Partner_OTC= "OTCPartner";
 export const  D_Report = "Report";
 export const  D_Schema  = "Schema";
+export const  D_Term = "Terme";
 export const  D_Muster = "Muster";
 export const  D_Adressen="Adressen";
 
