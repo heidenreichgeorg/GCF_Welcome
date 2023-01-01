@@ -51,7 +51,7 @@ function setRoot(root) {
         SERVEROOT=root+'/';
     }
 
-    console.dir("Sheets.setRoot = "+SERVEROOT);
+    console.log("Sheets.setRoot = "+SERVEROOT);
 }
 module.exports['setRoot']=setRoot;
 
@@ -68,9 +68,9 @@ const SY_MAXROWS=4190; // maximum number of rows in the table
 function sy_purgeRow(row) {
     if(!row) return null;
     if(row.length>=(SY_MAXLINE)) {
-        console.dir("***************************************"); 
-        console.dir("*           SECURITY                  *"); 
-        console.dir("***************************************"); 
+        console.log("***************************************"); 
+        console.log("*           SECURITY                  *"); 
+        console.log("***************************************"); 
     }
     return row.substring(0,SY_MAXLINE);
 }
@@ -143,7 +143,7 @@ function bookSheet(sessionId,tBuffer,sessionTime,nextSessionId) {
             if(client && year && session.sheetCells) {
 
                 var numLines = session.sheetCells.length;
-                if(debugWrite) console.log("1450 sheets.bookSheet ENTER "+session.sheetName+ " for ("+client+","+year+") with "+numLines+" lines in sheet ");
+                if(debugWrite) console.dir("1450 sheets.bookSheet ENTER "+session.sheetName+ " for ("+client+","+year+") with "+numLines+" lines in sheet ");
                 
                 if(tBuffer) {
                     // add hash
@@ -154,23 +154,23 @@ function bookSheet(sessionId,tBuffer,sessionTime,nextSessionId) {
                     session.time=sessionTime;
                     session.id=nextSessionId;
 
-                    if(debugWrite) console.log("1452 sheets.bookSheet APPEND  "+JSON.stringify(tBuffer)+" to ("+client+","+year+") #"+numLines);
+                    if(debugWrite) console.dir("1452 sheets.bookSheet APPEND  "+JSON.stringify(tBuffer)+" to ("+client+","+year+") #"+numLines);
 
                     // GH20221120 write to firestore
                     //fireWrite(session);
 
                     Server.setSession(session);
 
-                    if(debugWrite) console.log("1454 sheets.bookSheet SET SESSION  "+session.id + " "+session.client + " "+session.year + " --> "+JSON.stringify(Object.keys(session)));
+                    if(debugWrite) console.dir("1454 sheets.bookSheet SET SESSION  "+session.id + " "+session.client + " "+session.year + " --> "+JSON.stringify(Object.keys(session)));
                     
                 }
-                else if(debugWrite) console.log("1451 sheets.bookSheet SAVE NO booking statement tBuffer ("+client+","+year+") #"+numLines);
+                else if(debugWrite) console.dir("1451 sheets.bookSheet SAVE NO booking statement tBuffer ("+client+","+year+") #"+numLines);
             }
-            else if(debugWrite) console.log("1453 sheets.bookSheet SAVE NO DATA ("+client+","+year+")") ;
+            else if(debugWrite) console.dir("1453 sheets.bookSheet SAVE NO DATA ("+client+","+year+")") ;
         }
-        else if(debugWrite) console.log("1455 sheets.bookSheet SAVE NO sheetName"+sessionId);
+        else if(debug) console.log("1455 sheets.bookSheet SAVE NO sheetName"+sessionId);
     }
-    else if(debugWrite) console.log("1457 sheets.bookSheet SAVE NO session"+sessionId);
+    else if(debug) console.log("1457 sheets.bookSheet SAVE NO session"+sessionId);
 
     return session;
 }
@@ -192,7 +192,7 @@ function getNLine(aoaCells) {
         var numLines=aoaCells.length;
 
         let lastLine = aoaCells[numLines-1];
-        console.log("1490 sheets.getNLine() LAST TXN at "+lastLine[1]+' for '+lastLine[3]);
+        if(debug) console.log("1490 sheets.getNLine() LAST TXN at "+lastLine[1]+' for '+lastLine[3]);
 
         if(numLines>J_MINROW) {
 
@@ -230,10 +230,7 @@ function getNLine(aoaCells) {
                         result[Compiler.D_Schema].total=column;
                     }
                 });
-            } catch (err) {
-                console.error('1455 sheets.js getNLine:'+err);
-                console.dir('1457 sheets.js getNLine:'+err);
-            }
+            } catch (err) {console.error('1455 sheets.js getNLine:'+err);}
         }
     }
     return result;
@@ -243,52 +240,74 @@ function getNLine(aoaCells) {
 
 
 
-
-
-function makeWorkBook(jExcel) {
+function makeWorkBook(jExcel,sheetName,year) {
 
     var  workBook = null;
     if(jExcel) {
-        let sheetName=jExcel.sheetName;
-        let sheetFile=jExcel.sheetFile;
-
+/*
         try{  
             workBook = XLSX.readFile(sheetFile);
-            if(debugWrite) console.log("1478 sheets.makeWorkBook READ workbook for ("+sheetName+")");
+            if(debugWrite) console.dir("1478 sheets.makeWorkBook READ workbook for ("+sheetName+")");
     
-        } catch(err) { console.dir("1477 sheets.makeWorkBook FAILED to OPEN sheetFile "+sheetFile+" for ("+sheetName+")");}
-    
+        } catch(err) { console.error("1477 sheets.makeWorkBook FAILED to OPEN sheetFile "+sheetFile+" for ("+sheetName+")");}
+*/    
         if(workBook==null) {
             workBook = XLSX.utils.book_new();
-            if(debugWrite) console.log("1480 sheets.makeWorkBook CREATE new workbook for ("+sheetName+")");
+            if(debugWrite) console.dir("1480 sheets.makeWorkBook CREATE new workbook for ("+sheetName+")");
         }
     
         for(tabName in jExcel) {
             let jSheet = jExcel[tabName];
+            let formulae;
+            let rows=0;
+            let cols=0;
             if(jSheet) {
                 let numLines = jSheet.length;
-                if(tabName==='sheetFile') {
-                } else if(tabName==='sheetName') {
-                } else if(numLines>0 && jSheet.forEach!=null) {        
+                if(numLines>0 && jSheet.forEach!=null) {  
+
+                    if(tabName=='TXN') {
+                        let prefix = [' ',year+'-12-31','CLOSE','ACCOUNTS','WITH','GAIN/LOSS'];
+                        formulae=jSheet.map((_,i)=>i>=J_ACCT?0.0:prefix[i]);                        
+                        cols= formulae.length;
+                        jSheet.push(formulae);
+                        rows = jSheet.length;
+                    }
                     try {
                         if(debugWrite>2) console.dir("JSON2SHEET "+JSON.stringify(jSheet));
+
                         var  xSheet = XLSX.utils.aoa_to_sheet(jSheet,{skipHeader:true });
                         //var  xSheet = XLSX.utils.json_to_sheet(jSheet,{skipHeader:true });
                         if(xSheet) {
+
+                            if(tabName=='TXN') {
+
+                                var colNames=['G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X'];
+                                /*
+                                const A = "A".charCodeAt();
+                                for(let i=J_ACCT;i<26;i++) { colNames.push(fromCharCode())}
+                                */
+                                colNames.map(function(col) {
+                                    let cell = xSheet[col+rows];
+                                    cell.v=null;
+                                    cell.t='n';
+                                    cell.f='sum('+col+'1:'+col+(rows-1)+')';
+                                })
+                            }
+
                             if(workBook.Sheets && workBook.Sheets[sheetName]) {
                                 workBook.Sheets[sheetName]=xSheet;   
-                                if(debugWrite) console.log("1482 sheets.makeWorkBook UPDATE SHEET ("+tabName+") #"+numLines);
+                                if(debugWrite) console.dir("1482 sheets.makeWorkBook UPDATE SHEET ("+tabName+") #"+numLines);
 
                             } else {
                                 // append did not work, so make a new one
                                 XLSX.utils.book_append_sheet(workBook, xSheet, tabName);
-                                if(debugWrite) console.log("1484 sheets.makeWorkBook CREATE SHEET "+sheetName+" for ("+tabName+") #"+numLines);
+                                if(debugWrite) console.dir("1484 sheets.makeWorkBook CREATE SHEET "+sheetName+" for ("+tabName+") #"+numLines);
                             }
-                            if(debugWrite) console.log("1486 sheets.makeWorkBook SHEET ("+tabName+")  OK ");
-                        } else console.log("1489 sheets.makeWorkBook SHEET ("+tabName+") BULDING X-SHEET FAILED");
-                    } catch(err) { console.log("1491 sheets.makeWorkBook SHEET ("+tabName+") BULDING X-SHEET FAILED "+err); }
-                } else console.log("1487 sheets.makeWorkBook SHEET ("+tabName+") NO DATA IN PARAMETER");
-            } else console.log("1485 sheets.makeWorkBook SHEET ("+tabName+") NO TAB");
+                            if(debugWrite) console.dir("1486 sheets.makeWorkBook SHEET ("+tabName+")  OK ");
+                        } else console.dir("1489 sheets.makeWorkBook SHEET ("+tabName+") BULDING X-SHEET FAILED");
+                    } catch(err) { console.error("1491 sheets.makeWorkBook SHEET ("+tabName+") BULDING X-SHEET FAILED "+err); }
+                } else console.dir("1487 sheets.makeWorkBook SHEET ("+tabName+") NO DATA IN PARAMETER");
+            } else console.dir("1485 sheets.makeWorkBook SHEET ("+tabName+") NO TAB");
         } // for
     } else console.log("1481 sheets.makeWorkBook NO JSON INPUT");
 
@@ -326,8 +345,7 @@ function xlsxWrite(sessionId) {
     var session = Server.getSession(sessionId);
     if(session) {
        
-
-        // ignore session.sheetFile
+        // return 'serverFile':sheetFile
         sheetFile = getClientDir(session.client) + session.year + session.client + ".xlsx"
         if(sheetFile) {
             if(session.sheetName) {
@@ -335,7 +353,7 @@ function xlsxWrite(sessionId) {
                 year = session.year;
                 let sheetName = session.sheetName;
                 if(client && year) {
-                        if(debugWrite) console.log("1400 sheets.xlsxWrite ENTER "+sheetName+ " for ("+client+","+year+") in file "+sheetFile);
+                        if(debugWrite) console.dir("1400 sheets.xlsxWrite ENTER "+sheetName+ " for ("+client+","+year+") in file "+sheetFile);
 
                         if(debug) console.log("1402 sheets.xlsxWrite jAssets "+sheetName+ " = "+Object.keys(session).join(", "));
 
@@ -379,23 +397,26 @@ const D_Partner_OTC= "OTCPartner";
                             session.addrT);
                         
 
-                        let workBook = makeWorkBook(jExcel);
+                        let workBook = makeWorkBook(jExcel,sheetName,year);
 
                         XLSX.writeFile(workBook, sheetFile);
                         
-                        if(debugWrite)  console.log("1409 sheets.xlsxWrite WRITE FILE "+sheetFile);
+                        if(debugWrite)  console.dir("1409 sheets.xlsxWrite WRITE FILE "+sheetFile);
                         
                     } else {
-                        console.dir("1407 sheets.xlsxWrite() NO client / year "+JSON.stringify(session));
+                        if(debugWrite) console.dir("1407 sheets.xlsxWrite() NO client / year "+JSON.stringify(session));
+                        console.log("1407 sheets.xlsxWrite() NO client / year "+JSON.stringify(session));
                     }   
                 } else {
-                    console.dir("1405 sheets.xlsxWrite() NO sheetName and NOT writing "+JSON.stringify(session));
+                    if(debugWrite) console.dir("1405 sheets.xlsxWrite() NO sheetName and NOT writing "+JSON.stringify(session));
+                    console.log("1405 sheets.xlsxWrite() NO sheetName and NOT writing");
                 }
             } else {
-                console.dir("1403 sheets.xlsxWrite NO sheetFile and NOT writing "+JSON.stringify(session));
+                if(debugWrite) console.dir("1403 sheets.xlsxWrite NO sheetFile and NOT writing "+JSON.stringify(session));
+                console.log("1403 sheets.xlsxWrite NO sheetFile and NOT writing");
             }
         } else {
-            console.dir("1401 sheets.xlsxWrite NO SESSION "+sessionId);
+            console.log("1401 sheets.xlsxWrite NO SESSION "+sessionId);
         }
 
         // return csv;
@@ -421,9 +442,7 @@ function makeXLTabs(client,year,sheetCells,jAssets,jHistory,jSchema,jPartner,jBa
                         'CLOSE':excelCloseT,  
                         'ASSETS':excelAssetT,  
                         'PARTNER':excelPartnerT,  
-                        'ADDR':excelAddrT,  
-                        'sheetFile':fileName,  
-                        'sheetName':fileName  };
+                        'ADDR':excelAddrT  };
     var schemaLen = 0;
 
 
@@ -445,13 +464,13 @@ function makeXLTabs(client,year,sheetCells,jAssets,jHistory,jSchema,jPartner,jBa
             let arrXBRL = jXBRL;
             let aLen = parseInt(arrSchema.assets);
             let eLen = parseInt(arrSchema.eqliab);
-            if(debugWrite) console.log("1420 sheets.makeXLTabs using schemaLen "+schemaLen+"("+aLen+","+eLen+")");
-            if(debugWrite) console.log("     Schema = "+JSON.stringify(arrSchema));
-            if(debugWrite) console.log("     XBRL = "+JSON.stringify(arrXBRL));
+            if(debugWrite) console.dir("1420 sheets.makeXLTabs using schemaLen "+schemaLen+"("+aLen+","+eLen+")");
+            if(debugWrite) console.dir("     Schema = "+JSON.stringify(arrSchema));
+            if(debugWrite) console.dir("     XBRL = "+JSON.stringify(arrXBRL));
 
             if(jHistory) {
                 let aNames = jSchema.Names;
-                if(debugWrite) console.log("1422 sheets.makeXLTabs ACCOUNT NAMES("+aLen+"-"+eLen+") "+aNames.join(",  "));
+                if(debugWrite) console.dir("1422 sheets.makeXLTabs ACCOUNT NAMES("+aLen+"-"+eLen+") "+aNames.join(",  "));
 
                 let txns = Object.keys(jHistory).map((p) => ( Object.keys(jHistory[p]).map((key,i)=>(jHistory[p][key])))); 
 
@@ -481,13 +500,13 @@ function makeXLTabs(client,year,sheetCells,jAssets,jHistory,jSchema,jPartner,jBa
                     let tab = accountSheet(column,txns,seSaldo);
                     excelTabs["EL_"+aNames[column]]=tab.page;
                     seSaldo=tab.saldo;
-                    pushClose(excelCloseTarrXBRL[column],aNames[column],tab.close)
+                    pushClose(excelCloseT,arrXBRL[column],aNames[column],tab.close)
                 }
                 pushClose(excelCloseT,'de-gaap-ci_bs.eqLiab','Equity/Liab',seSaldo)
 
 
-            } else console.dir("1425 sheets.makeXLTabs NO AUX");
-        } catch(err) {console.dir("1423 sheets.makeXLTabs AUX "+err);}
+            } else console.log("1425 sheets.makeXLTabs NO AUX");
+        } catch(err) {console.error("1423 sheets.makeXLTabs AUX "+err);}
     } else console.error("1421 sheets.makeXLTabs NO sheetCells");
 
     
@@ -499,8 +518,8 @@ function makeXLTabs(client,year,sheetCells,jAssets,jHistory,jSchema,jPartner,jBa
             excelAssetT.push ( Object.keys(jAssets[Object.keys(jAssets)[0]])); // title row            
             let assets = Object.keys(jAssets).map((p) => ( Object.keys(jAssets[p]).map((key,i)=>(jAssets[p][key]))));           
             assets.forEach(line => pushAsset(excelAssetT,line));         
-        } else console.dir("1427 sheets.makeXLTabs NO ASSETS");
-    } catch(err) {console.dir("1429 sheets.makeXLTabs ASSETS: "+err);}
+        } else console.log("1427 sheets.makeXLTabs NO ASSETS");
+    } catch(err) {console.error("1429 sheets.makeXLTabs ASSETS: "+err);}
 
 
 
@@ -542,7 +561,7 @@ function makeXLTabs(client,year,sheetCells,jAssets,jHistory,jSchema,jPartner,jBa
 
     partner.push({});
 
-    taxDetails.map((row) =>(console.log(JSON.stringify(taxDetails))));
+    if(debugWrite) taxDetails.map((row) =>(console.dir(JSON.stringify(taxDetails))));
                 
     taxDetails.map((row) => (                
         Object.keys(row).map((fieldName) => (partner.push({'name':fieldName==='name'?'':fieldName,'amnt':row[fieldName]})))));
@@ -570,7 +589,7 @@ function makeXLTabs(client,year,sheetCells,jAssets,jHistory,jSchema,jPartner,jBa
 
 
     
-    console.log("1460 sheets.makeXLTabs RESULT  "+JSON.stringify(Object.keys(excelTabs)));
+    if(debugWrite) console.dir("1460 sheets.makeXLTabs RESULT  "+JSON.stringify(Object.keys(excelTabs)));
     return excelTabs;
 }
 module.exports['makeXLTabs']=makeXLTabs;
@@ -598,7 +617,7 @@ function accountSheet(column,txns,saldo) {
             sFinal=""+cSaldo;
             txn[J_ACCT+1]=parseFloat(""+cSaldo)/100.0;
         });      
-    } catch(err) { console.dir("accountSheet READ "+err)}
+    } catch(err) { console.error("accountSheet READ "+err)}
     iSaldo=BigInt(saldo);
     iSaldo += cSaldo;
     
@@ -614,7 +633,7 @@ function makeTax(jBalance,partner,index,fix) {
                                                 (result[name]=parseFloat(fix+(BigInt(jBalance[name].yearEnd)*igain)/ideno)/100.0)
                                                 :0.0));
 
-    console.log("Partner("+index+") with "+igain+"/"+ideno+"response D_Report"+JSON.stringify(result));
+    if(debugWrite) console.dir("Partner("+index+") with "+igain+"/"+ideno+"response D_Report"+JSON.stringify(result));
     return result;
 }
 
@@ -637,11 +656,11 @@ function bigEUMoney(strSet) {
                     const strDigits=digits[0]+digits[1];
                     cents=BigInt(strDigits);
                 }
-            } catch(err) { console.dir("0475 bigEUMoney("+plain+"=>"+factor+"*("+euros+",$"+srDigits+")"); }
+            } catch(err) { console.error("0475 bigEUMoney("+plain+"=>"+factor+"*("+euros+",$"+srDigits+")"); }
             try {
                 result = factor * ( euros * 100n + cents );
-            } catch(err) { console.dir("0477 bigEUMoney("+plain+"=>"+factor+"*("+euros+",$"+srDigits+")"); }
-        } catch(err) { console.dir("0479 bigEUMoney("+strSet+"=>"+factor+"*("+euros+","+cents+")"); }
+            } catch(err) { console.error("0477 bigEUMoney("+plain+"=>"+factor+"*("+euros+",$"+srDigits+")"); }
+        } catch(err) { console.error("0479 bigEUMoney("+strSet+"=>"+factor+"*("+euros+","+cents+")"); }
     }
     return result;        
 }
