@@ -6,7 +6,7 @@ download JSON function
 
 for each account in D_Balance with XBRL=de-gaap-ci_bs.ass.currAss.receiv.other.otherTaxRec.CapTax
 
-    for each partner in D_Partner_NET take gain/denom
+    for each partner in D_Partner take gain/denom
 */
 
 /* global BigInt */
@@ -17,7 +17,7 @@ import FooterRow from '../components/FooterRow'
 import { useSession } from '../modules/sessionmanager';
 import { cents2EU, bigEUMoney } from  '../modules/money'
 
-import { D_Balance, D_Partner_NET, D_Page, D_Report, D_Schema, X_ASSETS, X_EQLIAB, X_INCOME, SCREENLINES }  from '../terms.js';
+import { D_Balance, D_Partner, D_Page, D_Report, D_Schema, X_ASSETS, X_EQLIAB, X_INCOME, SCREENLINES }  from '../terms.js';
 
 export default function Partner() {
 
@@ -41,7 +41,7 @@ export default function Partner() {
     
     let page = sheet[D_Page];
     
-    var jReport = JSON.parse(JSON.stringify(sheet[D_Partner_NET]));
+    var jReport = JSON.parse(JSON.stringify(sheet[D_Partner]));
     var jBalance = sheet[D_Balance];
 
     

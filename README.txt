@@ -57,7 +57,7 @@ Server process reads TABLE (e.g. MS Excel (TM)) with accounting history in Euros
  [   D_Balance   ]  balance
  [   D_Report    ]  gain/loss summaries
  [   D_FixAss    ]  list of fixed assets
- [ D_Partner_NET ]  partner tax summary
+ [ D_Partner ]  partner tax summary
  [   D_Muster    ]  predefined templates for transactions
  [  D_Adressen   ]  predefined partner postal addresses
 
@@ -213,7 +213,7 @@ D_REPORT = {
     "client": "(entityname))"
 }
 
-D_Partner_NET = {
+D_Partner = {
 i:{"id":i,"vk":"K2xx","gain":n,"denom":z,
 "iVar":31,"iCap":37,"name":name,
 "tax":s,"cyLoss":s,"income":s,"netIncomeFin":s,"netIncomeOTC":s,"init":s,"credit":s,"debit":s,"yearEnd":s,"close":s,"next":s},

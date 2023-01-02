@@ -3,10 +3,11 @@
 
 // CAN ONLY DOCUMENT UP TO SIX PARTNERS
 const debug=null;
+const debugYield=1;
 
 
 // SETTING THIS WILL VIOLATE PRIVACY AT THE ADMIN CONSOLE !!! 
-let debugReport=1;
+const debugReport=null;
 
 
 // table parsing
@@ -23,9 +24,6 @@ const Account = require('./account');
 const Sheets = require('./sheets'); // setting root attribute
 const Server = require('./server');
 
-
-const D_Page = "Seite";   // client register reference author
-const D_Term = "Terme";   // language file
 const HTMLSPACE=" "; 
 
 
@@ -89,30 +87,33 @@ let de_DE = {
     AssetPrice: "Stückkosten",
 
     // GainLoss GuV
-    Carry4Loss: "Verlustvortrag",
-    NextYear: "Folgejahr",
+    Carry4Loss:  "Verlustvortrag",
+    NextYear:    "Folgejahr",
     VariableCap: "Variables Kapital",
-    CapGainTax: "KapErtragSt",
+    CapGainTax:  "KapErtragSt",
     CapGainSoli: "KapErtragStSoli",
-    RegularOTC: "Betriebsergebnis",
-    RegularFIN: "Finanzergebnis",
-    Revenue:    "Umsatz",
-    DirectCost: "zurechenb. Kosten",
-    GrossYield: "Rohertrag",
-    DirectCost: "zurechenb. Kosten",
+    RegularOTC:  "Betriebsergebnis",
+    RegularFIN:  "Finanzergebnis",
+    Revenue:     "Umsatz",
+    OpCost:      "Betriebsaufwand",
+    DirectCost:  "zurechenb. Kosten",
+    GrossYield:  "Rohertrag",
+    DirectCost:  "zurechenb. Kosten",
     Depreciation:"Abschreibung",
-    OtherRegular:"and. betriebl. Kosten",
-    YPart:"Beteiligungsergebnis",
-    FinSale:"Wertpapier-VK",
-    NetInterest:"Zinseinnahmen",
+    OtherOTC:    "betriebl. Nebenkosten",
+    OtherRegular:"sonstig.betr.Aufwand",
+    PartYield:   "Beteiligungsergebnis",
+    FinSale:     "Wertpapier-VK",
+    NetInterest: "Zinseinnahmen",
     InterestCost:"Zinskosten",
-    CapTax:"Kap.Ertragssteuer",
-    PaidTax:"gezahlte Steuern",
-    OpAssets:"betriebsnotw.Vermögen",
-    AvgCurrent:"mittl.Umlaufvermögen",
-    OpCapital:"betriebsnotw.Kapital",
-    TaxClaims:"Steuerforderung",
-    CapMargin:"Kapitalrendite",
+    CapTax:      "Kap.Ertragssteuer",
+    PaidTax:     "Ges.Steuerforderung",
+    FinYield:    "außerordentl.Ergebnis",
+    OpAssets:    "betriebsnotw.Vermögen",
+    AvgCurrent:  "mittl. Umlaufvermögen",
+    OpCapital:   "betriebsnotw.Kapital",
+    TaxClaims:   "Steuerforderung",
+    CapMargin:   "Kapitalrendite",
 
     // Buttons
     Address:"Adresse",
@@ -120,9 +121,18 @@ let de_DE = {
     Closing:"Abschluss",
     Diagram:"Diagramm",
     Transfer:"Überweisung",
-    Transaction:"Buchung"
+    Transaction:"Buchung",
+
+    // Anlage
+    AcqDate:"Anschaffungsdatum",
+    AcquisitionPrice:"Anschaffungspreis",
+    Init:"Anfangswert",
+    Close:"Abschluss",
+    Next:"Folgejahr"
 }
 module.exports['de_DE']=de_DE;
+let jTerms={};
+
 
 
 // main response object
@@ -135,14 +145,13 @@ const D_Equity = "Kapital";
 // TRANSACTIONS-part
 const D_Balance= "Bilanz";
 const D_History= "Historie";
-const D_Partner_NET= "NETPartner";
-const D_Partner_CAP= "CAPPartner";
-const D_Partner_OTC= "OTCPartner";
+const D_Partner= "PartnerR";
 const D_SHARES = "Anteile";
 const D_Report = "Report";
 const D_FixAss = "Anlagen";
 const D_Muster = "Muster";
 const D_Adressen="Adressen";
+const D_Page = "Seite";   // client register reference author
 
 
 
@@ -315,6 +324,11 @@ function init(app, argv) {
     // get Excel by client
     
 
+    // prepare jTerms
+    Object.keys(de_DE).map(function(id){
+        jTerms[id]={'de_DE':de_DE[id]}
+    });
+
 
     return processArgv(argv);
 }
@@ -350,12 +364,8 @@ function initBalance() {
     balance[D_History]={};
     balance[D_Schema]= {};
     balance[D_FixAss]= {};
-    balance[D_Partner_NET]= {};
-    balance[D_Term]={ 
-        init:  { de_DE:'Eröffnung' },
-        close: { de_DE:'Abschluss' },
-        next : { de_DE:'Folgejahr' },
-    };
+    balance[D_Partner]={}; 
+    
     balance[D_Report]={
         xbrlTanFix : { level:3, xbrl: "de-gaap-ci_bs.ass.fixAss.tan", de_DE:'Sachanlagen'},
         xbrlFinFix : { level:3, xbrl: "de-gaap-ci_bs.ass.fixAss.fin", de_DE:'Finanzanlagen'},
@@ -652,15 +662,16 @@ function compile(sessionData) {
                                             var date = result[D_FixAss][idnt].date;
                                             var type = result[D_FixAss][idnt].type;
                                             var iVal = result[D_FixAss][idnt].init;
-                                            var nmbr = result[D_FixAss][idnt].nmbr;
+                                            var nmbr =  result[D_FixAss][idnt].nmbr;
                                             var icurr = BigInt(result[D_FixAss][idnt].rest);
 
-                                            // yield type of devidend payment reduces the INIT value
+                                            // yield type of dividend payment reduces the INIT value
                                             // GH20220108  amount reduces the CURRent value
                                             var irest = icurr+iamnt;
 
                                             // GH20220108 NEW cost is calculated as the INIT price per number of units
                                             var icost = bigCost(idnt,nmbr,irest);
+                                            // GH20230102 NEW cost is calculated as the REST price per number of units
 
                                             // OPEN
                                             // MUST VERIFY existing identifier
@@ -671,7 +682,7 @@ function compile(sessionData) {
                                                                      "idnt":idnt,
                                                                      "rest":""+irest,
                                                                      "cost":""+icost  };
-                                            if(debug>1) console.log("0376 YIELD amount="+iamnt+" changes "+idnt+" from "+icurr+" to "+result[D_FixAss][idnt].rest);
+                                            if(debugYield) console.log("0376 YIELD amount="+iamnt+" changes "+idnt+" from "+icurr+" to "+result[D_FixAss][idnt].rest);
 
                                             } else  console.log("0371 YIELD UNKNOWN "+idnt+" ASSET");
                                     } else {
@@ -699,7 +710,7 @@ function compile(sessionData) {
 
     
     
-/*          D_Partner_NET[i] = { }
+/*          D_Partner[i] = { }
             compile
                     id:   # 0-(N-1)
                     vk    Name 'K2xx'
@@ -783,7 +794,7 @@ function compile(sessionData) {
                 } else console.log("0379 compile.compile: NO PARTNERS");
 
 
-                result[D_Partner_NET]=partners;
+                result[D_Partner]=partners;
                 if(debugReport) 
                     for (let i in partners) { console.log("0380 compile Partner("+i+") "+JSON.stringify(partners[i])); }
 
@@ -859,8 +870,8 @@ function sendBalance(balance) {
     gResponse[D_Schema]={};
     var gNames = balance[D_Schema].Names;
 
-    let partners=balance[D_Partner_NET];
-    gResponse[D_Partner_NET]=partners;
+    let partners=balance[D_Partner];
+    gResponse[D_Partner]=partners;
 
 
     let bReport = balance[D_Report];
@@ -1170,10 +1181,9 @@ function sendBalance(balance) {
 
 
     // transfer txn pattern information
-    gResponse[D_Muster] = balance[D_Muster];
-    gResponse[D_Adressen] = balance[D_Adressen];
-    gResponse[D_Term] = balance[D_Term];
-
+    gResponse[D_Muster]  = balance[D_Muster];
+    gResponse[D_Adressen]= balance[D_Adressen];
+    
     // transfer page header footer information
     var page = makePage(balance); // side-effect
     if(debugReport) console.log("compile.js sendBalance PAGE "+JSON.stringify(page));

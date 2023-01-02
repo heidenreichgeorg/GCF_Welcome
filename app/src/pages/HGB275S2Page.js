@@ -5,7 +5,7 @@ import { useEffect, useState  } from 'react';
 import {  cents2EU } from '../modules/money'
 import Screen from '../pages/Screen'
 import FooterRow from '../components/FooterRow'
-import { D_Balance, D_Page, D_Report, D_Term, X_ASSETS, X_EQLIAB, SCREENLINES }  from '../terms.js';
+import { D_Balance, D_Page, D_Report, X_ASSETS, X_EQLIAB, SCREENLINES }  from '../terms.js';
 import { useSession } from '../modules/sessionmanager';
 
 
@@ -57,7 +57,7 @@ function makeReport(response,value) {
     let balance = []; 
 
     var jReport = response[D_Report];
-    var jTerms = response[D_Term];
+    
     console.log("makeReport from response D_Report"+JSON.stringify(Object.keys(jReport)));
     var jAccounts = response[D_Balance];
     let page = response[D_Page];
@@ -174,7 +174,7 @@ function makeReport(response,value) {
         var iRite=2;
         var iLeft=1;
         //balance.push({  });
-        balance.push({ 'tw1':jReport.xbrlEqLiab.de_DE, 'am3':jTerms.init.de_DE, 'am2':jTerms.next.de_DE });
+        balance.push({ 'tw1':jReport.xbrlEqLiab.de_DE, 'am3':page.Init, 'am2':page.Close, 'am1':page.Next });
 
  
         for (let name in aRite)   {
@@ -182,41 +182,43 @@ function makeReport(response,value) {
 
             var iName = account.name;
             var cBegin= BigInt(account.init);
+            var cClose = BigInt(account.yearEnd);
             var cNext = BigInt(account.next);
             console.log("EqLiab account ="+JSON.stringify(account));
     
-           iLeft = fillLeft(balance,cBegin,cNext,iName,iLeft);
+           iLeft = fillLeft(balance,cBegin,cClose,cNext,iName,iLeft);
         }
 
-        fillRight(balance,chgb1,"Umsatz",0,1);
-        fillRight(balance,chgb5,"Betriebsaufwand",1,1);
-        fillRight(balance,grossYield,"Bruttoergebnis",2,2);
+        fillRight(balance,chgb1,page.Revenue,0,1);
+        fillRight(balance,chgb5,page.OpCost,1,1);
+        fillRight(balance,grossYield,page.GrossYield,2,2);
         // Bruttoergebnis
 
-        fillRight(balance,chgb7,"Abschreibungen Sachanlagen",4,1); 
-        fillRight(balance,chgb8,"betriebl. Nebenkosten",5,1);
-        fillRight(balance,chgb7+chgb8,"Sonst betri. Aufwand",6,2);
+        fillRight(balance,chgb7,page.Depreciation,4,1); 
+        fillRight(balance,chgb8,page.OtherOTC,5,1);
+        fillRight(balance,chgb7+chgb8,page.OtherRegular,6,2);
         // Ergebnis
 
-        fillRight(balance,chgb9 ,"Ertrag aus Beteiligungen",8,1);
-        fillRight(balance,chgbA,"Wertpapierertrag",9,1);
-        fillRight(balance,chgbB,"Zinseinnahmen",10,1);
-        fillRight(balance,chgbD,"Zinsaufwand",11,1);
-        //fillRight(balance,chgbE,"gezahlte Steuern Ein+Ert",12,1);
+        fillRight(balance,chgb9 ,page.PartYield,8,1);
+        fillRight(balance,chgbA,page.FinSale,9,1);
+        fillRight(balance,chgbB,page.NetInterest,10,1);
+        fillRight(balance,chgbD,page.InterestCost,11,1);
+        
         let fin = chgb9+chgbA+chgbB+chgbD-chgbF
-        fillRight(balance,chgbF,"Steuerforderung d Gesel.",12,1);
-        fillRight(balance,fin,"außerorden.Ergebnis",13,2);
+        //fillRight(balance,chgbE,"gezahlte Steuern Ein+Ert",12,1);
+        fillRight(balance,chgbF,page.PaidTax,12,1);
+        fillRight(balance,fin,page.FinYield,13,2);
         let gain = regularOTC+fin;
         // Jahresueberschuss
-        fillRight(balance,gain,"Gewinn/Verlust",14,3);
+        fillRight(balance,gain,page.closing,14,3);
 
-        fillRight(balance,cAvgFix,"betriebsnotwendiges Ver.",15,1);
-        fillRight(balance,cAvgCur,"mittleres Umlaufvermögen",16,1);
-        fillRight(balance,cReceiv,"Forderungen",17,1);
+        fillRight(balance,cAvgFix,page.OpAssets,15,1);
+        fillRight(balance,cAvgCur,page.AvgCurrent,16,1);
+        fillRight(balance,cReceiv,page.rec,17,1);
         let opCap = cAvgFix+cAvgCur+cReceiv;
-        fillRight(balance,opCap,"betriebsnotwendiges Kap.",18,2);
+        fillRight(balance,opCap,page.OpCapital,18,2);
         let performanceBP = (10000n*gain)/opCap;
-        iRite=fillRight(balance,performanceBP,"Kapitalrendite",19,3);
+        iRite=fillRight(balance,performanceBP,page.CapMargin,19,3);
         
         }
     while(iRite<=SCREENLINES && iLeft<=SCREENLINES) {
@@ -228,14 +230,16 @@ function makeReport(response,value) {
     return balance;
 }
 
-function fillLeft(balance,dispValue1,dispValue2,iName,iLeft) {
+function fillLeft(balance,dispValue1,dispValue2,dispValue3,iName,iLeft) {
     if(iLeft<SCREENLINES) {
         if(!balance[iLeft]) balance[iLeft]={};
         balance[iLeft].tw1=iName;
         let cValue1=cents2EU(dispValue1);
         let cValue2=cents2EU(dispValue2);
+        let cValue3=cents2EU(dispValue3);
         balance[iLeft].am3=cValue1; 
         balance[iLeft].am2=cValue2; 
+        balance[iLeft].am1=cValue3; 
         
         iLeft++;
     }

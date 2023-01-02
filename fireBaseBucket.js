@@ -15,7 +15,7 @@ UPLOAD JSON (Admin only)
 
 */
 
-const debug=1;
+const debug=null;
 
 // SETTING THIS WILL VIOLATE PRIVACY AT ADMIN CONSOLE
 const debugReport=null;
@@ -77,7 +77,7 @@ function accessFirebase(accessMethod,firebaseConfig,client,year,jData,startSessi
 
   // LOGIN user 
   const auth = fbAuth.getAuth();
-  console.log("\nFB.bucketInit");
+  if(debug) console.log("\nFB.bucketInit");
   fbAuth.signInWithEmailAndPassword(auth, firebaseConfig.usermail, firebaseConfig.userpassword)
     .then((userCredential) => {
       // Signed in 
@@ -134,12 +134,12 @@ async function bucketDownload(bpStorage,client,year,jData,startSessionCB,callRes
               session = JSON.parse(body);
             }
             catch(err) {
-              console.dir("Firebase.download ERR "+err.toString());
+              console.error("Firebase.download ERR "+err.toString());
             }
 
-            if(debug) console.dir("0016 Firebase.download session "+JSON.stringify(Object.keys(session)));
+            if(debug) console.log("0016 Firebase.download session "+JSON.stringify(Object.keys(session)));
 
-            if(debugReport) console.log("Firebase.download session "+JSON.stringify(session));
+            if(debugReport) console.dir("Firebase.download session "+JSON.stringify(session));
             // AVOID double HEADERS 
             startSessionCB(session,callRes);
           })
@@ -149,43 +149,43 @@ async function bucketDownload(bpStorage,client,year,jData,startSessionCB,callRes
           // https://firebase.google.com/docs/storage/web/handle-errors
           switch (error.code) {
             case 'storage/object-not-found':
-              console.dir('Firebase.download storage/object-not-found')
+              console.error('Firebase.download storage/object-not-found')
             break;
 
             case 'storage/bucket-not-found':
-              console.dir('Firebase.download storage/bucket-not-found')
+              console.error('Firebase.download storage/bucket-not-found')
             break;
 
             case 'storage/project-not-found':
-              console.dir('Firebase.download storage/project-not-found')
+              console.error('Firebase.download storage/project-not-found')
             break;
       
             case 'storage/unauthorized':
-              console.dir('Firebase.download storage/unauthorized')
+              console.error('Firebase.download storage/unauthorized')
             break;
 
             case 'storage/quota-exceeded':
-              console.dir('Firebase.download storage/quota-exceeded')
+              console.error('Firebase.download storage/quota-exceeded')
               break;
 
             case 'storage/unauthenticated':
-              console.dir('Firebase.download storage/unauthenticated')
+              console.error('Firebase.download storage/unauthenticated')
               break;
 
             case 'storage/canceled':
-              console.dir('Firebase.download storage/canceled')
+              console.error('Firebase.download storage/canceled')
               break;
 
             case 'storage/invalid-checksum':
-              console.dir('Firebase.download storage/invalid-checksum')
+              console.error('Firebase.download storage/invalid-checksum')
               break;
 
             case 'storage/unknown':
-              console.dir('Firebase.download storage/unknown')
+              console.error('Firebase.download storage/unknown')
               break;
 
             default:
-              console.dir("Firebase.download ERROR "+JSON.stringify(error));
+              console.error("Firebase.download ERROR "+JSON.stringify(error));
           }  
       })
     })
@@ -320,7 +320,7 @@ function fireWrite(session) {
 
       if(debug) console.log("Firebase fireWrite setDoc"+name);
 
-  } else console.dir("Firebase fireWrite SKIP");
+  } else console.error("Firebase fireWrite SKIP");
 }
 module.exports['fireWrite']=fireWrite;
 
@@ -352,6 +352,6 @@ async function markActive(client) {
     console.log('Updated task');
   })
   .catch(err => {
-    console.dir('ERROR:', err);
+    console.error('ERROR:', err);
   });
 }

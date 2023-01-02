@@ -378,13 +378,8 @@ function xlsxWrite(sessionId) {
 
                         var jSchema = balance.Schema;
                         if(debug) console.log("1410 sheets.xlsxWrite jHistory "+sheetName+ " = "+JSON.stringify(jSchema));
-/*
-const D_Partner_NET= "NETPartner";
-const D_Partner_CAP= "CAPPartner";
-const D_Partner_OTC= "OTCPartner";
 
-*/
-                        var jPartner = balance.NETPartner;
+                        var jPartner = balance.PartnerR;
                         if(debug) console.log("1412 sheets.xlsxWrite jPartner "+sheetName+ " = "+JSON.stringify(jPartner));
 
 
