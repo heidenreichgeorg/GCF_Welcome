@@ -15,7 +15,7 @@ Server process reads TABLE (e.g. MS Excel (TM)) with accounting history in Euros
  Column  'D' should be the Equity/Liability/Gain/Cost account that is affected
  Column  'E' should be the reason or keyword for the transaction
  Column  'F' should be the referring date interval e.g.month/quarter/year or an external identification code for that transaction 
- Columns 'G' on shall be asset accounts, preferably starting with fixed assets then currecny assets and then claims
+ Columns 'G' and subsequent columns shall be asset accounts, preferably starting with fixed assets then currecny assets and then claims
  The limiting columns is then called ASSETS
  Subsequent columns shall be for Gain/Loss accounts i.e. revenues and cost
  The limiting columns is then called EQLIAB
@@ -57,7 +57,7 @@ Server process reads TABLE (e.g. MS Excel (TM)) with accounting history in Euros
  [   D_Balance   ]  balance
  [   D_Report    ]  gain/loss summaries
  [   D_FixAss    ]  list of fixed assets
- [ D_Partner ]  partner tax summary
+ [   D_Partner   ]  partner tax summary
  [   D_Muster    ]  predefined templates for transactions
  [  D_Adressen   ]  predefined partner postal addresses
 
@@ -77,6 +77,19 @@ D_REPORT = {
 "xbrlEqLiab":{"level":2,"xbrl":"de-gaap-ci_bs.eqLiab","de_DE":"Passiv_oG","account":{"name":"Passiv_oG","desc":"Passiv_oG","xbrl":"de-gaap-ci_bs.eqLiab","credit":"240.306,04","debit":"0,00","init":"241.725,74","min":"0,00","yearEnd":"240.306,04"}},
 "xbrlIncome":{"level":1,"xbrl":"de-gaap-ci_bs.eqLiab.income","de_DE":"Passiva","account":{"name":"Passiva","desc":"Passiva","xbrl":"de-gaap-ci_bs.eqLiab.income","init":"0,00","min":"0,00","credit":"0,00","debit":"0,00","yearEnd":"0,00"}}}
 
+
+# D_Balance = Bilanz
+    {:{"n":{"name":"n",
+    "index":#,
+    "desc":"$$$",
+    "xbrl":"de-gaap-ci_bs.ass.fixAss.tan.landBuildings.buildingsOnOwnLand",
+    "credit":"0",
+    "debit":"-243000",
+    "init":"14985000",
+    "min":"14742000",
+    "next":"14742000",
+    "yearEnd":"14742000"},"
+                    
 # D_Balance {
 "GRSB":{"name":"GRSB","index":6,"desc":"Immo","xbrl":"de-gaap-ci_bs.ass.fixAss.tan.landBuildings.buildingsOnOwnLand","init":"149.850,00","min":"149.850,00","credit":"0,00","debit":"0,00","yearEnd":"149.850,00","next":"149.850,00"},
 "EBKS":{"name":"EBKS","index":7,"desc":"Sachanlage","xbrl":"de-gaap-ci_bs.ass.fixAss.tan.landBuildings.other","init":"282,00","min":"282,00","credit":"0,00","debit":"0,00","yearEnd":"282,00","next":"282,00"},
