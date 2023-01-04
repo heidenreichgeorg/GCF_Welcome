@@ -26,6 +26,8 @@ const ReactPort = 3000;
 
 const debug=null;
 const debugReport = null; // will violate data privacy of reporting subject
+const debugUpload = 1; // will violate data privacy of reporting subject
+
 
 const HTTP_OK = 200;
 const HTTP_WRONG = 400;
@@ -507,14 +509,14 @@ module.exports['save2Bucket']=save2Bucket;
 // HIDDEN start session with uploading a session file for a known client
 app.post("/UPLOAD", (req, res) => { 
     let strTimeSymbol = timeSymbol();
-    console.log("\n\n"+strTimeSymbol);
+    if(debugUpload) console.log("\n\n0800 UPLOAD at "+strTimeSymbol);
 
     // client sends yearclient.JSON file
     // this json has to be stored in heap
     //var signup = "NO SESSION";
 
     let remote = req.socket.remoteAddress;
-    console.log("0810 app.post UPLOAD from "+remote);
+    if(debugUpload) console.log("0810 app.post UPLOAD from "+remote);
 
     let rawData = req.body;
 
@@ -529,7 +531,7 @@ app.post("/UPLOAD", (req, res) => {
 
         if(sessionId===computed) { } 
         else {
-            console.dir("0811 app.post UPLOAD  client="+client+",year="+year+",time="+time+",r="+remote+"  ---> "+computed);
+            if(debugUpload) console.dir("0811 app.post UPLOAD  client="+client+",year="+year+",time="+time+",r="+remote+"  ---> "+computed);
             rawData.id=computed;
             sessionId=computed;
         }
@@ -537,7 +539,7 @@ app.post("/UPLOAD", (req, res) => {
 
         if(sessionId!=null && computed!=null && year!=null && client!=null) {
             // save file on server, not on client and forward to LOGIN page
-            console.dir("0812 app.post UPLOAD with function="+clientFunction+",client="+client+",year="+year+",time="+time+",r="+remote+"  ---> "+computed);
+            if(debugUpload) console.dir("0812 app.post UPLOAD with function="+clientFunction+",client="+client+",year="+year+",time="+time+",r="+remote+"  ---> "+computed);
          
             let sessionData = rawData;
             sessionData.strTimeSymbol=strTimeSymbol;
@@ -561,14 +563,14 @@ app.post("/UPLOAD", (req, res) => {
             // shortcut for OFFLINE start  
             // 20221207 DO NOT call sendDisplay              
             startSessionDisplay(sessionData,null); 
-            console.dir("0818 app.post UPLOAD starts offline");
+            if(debugUpload) console.dir("0818 app.post UPLOAD starts offline");
             
 
             
             let cmdLogin = "http://localhost:81/LATEST?client="+client+"&year="+year+"&ext=JSON&clientSave=JSON";
             // should not set a sesssion.id because id not known while async save2bucket is not finished       
 
-            console.dir("0822 app.post UPLOAD rendering QR code");
+            if(debugUpload) console.dir("0822 app.post UPLOAD rendering QR code");
             res.write('<DIV class="attrRow"><H1>'+year+'&nbsp;'+client+'&nbsp;</H1>'
             +'<DIV class="attrRow"><DIV class="C100"><A HREF="'+cmdLogin+'"><BUTTON class="largeKey">LOGIN</BUTTON></A></DIV></DIV>'
             +'</DIV>'
@@ -576,10 +578,10 @@ app.post("/UPLOAD", (req, res) => {
             res.end();
             
 
-        } else console.log ( "0813 UPLOAD VOID client="+client+",year="+year+",time="+time+",addr="+remote+"  ---> "+computed);
+        } else if(debugUpload) console.log ( "0813 UPLOAD VOID client="+client+",year="+year+",time="+time+",addr="+remote+"  ---> "+computed);
 
         return;
-    } else console.log ( "0809 UPLOAD EMPTY  addr="+remote);
+    } else console.error ( "0809 UPLOAD EMPTY  addr="+remote);
 
     // send back sessionId to client browser or file
     //res.writeHead(HTTP_WRONG, {"Content-Type": "text/html"});

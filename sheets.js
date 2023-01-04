@@ -217,7 +217,7 @@ function makeWorkBook(jExcel,sheetName,year,aLen,eLen) {
 */    
         if(workBook==null) {
             workBook = XLSX.utils.book_new();
-            if(debugWrite) console.dir("1480 sheets.makeWorkBook CREATE new workbook for ("+sheetName+")");
+            if(debug) console.log("1480 sheets.makeWorkBook CREATE new workbook for ("+sheetName+")");
         }
     
         for(tabName in jExcel) {
@@ -290,113 +290,6 @@ function makeWorkBook(jExcel,sheetName,year,aLen,eLen) {
 module.exports['makeWorkBook']=makeWorkBook;
 
 
-
-function getClientDir(client) {
-    return getRoot()+client+Slash; 
-}
-module.exports['getClientDir']=getClientDir;
-
-
-function symbolic(pat) {
-    var res = 0;
-    if(pat) {
-        var sequence = ' '+pat+pat+pat;
-        var base=71
-        for(let p=0;p<sequence.length && p<80;p++) {
-            res = (res + sequence.charCodeAt(p) & 0x1FFFFFEF)*base;  
-        }
-    }
-    return res & 0x3FFFFFF;
-}
-module.exports['symbolic']=symbolic;
-
-
-function xlsxWrite(sessionId) {
-
-    let sheetFile = "BOOKING.xlsx"
-    let client="client";
-    let year="YYYY";
-    var session = Server.getSession(sessionId);
-    if(session) {
-       
-        // return 'serverFile':sheetFile
-        sheetFile = getClientDir(session.client) + session.year + session.client + ".xlsx"
-        if(sheetFile) {
-            if(session.sheetName) {
-                client = session.client;
-                year = session.year;
-                let sheetName = session.sheetName;
-                if(client && year) {
-                        if(debugWrite) console.dir("1400 sheets.xlsxWrite ENTER "+sheetName+ " for ("+client+","+year+") in file "+sheetFile);
-
-                        if(debugWrite) console.dir("1402 sheets.xlsxWrite session "+sheetName+ " = "+Object.keys(session).join(", "));
-
-                        let balance = session.generated;
-                        if(debugWrite) console.dir("1404 sheets.xlsxWrite balance "+sheetName+ " = "+Object.keys(balance).join(", "));
-
-                        var jAssets = balance.Anlagen; // balance[Compiler.D_FixAss];
-                        if(debugWrite) console.dir("1406 sheets.xlsxWrite jAssets "+sheetName+ " = "+JSON.stringify(jAssets));
-                        
-                        var strHistory = JSON.stringify(balance.Historie); // balance[Compiler.D_History];
-                        if(debugWrite) console.dir("1408 sheets.xlsxWrite jHistory "+sheetName+ " = "+strHistory);
-
-                        var jSchema = balance.Schema;
-                        if(debugWrite) console.dir("1410 sheets.xlsxWrite jHistory "+sheetName+ " = "+JSON.stringify(jSchema));
-
-                        var jPartner = balance.PartnerR;
-                        if(debugWrite) console.dir("1412 sheets.xlsxWrite jPartner "+sheetName+ " = "+JSON.stringify(jPartner));
-
-
-                        var jBalance = balance.Bilanz;
-                        if(debug) console.log("1414 sheets.xlsxWrite jBalance "+sheetName+ " = "+JSON.stringify(jBalance));
-
-                        var jXBRL = balance.XBRL;
-                        if(debug) console.log("1416 sheets.xlsxWrite jXBRL "+sheetName+ " = "+JSON.stringify(jXBRL));
-
-
-                        let jExcel = makeXLTabs(                            
-                            session.sheetCells,
-                            jAssets,
-                            JSON.parse(strHistory), // all bookings of a year
-                            jSchema,        // account schema
-                            jPartner, // NET results
-                            jBalance,  // account values
-                            jXBRL,
-                            session.addrT);
-                        
-
-                        let workBook = makeWorkBook(jExcel,
-                                                    sheetName,
-                                                    year,
-                                                    parseInt(jSchema.assets),
-                                                    parseInt(jSchema.eqliab));
-
-                        XLSX.writeFile(workBook, sheetFile);
-                        
-                        if(debugWrite)  console.dir("1409 sheets.xlsxWrite WRITE FILE "+sheetFile);
-                        
-                    } else {
-                        if(debugWrite) console.dir("1407 sheets.xlsxWrite() NO client / year "+JSON.stringify(session));
-                        console.log("1407 sheets.xlsxWrite() NO client / year "+JSON.stringify(session));
-                    }   
-                } else {
-                    if(debugWrite) console.dir("1405 sheets.xlsxWrite() NO sheetName and NOT writing "+JSON.stringify(session));
-                    console.log("1405 sheets.xlsxWrite() NO sheetName and NOT writing");
-                }
-            } else {
-                if(debugWrite) console.dir("1403 sheets.xlsxWrite NO sheetFile and NOT writing "+JSON.stringify(session));
-                console.log("1403 sheets.xlsxWrite NO sheetFile and NOT writing");
-            }
-        } else {
-            console.log("1401 sheets.xlsxWrite NO SESSION "+sessionId);
-        }
-
-        // return csv;
-        return {'serverFile':sheetFile, 'localFile': (client+year+".xlsx"),'id':sessionId};
-    }
-module.exports['xlsxWrite']=xlsxWrite;
-
-
 // generate all the tabs for Excel
 function makeXLTabs(sheetCells,jAssets,jHistory,jSchema,jPartner,jBalance,jXBRL,addrT) {
 
@@ -413,6 +306,10 @@ function makeXLTabs(sheetCells,jAssets,jHistory,jSchema,jPartner,jBalance,jXBRL,
     
     function pushAsset(arr,line){
         arr.push([line[0],line[1],parseFloat(line[2])/100.0,parseInt(line[3]),line[4],parseFloat(line[5])/100.0,parseFloat(line[6])/100.0]);
+    }
+
+    function pushAssetStart(arr,line){
+        arr.push(['A',line[0],line[1],parseFloat(line[2]),parseInt(line[3]),line[4],parseFloat(line[5])]);
     }
     
     function pushNET(arr,line){
@@ -443,15 +340,18 @@ function makeXLTabs(sheetCells,jAssets,jHistory,jSchema,jPartner,jBalance,jXBRL,
     var pLine=null;
     for(let r=0;r<20;r++) {
         let line = sheetCells[r];
-        if(line[0]=='N') { if(line.length>6) { nLine = line; } }
-        if(line[0]=='C') { if(line.length>6) { cLine = line; } }
-        if(line[0]=='I') { if(line.length>6) { iLine = line; } }
-        if(line[0]=='K') { if(line.length>6) { kLine = line; } }
-        if(line[0]=='S') { if(line.length>6) { sLine = line; } }
-        if(line[0]=='R') { if(line.length>6) { rLine = line; } }
-        if(line[0]=='E') { if(line.length>6) { eLine = line; } }
-        if(line[0]=='C') { if(line.length>6) { cLine = line; } }
-        if(line[0]=='P') { if(line.length>6) { pLine = line; } }
+        if(line.length>6) {
+            let linec = line[0];
+            if(linec=='N') { nLine = line; } 
+            if(linec=='C') { cLine = line; } 
+            if(linec=='I') { iLine = line; } 
+            if(linec=='K') { kLine = line; } 
+            if(linec=='S') { sLine = line; } 
+            if(linec=='R') { rLine = line; } 
+            if(linec=='E') { eLine = line; } 
+            if(linec=='C') { cLine = line; }
+            if(linec=='P') { pLine = line; } 
+        }
     }
 
     tempStartT.push(nLine);
@@ -460,14 +360,14 @@ function makeXLTabs(sheetCells,jAssets,jHistory,jSchema,jPartner,jBalance,jXBRL,
     tempStartT.push([]); // next
 
     const strStart = JSON.stringify(tempStartT);
-    if(debug) console.log("EXCELSTART= "+strStart);
+    if(debugWrite) console.dir("EXCELSTART= "+strStart);
 
     // make a TAB-structure
-    let excelTabs = {   'TXN':excelTransactionT,  //20230101
+    let excelTabs = {   'START':tempStartT, //20230103
+                        'TXN':excelTransactionT,  //20230101
                         'ASSETS':excelAssetT,  
                         'PARTNER':excelPartnerT,  
-                        'ADDR':excelAddrT,
-                        'START':tempStartT //20230103
+                        'ADDR':excelAddrT                        
                     };
 
     var schemaLen = 0;
@@ -622,14 +522,16 @@ function makeXLTabs(sheetCells,jAssets,jHistory,jSchema,jPartner,jBalance,jXBRL,
             excelStartT.push(strCLOS);
             excelStartT.push(strNEXT);
 
+            excelAssetT.map(function(asset) { 
+                pushAssetStart(excelStartT,asset);
+            })
+
             excelTabs.START = excelStartT;
 
             //excelTabs.CLOSE = transpose(tempStartT);
+
          } catch(err) { console.error("transpose failed "+err);}
     
-        
-
-
     
     } else console.error("1421 sheets.makeXLTabs NO sheetCells");
 
@@ -638,6 +540,94 @@ function makeXLTabs(sheetCells,jAssets,jHistory,jSchema,jPartner,jBalance,jXBRL,
     return excelTabs;
 }
 module.exports['makeXLTabs']=makeXLTabs;
+
+
+
+
+function xlsxWrite(sessionId) {
+
+    let sheetFile = "BOOKING.xlsx"
+    let client="client";
+    let year="YYYY";
+    var session = Server.getSession(sessionId);
+    if(session) {
+       
+        // return 'serverFile':sheetFile
+        sheetFile = getClientDir(session.client) + session.year + session.client + ".xlsx"
+        if(sheetFile) {
+            if(session.sheetName) {
+                client = session.client;
+                year = session.year;
+                let sheetName = session.sheetName;
+                if(client && year) {
+                        if(debugWrite) console.dir("1400 sheets.xlsxWrite ENTER "+sheetName+ " for ("+client+","+year+") in file "+sheetFile);
+
+                        if(debugWrite) console.dir("1402 sheets.xlsxWrite session "+sheetName+ " = "+Object.keys(session).join(", "));
+
+                        let balance = session.generated;
+                        if(debugWrite) console.dir("1404 sheets.xlsxWrite balance "+sheetName+ " = "+Object.keys(balance).join(", "));
+
+                        var jAssets = balance.Anlagen; // balance[Compiler.D_FixAss];
+                        if(debugWrite) console.dir("1406 sheets.xlsxWrite jAssets "+sheetName+ " = "+JSON.stringify(jAssets));
+                        
+                        var strHistory = JSON.stringify(balance.Historie); // balance[Compiler.D_History];
+                        if(debugWrite) console.dir("1408 sheets.xlsxWrite jHistory "+sheetName+ " = "+strHistory);
+
+                        var jSchema = balance.Schema;
+                        if(debugWrite) console.dir("1410 sheets.xlsxWrite jHistory "+sheetName+ " = "+JSON.stringify(jSchema));
+
+                        var jPartner = balance.PartnerR;
+                        if(debugWrite) console.dir("1412 sheets.xlsxWrite jPartner "+sheetName+ " = "+JSON.stringify(jPartner));
+
+
+                        var jBalance = balance.Bilanz;
+                        if(debug) console.log("1414 sheets.xlsxWrite jBalance "+sheetName+ " = "+JSON.stringify(jBalance));
+
+                        var jXBRL = balance.XBRL;
+                        if(debug) console.log("1416 sheets.xlsxWrite jXBRL "+sheetName+ " = "+JSON.stringify(jXBRL));
+
+
+                        let jExcel = makeXLTabs(                            
+                            session.sheetCells,
+                            jAssets,
+                            JSON.parse(strHistory), // all bookings of a year
+                            jSchema,        // account schema
+                            jPartner, // NET results
+                            jBalance,  // account values
+                            jXBRL,
+                            session.addrT);
+                        
+
+                        let workBook = makeWorkBook(jExcel,
+                                                    sheetName,
+                                                    year,
+                                                    parseInt(jSchema.assets),
+                                                    parseInt(jSchema.eqliab));
+
+                        XLSX.writeFile(workBook, sheetFile);
+                        
+                        if(debugWrite)  console.dir("1409 sheets.xlsxWrite WRITE FILE "+sheetFile);
+                        
+                    } else {
+                        if(debugWrite) console.dir("1407 sheets.xlsxWrite() NO client / year "+JSON.stringify(session));
+                        console.log("1407 sheets.xlsxWrite() NO client / year "+JSON.stringify(session));
+                    }   
+                } else {
+                    if(debugWrite) console.dir("1405 sheets.xlsxWrite() NO sheetName and NOT writing "+JSON.stringify(session));
+                    console.log("1405 sheets.xlsxWrite() NO sheetName and NOT writing");
+                }
+            } else {
+                if(debugWrite) console.dir("1403 sheets.xlsxWrite NO sheetFile and NOT writing "+JSON.stringify(session));
+                console.log("1403 sheets.xlsxWrite NO sheetFile and NOT writing");
+            }
+        } else {
+            console.log("1401 sheets.xlsxWrite NO SESSION "+sessionId);
+        }
+
+        // return csv;
+        return {'serverFile':sheetFile, 'localFile': (client+year+".xlsx"),'id':sessionId};
+    }
+module.exports['xlsxWrite']=xlsxWrite;
 
 
 
@@ -699,4 +689,26 @@ function makeSum(xSheet,a1Cell,a1From,a1To) {
     cell.t='n';
     cell.f='sum('+a1From+':'+a1To+')';
 }
+
+
+
+function getClientDir(client) {
+    return getRoot()+client+Slash; 
+}
+module.exports['getClientDir']=getClientDir;
+
+
+
+function symbolic(pat) {
+    var res = 0;
+    if(pat) {
+        var sequence = ' '+pat+pat+pat;
+        var base=71
+        for(let p=0;p<sequence.length && p<80;p++) {
+            res = (res + sequence.charCodeAt(p) & 0x1FFFFFEF)*base;  
+        }
+    }
+    return res & 0x3FFFFFF;
+}
+module.exports['symbolic']=symbolic;
 
