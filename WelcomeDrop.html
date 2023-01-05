@@ -71,12 +71,15 @@ function dropHandler(ev) {
                   jData.clientFunction="Booking"; // GH20220926
                   callServer('POST',"UPLOAD","application/json",JSON.stringify(jData),showResponse);
             } catch(err) { 
-               console.dir("WELCOMEDROP CANNOT PARSE "+fileBuffer); jData=fileBuffer; 
-               callServer('POST',"UPLOAD","application/text",jData,showResponse);
+               console.dir("WELCOMEDROP CANNOT PARSE "+fileBuffer); 
+               let sheetLines = fileBuffer.split('\n');
+               console.error ( "0820 UPLOAD CSV WITH "+sheetLines.length+" lines");
+               let strSheet = JSON.stringify(sheetLines);
+               console.dir("WELCOMEDROP PARSE "+strSheet); 
+               let jData = JSON.parse(strSheet);
+               callServer('POST',"UPLOAD","application/json",JSON.stringify(jData),showResponse);
             }
 
-
-            
 
            }
            fr.readAsText(item);

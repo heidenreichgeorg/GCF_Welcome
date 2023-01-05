@@ -291,7 +291,7 @@ module.exports['makeWorkBook']=makeWorkBook;
 
 
 // generate all the tabs for Excel
-function makeXLTabs(sheetCells,jAssets,jHistory,jSchema,jPartner,jBalance,jXBRL,addrT) {
+function makeXLTabs(sheetCells,jAssets,jHistory,jSchema,jPartner,jBalance,jXBRL,addrT,client,year) {
 
     var excelAssetT=[];            
     var excelAddrT=[];            
@@ -345,7 +345,7 @@ function makeXLTabs(sheetCells,jAssets,jHistory,jSchema,jPartner,jBalance,jXBRL,
             if(linec=='N') { nLine = line; } 
             if(linec=='C') { cLine = line; } 
             if(linec=='I') { iLine = line; } 
-            if(linec=='K') { kLine = line; } 
+            if(linec=='K') { kLine = line; kLine[2]=parseInt(year)+1; kLine[4]=client} 
             if(linec=='S') { sLine = line; } 
             if(linec=='R') { rLine = line; } 
             if(linec=='E') { eLine = line; } 
@@ -595,7 +595,9 @@ function xlsxWrite(sessionId) {
                             jPartner, // NET results
                             jBalance,  // account values
                             jXBRL,
-                            session.addrT);
+                            session.addrT,
+                            client,
+                            year);
                         
 
                         let workBook = makeWorkBook(jExcel,

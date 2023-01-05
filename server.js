@@ -218,9 +218,8 @@ app.get('/SESSION', (req, res) => {
         // WARM START : FOUND EXISTING ID
         } else {
             session = getSession(sessionId);
-//            if(session) console.log("\n 0820 GET /SESSION FOUND LOADED "+showRecent(session)+" => "+session.id);
-            if(session && debugReport>3) console.log("\n 0820 GET /SESSION FOUND LOADED "+JSON.stringify(session));
-            else console.log("\n0821 GET /SESSION NOT FOUND => FOR EXISTING #"+sessionId);
+            if(session && debugReport>3) console.log("\n0830 GET /SESSION FOUND LOADED "+JSON.stringify(session));
+            else console.error("\n0831 GET /SESSION NOT FOUND => FOR EXISTING #"+sessionId);
 
             
             if(session && session.id) res.json(session);
@@ -584,10 +583,13 @@ app.post("/UPLOAD", (req, res) => {
 
         return;
     } else {
-        console.error ( "0809 UPLOAD EMPTY  addr="+remote);
+        console.error ( "0809 UPLOAD EMPTY JSON addr="+remote);
 
-        //split into aoa
-        sget client from 4.4 and year from 4.2 , client = K[2] , year = K[4]
+        if(rawData) {
+            //split into aoa
+            //get client from 4.4 and year from 4.2 , year = K[2] , client = K[4]
+            console.dir(rawData);
+        }
     }
     // send back sessionId to client browser or file
     //res.writeHead(HTTP_WRONG, {"Content-Type": "text/html"});
