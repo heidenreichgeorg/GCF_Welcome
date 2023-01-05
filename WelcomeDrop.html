@@ -60,18 +60,23 @@ function dropHandler(ev) {
            //console.log('FILES... file[' + i + '].name = ' + file.name);
 
 
-           var fr = new FileReader();
-           fr.onload = function () {
+         var fr = new FileReader();
+         fr.onload = function () {
 
-              fileBuffer = this.result;            
-              
-              let jData = JSON.parse(fileBuffer);
+            fileBuffer = this.result;            
+               
+            let jData=null;
+            try {
+                  jData = JSON.parse(fileBuffer);
+                  jData.clientFunction="Booking"; // GH20220926
+                  callServer('POST',"UPLOAD","application/json",JSON.stringify(jData),showResponse);
+            } catch(err) { 
+               console.dir("WELCOMEDROP CANNOT PARSE "+fileBuffer); jData=fileBuffer; 
+               callServer('POST',"UPLOAD","application/text",jData,showResponse);
+            }
 
-               jData.clientFunction="Booking"; // GH20220926
 
-               callServer('POST',"UPLOAD",JSON.stringify(jData),showResponse);
-                       
-
+            
 
            }
            fr.readAsText(item);
@@ -87,7 +92,7 @@ function dropHandler(ev) {
         if(response) display.innerHTML=response;
   }
 
-  function callServer(cmd,strTarget,strParams,callBack) {
+  function callServer(cmd,strTarget,applicationType,strParams,callBack) {
     // cmd = GET or POST
     let strServerDNS = 'http://'+self.location.hostname+':'+PORT+'/';     
     if(strTarget) {
@@ -108,7 +113,7 @@ function dropHandler(ev) {
         request.addEventListener('error', handleEvent);
         request.setRequestHeader('Cache-control', 'no-cache, must-revalidate, post-check=0, pre-check=0');
         request.setRequestHeader('Cache-control', 'max-age=0');
-        request.setRequestHeader( 'Content-Type', 'application/json;charset=UTF-8'); //("Content-type", "text/json");			
+        request.setRequestHeader( 'Content-Type', applicationType+';charset=UTF-8'); //("Content-type", "text/json");			
         request.send(strParams);
     } else alert('callServer: no target:  '+cmd+' '+strServerDNS+strTarget+"?"+strParams+"\n");
 }

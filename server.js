@@ -516,9 +516,11 @@ app.post("/UPLOAD", (req, res) => {
     //var signup = "NO SESSION";
 
     let remote = req.socket.remoteAddress;
-    if(debugUpload) console.log("0810 app.post UPLOAD from "+remote);
+    if(debug) console.log("0810 app.post UPLOAD from "+remote);
 
     let rawData = req.body;
+    if(debugUpload) console.dir("0810 app.post UPLOAD from "+rawData);
+
 
     if(rawData && rawData.client && rawData.year) {
 
@@ -581,8 +583,12 @@ app.post("/UPLOAD", (req, res) => {
         } else if(debugUpload) console.log ( "0813 UPLOAD VOID client="+client+",year="+year+",time="+time+",addr="+remote+"  ---> "+computed);
 
         return;
-    } else console.error ( "0809 UPLOAD EMPTY  addr="+remote);
+    } else {
+        console.error ( "0809 UPLOAD EMPTY  addr="+remote);
 
+        //split into aoa
+        sget client from 4.4 and year from 4.2 , client = K[2] , year = K[4]
+    }
     // send back sessionId to client browser or file
     //res.writeHead(HTTP_WRONG, {"Content-Type": "text/html"});
     res.write("\n<HTML><HEAD><link rel='stylesheet' href='./FBA/mobile_green.css'/></HEAD><TITLE>UPLOAD Welcome</TITLE>INVALID SESSION FILE 'client' and/or 'year' missing</HTML>\n\n"); 
