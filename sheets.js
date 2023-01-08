@@ -297,13 +297,17 @@ function makeXLTabs(sheetCells,jAssets,jHistory,jSchema,jPartner,jBalance,jXBRL,
     var excelAddrT=[];            
     var excelPartnerT=[];  
     var excelTransactionT=[];          
-    var tempStartT=[];
+    var tempStartT=[]; // ['A',	'date',	'type', 'init', 'nmbr', 'rest', 'cost']
 
     function pushClose(arr,name,xbrl,m3,m4) {
         let account = [ name, xbrl, parseFloat(m3)/100.0, parseFloat(m4)/100.0 ]
         arr.map(function(row,line){ if(line>0 && line<account.length) row.push(account[line])});
     }
     
+    function pushAssetTitle(arr,line){
+        arr.push([line[0],line[1],line[2],line[3],line[4],line[5],line[6]]);
+    }
+
     function pushAsset(arr,line){
         arr.push([line[0],line[1],parseFloat(line[2])/100.0,parseInt(line[3]),line[4],parseFloat(line[5])/100.0,parseFloat(line[6])/100.0]);
     }
@@ -316,18 +320,6 @@ function makeXLTabs(sheetCells,jAssets,jHistory,jSchema,jPartner,jBalance,jXBRL,
         arr.push(Object.keys(line).map((key,i)=>(i>J_ACCT?parseFloat(line[key])/100.0:line[key])));
     }
     
-    function transpose(aoa) {
-        var result=null;
-        if(aoa) {
-            result=[];
-            let cols = aoa[0].length;
-            if(cols>0) {
-                for(let c=0;c<cols && c<result.length;c++) result[c]=[];
-                aoa.map(function(line) {line.map(function(cell,c){if(result[c]) result[c].push(cell)})})
-            }
-        }
-        return result;
-    }
     
     var nLine=null;
     var cLine=null;
@@ -337,7 +329,6 @@ function makeXLTabs(sheetCells,jAssets,jHistory,jSchema,jPartner,jBalance,jXBRL,
     var rLine=null;
     var eLine=null;
     var cLine=null;
-    var xLine=null;
     var pLine=null;
     for(let r=0;r<20;r++) {
         let line = sheetCells[r];
@@ -350,7 +341,6 @@ function makeXLTabs(sheetCells,jAssets,jHistory,jSchema,jPartner,jBalance,jXBRL,
             if(linec=='S') { sLine = line; } 
             if(linec=='R') { rLine = line; } 
             if(linec=='E') { eLine = line; } 
-            if(linec=='X') { xLine = line; }
             if(linec=='C') { cLine = line; }
             if(linec=='P') { pLine = line; } 
         }
@@ -374,10 +364,6 @@ function makeXLTabs(sheetCells,jAssets,jHistory,jSchema,jPartner,jBalance,jXBRL,
 
     var schemaLen = 0;
     
-
-
-    // puts an array for each account into an array EXCEL-formatted tabs
-
 
 
     try {
@@ -494,12 +480,13 @@ function makeXLTabs(sheetCells,jAssets,jHistory,jSchema,jPartner,jBalance,jXBRL,
                             if(debugWrite) console.dir("pushClose A="+JSON.stringify(account));
                             pushClose(tempStartT,name,account.xbrl,account.yearEnd,account.next);
                         } else pushClose(tempStartT,name,".","0","0");
-                    } else pushClose(tempStartT,name,".","0","0");
+                    } else if(c==0)  pushClose(tempStartT,name,"X","0","1"); 
+                    else pushClose(tempStartT,name,".","0","0"); 
 
                     strXBRL = tempStartT[1];
                     strCLOS = tempStartT[2];
                     strNEXT = tempStartT[3];
-                    strNEXT[0]='1'; // flag as active opeining txn
+                    strNEXT[0]='1'; // flag as active opening txn
 
                     if(debugWrite) console.dir("pushClose X="+JSON.stringify(strXBRL));
                     if(debugWrite) console.dir("pushClose C="+JSON.stringify(strCLOS));
@@ -515,7 +502,6 @@ function makeXLTabs(sheetCells,jAssets,jHistory,jSchema,jPartner,jBalance,jXBRL,
             excelStartT.push(nLine);
             excelStartT.push(cLine);
             excelStartT.push(iLine);
-            excelStartT.push(xLine);
             excelStartT.push(kLine);
             excelStartT.push(sLine);
             excelStartT.push(rLine);
@@ -525,13 +511,11 @@ function makeXLTabs(sheetCells,jAssets,jHistory,jSchema,jPartner,jBalance,jXBRL,
             excelStartT.push(strCLOS);
             excelStartT.push(strNEXT);
 
-            excelAssetT.map(function(asset) { 
-                pushAssetStart(excelStartT,asset);
+            excelAssetT.map(function(asset,i) { 
+                if(i==0) pushAssetTitle(excelStartT,asset); else pushAssetStart(excelStartT,asset);
             })
 
             excelTabs.START = excelStartT;
-
-            //excelTabs.CLOSE = transpose(tempStartT);
 
          } catch(err) { console.error("transpose failed "+err);}
     
