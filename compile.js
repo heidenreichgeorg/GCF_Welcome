@@ -3,6 +3,7 @@
 
 // CAN ONLY DOCUMENT UP TO SIX PARTNERS
 const debug=null;
+const debugTax=1;
 const debugYield=1;
 
 
@@ -1198,14 +1199,14 @@ function sendBalance(balance) {
 function distribute(iMoney,bPartner,target) {      
     
     var check=0n;
-    // can only server six partners
+    // can only serve six partners
 
-    var result=[ 0n, 0n, 0n, 0n, 0n, 0n ];
+    var shares=[ 0n, 0n, 0n, 0n, 0n, 0n ];
     var cents =[ 0n, 0n, 0n, 0n, 0n, 0n ];
     var sign=1n;
-    if(debug>2) console.log('0130 Sender.distribute('+iMoney+') CALL WITH MONEY');
+    if(debugTax) console.log('0130 Sender.distribute('+iMoney+') CALL WITH MONEY');
     if(iMoney<0n) { iMoney = -iMoney; sign=-1n; }
-    if(debug>2) console.log('0132 Sender.distribute('+iMoney+' * '+sign+') ABSOLUTE VALUE ');
+    if(debugTax) console.log('0132 Sender.distribute('+iMoney+' * '+sign+') ABSOLUTE VALUE ');
 
 
     if(bPartner) { 
@@ -1215,7 +1216,7 @@ function distribute(iMoney,bPartner,target) {
             var p=bPartner[n];
             if(p) pNum++;
         }
-
+        // pNum = #partners
 
         // init with raw share
         let index1=0;
@@ -1223,9 +1224,9 @@ function distribute(iMoney,bPartner,target) {
             var p=bPartner[n];
             if(p) {
                 let iShare = (iMoney * BigInt(p.gain)) / BigInt(p.denom);
-                result[index1]=iShare;
+                shares[index1]=iShare;
                 cents[index1]=0n;
-                if(debug>2) console.log('0134 Sender.distribute #'+n+'='+index1+': '+sign+'*'+iShare+' to '+ p.vk+ " with "+p.gain+"/"+p.denom);
+                if(debugTax) console.log('0134 Sender.distribute #'+n+'='+index1+': '+sign+'*'+iShare+' to '+ p.vk+ " with "+p.gain+"/"+p.denom);
                 index1++;
             }
         }
@@ -1234,10 +1235,12 @@ function distribute(iMoney,bPartner,target) {
 
         // skip one-man show
         if(bPartner.length<2) {
-            if(debug==4) console.log('0136 Sender.distributeMoney('+iMoney+') PRE-LOOP NO PARTNERS IN BALANCE'); 
-            result[0]=iMoney;
+            if(debugTax) console.log('0136 Sender.distributeMoney('+iMoney+') PRE-LOOP NO PARTNERS IN BALANCE'); 
+            shares[0]=iMoney;
         }
         else while(check<iMoney){
+            
+            if(debugTax) console.log("\n");
 
             // init minimum correction
             let min=cents[0];
@@ -1245,9 +1248,9 @@ function distribute(iMoney,bPartner,target) {
 
             // calculate error
             check=0n;
-            for(var q=0;q<result.length;q++) {
-                check = check + result[q] + cents[q];
-                if(debug==4) console.log("0138 distribute  "+q+"="+result[q]+"+"+cents[q])
+            for(var q=0;q<shares.length;q++) {
+                check = check + shares[q] + cents[q];
+                if(debugTax) console.log("0138 distribute  "+q+"="+shares[q]+"+"+cents[q])
             }
             let err = iMoney-check;
 
@@ -1264,7 +1267,7 @@ function distribute(iMoney,bPartner,target) {
 
                 // increment cents' miminum
                 cents[mIndex]=min+1n;                
-                if(debug==4) console.log("0140 cents["+mIndex+"]="+cents[mIndex]+" G"+result[0]+" E"+result[1]+" A"+result[2]+" K"+result[3]+" T"+result[5]);
+                if(debugTax) console.log("0140 (min="+min+"   err="+err+") \n0140cents["+mIndex+"]="+cents[mIndex]+" G"+shares[0]+" E"+shares[1]+" A"+shares[2]+" K"+shares[3]+" T"+shares[5]);
                 
 
             }
@@ -1282,34 +1285,34 @@ function distribute(iMoney,bPartner,target) {
         }
 
 
-        // consolidate result+cents
+        // consolidate shares+cents
         for(var q in cents) {
-            if(cents[q]!=0n) {
-                result[index] = result[index] + cents[index];
-            }
+            
+                shares[q] = shares[q] + cents[q];
+            
         }
 
 
-        // transfer result
+        // transfer shares
         var index=0;
         for (let id in bPartner) {
             var p=bPartner[id];
             if(p) {
-                p[target]= ""+result[index];
+                p[target]= ""+shares[index];
 
-                if(debug==4) console.log('0142 distributeMoney('+result[index]+') to '+JSON.stringify(p)+"["+target+"]");
+                if(debugTax) console.log('0142 distributeMoney('+shares[index]+') to '+JSON.stringify(p)+"["+target+"]");
 
                 index++;
 
             }
         }
 
-    } else console.log('0133 Sender.distributeMoney('+JSON.stringify(iMoney)+') NO PARTNERS IN BALANCE');
+    } else console.error('0133 Sender.distributeMoney('+JSON.stringify(iMoney)+') NO PARTNERS IN BALANCE');
 
     
-    if(debug && result && result.length>5) console.log('0144 Sender.distributeMoney '+iMoney + " G"+result[0]+" E"+result[1]+" A"+result[2]+" K"+result[3]+" T"+result[4]+" L"+result[5]);
-    if(debug && cents && cents.length>5)   console.log('0146 Sender.distributeMoney '+iMoney + " G"+cents[0]+"  E"+cents[1] +" A"+ cents[2]+" K"+ cents[3]+" T"+ cents[4]+" L"+ cents[5]);
-    return result;
+    if(debugTax && shares && shares.length>1) console.log('0144 Sender.distributeMoney RESULT '+iMoney + " G"+shares[0]+" E"+shares[1]+" A"+shares[2]+" K"+shares[3]+" T"+shares[4]+" L"+shares[5]);
+    if(debugTax && cents && cents.length>1)   console.log('0146 Sender.distributeMoney  CENTS '+iMoney + " G"+cents[0]+"  E"+cents[1] +" A"+ cents[2]+" K"+ cents[3]+" T"+ cents[4]+" L"+ cents[5]);
+    return shares; // shares.map((s,i)=>(s+cents[i]));
 }
 
 
@@ -1481,7 +1484,7 @@ async function send(res,session) {
 
         if(res && balance) {
 
-            // send the whole result
+            // send the whole shares
             let payLoad = JSON.stringify(balance);    
             res.write(payLoad);
             res.write("\n");
