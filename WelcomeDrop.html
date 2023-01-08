@@ -8,7 +8,7 @@
 </head>
 <body>
   <div id='mainPage'>
-     <h1 id="SignUp">Sign Up</h1>
+     <h1 id="SignUp">Sign Up</h1>CSV in UTF-8
         <div class="keyPanel" ondragover="dragOverHandler(event);" ondrop="dropHandler(event);">  
           
            <div  class="instRow"  >&nbsp;</div>            
@@ -80,23 +80,24 @@ function dropHandler(ev) {
                //console.dir("WELCOMEDROP CANNOT PARSE "+fileBuffer); 
                let sheetLines = fileBuffer.split(CSV_RS);
                if(sheetLines.length>6) {
-                  console.error ( "0820 UPLOAD CSV WITH "+sheetLines.length+" lines");
-                  let strSheet = JSON.stringify(sheetLines);
-                  
+                  console.error ( "0820 UPLOAD CSV WITH "+sheetLines.length+" lines");                  
                   console.dir("\n0822 UPLOAD CSV N-line "+JSON.stringify(sheetLines[0])); 
-                  console.dir("\n0824 UPLOAD CSV K-line "+JSON.stringify(sheetLines[3]));                   
+                  console.dir("\n0824 UPLOAD CSV K-line "+JSON.stringify(sheetLines[4]));                   
 
-                  let arrKLine = sheetLines[3].split(CSV_FS);
+                  let arrKLine = sheetLines[4].split(CSV_FS);
                   let year  = arrKLine[2];
                   let client= arrKLine[4];
                   console.dir("\n0826 UPLOAD CSV client:"+client+"  year:"+year);                   
 
+                  let aoaSheet = sheetLines.map((strRow)=>(strRow.split(CSV_FS)));
+
                   jData.year  = year;
                   jData.client= client;
-                  jData.sheetCells = JSON.parse(strSheet);
+                  jData.sheetCells = JSON.parse(JSON.stringify(aoaSheet));
                   jData.clientFunction= "BeginYear";
 
 
+// Server in UPLOAD
 //                  let sessionTime=Server.timeSymbol();
 //                  jData.time  = sessionTime;
 //                  jData.sessionId = Server.strSymbol(sessionTime+client+year+sessionTime);

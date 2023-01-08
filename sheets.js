@@ -337,6 +337,7 @@ function makeXLTabs(sheetCells,jAssets,jHistory,jSchema,jPartner,jBalance,jXBRL,
     var rLine=null;
     var eLine=null;
     var cLine=null;
+    var xLine=null;
     var pLine=null;
     for(let r=0;r<20;r++) {
         let line = sheetCells[r];
@@ -349,6 +350,7 @@ function makeXLTabs(sheetCells,jAssets,jHistory,jSchema,jPartner,jBalance,jXBRL,
             if(linec=='S') { sLine = line; } 
             if(linec=='R') { rLine = line; } 
             if(linec=='E') { eLine = line; } 
+            if(linec=='X') { xLine = line; }
             if(linec=='C') { cLine = line; }
             if(linec=='P') { pLine = line; } 
         }
@@ -513,6 +515,7 @@ function makeXLTabs(sheetCells,jAssets,jHistory,jSchema,jPartner,jBalance,jXBRL,
             excelStartT.push(nLine);
             excelStartT.push(cLine);
             excelStartT.push(iLine);
+            excelStartT.push(xLine);
             excelStartT.push(kLine);
             excelStartT.push(sLine);
             excelStartT.push(rLine);

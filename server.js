@@ -583,13 +583,8 @@ app.post("/UPLOAD", (req, res) => {
 
         return;
     } else {
-        console.error ( "0809 UPLOAD EMPTY JSON addr="+remote);
+        console.error ( "0809 UPLOAD EMPTY JSON "+JSON.stringify(Object.keys(rawData)) +" from addr="+remote);
 
-        if(rawData) {
-            //split into aoa
-            //get client from 4.4 and year from 4.2 , year = K[2] , client = K[4]
-            console.dir(rawData);
-        }
     }
     // send back sessionId to client browser or file
     //res.writeHead(HTTP_WRONG, {"Content-Type": "text/html"});

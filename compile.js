@@ -565,39 +565,40 @@ function compile(sessionData) {
                                         };
                                     } catch(err) { console.dir("0359 FIRST REGULAR TXN INPUT "+err); }
                                 }
-
-                                var column=0;
-                                aLine.forEach(strAmount => {
-                                    if(debug>3) console.log("0360 init "+strAmount);
-                                    if(column>=J_ACCT && strAmount && strAmount.length>0) {
-                                        var acName = gNames[column];
-                                        if(acName && acName.length>1) {
-                                            if(firstLine) {
-                                                // initialize the values with 0,00 if nothing is specified
-                                                if(strAmount==null || strAmount.length==0) strAmount="0";
-                                            }
-                                            try {
-                                                var account = result[D_Balance][acName];
-                                                if(account && account.xbrl) {
-                                                    const iAmount = Sheets.bigEUMoney(strAmount);
-                                                    if(firstLine) {
-                                                        result[D_Balance][acName] = Account.openAccount(account,iAmount);
-                                                        if(debug>2) console.log("0366 open "+strAmount+"("+iAmount+")"
-                                                            +" for "+gNames[column]
-                                                            +"  = "+JSON.stringify(result[D_Balance][acName])
-                                                        );
-                                                    } else { 
-                                                        result[D_Balance][acName] = Account.add(account,iAmount);
-                                                        if(debug>2) console.log("0368 add  "+strAmount+"("+iAmount+")"
-                                                        +" to  "+gNames[column]
-                                                        +"  = "+JSON.stringify(result[D_Balance][acName]));
-                                                    }
+                                if(aLine.length>0) {
+                                    var column=0;
+                                    aLine.forEach(strAmount => {
+                                        if(debug>3) console.log("0360 init "+strAmount);
+                                        if(column>=J_ACCT && strAmount && strAmount.length>0) {
+                                            var acName = gNames[column];
+                                            if(acName && acName.length>1) {
+                                                if(firstLine) {
+                                                    // initialize the values with 0,00 if nothing is specified
+                                                    if(strAmount==null || strAmount.length==0) strAmount="0";
                                                 }
-                                            } catch(err) { console.dir("0369 REGULAR TXN INPUT "+err); }
+                                                try {
+                                                    var account = result[D_Balance][acName];
+                                                    if(account && account.xbrl) {
+                                                        const iAmount = Sheets.bigEUMoney(strAmount);
+                                                        if(firstLine) {
+                                                            result[D_Balance][acName] = Account.openAccount(account,iAmount);
+                                                            if(debug>2) console.log("0366 open "+strAmount+"("+iAmount+")"
+                                                                +" for "+gNames[column]
+                                                                +"  = "+JSON.stringify(result[D_Balance][acName])
+                                                            );
+                                                        } else { 
+                                                            result[D_Balance][acName] = Account.add(account,iAmount);
+                                                            if(debug>2) console.log("0368 add  "+strAmount+"("+iAmount+")"
+                                                            +" to  "+gNames[column]
+                                                            +"  = "+JSON.stringify(result[D_Balance][acName]));
+                                                        }
+                                                    }
+                                                } catch(err) { console.dir("0369 REGULAR TXN INPUT "+err); }
+                                            }
                                         }
-                                    }
-                                    column++;
-                                })
+                                        column++;
+                                    })
+                                } else console.error("0367 Asset Line is not an array "+JSON.stringify(aLine));
                                 firstLine=null;                
                                 // 2697211	2021-01-19	BAY001	INVEST	200	BAYR_1
                                 
