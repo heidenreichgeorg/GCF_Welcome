@@ -17,12 +17,18 @@
   </div>
   
 
+  
 
 <SCRIPT type="text/javascript" >
-        
+
+
+
    const HTTP_OK = 200;
    const HTTP_WRONG = 400;
    const PORT = 81;
+
+   const CSV_RS = '\n'
+   const CSV_FS = ';'
 
   var reader;
   var content;
@@ -65,20 +71,38 @@ function dropHandler(ev) {
 
             fileBuffer = this.result;            
                
-            let jData=null;
+            let jData={};
             try {
-                  jData = JSON.parse(fileBuffer);
-                  jData.clientFunction="Booking"; // GH20220926
-                  callServer('POST',"UPLOAD","application/json",JSON.stringify(jData),showResponse);
+               jData = JSON.parse(fileBuffer);
+               jData.clientFunction="Booking"; // GH20220926
+
             } catch(err) { 
-               console.dir("WELCOMEDROP CANNOT PARSE "+fileBuffer); 
-               let sheetLines = fileBuffer.split('\n');
-               console.error ( "0820 UPLOAD CSV WITH "+sheetLines.length+" lines");
-               let strSheet = JSON.stringify(sheetLines);
-               console.dir("WELCOMEDROP PARSE "+strSheet); 
-               let jData = JSON.parse(strSheet);
-               callServer('POST',"UPLOAD","application/json",JSON.stringify(jData),showResponse);
-            }
+               //console.dir("WELCOMEDROP CANNOT PARSE "+fileBuffer); 
+               let sheetLines = fileBuffer.split(CSV_RS);
+               if(sheetLines.length>6) {
+                  console.error ( "0820 UPLOAD CSV WITH "+sheetLines.length+" lines");
+                  let strSheet = JSON.stringify(sheetLines);
+                  
+                  console.dir("\n0822 UPLOAD CSV N-line "+JSON.stringify(sheetLines[0])); 
+                  console.dir("\n0824 UPLOAD CSV K-line "+JSON.stringify(sheetLines[3]));                   
+
+                  let arrKLine = sheetLines[3].split(CSV_FS);
+                  let year  = arrKLine[2];
+                  let client= arrKLine[4];
+                  console.dir("\n0826 UPLOAD CSV client:"+client+"  year:"+year);                   
+
+                  jData.year  = year;
+                  jData.client= client;
+                  jData.sheetCells = JSON.parse(strSheet);
+                  jData.clientFunction= "BeginYear";
+
+
+//                  let sessionTime=Server.timeSymbol();
+//                  jData.time  = sessionTime;
+//                  jData.sessionId = Server.strSymbol(sessionTime+client+year+sessionTime);
+               }
+           }
+           callServer('POST',"UPLOAD","application/json",JSON.stringify(jData),showResponse);
 
 
            }
