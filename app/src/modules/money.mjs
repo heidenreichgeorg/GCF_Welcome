@@ -49,7 +49,7 @@ export function cents2EU(amount) {
         var megaStr = (megaNum>0n) ? megaNum.toString()+"." : "";
 
         var milleNum = kiloNum-(1000n*megaNum); 
-        var milleStr = (milleNum>0n) ? milleNum.toString()+"." : "";
+        var milleStr = (megaNum>0n) ? milleNum.toString().padStart(3,'0')+"." : (milleNum>0n) ? milleNum.toString()+"." : "";
         cents = cents - (kiloNum*100000n);
 
         var euroNum = BigInt(cents/100n);

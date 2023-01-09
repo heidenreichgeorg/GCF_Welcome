@@ -19,6 +19,7 @@ import { cents2EU, bigEUMoney } from  '../modules/money'
 
 import { D_Balance, D_Partner, D_Page, D_Report, D_Schema, X_ASSETS, X_EQLIAB, X_INCOME, SCREENLINES }  from '../terms.js';
 
+
 export default function Partner() {
 
     const { session, status } = useSession()   
@@ -81,6 +82,22 @@ export default function Partner() {
     }
     
 
+   
+    let jPage =  {'name':'Summe', 
+            'init':0, 
+            'credit':0,
+            'debit':0,
+            'yearEnd':0,
+            'netIncomeOTC':0,
+            'netIncomeFin':0,
+            'close':0,
+            'tax':0,
+            'next':0 };
+
+        // 20230109
+    function addColumns(row) {
+        Object.keys(jPage).map((key,pos)=>(pos==0?'Summe':jPage[key]=(""+(BigInt(jPage[key])+BigInt(row[key])))));
+    }
 
     return (
         <Screen prevFunc={prevFunc} nextFunc={nextFunc} tabSelector={aPages} >
@@ -100,11 +117,11 @@ export default function Partner() {
                     <PartnerRow p={jReport[id]}/>    
                 ))}           
 
-                <FlexRow p={[]}/>    
+                { Object.keys(jReport).map((id)=>(addColumns(jReport[id]))) }
 
-                {/* taxHeaders.map((row) => (
-                    <FlexRow p={row}/>    
-                )) */}    
+                <PartnerRow p={jPage}/>    
+
+                <FlexRow p={[]}/>    
 
                 { taxDetails.map((row) =>(console.log(JSON.stringify(taxDetails)))) }
                 
@@ -186,7 +203,7 @@ function NamedAmount(mRow) {
 
 function PartnerRow(mRow) {
 
-    // console.log("PartnerRow mRow="+JSON.stringify(mRow));
+     console.log("PartnerRow mRow="+JSON.stringify(mRow));
 
     return (
 
@@ -199,7 +216,7 @@ function PartnerRow(mRow) {
             <div className="MOAM">{cents2EU(mRow.p.netIncomeOTC)}</div>
             <div className="MOAM">{cents2EU(mRow.p.netIncomeFin)}</div>
             <div className="MOAM">{cents2EU(mRow.p.close)}</div>
-            <div className="TAX" >{cents2EU(mRow.p.tax)}</div>
+            <div className="MOAM" >{cents2EU(mRow.p.tax)}</div>
             <div className="MOAM">{cents2EU(mRow.p.next)}</div>
         </div>
     
