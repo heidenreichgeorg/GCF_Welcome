@@ -24,9 +24,9 @@ const ReactPort = 3000;
 // /UPLOAD with JSON data
 
 
-const debug=null;
-const debugReport = null; // will violate data privacy of reporting subject
-const debugUpload = 1; // will violate data privacy of reporting subject
+const debug=1;
+const debugReport = 1; // will violate data privacy of reporting subject
+const debugUpload = 2; // will violate data privacy of reporting subject
 
 
 const HTTP_OK = 200;
@@ -120,6 +120,7 @@ function clearSessions() {  allSession = null;
 module.exports['clearSessions']=clearSessions;
 
 function showRecent(aSession) {
+    // show recent transaction
     let prev="";
     if(aSession && aSession.sheetCells) {
         let len=aSession.sheetCells.length;
@@ -492,11 +493,14 @@ async function save2Bucket(session,client,year) {
             // async, setSession and compile
             FB.accessFirebase(FB.bucketUpload,fbConfig,client,year,session,startSessionDisplay,null);
                 
+            if(debug) {
+                console.log("0034 save2Bucket session.sheetcells keys="+JSON.stringify(Object.keys(session.sheetCells).map((i)=>(session.sheetCells[i][0]))));
+            }
 
             return "save2Bucket OK";
 
         } else {
-            console.log("0033 save2Bucket NO FIREBASE CONFIG");
+            console.error("0033 save2Bucket NO FIREBASE CONFIG");
             return "save2Bucket NO FIREBASE CONFIG";
         }
     } else return "save2Bucket NO CONFIG PARAMETER";

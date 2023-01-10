@@ -2,13 +2,13 @@
 
 
 // CAN ONLY DOCUMENT UP TO SIX PARTNERS
-const debug=null;
+const debug=1;
 const debugTax=1;
 const debugYield=1;
 
 
 // SETTING THIS WILL VIOLATE PRIVACY AT THE ADMIN CONSOLE !!! 
-const debugReport=null;
+const debugReport=1;
 
 
 // table parsing
@@ -179,7 +179,7 @@ function init(app, argv) {
         if(debug) console.log("\n\n");
         // from TransferForm.html       
         if(debug) console.log(Server.timeSymbol());
-        if(debugReport) console.log("0610 app.post BOOK formatTXN('"+JSON.stringify(req.body)+"')");
+        if(debugReport) console.log("0610 app.post BOOK jTXN('"+JSON.stringify(req.body)+"')");
 
         var result="SERVER BOOKED";
         let sessionId = req.body.sessionId; // OLD

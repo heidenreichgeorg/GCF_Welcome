@@ -5,7 +5,7 @@ import Screen from '../pages/Screen'
 import { prettyTXN, prepareTXN }  from '../modules/App';
 import { J_ACCT, D_Page, D_History, D_Schema, CSEP } from '../terms.js'
 import { useSession } from '../modules/sessionmanager';
-import e from 'cors';
+
 
 
 export default function Transfer() {

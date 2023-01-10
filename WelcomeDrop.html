@@ -80,11 +80,13 @@ function dropHandler(ev) {
                //console.dir("WELCOMEDROP CANNOT PARSE "+fileBuffer); 
                let sheetLines = fileBuffer.split(CSV_RS);
                if(sheetLines.length>6) {
-                  console.error ( "0820 UPLOAD CSV WITH "+sheetLines.length+" lines");                  
+                  console.error("0820 UPLOAD CSV WITH "+sheetLines.length+" lines");                  
                   console.dir("\n0822 UPLOAD CSV N-line "+JSON.stringify(sheetLines[0])); 
                   console.dir("\n0824 UPLOAD CSV K-line "+JSON.stringify(sheetLines[4]));                   
 
-                  let arrKLine = sheetLines[4].split(CSV_FS);
+
+                  // indices depend on Sheets.makeXLTabs
+                  let arrKLine = sheetLines[3].split(CSV_FS);
                   let year  = arrKLine[2];
                   let client= arrKLine[4];
                   console.dir("\n0826 UPLOAD CSV client:"+client+"  year:"+year);                   
@@ -94,6 +96,7 @@ function dropHandler(ev) {
                   jData.year  = year;
                   jData.client= client;
                   jData.sheetCells = JSON.parse(JSON.stringify(aoaSheet));
+                  jData.sheetName = ""+client+year;
                   jData.clientFunction= "BeginYear";
 
 

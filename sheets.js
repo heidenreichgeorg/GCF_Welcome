@@ -1,4 +1,4 @@
-const debug=null;
+const debug=1;
 
 
 // setting this will violate privacy 
@@ -107,7 +107,7 @@ function bookSheet(sessionId,tBuffer,sessionTime,nextSessionId) {
             if(client && year && session.sheetCells) {
 
                 var numLines = session.sheetCells.length;
-                if(debugWrite) console.dir("1450 sheets.bookSheet ENTER "+session.sheetName+ " for ("+client+","+year+") with "+numLines+" lines in sheet ");
+                if(debugWrite) console.dir("1450 sheets.bookSheet ENTER "+JSON.stringify(tBuffer)+" into "+session.sheetName+ " for ("+client+","+year+") with "+numLines+" lines in sheet ");
                 
                 if(tBuffer) {
                     // add hash
@@ -120,12 +120,14 @@ function bookSheet(sessionId,tBuffer,sessionTime,nextSessionId) {
 
                     if(debugWrite) console.dir("1452 sheets.bookSheet APPEND  "+JSON.stringify(tBuffer)+" to ("+client+","+year+") #"+numLines);
 
-                    // GH20221120 write to firestore
-                    //fireWrite(session);
+                            
+                    if(debug) {
+                        console.log("1454 sheets.bookSheet NEW keys="+JSON.stringify(Object.keys(session.sheetCells).map((i)=>(session.sheetCells[i][0]))));
+                    }
 
                     Server.setSession(session);
 
-                    if(debugWrite) console.dir("1454 sheets.bookSheet SET SESSION  "+session.id + " "+session.client + " "+session.year + " --> "+JSON.stringify(Object.keys(session)));
+                    if(debugWrite) console.dir("1456 sheets.bookSheet SET SESSION  "+session.id + " "+session.client + " "+session.year + " --> "+JSON.stringify(Object.keys(session)));
                     
                 }
                 else if(debugWrite) console.dir("1451 sheets.bookSheet SAVE NO booking statement tBuffer ("+client+","+year+") #"+numLines);
