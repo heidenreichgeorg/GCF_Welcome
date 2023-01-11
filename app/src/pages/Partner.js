@@ -17,7 +17,7 @@ import FooterRow from '../components/FooterRow'
 import { useSession } from '../modules/sessionmanager';
 import { cents2EU, bigEUMoney } from  '../modules/money'
 
-import { D_Balance, D_Partner, D_Page, D_Report, D_Schema, X_ASSETS, X_EQLIAB, X_INCOME, SCREENLINES }  from '../terms.js';
+import { D_Balance, D_Partner, D_Page, SCREENLINES }  from '../terms.js';
 
 
 export default function Partner() {
@@ -45,14 +45,13 @@ export default function Partner() {
     var jReport = JSON.parse(JSON.stringify(sheet[D_Partner]));
     var jBalance = sheet[D_Balance];
 
-    
-
     let aPages = [];
 
     function makeTax(partner,index,ifix) {
         let igain=BigInt(partner.gain);
         let ideno=BigInt(partner.denom);               
-        let result= { 'name': partner.name };
+        let taxID = partner.taxID;
+        let result= { 'name': partner.name, 'SteuerID':taxID };
         Object.keys(jBalance).map((name,index) => (jBalance[name].xbrl==='de-gaap-ci_bs.ass.currAss.receiv.other.otherTaxRec.CapTax'?
  //                                                   (result[name]=cents2EU(((ifix+BigInt(jBalance[name].yearEnd))*igain)/ideno))
                                                     (result[name]=cents2EU((5n+BigInt(jBalance[name].yearEnd+"0"))*igain/ideno/10n))
@@ -195,7 +194,7 @@ function NamedAmount(mRow) {
     console.log("NamedRow "+JSON.stringify(mRow));
     return(
         <div>
-        <div className="MOAM">{mRow.p.amnt}</div>
+        <div className="IDNT">{mRow.p.amnt}</div>
         <div className="SYMB">{mRow.p.name}</div>
         </div>
     )

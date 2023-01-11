@@ -8,6 +8,7 @@ export const  D_Partner= "PartnerR";
 export const  D_Report = "Report";
 export const  D_Schema  = "Schema";
 export const  D_Muster = "Muster";
+export const  D_SteuerID = "SteuerID";
 export const  D_Adressen="Adressen";
 
 

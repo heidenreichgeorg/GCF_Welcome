@@ -141,7 +141,7 @@ let jTerms={};
 const COLMIN=2;
 const D_Schema = "Schema"; // includes .Names .total .assets .eqliab  N1.author N2.residence  I1.iban I2.register I3.taxnumber  K1.reportYear K2.client
 const D_XBRL   = "XBRL";
-const D_Eigner = "Eigner";
+const D_SteuerID = "SteuerID";
 const D_Equity = "Kapital";
 // TRANSACTIONS-part
 const D_Balance= "Bilanz";
@@ -432,7 +432,7 @@ function compile(sessionData) {
 
         if(numLines>J_MINROW) {
 
-            result[D_Eigner] = {};
+            result[D_SteuerID] = {};
             result[D_Schema] = {};
             try {
                 var iAssets=0;
@@ -537,7 +537,8 @@ function compile(sessionData) {
 
                     }
                     else if(key && key==='P') {
-                        result[D_Eigner]=row;
+                        // tax subject identifier
+                        result[D_SteuerID]=row;
                     }
                     else if(key && parseInt(key)>0) {                    
                         const MINTXN=5; // elements in a TXN
@@ -699,11 +700,11 @@ function compile(sessionData) {
 
                 // process the partners
                 var partners = {};
-                if(result[D_SHARES] && result[D_XBRL] && result[D_Schema] && result[D_Schema].eqliab>J_ACCT) {
+                if(result[D_SHARES] && result[D_XBRL] && result[D_Schema] &&  result[D_SteuerID] && result[D_Schema].eqliab>J_ACCT) {
 
                     var shares = result[D_SHARES];
                     var arrXBRL= result[D_XBRL];
-                    var arrEQUI= result[D_Equity];
+                    var arrTaxID=result[D_SteuerID];
                     var gNames = result[D_Schema].Names;
                     var eqliab = result[D_Schema].eqliab;
 
@@ -739,8 +740,9 @@ function compile(sessionData) {
                     for(col=eqliab+1;col<shares.length;col++) {
                         if(shares[col] && arrXBRL[col].includes('limitedLiablePartners.VK')) {
                             var pShare = shares[col];
+                            
                             if(isNaN(pShare)) pShare=" 0";                       
-                            partners[pNum]={ 'id':pNum, 'vk':gNames[col], 'gain':pShare, 'denom':basis, 'iVar':col };
+                            partners[pNum]={ 'id':pNum, 'vk':gNames[col], 'gain':pShare, 'denom':basis, 'iVar':col, 'taxID':arrTaxID[col] };
                             pNum++; // GH20220206 
                         }
                     }
@@ -874,6 +876,10 @@ function sendBalance(balance) {
 
     let partners=balance[D_Partner];
     gResponse[D_Partner]=partners;
+
+    // 20230111 tax subject identifier in partner.taxID
+    //let partnerIDs=balance[D_SteuerID];
+    //gResponse[D_SteuerID]=partnerIDs;
 
 
     let bReport = balance[D_Report];
