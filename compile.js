@@ -501,7 +501,7 @@ function compile(sessionData) {
                         if(assetInfo.length>J_ACCT) {
                             var date = assetInfo[1];
                             var type = assetInfo[2];
-                            var init = bigENMoney(assetInfo[3]); // AnschaffungsK parse huge EN format string
+                            var init = Sheets.bigEUMoney(assetInfo[3]); // bigENMoney AnschaffungsK parse huge EN format string
                             var nmbr = assetInfo[4];
                             var idnt = assetInfo[5];
                             if(idnt && idnt.length>COLMIN && nmbr && nmbr.length>0) {
@@ -1500,6 +1500,7 @@ async function send(res,session) {
 }
 
 
+/* was needed to migrate from numerically-formatted XLSX files
 function bigENMoney(strSet) {
     var euros=0n;
     var cents=0n;
@@ -1522,8 +1523,7 @@ function bigENMoney(strSet) {
     }
     return result;        
 }
-
-
+*/
 
 
 function bigCost(idnt,nmbr,init) {
