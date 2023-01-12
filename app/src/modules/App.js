@@ -1,6 +1,6 @@
 /* global BigInt */
 
-import { J_ACCT, COLMIN, DOUBLE } from '../terms.js'
+import { D_Balance, D_Report, D_Page, X_ASSETS, X_EQLIAB, J_ACCT, COLMIN, DOUBLE, SCREENLINES } from '../terms.js'
 
 import { bigEUMoney, cents2EU } from './money'
 
@@ -149,4 +149,215 @@ export function symbolic(pat) {
         }
     }
     return res & 0x3FFFFFFFF;
+}
+
+
+export function makeHGB275S2Report(response) {
+
+    let balance = []; 
+
+    var jReport = response[D_Report];
+    
+    console.log("makeReport from response D_Report"+JSON.stringify(Object.keys(jReport)));
+    var jAccounts = response[D_Balance];
+    let page = response[D_Page];
+              
+    if(page) {           
+        var chgb1 = 0n; // Umsatz
+        var chgb5 = 0n; // MAT+RHB+Leistungen direkter Aufwand
+        // Bruttoergebnis
+
+        var chgb7 = 0n; // Abschreibungen Sachanlagen
+        var chgb8 = 0n; // sonstige betr. Aufwand
+        // Ergebnis
+
+        var chgb9 = 0n; // Ertrag aus Beteiligungen
+        var chgbA = 0n; // Wertpapierertrag
+        var chgbB = 0n; // Zinseinnahmen
+        var chgbD = 0n; // Zinsaufwand
+        var chgbE = 0n; // gezahlte Steuern v Einkommen und Ertrag
+        var chgbF = 0n; // Steuerforderung d Gesellschafter
+        // Jahresueberschuss
+
+        var cAvgFix = 0n; // betriebsnotwendiges Vermoegen
+        var cAvgCur = 0n; // mittleres Umlaufvermoegen
+        var cReceiv = 0n; // Forderungen
+
+
+
+        for (let name in jAccounts)   {
+            var account=jAccounts[name];
+            var init = account.init;
+            var yearEnd = account.yearEnd;
+            var iName = account.name;
+            var full_xbrl = account.xbrl;
+
+
+
+            if(yearEnd && iName && full_xbrl) {
+                
+                if(full_xbrl.startsWith('de-gaap-ci_bs.ass.fixAss'))  { cAvgFix = cAvgFix +(BigInt(init)+BigInt(yearEnd))/2n; console.log("BNV  "+name+"="+cAvgFix); }  
+                if(full_xbrl.startsWith('de-gaap-ci_bs.ass.currAss')) { cAvgCur+=(BigInt(init)+BigInt(yearEnd))/2n; console.log("DUV  "+name+"="+cAvgCur); }
+                if(full_xbrl.startsWith('de-gaap-ci_bs.ass.currAss.receiv')) { cReceiv-=BigInt(yearEnd);                     console.log("FOR  "+name+"="+cReceiv); }
+                if(full_xbrl.startsWith('de-gaap-ci_bs.ass.currAss.receiv.other.otherTaxRec')) { chgbF+=BigInt(yearEnd); console.log("TAX  "+name+"("+yearEnd+")="+chgbF);  } // 20220521 keep tax claims separately
+
+                // MIET / rent was 'de-gaap-ci_is.netIncome.regular.operatingTC.yearEndTradingProfit'
+                if(full_xbrl.startsWith('de-gaap-ci_is.netIncome.regular.operatingTC.grossTradingProfit')) { chgb1+=BigInt(yearEnd); }
+                if(full_xbrl.startsWith('de-gaap-ci_is.netIncome.regular.operatingTC.otherCost.fixingLandBuildings')) { chgb5+=BigInt(yearEnd); }
+
+                if(full_xbrl.startsWith('de-gaap-ci_is.netIncome.regular.operatingTC.deprAmort.fixAss.tan')) { chgb7+=BigInt(yearEnd); }
+                if(full_xbrl.startsWith('de-gaap-ci_is.netIncome.regular.operatingTC.otherCost.otherOrdinary')) { chgb8+=BigInt(yearEnd); }
+                
+                // EZIN = de-gaap-ci_is.netIncome.regular.fin.netInterest.income
+                if(full_xbrl.startsWith('de-gaap-ci_is.netIncome.regular.fin.netParticipation')) { chgb9+=BigInt(yearEnd); }
+                if(full_xbrl.startsWith('de-gaap-ci_is.netIncome.regular.fin.sale')) { chgbA+=BigInt(yearEnd); }
+                if(full_xbrl.startsWith('de-gaap-ci_is.netIncome.regular.fin.netInterest')) { chgbB+=BigInt(yearEnd);  console.log("EZIN = "+yearEnd+ " from "+JSON.stringify(account)); }
+                if(full_xbrl.startsWith('de-gaap-ci_is.netIncome.regular.fin.expenses')) { chgbD+=BigInt(yearEnd); }
+                if(full_xbrl.startsWith('de-gaap-ci_is.is.netIncome.tax')) { chgbE-=BigInt(yearEnd); }
+
+               // console.log("READ xbrl="+full_xbrl+" "+chgb5+" "+chgb7+" "+chgb8+" "+chgbA+" "+chgbB+" "+chgbD+" "+chgbE+" "+chgbF);
+               
+            }
+
+        }
+
+        let grossYield = chgb5+chgb1;
+    //                    cursor=printFormat(cursor,[' ',page.Revenue,cents2EU(chgb1)]);
+    //                    cursor=printFormat(cursor,[' ',page.DirectCost,cents2EU(chgb5)]);
+    //                    cursor=printFormat(cursor,['Gross Yield',' ',page.yearEndYield,cents2EU(grossYield)]);
+
+
+        let regularOTC = grossYield+chgb7+chgb8;
+    //                    cursor=printFormat(cursor,[' ',page.Depreciation,cents2EU(chgb7)]);
+    //                    cursor=printFormat(cursor,[' ',page.OtherRegular,cents2EU(chgb8)]);
+    //                    cursor=printFormat(cursor,['EBITDA',' ',page.RegularOTC,cents2EU(regularOTC)]);
+
+
+
+
+
+        let ass,eql,gls;
+        // add three additional accounts: ASSETS, EQLIAB, GAINLOSS
+        if(jReport["xbrlAssets"].account) { 
+            ass = jReport["xbrlAssets"].account; 
+            //console.log("ASSET "+JSON.stringify(ass)); 
+            jAccounts["xbrlAssets"]=ass;
+        }
+        if(jReport["xbrlEqLiab"].account) { 
+            eql = jReport["xbrlEqLiab"].account; 
+            //console.log("EQLIB "+JSON.stringify(eql)); 
+            jAccounts["xbrlEqLiab"]=eql;
+        }
+        if(jReport["xbrlRegular"].account) { 
+            gls = jReport["xbrlRegular"].account; 
+            //console.log("GALOS "+JSON.stringify(gls)); 
+            jAccounts["xbrlRegular"]=gls;
+        }
+        console.log("makeReport from response D_Balance"+JSON.stringify(Object.keys(jAccounts)));
+
+        
+        // build three columns
+        let aLeft={};
+        let aRite={};
+
+        for (let name in jAccounts)   {
+            var account=jAccounts[name];
+            if(account.xbrl.length>1) {
+                var xbrl = account.xbrl.split('\.').reverse();
+                var xbrl_pre = xbrl.pop()+ "."+ xbrl.pop();
+                if(xbrl_pre===X_ASSETS) aLeft[name]=account;            
+                if(xbrl_pre===X_EQLIAB) aRite[name]=account;
+            }
+        }
+
+    
+        var iRite=2;
+        var iLeft=1;
+        //balance.push({  });
+        balance.push({ 'tw1':jReport.xbrlEqLiab.de_DE, 'am3':page.Init, 'am2':page.Close, 'am1':page.Next });
+
+ 
+        for (let name in aRite)   {
+            var account=aRite[name];
+
+            var iName = account.name;
+            var cBegin= BigInt(account.init);
+            var cClose = BigInt(account.yearEnd);
+            var cNext = BigInt(account.next);
+            console.log("EqLiab account ="+JSON.stringify(account));
+    
+           iLeft = fillLeft(balance,cBegin,cClose,cNext,iName,iLeft);
+        }
+
+        fillRight(balance,chgb1,page.Revenue,0,1);
+        fillRight(balance,chgb5,page.OpCost,1,1);
+        fillRight(balance,grossYield,page.GrossYield,2,2);
+        // Bruttoergebnis
+
+        fillRight(balance,chgb7,page.Depreciation,4,1); 
+        fillRight(balance,chgb8,page.OtherOTC,5,1);
+        fillRight(balance,chgb7+chgb8,page.OtherRegular,6,2);
+        fillRight(balance,regularOTC,page.OtherRegular,7,3);
+        // Ergebnis
+
+        fillRight(balance,chgb9,page.PartYield,8,1);
+        fillRight(balance,chgbA,page.FinSale,9,1);
+        fillRight(balance,chgbB,page.NetInterest,10,1);
+        fillRight(balance,chgbD,page.InterestCost,11,1);
+        
+        let fin = chgb9+chgbA+chgbB+chgbD;
+        fillRight(balance,fin,page.FinYield,12,3);
+        let gain = regularOTC+fin;
+        // Jahresueberschuss
+        fillRight(balance,gain,page.closing,13,3);
+        fillRight(balance,-chgbF,page.CapTax,14,3); // -- this part needed for 
+        let netGain = gain-chgbF;
+        fillRight(balance,netGain,"Netto-Gewinn",16,3);
+
+        fillRight(balance,cAvgFix,page.OpAssets,17,1);
+        fillRight(balance,cAvgCur,page.AvgCurrent,18,1);
+        fillRight(balance,cReceiv,page.rec,19,1);
+        let opCap = cAvgFix+cAvgCur+cReceiv;
+        fillRight(balance,opCap,page.OpCapital,21,3);
+        let performanceBP = (10000n*netGain)/opCap;
+        iRite=fillRight(balance,performanceBP,page.CapMargin,22,3);
+        
+        }
+    while(iRite<=SCREENLINES && iLeft<=SCREENLINES) {
+        balance.push({  });
+        iLeft++;
+        iRite++;
+    }
+
+    return balance;
+}
+
+function fillLeft(balance,dispValue1,dispValue2,dispValue3,iName,iLeft) {
+    if(iLeft<SCREENLINES) {
+        if(!balance[iLeft]) balance[iLeft]={};
+        balance[iLeft].tw1=iName;
+        let cValue1=cents2EU(dispValue1);
+        let cValue2=cents2EU(dispValue2);
+        let cValue3=cents2EU(dispValue3);
+        balance[iLeft].am3=cValue1; 
+        balance[iLeft].am2=cValue2; 
+        balance[iLeft].am1=cValue3; 
+        
+        iLeft++;
+    }
+    return iLeft;
+}
+
+
+function fillRight(balance,cValue,iName,iRite,level) {
+    if(iRite<SCREENLINES) {
+        if(!balance[iRite]) balance[iRite]={};
+        balance[iRite].tx1=iName;
+        let dispValue=cents2EU(cValue);
+        if(level==3) { balance[iRite].an1=dispValue; }
+        if(level==2) { balance[iRite].an2=dispValue; }
+        if(level==1) { balance[iRite].an3=dispValue; }
+        iRite++;
+    }
+    return iRite;
 }

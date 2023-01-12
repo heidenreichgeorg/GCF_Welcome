@@ -389,7 +389,7 @@ function makeXLTabs(sheetCells,jAssets,jHistory,jSchema,jPartner,jBalance,jXBRL,
 
     // fix are cents to compensate for rounding when tax is shared among partners
     let fix = BigInt(Object.keys(jReport).length-1);
-    let aTax = Object.keys(jReport).map((index) => (taxDetails.push(makeTax(jBalance,jReport[index],index,fix))));
+    Object.keys(jReport).map((index) => (taxDetails.push(makeTax(jBalance,jReport[index],index,fix))));
     let hKeys=Object.keys(taxDetails[0]);
     taxHeaders.push(  hKeys );
     
