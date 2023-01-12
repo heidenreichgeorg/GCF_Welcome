@@ -129,7 +129,13 @@ let de_DE = {
     AcquisitionPrice:"Anschaffungspreis",
     Init:"Anfangswert",
     Close:"Abschluss",
-    Next:"Folgejahr"
+    Next:"Folgejahr",
+
+    // Partner
+    Name:"Name",
+    Credit:"Einlagen",
+    Debit:"Entnahmen",
+    YearEnd:"Endstand"
 }
 module.exports['de_DE']=de_DE;
 let jTerms={};

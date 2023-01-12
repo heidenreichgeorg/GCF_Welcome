@@ -73,8 +73,8 @@ export default function Partner() {
     taxHeaders.push(  hKeys );
     
 
-    let jLength = Object.keys(jReport).length  + 2 + Object.keys(aTax).length;
 
+    let jLength = 6; // Object.keys(jReport).length  + 2 + Object.keys(aTax).length;
     let  filler=[];
     for(let p=jLength;p<SCREENLINES+1;p++) {
         filler.push({});
@@ -93,54 +93,64 @@ export default function Partner() {
             'tax':0,
             'next':0 };
 
-        // 20230109
+    // 20230109
+    function initColumns() {
+        Object.keys(jPage).map((key,pos)=>(pos==0?'Summe':jPage[key]="0"));
+        return ""; // value walks into page
+    }
     function addColumns(row) {
         Object.keys(jPage).map((key,pos)=>(pos==0?'Summe':jPage[key]=(""+(BigInt(jPage[key])+BigInt(row[key])))));
+        return ""; // value walks into page
     }
 
+    let partnerPages = Object.keys(jReport).map((_,i)=>i==0?'block':'none');
     return (
-        <Screen prevFunc={prevFunc} nextFunc={nextFunc} tabSelector={aPages} >
+        <Screen prevFunc={prevFunc} nextFunc={nextFunc} tabSelector={partnerPages} >
             
-            <div className="ulliTab" id={"PageContent1"} style= {{ 'display': 'block'}} >
-            <PartnerRow p={ {'name':'name', 
-                        'init':'init', 
-                        'credit':'credit',
-                        'debit':'debit',
-                        'yearEnd':'yearEnd',
-                        'netIncomeOTC':'netIncomeOTC',
-                        'netIncomeFin':'netIncomeFin',
-                        'close':'close',
-                        'tax':'tax',
-                        'next':'next'} } />
-                {Object.keys(jReport).map((id) => (
-                    <PartnerRow p={jReport[id]}/>    
-                ))}           
-
-                { Object.keys(jReport).map((id)=>(addColumns(jReport[id]))) }
-
-                <PartnerRow p={jPage}/>    
-
-                <FlexRow p={[]}/>    
-
-                { taxDetails.map((row) =>(console.log(JSON.stringify(taxDetails)))) }
-                
-
-                { taxDetails.map((row) => (
+            {Object.keys(jReport).map((jPartner,partnerNo) => ( 
+                <div className="ulliTab" id={"PageContent"+partnerNo} style= {(partnerNo==0?{ 'display': 'block'}:{ 'display': 'none'})} >
+                <PartnerRow p={ {'name':page.Name, 
+                            'init':page.Init, 
+                            'credit':page.Credit,
+                            'debit':page.Debit,
+                            'yearEnd':page.YearEnd,
+                            'netIncomeOTC':page.RegularOTC,
+                            'netIncomeFin':page.RegularFIN,
+                            'close':page.Close,
+                            'tax':page.PaidTax,
+                            'next':page.NextYear} } />
                     
-                    <div className='attrLine'>                      
-                        {Object.keys(row).map((fieldName) => <NamedAmount p={{'name':fieldName==='name'?'':fieldName,'amnt':row[fieldName]}}/>
-                        )}                       
-                    </div>
-                ))}    
+                    
+                    <PartnerRow p={jReport[partnerNo]}/>    
+                    
 
-                { filler.map((row) => (
-                    <PartnerRow p={row}/>    
-                ))}    
-                
-                <FooterRow left={page["client"]}  right={page["register"]} prevFunc={prevFunc} nextFunc={nextFunc} miscFunc={handleJSONSave}/>
-                <FooterRow left={page["reference"]} right={page["author"]} prevFunc={prevFunc} nextFunc={nextFunc}/>
-            </div>
-            
+                    { initColumns() + Object.keys(jReport).map((id)=>(addColumns(jReport[id]))) }
+
+                    <PartnerRow p={jPage}/>    
+
+                    <FlexRow p={[]}/>    
+
+                    { taxDetails.map((row) =>(console.log(JSON.stringify(taxDetails)))) }
+                    
+
+                    { taxDetails.map((row,i) => ((i==partnerNo)?
+                        
+                        <div className='attrLine'>                      
+                            {Object.keys(row).map((fieldName) => <NamedAmount p={{'name':fieldName==='name'?'':fieldName,'amnt':row[fieldName]}}/>
+                            )}                       
+                        </div>
+                    :""))}    
+                    
+                    { filler.map((row) => (
+                        <PartnerRow p={row}/>    
+                    ))}    
+                    
+                    <FooterRow left={page["client"]}  right={page["register"]} prevFunc={prevFunc} nextFunc={nextFunc} miscFunc={handleJSONSave}/>
+                    <FooterRow left={page["reference"]} right={page["author"]} prevFunc={prevFunc} nextFunc={nextFunc}/>
+                </div>
+
+            ))} 
+
         </Screen>
     )
     

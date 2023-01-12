@@ -35,8 +35,8 @@ export default function FixedAssets() {
 
     let aPages = [];
 
-    let jLength = Object.keys(jAssets).length  + 2;
-
+    
+    let jLength = Object.keys(jAssets).length  + 3;
     let  filler=[];
     for(let p=jLength;p<=SCREENLINES+1;p++) {
         filler.push({});
