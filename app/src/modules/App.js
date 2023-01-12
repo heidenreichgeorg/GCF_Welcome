@@ -297,7 +297,7 @@ export function makeHGB275S2Report(response) {
         fillRight(balance,chgb7,page.Depreciation,4,1); 
         fillRight(balance,chgb8,page.OtherOTC,5,1);
         fillRight(balance,chgb7+chgb8,page.OtherRegular,6,2);
-        fillRight(balance,regularOTC,page.OtherRegular,7,3);
+        fillRight(balance,regularOTC,page.RegularOTC,7,3);
         // Ergebnis
 
         fillRight(balance,chgb9,page.PartYield,8,1);

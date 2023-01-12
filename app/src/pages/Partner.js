@@ -44,27 +44,38 @@ export default function Partner() {
     
     var jReport = JSON.parse(JSON.stringify(sheet[D_Partner]));
     var jBalance = sheet[D_Balance];
-
-    function makeTax(partner,index,ifix) {
-        let igain=BigInt(partner.gain);
-        let ideno=BigInt(partner.denom);               
-        let taxID = partner.taxID;
-        let result= { 'name': partner.name, 'SteuerID':taxID };
-        Object.keys(jBalance).map((name,index) => (jBalance[name].xbrl==='de-gaap-ci_bs.ass.currAss.receiv.other.otherTaxRec.CapTax'?
- //                                                   (result[name]=cents2EU(((ifix+BigInt(jBalance[name].yearEnd))*igain)/ideno))
-                                                    (result[name]=cents2EU((5n+BigInt(jBalance[name].yearEnd+"0"))*igain/ideno/10n))
-                                                    :{}));
-
-        console.log("Partner("+index+") with "+igain+"/"+ideno+"response D_Report"+JSON.stringify(result));
-        return result;
-    }
     
     let  taxHeaders=[];
     let  taxDetails=[];
 
-    // fix are cents to compensate for rounding when tax is shared among partners
-    let fix = Object.keys(jReport).length-1;
-    Object.keys(jReport).map((index) => (taxDetails.push(makeTax(jReport[index],index,BigInt(fix)))));
+    function makeTax(partner,index) {
+        var ifix=0n; // ifix are cents to compensate for rounding when tax is shared among partners
+        let igain=BigInt(partner.gain);
+        let ideno=BigInt(partner.denom);               
+        let taxID = partner.taxID;
+        let result= { 'name': partner.name, 'SteuerID':taxID,  };
+
+        let taxPaid = BigInt(partner.tax);
+        var iSum=0n;
+        while(iSum<taxPaid && ifix<20n) {
+            iSum=0n;
+            var cFix=ifix;
+            let taxAccounts = Object.keys(jBalance).filter((name)=>jBalance[name].xbrl==='de-gaap-ci_bs.ass.currAss.receiv.other.otherTaxRec.CapTax');
+            taxAccounts.map(function(name) { 
+                    let iPosition = 4n + BigInt(jBalance[name].yearEnd+"0");
+                    if(iSum+cFix>=taxPaid) cFix=0n;
+                    let iShare = cFix+(iPosition*igain/ideno/10n);
+                    if(cFix>0) cFix--;
+                    iSum = iSum + iShare;
+                    result[name] = cents2EU(iShare)})
+            ifix++;
+        } 
+
+        console.log("Partner("+index+") with "+igain+"/"+ideno+"response ="+iSum+" % "+taxPaid);
+        return result;
+    }
+
+    Object.keys(jReport).map((index) => (taxDetails.push(makeTax(jReport[index],index))));
     
 
     let hKeys=Object.keys(taxDetails[0]);
