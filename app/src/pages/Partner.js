@@ -83,7 +83,7 @@ export default function Partner() {
     
 
 
-    let jLength = 20; // Object.keys(jReport).length  + 2 + Object.keys(aTax).length;
+    let jLength = 22; // Object.keys(jReport).length  + 2 + Object.keys(aTax).length;
     let  filler=[];
     for(let p=jLength;p<SCREENLINES+1;p++) {
         filler.push({});
@@ -117,6 +117,8 @@ export default function Partner() {
     return (
         <Screen prevFunc={prevFunc} nextFunc={nextFunc} tabSelector={partnerPages} >
             
+            {page.GainLoss + ' ' + session.year}
+
             {Object.keys(jReport).map((jPartner,partnerNo) => ( 
 
                 <div className="ulliTab" id={"PageContent"+partnerNo} style= {(partnerNo==0?{ 'display': 'block'}:{ 'display': 'none'})} >
@@ -128,7 +130,11 @@ export default function Partner() {
                     )}
 
 
-<FlexRow p={[' ']}/>    
+                    <FlexRow p={[' ']}/>    
+                    { [''].map(function(){ 
+                        initColumns(); 
+                        Object.keys(jReport).map((id)=>(addColumns(jReport[id]))); 
+                        return page.AcctHistory + ' ' + session.year})}
 
                     <PartnerRow p={ {'name':page.Name, 
                             'init':page.Init, 
@@ -145,7 +151,6 @@ export default function Partner() {
                     <PartnerRow p={jReport[partnerNo]}/>    
                     
 
-                    { ['nbsp;'].map(function(){ initColumns(); Object.keys(jReport).map((id)=>(addColumns(jReport[id]))); return ' '})}
 
                     <PartnerRow p={jPage}/>    
 
