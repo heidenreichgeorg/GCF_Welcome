@@ -117,24 +117,23 @@ export default function Partner() {
     return (
         <Screen prevFunc={prevFunc} nextFunc={nextFunc} tabSelector={partnerPages} >
             
-            {page.GainLoss + ' ' + session.year}
+            <div className="attrLine">{page.GainLoss + ' ' + session.year}</div>
 
             {Object.keys(jReport).map((jPartner,partnerNo) => ( 
 
                 <div className="ulliTab" id={"PageContent"+partnerNo} style= {(partnerNo==0?{ 'display': 'block'}:{ 'display': 'none'})} >
-
                     
                     { shortReport.map((row,i)=> (
                         <HGB275Row jArgs={row} id={"Args"+i} />
                         )
                     )}
 
-
                     <FlexRow p={[' ']}/>    
-                    { [''].map(function(){ 
+                    <div className="attrLine">{ [''].map(function(){ 
                         initColumns(); 
                         Object.keys(jReport).map((id)=>(addColumns(jReport[id]))); 
                         return page.AcctHistory + ' ' + session.year})}
+                    </div>                        
 
                     <PartnerRow p={ {'name':page.Name, 
                             'init':page.Init, 
@@ -146,20 +145,13 @@ export default function Partner() {
                             'close':page.Close,
                             'tax':page.PaidTax,
                             'next':page.NextYear} } />
-                    
-                    
+                                        
                     <PartnerRow p={jReport[partnerNo]}/>    
                     
-
-
                     <PartnerRow p={jPage}/>    
 
                     <FlexRow p={[' ']}/>    
-
-                    { //taxDetails.map((row) =>(console.log(JSON.stringify(taxDetails)))) 
-                    }
                                         
-
                     { taxDetails.map((row,i) => ((i==partnerNo)?
                         
                         <div className='attrLine'>                      
@@ -214,12 +206,9 @@ export default function Partner() {
     };
 }
 
-
 function FlexRow(mRow) {
     let keys = Object.keys(mRow.p);
-
     let sPairs = keys.map((kn) => ("  "+mRow.p[kn])).join("");
-
     return (
         <div className="attrLine">
             <div className="LFUL">{sPairs}</div>
@@ -238,11 +227,8 @@ function NamedAmount(mRow) {
 }
 
 function PartnerRow(mRow) {
-
-     console.log("PartnerRow mRow="+JSON.stringify(mRow));
-
+    console.log("PartnerRow mRow="+JSON.stringify(mRow));
     return (
-
         <div className="attrLine">
             <div className="SYMB">{mRow.p.name}</div>
             <div className="MOAM">{cents2EU(mRow.p.init)}</div>
@@ -252,13 +238,11 @@ function PartnerRow(mRow) {
             <div className="MOAM">{cents2EU(mRow.p.netIncomeOTC)}</div>
             <div className="MOAM">{cents2EU(mRow.p.netIncomeFin)}</div>
             <div className="MOAM">{cents2EU(mRow.p.close)}</div>
-            <div className="MOAM" >{cents2EU(mRow.p.tax)}</div>
+            <div className="MOAM">{cents2EU(mRow.p.tax)}</div>
             <div className="MOAM">{cents2EU(mRow.p.next)}</div>
         </div>
-    
     )
 }
-
 
 function HGB275Row({ jArgs, id }) {
     return(

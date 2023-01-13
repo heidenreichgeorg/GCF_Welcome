@@ -41,6 +41,7 @@ export default function Balance() {
         <Screen prevFunc={prevFunc} nextFunc={nextFunc} tabSelector={aPages} >
             {report.map((balance,n) => ( 
                 <div className="ulliTab" id={"PageContent"+n} style= {{ 'display': aPages[n]}} >
+                    <div className="attrLine">{[page.BalanceOpen,page.BalanceClose,page.BalanceNext][n] + ' ' + (parseInt(session.year)+1)}</div>
                     {balance.map((row,i) => (
                         <BalanceRow jArgs={row} id={i} />    
                     ))}
@@ -102,8 +103,8 @@ function makeBalance(response,value) {
 
     let balance = []; 
  
-    var iRite=2;
-    var iLeft=2;
+    var iRite=3;
+    var iLeft=3;
     balance.push({  });
     balance.push({ 'tw1':jReport.xbrlAssets.de_DE, 'tx1':jReport.xbrlEqLiab.de_DE });
 
