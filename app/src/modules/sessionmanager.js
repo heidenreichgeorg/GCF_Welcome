@@ -32,9 +32,8 @@ export function SessionProvider({ children,  location, default_value, onLoading,
                 setStatus('error')
             }
         } else { 
-            fetch(`${process.env.REACT_APP_API_HOST}/SESSION${strSearch}`)
-            //fetch(`${server}/SESSION${strSearch}`)
-            // CORS wrong
+            fetch(`${process.env.REACT_APP_API_HOST}/SESSION${strSearch}`,  
+            {mode:'cors'}) // CORS 20230114
             .then(data => data.json())
             .then(data => {
                 let len=0;

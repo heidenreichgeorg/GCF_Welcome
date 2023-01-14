@@ -38,7 +38,7 @@ export default function Status() {
 
     function handleXLSave() {
         console.log("1110 Status.handleXLSave sessionId = "+session.id);
-        const rqOptions = { method: 'GET', headers: {  'Accept': 'application/octet-stream'}};
+        const rqOptions = { method: 'GET', headers: {  'Accept': 'application/octet-stream'}, mode:'cors'};
         try {
             
             fetch(`${process.env.REACT_APP_API_HOST}/EXCEL?sessionId=${session.id}`, rqOptions)

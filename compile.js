@@ -229,12 +229,15 @@ function init(app, argv) {
 
 
 
-    app.get("/favicon.ico", (req, res)  => { res.sendFile(__dirname + "/favicon.jpg"); });
+    app.get("/favicon.ico", (req, res)  => { 
+        res.sendFile(__dirname + "/favicon.jpg"); });
 
-    app.get('/SHOW/', (req, res)    => {     
+    app.get('/SHOW/', (req, res)    => {     // CORS 20230114
+        res.set('Access-Control-Allow-Origin');
         // two very different functions here
         // with SESSION-ID: returns normal JSON data structure from local server-side session storage
-        
+        // App. js in React   , {mode:'cors'}
+
         if(debug) console.log("\n\n");
         if(debug) console.log(Server.timeSymbol());
         if(debug) console.log("1910 app.get SHOW sessionId="+ req.query.sessionId);
@@ -383,7 +386,7 @@ function initBalance() {
         abrlABank: {   level:4, xbrl: "de-gaap-ci_bs.ass.currAss.cashEquiv.bank", de_DE:'Bankkonto'},
         abrlAmoney: {  level:3, xbrl: "de-gaap-ci_bs.ass.currAss.cashEquiv", de_DE:'Geldinstr.'},
         xbrlPaidTax: { level:4, xbrl: "de-gaap-ci_bs.ass.currAss.receiv.other.otherTaxRec", de_DE:'gezahlte Steuer'},     
-                    // KESO KEST AQST= de-gaap-ci_bs.ass.currAss.receiv.other.otherTaxRec.CapTax 
+        // KESO KEST AQST= de-gaap-ci_bs.ass.currAss.receiv.other.otherTaxRec.CapTax 
         xbrlArec:  {   level:3, xbrl: "de-gaap-ci_bs.ass.currAss.receiv", de_DE:'Forderungen'},
         xbrlAcurr:  {  level:2, xbrl: "de-gaap-ci_bs.ass.currAss", de_DE:'Umlaufvermögen'},
         xbrlAssets :{  level:1, xbrl: "de-gaap-ci_bs.ass", de_DE:'Aktiva'},
@@ -399,9 +402,9 @@ function initBalance() {
         xbrlUVAVA:  {  level:3, xbrl: "de-gaap-ci_bs.eqLiab.equity.subscribed.unlimitedLiablePartners.accumLoss", de_DE:'Verlust FA Komplem.'},
         xbrlLVAVA:  {  level:3, xbrl: "de-gaap-ci_bs.eqLiab.equity.subscribed.limitedLiablePartners.accumLoss", de_DE:'Verlust FA Kommmand.'},
         xbrlEquity: {  level:2, xbrl: "de-gaap-ci_bs.eqLiab.equity", de_DE:'Eigenkapital'},
-        xbrlRegFin: {  level:3, xbrl:"de-gaap-ci_is.netIncome.regular.fin", de_DE:de_DE.RegularFIN},      
-        xbrlRegOTC: {  level:3, xbrl:"de-gaap-ci_is.netIncome.regular.operatingTC", de_DE:de_DE.RegularOTC},      
-        xbrlRegular:{  level:2, xbrl:"de-gaap-ci_is.netIncome.regular", de_DE:'Gewinn/Verlust'},      
+        xbrlRegFin: {  level:3, xbrl: "de-gaap-ci_is.netIncome.regular.fin", de_DE:de_DE.RegularFIN},      
+        xbrlRegOTC: {  level:3, xbrl: "de-gaap-ci_is.netIncome.regular.operatingTC", de_DE:de_DE.RegularOTC},      
+        xbrlRegular:{  level:2, xbrl: "de-gaap-ci_is.netIncome.regular", de_DE:'Gewinn/Verlust'},      
         xbrlEqLiab :{  level:2, xbrl: "de-gaap-ci_bs.eqLiab", de_DE:'Passiva'}, // see HGBBeginYear.html HGBRegular.html
         xbrlIncome: {  level:1, xbrl: "de-gaap-ci_bs.eqLiab.income", de_DE:'Passiva Gewinn'},
         // see sendBalance(), CloseAndSave.htmlReport.xbrlIncome.closing.split(CSEP);

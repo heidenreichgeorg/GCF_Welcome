@@ -202,7 +202,9 @@ app.get("/STATUS",  (req, res) => { res.sendFile(__dirname + "/status.html")});
 // responds with session contxt object  
 // uses buffered session context if one exists for that client/year
 // does not refresh buffered session context if external session context has changed
-app.get('/SESSION', (req, res) => {
+app.get('/SESSION', (req, res) => {   // CORS 20230114
+    res.set('Access-Control-Allow-Origin');
+
     if(req && req.query && req.socket) {       
         
         let query = req.query;
@@ -572,7 +574,7 @@ app.post("/UPLOAD", (req, res) => {
             
 
             
-            let cmdLogin = "http://localhost:81/LATEST?client="+client+"&year="+year+"&ext=JSON&clientSave=JSON";
+            let cmdLogin = "http://"+localhost().addr+":81/LATEST?client="+client+"&year="+year+"&ext=JSON&clientSave=JSON";
             // should not set a sesssion.id because id not known while async save2bucket is not finished       
 
             if(debugUpload) console.dir("0822 app.post UPLOAD rendering QR code");

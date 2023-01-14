@@ -17,8 +17,7 @@ import FooterRow from '../components/FooterRow'
 import { useSession } from '../modules/sessionmanager';
 import { cents2EU } from  '../modules/money'
 import { makeHGB275S2Report } from "../modules/App.js"
-import { D_Balance, D_Partner, D_Page, SCREENLINES }  from '../terms.js';
-
+import { REACT_APP_API_HOST, D_Balance, D_Partner, D_Page, SCREENLINES }  from '../terms.js';
 
 export default function Partner() {
 
@@ -175,7 +174,7 @@ export default function Partner() {
     
     function handleJSONSave() {
         console.log("1110 Status.handleJSONSave sessionId = "+session.id);
-        const rqOptions = { method: 'GET', headers: {  'Accept': 'application/json'}};
+        const rqOptions = { method: 'GET', headers: {  'Accept': 'application/json'}, mode:'cors'};
         try {
             
             fetch(`${process.env.REACT_APP_API_HOST}/DOWNLOAD?sessionId=${session.id}`, rqOptions)
