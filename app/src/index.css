@@ -1,58 +1,47 @@
 body {
   margin: 0;
-  font-family:  monospace, sans-serif;
+  font-family: monospace, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-input  { color:#0F0F0F; background-color:inherit; font-family :inherit; font-size: 12px; }
 
+.dosBorder{ max-width:1005px; padding: 4px; border-style: solid; border-radius: 10px; border-width: 2px; border-color: #AEADAE;  background-color: #FFF; color: #0F0F0F; }
+.ulliTab  { width:995px;  padding: 1px; border: none;  font-size: 12px; font-weight:400; } 
+.mTable   { font-family: Bahnschrift,monospace;                             height: 18px;             display:table;    }
+
+input  { color:#0F0F0F; background-color:inherit; font-family :inherit; font-size: 10px; }
 
 input[type="radio"] {
   /* Add if not using autoprefixer */
   -webkit-appearance: none;
   appearance: none;
-  font-family: monospace, sans-serif; font-size: 13px; font-weight:400; text-align: center;
+  font-family: monospace, sans-serif; font-size: 10px; font-weight:400; text-align: center;
   background-color: inherit;
   margin: 0;
 }
 
 input[type="radio"]::before {content: "#"; }
 
+.attrLine { width:990px; padding: 1px; float: left;               min-height: 16px; height: 16px; font-family :inherit; font-size: 11px; font-weight:400; text-align: center;}
+.attrPair {              padding: 1px; float: left; color:inherit;min-height: 48px;               font-family: inherit; font-size: 11px; font-weight:400; text-align: center; background-color: inherit; } 
 
-.attrLine { width:990px; padding: 1px; float: left;               min-height: 16px; height: 16px; font-family :inherit; font-size: 12px; font-weight:400; text-align: center;}
-.attrPair {              padding: 1px; float: left; color:inherit;min-height: 48px;               font-family: inherit; font-size: 14px; font-weight:400; text-align: center; background-color: inherit; } 
-
-
-.attrLine:nth-child(even) {
-  background: #F0F0F0;
-}
+.attrLine:nth-child(even) { background: #F0F0F0; }
 
 .key      { width: 70px;  height:16px;  margin: 0px; border: 0px 1px 0px 1px solid gray; float: left; background-color:transparent; font-family:  inherit; font-size: inherit; font-weight:600; color: #000; }
 
-.ulliTab  { width:995px;  padding: 1px; border: none;  font-size: 14px; font-weight:400; } 
-.mTable   {                                  height: 18px;             display:table;    }
-.dosBorder{ max-width:1005px; padding: 4px; border-style: solid; border-radius: 10px; border-width: 2px; border-color: #AEADAE;
-   background-color: #FFF; color: #0F0F0F; }
-  
-.oldDOS{ background-image: radial-gradient( rgba(0, 90, 0, 0.75), black 120% );}
+.FIELD    { overflow:hidden; padding: 1px; border: none; float: left;  font-family: inherit; font-size: inherit; font-weight:inherit; color: inherit;} 
 
-.SEP      { width: 22px; overflow:hidden; padding: 2px; border: none; float: left;  font-family: inherit; font-size: inherit; font-weight:inherit; color: inherit; text-align: left;  }		
-.TAX      { width: 45px; overflow:hidden; padding: 2px; border: none; float: left;  font-family: inherit; font-size: inherit; font-weight:inherit; color: inherit; text-align: right;  }		
-.TAG      { width: 50px; overflow:hidden; padding: 2px; border: none; float: left;  font-family: inherit; font-size: inherit; font-weight:inherit; color: inherit; text-align: left;  }		
-.SYMB     { width: 65px; overflow:hidden; padding: 2px; border: none; float: left;  font-family: inherit; font-size: inherit; font-weight:inherit; color: inherit; text-align: left;  }		
-.MOAM     { width: 95px; overflow:hidden; padding: 2px; border: none; float: left;  font-family: inherit; font-size: inherit; font-weight:inherit; color: inherit; text-align: right; }
-.C100     { width:100px; overflow:hidden; padding: 2px; border: none; float: left;  font-family: inherit; font-size: inherit; font-weight:inherit; color: inherit; }
-.R105     { width:105px; overflow:hidden; padding: 2px; border: none; float: left;  font-family: inherit; font-size: inherit; font-weight:inherit; color: inherit; text-align: right; }
-.SNAM     { width:110px; overflow:hidden; padding: 2px; border: none; float: left;  font-family: inherit; font-size: inherit; font-weight:inherit; color: inherit; text-align: left;}
-.IDNT     { width:120px; overflow:hidden; padding: 2px; border: none; float: left;  font-family: inherit; font-size: inherit; font-weight:inherit; color: inherit; text-align: right;}
-.C140     { width:140px; overflow:hidden; padding: 2px; border: none; float: left;  font-family: inherit; font-size: inherit; font-weight:inherit; color: inherit;}
-.L150     { width:150px; overflow:hidden; padding: 2px; border: none; float: left;  font-family: inherit; font-size: inherit; font-weight:inherit; color: inherit; text-align: left;}
-.R165     { width:165px; overflow:hidden; padding: 2px; border: none; float: left;  font-family: inherit; font-size: inherit; font-weight:inherit; color: inherit; text-align: right; }
-.LNAM     { width:165px; overflow:hidden; padding: 2px; border: none; float: left;  font-family: inherit; font-size: inherit; font-weight:inherit; color: inherit; text-align: left;}
-.LTXT     { width:220px; overflow:hidden; padding: 2px; border: none; float: left;  font-family: inherit; font-size: inherit; font-weight:inherit; color: inherit; text-align: left;}
-.L280     { width:280px; overflow:hidden; padding: 2px; border: none; float: left;  font-family: inherit; font-size: inherit; font-weight:inherit; color: inherit; text-align: left;} 
-.C280     { width:280px; overflow:hidden; padding: 2px; border: none; float: left;  font-family: inherit; font-size: inherit; font-weight:inherit; color: inherit; } 
-.LFUL     { width:999px; overflow:hidden; padding: 2px; border: none; float: left;  font-family: inherit; font-size: inherit; font-weight:inherit; color: inherit; text-align: left;} 
-
-
+.SEP      { width: 2em; text-align: left;  }		
+.TAG      { width: 5em; text-align: left;  }		
+.SYMB     { width: 6em;  text-align: left; }		
+.MOAM     { width: 9em; text-align: right; }
+.C100     { width: 10em; }
+.R105     { width:10em; text-align: right; }
+.SNAM     { width:11em; text-align: left;  }
+.IDNT     { width:11em; text-align: right; }
+.XFER     { width:15em; text-align: left;  }
+.LNAM     { width:16em; text-align: left;}
+.LTXT     { width:22em; text-align: left;}
+.L280     { width:27em; text-align: left;} 
+.FLEX     { width:99em; text-align: left;} 
