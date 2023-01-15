@@ -1,3 +1,6 @@
+
+// PUT REAL IP ADDR or DNS NAME OF BACKEND INTO .env file
+
 import { createContext, useContext, useEffect, useState } from "react";
 
 const SessionContext = createContext()
@@ -32,6 +35,7 @@ export function SessionProvider({ children,  location, default_value, onLoading,
                 setStatus('error')
             }
         } else { 
+            // PUT REAL IP ADDR or DNS NAME OF BACKEND INTO .env file
             fetch(`${process.env.REACT_APP_API_HOST}/SESSION${strSearch}`,  
             {mode:'cors'}) // CORS 20230114
             .then(data => data.json())
