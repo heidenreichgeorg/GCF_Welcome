@@ -31,14 +31,15 @@ export default function Balance() {
 
     let page = sheet[D_Page];
     
-    let report = [ makeBalance(sheet,'init'), makeBalance(sheet,'yearEnd'), makeBalance(sheet,'next')  ];
-
-
+    let pageNames = [ 'init','yearEnd','next'];
+    let pageText =  ['Init', 'Close',  'Next'].map((name) =>( page[name] ));
+    let report = pageNames.map((name) =>( makeBalance(sheet,name) ));
     let aPages = [];
     for(let p=1;p<report.length;p++) aPages[p]='none'; 
     aPages[0]='block';
+
     return (
-        <Screen prevFunc={prevFunc} nextFunc={nextFunc} tabSelector={aPages} >
+        <Screen prevFunc={prevFunc} nextFunc={nextFunc} tabSelector={pageText} >
             {report.map((balance,n) => ( 
                 <div className="ulliTab" id={"PageContent"+n} style= {{ 'display': aPages[n]}} >
                     <div className="attrLine">{[page.BalanceOpen,page.BalanceClose,page.BalanceNext][n] + ' ' + (parseInt(session.year)+1)}</div>
@@ -141,6 +142,7 @@ function makeBalance(response,value) {
                     if(level==1) { balance[iLeft].am1=cValue; }
                     if(level==2) { balance[iLeft].am2=cValue; }
                     if(level==3) { balance[iLeft].am3=cValue; }
+                    if(level==4) { balance[iLeft].am4=cValue; }
                     iLeft++;
                 }
             } else {
@@ -151,6 +153,7 @@ function makeBalance(response,value) {
                     if(level==1) { balance[iRite].an1=cValue; }
                     if(level==2) { balance[iRite].an2=cValue; }
                     if(level==3) { balance[iRite].an3=cValue; }
+                    if(level==4) { balance[iRite].an4=cValue; }
                     iRite++;
                 }
             }
@@ -176,11 +179,13 @@ function BalanceRow({ jArgs, id }) {
     return(
         <div className={"attrLine"} >
             <div className="FIELD LNAM"> {jArgs.tw1}</div>
+            <div className="FIELD MOAM"> {jArgs.am4}</div>
             <div className="FIELD MOAM"> {jArgs.am3}</div>
             <div className="FIELD MOAM"> {jArgs.am2}</div>
             <div className="FIELD MOAM"> {jArgs.am1}</div>
             <div className="FIELD SEP">|&nbsp;</div>
             <div className="FIELD LNAM"> {jArgs.tx1}</div>
+            <div className="FIELD MOAM"> {jArgs.an4}</div>
             <div className="FIELD MOAM"> {jArgs.an3}</div>
             <div className="FIELD MOAM"> {jArgs.an2}</div>
             <div className="FIELD MOAM"> {jArgs.an1}</div>

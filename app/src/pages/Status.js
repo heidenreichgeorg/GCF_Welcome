@@ -94,6 +94,7 @@ export default function Status() {
 
 function makeStatusData(response) {
 
+    const page = response[D_Page];
 
     var jReport = response[D_Report];
     console.log("makeStatusData from response D_Report"+JSON.stringify(Object.keys(jReport)));
@@ -150,7 +151,7 @@ function makeStatusData(response) {
     if(maxRow>SCREENLINES) maxRow=SCREENLINES; // 20221201
     
     let iLeft=0;
-    statusData[iLeft++].nLeft= "Assets";
+    statusData[iLeft++].gLeft= page.Assets;
 
     for (let name in aLeft)   {
         var account=aLeft[name];
@@ -168,7 +169,7 @@ function makeStatusData(response) {
 
 
     let iMidl=0;
-    statusData[iMidl++].nMidl= "Gain/Loss";
+    statusData[iMidl++].gMidl= page.GainLoss;
 
     for (let name in aMidl)   {
         var account=aMidl[name];
@@ -183,7 +184,7 @@ function makeStatusData(response) {
 
 
     let iRite=0;
-    statusData[iRite++].nRite= "Equity/Liab";
+    statusData[iRite++].gRite= page.eqliab;
 
     for (let name in aRite)   {
         var account=aRite[name];
@@ -231,7 +232,7 @@ function makeStatusData(response) {
 
                 iTran--;
                 statusData[iTran].dTran=jPrettyTXN.entry[0].slice(2);
-                statusData[iTran].nTran=jPrettyTXN.entry[1].slice(0,9);
+                statusData[iTran].nTran=jPrettyTXN.entry[1].slice(0,16);
                 statusData[iTran].lTran= sAmount;                                
             }
             bLine--;
@@ -255,7 +256,7 @@ function StatusRow({ am1,tx1, am2, tx2, am3, tx3, d, n, l}) {
             <div className="FIELD SYMB"> {tx3}</div>
             <div className="FIELD SEP"> &nbsp;</div>
             <div className="FIELD SYMB"> {d}</div>
-            <div className="FIELD SYMB"> {n}</div>
+            <div className="FIELD SNAM"> {n}</div>
             <div className="FIELD LTXT">{l}</div>
         </div>
         

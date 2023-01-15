@@ -37,7 +37,7 @@ export default function Transfer() {
                 <div className="FIELD SYMB"><div className="key" onClick={downClick}>-</div></div>
                 <div className="FIELD MOAM"> &nbsp;</div>
                 <div className="FIELD SEP"> &nbsp;</div>
-                <div className="FIELD SYMB"><input type="submit" className="key" value="BOOK" onClick={(e)=>onBook(e)}/></div>
+                <div className="FIELD MOAM"><input type="submit" className="key" value="BOOK" onClick={(e)=>onBook(e)}/></div>
             </div>
         )
     }
@@ -75,19 +75,19 @@ export default function Transfer() {
         return(
             <div className="attrLine">
                 <div className="FIELD SEP"> &nbsp;</div>
-                <div className="FIELD TAG"> <input type="text" id="cNam1" name="cNam1"   ref={rName1} defaultValue={name1} onDragOver={ignore}  onDrop={handleDrop}/></div>
+                <div className="FIELD SYMB"> <input type="text" id="cNam1" name="cNam1"   ref={rName1} defaultValue={name1} onDragOver={ignore}  onDrop={handleDrop}/></div>
                 <div className="FIELD MOAM"> <input type="edit" id="cAmt1" name="cAmt1"  ref={rAmount1} defaultValue={amount1} onDrop={ignore}  /></div>
                 <div className="FIELD SEP"> &nbsp;</div>
-                <div className="FIELD TAG"> <input type="text" id="cNam2" name="cNam2"   ref={rName2} defaultValue={name2} onDragOver={ignore}  onDrop={handleDrop}/></div>
+                <div className="FIELD SYMB"> <input type="text" id="cNam2" name="cNam2"   ref={rName2} defaultValue={name2} onDragOver={ignore}  onDrop={handleDrop}/></div>
                 <div className="FIELD MOAM"> <input type="edit" id="cAmt2" name="cAmt2"  ref={rAmount2} defaultValue={amount2} onDrop={ignore}  /></div>
                 <div className="FIELD SEP"> &nbsp;</div>
-                <div className="FIELD TAG"> <input type="text" id="cNam3" name="cNam3"   ref={rName3} defaultValue={name3} onDragOver={ignore}  onDrop={handleDrop}/></div>
+                <div className="FIELD SYMB"> <input type="text" id="cNam3" name="cNam3"   ref={rName3} defaultValue={name3} onDragOver={ignore}  onDrop={handleDrop}/></div>
                 <div className="FIELD MOAM"> <input type="edit" id="cAmt3" name="cAmt3"  ref={rAmount3} defaultValue={amount3} onDrop={ignore}  /></div>
                 <div className="FIELD SEP"> &nbsp;</div>
-                <div className="FIELD TAG"> <input type="text" id="cNam4" name="cNam4"   ref={rName4} defaultValue={name4} onDragOver={ignore}  onDrop={handleDrop}/></div>
+                <div className="FIELD SYMB"> <input type="text" id="cNam4" name="cNam4"   ref={rName4} defaultValue={name4} onDragOver={ignore}  onDrop={handleDrop}/></div>
                 <div className="FIELD MOAM"> <input type="edit" id="cAmt4" name="cAmt4"  ref={rAmount4} defaultValue={amount4} onDrop={ignore}  /></div>
                 <div className="FIELD SEP"> &nbsp;</div>
-                <div className="FIELD TAG"> <input type="text" id="cNam5" name="cNam5"   ref={rName5} defaultValue={name5} onDragOver={ignore}  onDrop={handleDrop}/></div>
+                <div className="FIELD SYMB"> <input type="text" id="cNam5" name="cNam5"   ref={rName5} defaultValue={name5} onDragOver={ignore}  onDrop={handleDrop}/></div>
                 <div className="FIELD MOAM"> <input type="edit" id="cAmt5" name="cAmt5"  ref={rAmount5} defaultValue={amount5} onDrop={ignore}  /></div>
             </div>)
     }

@@ -112,9 +112,9 @@ export default function Partner() {
         return "."; // value walks into page
     }
 
-    let partnerPages = Object.keys(jReport).map((_,i)=>i==0?'block':'none');
+    let partnerPages = Object.keys(jReport).map((_,i)=>i==0?'block':'none'); // was <Svreen prev next partnerPages
     return (
-        <Screen prevFunc={prevFunc} nextFunc={nextFunc} tabSelector={partnerPages} >
+        <Screen prevFunc={prevFunc} nextFunc={nextFunc} tabSelector={Object.keys(jReport).map((i)=>(jReport[i].name))} >
             
             <div className="attrLine">{page.GainLoss + ' ' + session.year}</div>
 

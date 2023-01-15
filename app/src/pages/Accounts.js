@@ -40,9 +40,10 @@ export default function Accounts() {
     let aPages = [];
     for(let p=1;p<standsPages.length;p++) aPages[p]='none'; 
     aPages[0]='block';
+    let pageText =  ['Init', 'Close',  'Next'].map((name) =>( page[name] ));
 
     return (
-        <Screen prevFunc={prevFunc} nextFunc={nextFunc} tabSelector={aPages} >
+        <Screen prevFunc={prevFunc} nextFunc={nextFunc} tabSelector={pageText} >
             { aStands.map((report,n)=>
                 <div className="ulliTab" id={"PageContent"+n} style= {{ 'display': aPages[n]}} >
                     <div className="attrLine">{[page.AcctOpen,page.AcctClose,page.AcctNext][n] + ' ' + (parseInt(session.year)+1)}</div>
@@ -59,6 +60,8 @@ export default function Accounts() {
 }
 
 function makeAccountsPosition(response,currentPage) {
+
+    const page = response[D_Page];
 
     var jReport = response[D_Report];
     console.log("makeAccountsPosition from response D_Report"+JSON.stringify(Object.keys(jReport)));
@@ -103,7 +106,7 @@ function makeAccountsPosition(response,currentPage) {
     let maxCol = Object.keys(aLeft).length;
     let maxCom = Object.keys(aMidl).length;
     let maxCor = Object.keys(aRite).length;
-    let maxRow= SCREENLINES;
+    let maxRow= SCREENLINES-1;
     if(maxCol>maxRow) maxRow=maxCol;
     if(maxCom>maxRow) maxRow=maxCom;
     if(maxCor>maxRow) maxRow=maxCor;
@@ -112,7 +115,7 @@ function makeAccountsPosition(response,currentPage) {
     if(maxRow>SCREENLINES) maxRow=SCREENLINES; // 20221201
     
     let iLeft=0;
-    statusData[iLeft++].nLeft= "Assets";
+    statusData[iLeft++].gLeft= page.Assets;
 
     for (let name in aLeft)   {
         var account=aLeft[name];
@@ -130,7 +133,7 @@ function makeAccountsPosition(response,currentPage) {
 
 
     let iMidl=0;
-    statusData[iMidl++].nMidl= "Gain/Loss";
+    statusData[iMidl++].gMidl= page.GainLoss;
 
     for (let name in aMidl)   {
         var account=aMidl[name];
@@ -145,7 +148,7 @@ function makeAccountsPosition(response,currentPage) {
 
 
     let iRite=0;
-    statusData[iRite++].nRite= "Equity/Liab";
+    statusData[iRite++].gRite= page.eqliab;
 
     for (let name in aRite)   {
         var account=aRite[name];

@@ -114,15 +114,12 @@ export default function Screen({ children, prevFunc, nextFunc, tabSelector }) {
 // there is no onLoad={updateScreen} and no     <div className="attrLine" onLoad="updateScreen()">
     return (
         <div className="mTable">           
-            <div className="attrLine">           
+            <div className="attrLine">         
+            <select type="radio" name="tabSelector">                          
                 {tabSelector.map((row,tabNum) => (
-                    <div className="FIELD TAG" onClick={((e) => select('PageContent',{tabNum}))}>
-                        <label className="FIELD TAG">
-                            <input type="radio" name="tabSelector" autoFocus={tabNum==0?"1":""}/>                          
-                            &nbsp;{tabNum}
-                        </label>
-                    </div>
+                     <option value={row}  onClick={((e) => select('PageContent',{tabNum}))}>{row}</option>
                 ))}
+            </select>
             </div>
             <div>              
                 {children}                
