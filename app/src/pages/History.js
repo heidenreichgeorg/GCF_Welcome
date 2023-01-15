@@ -133,26 +133,26 @@ function SigRow(row) {
     return (
         <div className="attrPair">
             <div className="attrLine" id="{id}">
-                <div className="SYMB"><label><input TYPE="CHECKBOX" onChange={event => handleChange(event.target,aRow,mRow)}/></label></div>
-                <div className="SYMB">{aRow[0]}</div>
-                <div className="SEP">&nbsp;</div>
-                <div className="LNAM">{aRow[1]}</div>
-                <div className="LNAM">{aRow[2]}</div>
-                <div className="LNAM">{aRow[3]}</div>
-                <div className="LNAM">{aRow[4]}</div>
-                <div className="LNAM">{aRow[5]}</div>
+                <div className="FIELD SYMB"><label><input TYPE="CHECKBOX" onChange={event => handleChange(event.target,aRow,mRow)}/></label></div>
+                <div className="FIELD SYMB">{aRow[0]}</div>
+                <div className="FIELD SEP">&nbsp;</div>
+                <div className="FIELD LNAM">{aRow[1]}</div>
+                <div className="FIELD LNAM">{aRow[2]}</div>
+                <div className="FIELD LNAM">{aRow[3]}</div>
+                <div className="FIELD LNAM">{aRow[4]}</div>
+                <div className="FIELD LNAM">{aRow[5]}</div>
             </div>
             <div className="attrLine">
-                <div className="SEP">&nbsp;</div>
-                <div className="C100">{mRow[0]}</div>
-                <div className="C100">{mRow[1]}</div>
-                <div className="C100">{mRow[2]}</div>
-                <div className="C100">{mRow[3]}</div>
-                <div className="C100">{mRow[4]}</div>
-                <div className="C100">{mRow[5]}</div>
-                <div className="C100">{mRow[6]}</div>
-                <div className="C100">{mRow[7]}</div>
-                <div className="C100">{saldo}</div>
+                <div className="FIELD SEP">&nbsp;</div>
+                <div className="FIELD C100">{mRow[0]}</div>
+                <div className="FIELD C100">{mRow[1]}</div>
+                <div className="FIELD C100">{mRow[2]}</div>
+                <div className="FIELD C100">{mRow[3]}</div>
+                <div className="FIELD C100">{mRow[4]}</div>
+                <div className="FIELD C100">{mRow[5]}</div>
+                <div className="FIELD C100">{mRow[6]}</div>
+                <div className="FIELD C100">{mRow[7]}</div>
+                <div className="FIELD C100">{saldo}</div>
             </div>
         </div>
     )
@@ -228,13 +228,13 @@ function SearchForm(token) {
     return (
         <div className="attrLine">
             <form onSubmit={(e)=>(console.log("SEARCH "+JSON.stringify(e.target)))} >                
-                <div className='MOAM'></div>                
-                <div className='LTXT'>Line:<input type='edit' name='LPATTERN'/>&nbsp;</div>                
-                <div className='LTXT'>Acct:<input type='edit' name='APATTERN'/></div>                
+                <div className="FIELD MOAM"></div>                
+                <div className="FIELD LTXT">Line:<input type='edit' name='LPATTERN'/>&nbsp;</div>                
+                <div className="FIELD LTXT">Acct:<input type='edit' name='APATTERN'/></div>                
                 <input type='hidden' name='client' defaultValue={token.client}/>
                 <input type='hidden' name='year' defaultValue={token.year}/>
-                <div className='MOAM'><button autoFocus className='SYMB key'>Search</button></div>
-                <div className='MOAM'><input type='button' name='SELECT' value='SELECT' onClick={(event) => (funcShowReceipt())}/></div>                
+                <div className="FIELD MOAM"><button autoFocus className='SYMB key'>Search</button></div>
+                <div className="FIELD MOAM"><input type='button' name='SELECT' value='SELECT' onClick={(event) => (funcShowReceipt())}/></div>                
             </form>
         </div>
     )
@@ -277,14 +277,14 @@ function TXNReceipt(sym,i) {
 function BalanceRow({text,level6,level5,level4,level3,level2,level1,level0}) { 
     return (
         <div className="attrLine">
-            <div className="L280">{text}</div>
-            <div className="MOAM">{level6}</div>
-            <div className="MOAM">{level5}</div>
-            <div className="MOAM">{level4}</div>
-            <div className="MOAM">{level3}</div>
-            <div className="MOAM">{level2}</div>
-            <div className="MOAM">{level1}</div>
-            <div className="MOAM">{level0}</div>
+            <div className="FIELD L280">{text}</div>
+            <div className="FIELD MOAM">{level6}</div>
+            <div className="FIELD MOAM">{level5}</div>
+            <div className="FIELD MOAM">{level4}</div>
+            <div className="FIELD MOAM">{level3}</div>
+            <div className="FIELD MOAM">{level2}</div>
+            <div className="FIELD MOAM">{level1}</div>
+            <div className="FIELD MOAM">{level0}</div>
         </div>
     )
 }

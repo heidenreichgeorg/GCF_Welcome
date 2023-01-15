@@ -4,6 +4,8 @@ import './index.css';
 
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 
+import { MantineProvider } from '@mantine/core'
+
 import Accounts from './pages/Accounts'
 import Balance from './pages/Balance'
 import FixedAssets from './pages/FixedAssets'
@@ -58,12 +60,14 @@ const router = createBrowserRouter([
 const root = ReactDOM.createRoot(document.getElementById('windowBorder'));
 root.render(
     <React.StrictMode>
-        <SessionProvider
-            onLoading={'Loading session...'}
-            location={ router.state.location }
-            server={ window.location.origin.replace('3000','81')} //.split('//')[1]
-            >
-            <RouterProvider router={router} />
-        </SessionProvider>
+        <MantineProvider withGlobalStyles withNormalizeCSS>
+            <SessionProvider
+                onLoading={'Loading session...'}
+                location={ router.state.location }
+                server={ window.location.origin.replace('3000','81')} //.split('//')[1]
+                >
+                <RouterProvider router={router} />
+            </SessionProvider>
+        </MantineProvider>
     </React.StrictMode>
 );

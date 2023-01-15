@@ -97,13 +97,13 @@ export default function FixedAssets() {
         //let unitPrice = (mRow.p.nmbr && mRow.p.nmbr>0)?cents2EU(bigEUMoney(mRow.p.cost).cents/parseInt(mRow.p.nmbr)):"--";
         return (
             <div className="attrLine">
-                <div className="LNAM">{mRow.p.idnt}</div>
-                <div className="SNAM">{mRow.p.type}</div>
-                <div className="SNAM">{mRow.p.date}</div>
-                <div className="MOAM">{mRow.p.init}</div>
-                <div className="MOAM">{mRow.p.nmbr}</div>
-                <div className="MOAM">{mRow.p.rest}</div>
-                <div className="MOAM">{mRow.p.cost}</div>
+                <div className="FIELD LNAM">{mRow.p.idnt}</div>
+                <div className="FIELD SNAM">{mRow.p.type}</div>
+                <div className="FIELD SNAM">{mRow.p.date}</div>
+                <div className="FIELD MOAM">{mRow.p.init}</div>
+                <div className="FIELD MOAM">{mRow.p.nmbr}</div>
+                <div className="FIELD MOAM">{mRow.p.rest}</div>
+                <div className="FIELD MOAM">{mRow.p.cost}</div>
             </div>        
         )
     }

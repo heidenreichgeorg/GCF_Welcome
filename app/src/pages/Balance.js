@@ -174,16 +174,16 @@ function makeBalance(response,value) {
 
 function BalanceRow({ jArgs, id }) {
     return(
-        <div className={"attrLine line"+id} >
-            <div className="LNAM"> {jArgs.tw1}</div>
-            <div className="MOAM"> {jArgs.am3}</div>
-            <div className="MOAM"> {jArgs.am2}</div>
-            <div className="MOAM"> {jArgs.am1}</div>
-            <div className="SEP">|&nbsp;</div>
-            <div className="LNAM"> {jArgs.tx1}</div>
-            <div className="MOAM"> {jArgs.an3}</div>
-            <div className="MOAM"> {jArgs.an2}</div>
-            <div className="MOAM"> {jArgs.an1}</div>
+        <div className={"attrLine"} >
+            <div className="FIELD LNAM"> {jArgs.tw1}</div>
+            <div className="FIELD MOAM"> {jArgs.am3}</div>
+            <div className="FIELD MOAM"> {jArgs.am2}</div>
+            <div className="FIELD MOAM"> {jArgs.am1}</div>
+            <div className="FIELD SEP">|&nbsp;</div>
+            <div className="FIELD LNAM"> {jArgs.tx1}</div>
+            <div className="FIELD MOAM"> {jArgs.an3}</div>
+            <div className="FIELD MOAM"> {jArgs.an2}</div>
+            <div className="FIELD MOAM"> {jArgs.an1}</div>
         </div>
     )
 }

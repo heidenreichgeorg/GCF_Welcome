@@ -210,7 +210,7 @@ function FlexRow(mRow) {
     let sPairs = keys.map((kn) => ("  "+mRow.p[kn])).join("");
     return (
         <div className="attrLine">
-            <div className="LFUL">{sPairs}</div>
+            <div className="FIELD FLEX">{sPairs}</div>
         </div>    
     )
 }
@@ -219,8 +219,8 @@ function NamedAmount(mRow) {
     console.log("NamedRow "+JSON.stringify(mRow));
     return(
         <div>
-        <div className="IDNT">{mRow.p.amnt}</div>
-        <div className="SYMB">{mRow.p.name}</div>
+        <div className="FIELD IDNT">{mRow.p.amnt}</div>
+        <div className="FIELD SYMB">{mRow.p.name}</div>
         </div>
     )
 }
@@ -229,16 +229,16 @@ function PartnerRow(mRow) {
     console.log("PartnerRow mRow="+JSON.stringify(mRow));
     return (
         <div className="attrLine">
-            <div className="SYMB">{mRow.p.name}</div>
-            <div className="MOAM">{cents2EU(mRow.p.init)}</div>
-            <div className="MOAM">{cents2EU(mRow.p.credit)}</div>
-            <div className="MOAM">{cents2EU(mRow.p.debit)}</div>
-            <div className="MOAM">{cents2EU(mRow.p.yearEnd)}</div>
-            <div className="MOAM">{cents2EU(mRow.p.netIncomeOTC)}</div>
-            <div className="MOAM">{cents2EU(mRow.p.netIncomeFin)}</div>
-            <div className="MOAM">{cents2EU(mRow.p.close)}</div>
-            <div className="MOAM">{cents2EU(mRow.p.tax)}</div>
-            <div className="MOAM">{cents2EU(mRow.p.next)}</div>
+            <div className="FIELD SYMB">{mRow.p.name}</div>
+            <div className="FIELD MOAM">{cents2EU(mRow.p.init)}</div>
+            <div className="FIELD MOAM">{cents2EU(mRow.p.credit)}</div>
+            <div className="FIELD MOAM">{cents2EU(mRow.p.debit)}</div>
+            <div className="FIELD MOAM">{cents2EU(mRow.p.yearEnd)}</div>
+            <div className="FIELD MOAM">{cents2EU(mRow.p.netIncomeOTC)}</div>
+            <div className="FIELD MOAM">{cents2EU(mRow.p.netIncomeFin)}</div>
+            <div className="FIELD MOAM">{cents2EU(mRow.p.close)}</div>
+            <div className="FIELD MOAM">{cents2EU(mRow.p.tax)}</div>
+            <div className="FIELD MOAM">{cents2EU(mRow.p.next)}</div>
         </div>
     )
 }
@@ -246,10 +246,10 @@ function PartnerRow(mRow) {
 function HGB275Row({ jArgs, id }) {
     return(
         <div className={"attrLine line"+id} >
-            <div className="LNAM"> {jArgs.tx1}</div>
-            <div className="MOAM"> {jArgs.an3}</div>
-            <div className="MOAM"> {jArgs.an2}</div>
-            <div className="MOAM"> {jArgs.an1}</div>
+            <div className="FIELD LNAM"> {jArgs.tx1}</div>
+            <div className="FIELD MOAM"> {jArgs.an3}</div>
+            <div className="FIELD MOAM"> {jArgs.an2}</div>
+            <div className="FIELD MOAM"> {jArgs.an1}</div>
         </div>
     )
 }

@@ -116,8 +116,8 @@ export default function Screen({ children, prevFunc, nextFunc, tabSelector }) {
         <div className="mTable">           
             <div className="attrLine">           
                 {tabSelector.map((row,tabNum) => (
-                    <div className="TAG" onClick={((e) => select('PageContent',{tabNum}))}>
-                        <label className="TAG">
+                    <div className="FIELD TAG" onClick={((e) => select('PageContent',{tabNum}))}>
+                        <label className="FIELD TAG">
                             <input type="radio" name="tabSelector" autoFocus={tabNum==0?"1":""}/>                          
                             &nbsp;{tabNum}
                         </label>

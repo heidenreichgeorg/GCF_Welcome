@@ -245,18 +245,18 @@ function StatusRow({ am1,tx1, am2, tx2, am3, tx3, d, n, l}) {
 
     return(
         <div className="attrLine">
-            <div className="MOAM"> {cents2EU(am1)}</div>
-            <div className="SYMB"> {tx1}</div>
-            <div className="SEP"> &nbsp;</div>
-            <div className="MOAM"> {cents2EU(am2)}</div>
-            <div className="SYMB"> {tx2}</div>
-            <div className="SEP"> &nbsp;</div>
-            <div className="MOAM"> {cents2EU(am3)}</div>
-            <div className="SYMB"> {tx3}</div>
-            <div className="SEP"> &nbsp;</div>
-            <div className="SYMB"> {d}</div>
-            <div className="SYMB"> {n}</div>
-            <div className="LTXT">{l}</div>
+            <div className="FIELD MOAM"> {cents2EU(am1)}</div>
+            <div className="FIELD SYMB"> {tx1}</div>
+            <div className="FIELD SEP"> &nbsp;</div>
+            <div className="FIELD MOAM"> {cents2EU(am2)}</div>
+            <div className="FIELD SYMB"> {tx2}</div>
+            <div className="FIELD SEP"> &nbsp;</div>
+            <div className="FIELD MOAM"> {cents2EU(am3)}</div>
+            <div className="FIELD SYMB"> {tx3}</div>
+            <div className="FIELD SEP"> &nbsp;</div>
+            <div className="FIELD SYMB"> {d}</div>
+            <div className="FIELD SYMB"> {n}</div>
+            <div className="FIELD LTXT">{l}</div>
         </div>
         
     )

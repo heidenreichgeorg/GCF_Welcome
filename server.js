@@ -579,7 +579,7 @@ app.post("/UPLOAD", (req, res) => {
 
             if(debugUpload) console.dir("0822 app.post UPLOAD rendering QR code");
             res.write('<DIV class="attrRow"><H1>'+year+'&nbsp;'+client+'&nbsp;</H1>'
-            +'<DIV class="attrRow"><DIV class="C100"><A HREF="'+cmdLogin+'"><BUTTON class="largeKey">LOGIN</BUTTON></A></DIV></DIV>'
+            +'<DIV class="attrRow"><DIV class="FIELD C100"><A HREF="'+cmdLogin+'"><BUTTON class="largeKey">LOGIN</BUTTON></A></DIV></DIV>'
             +'</DIV>'
             );
             res.end();

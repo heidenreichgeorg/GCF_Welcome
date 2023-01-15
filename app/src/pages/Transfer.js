@@ -28,16 +28,16 @@ export default function Transfer() {
     function UpDownSubmitRow() {
         return(
             <div className="attrLine">
-                <div className="MOAM"> {iRow}</div>
-                <div className="SEP"> &nbsp;</div>
-                <div className="SYMB"><div className="key" onClick={upClick}>+ </div></div>
-                <div className="SEP"> &nbsp;</div>
-                <div className="MOAM"> &nbsp;</div>
-                <div className="SEP"> &nbsp;</div>
-                <div className="SYMB"><div className="key" onClick={downClick}>-</div></div>
-                <div className="MOAM"> &nbsp;</div>
-                <div className="SEP"> &nbsp;</div>
-                <div className="SYMB"><input type="submit" className="key" value="BOOK" onClick={(e)=>onBook(e)}/></div>
+                <div className="FIELD MOAM"> {iRow}</div>
+                <div className="FIELD SEP"> &nbsp;</div>
+                <div className="FIELD SYMB"><div className="key" onClick={upClick}>+ </div></div>
+                <div className="FIELD SEP"> &nbsp;</div>
+                <div className="FIELD MOAM"> &nbsp;</div>
+                <div className="FIELD SEP"> &nbsp;</div>
+                <div className="FIELD SYMB"><div className="key" onClick={downClick}>-</div></div>
+                <div className="FIELD MOAM"> &nbsp;</div>
+                <div className="FIELD SEP"> &nbsp;</div>
+                <div className="FIELD SYMB"><input type="submit" className="key" value="BOOK" onClick={(e)=>onBook(e)}/></div>
             </div>
         )
     }
@@ -48,15 +48,15 @@ export default function Transfer() {
         return(
             <div className="attrLine">
                 <div className="SYMB"> &nbsp;</div>
-                <div className="L150"> <input type="edit" id="cDate"   name="cDate"   defaultValue ={date} onDrop={ignore}  ref={refDate} /></div>
-                <div className="SEP"> &nbsp;</div>
-                <div className="L150"> <input type="edit" id="cSender" name="cSender" defaultValue ={sender} onDrop={ignore} ref={refSender}/></div>
-                <div className="SEP"> &nbsp;</div>
-                <div className="L150"> <input type="edit" id="cReason" name="cReason" defaultValue ={reason} onDrop={ignore}  ref={refReason}/></div>
-                <div className="SEP"> &nbsp;</div>
-                <div className="L150"> <input type="edit" id="cRef1"   name="cRef1"   defaultValue ={ref1} onDrop={ignore}   ref={refRef1}/></div>
-                <div className="SEP"> &nbsp;</div>
-                <div className="L150"> <input type="edit" id="cRef2"   name="cRef2"   defaultValue ={ref2} onDrop={ignore}   ref={refRef2}/></div>
+                <div className="FIELD XFER"> <input type="edit" id="cDate"   name="cDate"   defaultValue ={date} onDrop={ignore}  ref={refDate} /></div>
+                <div className="FIELD SEP"> &nbsp;</div>
+                <div className="FIELD XFER"> <input type="edit" id="cSender" name="cSender" defaultValue ={sender} onDrop={ignore} ref={refSender}/></div>
+                <div className="FIELD SEP"> &nbsp;</div>
+                <div className="FIELD XFER"> <input type="edit" id="cReason" name="cReason" defaultValue ={reason} onDrop={ignore}  ref={refReason}/></div>
+                <div className="FIELD SEP"> &nbsp;</div>
+                <div className="FIELD XFER"> <input type="edit" id="cRef1"   name="cRef1"   defaultValue ={ref1} onDrop={ignore}   ref={refRef1}/></div>
+                <div className="FIELD SEP"> &nbsp;</div>
+                <div className="FIELD XFER"> <input type="edit" id="cRef2"   name="cRef2"   defaultValue ={ref2} onDrop={ignore}   ref={refRef2}/></div>
             </div>)
     }
     
@@ -74,21 +74,21 @@ export default function Transfer() {
     function AccountRow({ name1,amount1, name2,amount2, name3,amount3, name4,amount4, name5,amount5}) {
         return(
             <div className="attrLine">
-                <div className="SEP"> &nbsp;</div>
-                <div className="TAG"> <input type="text" id="cNam1" name="cNam1"   ref={rName1} defaultValue={name1} onDragOver={ignore}  onDrop={handleDrop}/></div>
-                <div className="MOAM"> <input type="edit" id="cAmt1" name="cAmt1"  ref={rAmount1} defaultValue={amount1} onDrop={ignore}  /></div>
-                <div className="SEP"> &nbsp;</div>
-                <div className="TAG"> <input type="text" id="cNam2" name="cNam2"   ref={rName2} defaultValue={name2} onDragOver={ignore}  onDrop={handleDrop}/></div>
-                <div className="MOAM"> <input type="edit" id="cAmt2" name="cAmt2"  ref={rAmount2} defaultValue={amount2} onDrop={ignore}  /></div>
-                <div className="SEP"> &nbsp;</div>
-                <div className="TAG"> <input type="text" id="cNam3" name="cNam3"   ref={rName3} defaultValue={name3} onDragOver={ignore}  onDrop={handleDrop}/></div>
-                <div className="MOAM"> <input type="edit" id="cAmt3" name="cAmt3"  ref={rAmount3} defaultValue={amount3} onDrop={ignore}  /></div>
-                <div className="SEP"> &nbsp;</div>
-                <div className="TAG"> <input type="text" id="cNam4" name="cNam4"   ref={rName4} defaultValue={name4} onDragOver={ignore}  onDrop={handleDrop}/></div>
-                <div className="MOAM"> <input type="edit" id="cAmt4" name="cAmt4"  ref={rAmount4} defaultValue={amount4} onDrop={ignore}  /></div>
-                <div className="SEP"> &nbsp;</div>
-                <div className="TAG"> <input type="text" id="cNam5" name="cNam5"   ref={rName5} defaultValue={name5} onDragOver={ignore}  onDrop={handleDrop}/></div>
-                <div className="MOAM"> <input type="edit" id="cAmt5" name="cAmt5"  ref={rAmount5} defaultValue={amount5} onDrop={ignore}  /></div>
+                <div className="FIELD SEP"> &nbsp;</div>
+                <div className="FIELD TAG"> <input type="text" id="cNam1" name="cNam1"   ref={rName1} defaultValue={name1} onDragOver={ignore}  onDrop={handleDrop}/></div>
+                <div className="FIELD MOAM"> <input type="edit" id="cAmt1" name="cAmt1"  ref={rAmount1} defaultValue={amount1} onDrop={ignore}  /></div>
+                <div className="FIELD SEP"> &nbsp;</div>
+                <div className="FIELD TAG"> <input type="text" id="cNam2" name="cNam2"   ref={rName2} defaultValue={name2} onDragOver={ignore}  onDrop={handleDrop}/></div>
+                <div className="FIELD MOAM"> <input type="edit" id="cAmt2" name="cAmt2"  ref={rAmount2} defaultValue={amount2} onDrop={ignore}  /></div>
+                <div className="FIELD SEP"> &nbsp;</div>
+                <div className="FIELD TAG"> <input type="text" id="cNam3" name="cNam3"   ref={rName3} defaultValue={name3} onDragOver={ignore}  onDrop={handleDrop}/></div>
+                <div className="FIELD MOAM"> <input type="edit" id="cAmt3" name="cAmt3"  ref={rAmount3} defaultValue={amount3} onDrop={ignore}  /></div>
+                <div className="FIELD SEP"> &nbsp;</div>
+                <div className="FIELD TAG"> <input type="text" id="cNam4" name="cNam4"   ref={rName4} defaultValue={name4} onDragOver={ignore}  onDrop={handleDrop}/></div>
+                <div className="FIELD MOAM"> <input type="edit" id="cAmt4" name="cAmt4"  ref={rAmount4} defaultValue={amount4} onDrop={ignore}  /></div>
+                <div className="FIELD SEP"> &nbsp;</div>
+                <div className="FIELD TAG"> <input type="text" id="cNam5" name="cNam5"   ref={rName5} defaultValue={name5} onDragOver={ignore}  onDrop={handleDrop}/></div>
+                <div className="FIELD MOAM"> <input type="edit" id="cAmt5" name="cAmt5"  ref={rAmount5} defaultValue={amount5} onDrop={ignore}  /></div>
             </div>)
     }
 
@@ -102,50 +102,50 @@ export default function Transfer() {
         return(
             <div className="attrLine">
             <div className="attrLine">
-                <div className="SEP">&nbsp;</div>
-                <div className="TAG"><div className="key" draggable="true" id="cNam0" onDragStart={(e) => (setDragging(e,lineA[0]))}>{lineA[0]} </div></div>
-                <div className="SEP">&nbsp;</div>
-                <div className="TAG"><div className="key"  draggable="true" id="cNam1" onDragStart={(e) => (setDragging(e,lineA[1]))}>{lineA[1]} </div></div>
-                <div className="SEP">&nbsp;</div>
-                <div className="TAG"><div className="key"  draggable="true" id="cNam2" onDragStart={(e) => (setDragging(e,lineA[2]))}>{lineA[2]} </div></div>
-                <div className="SEP">&nbsp;</div>
-                <div className="TAG"><div className="key" draggable="true"  id="cNam3" onDragStart={(e) => (setDragging(e,lineA[3]))}>{lineA[3]} </div></div>
-                <div className="SEP">&nbsp;</div>
-                <div className="TAG"><div className="key" draggable="true"  id="cNam4" onDragStart={(e) => (setDragging(e,lineA[4]))}>{lineA[4]}</div></div>
-                <div className="SEP">&nbsp;</div>
-                <div className="TAG"><div className="key" draggable="true"  id="cNam5" onDragStart={(e) => (setDragging(e,lineA[5]))}>{lineA[5]} </div></div>
-                <div className="SEP">&nbsp;</div>
-                <div className="TAG"><div className="key" draggable="true"  id="cNam6" onDragStart={(e) => (setDragging(e,lineA[6]))}>{lineA[6]} </div></div>
-                <div className="SEP">&nbsp;</div>
-                <div className="TAG"><div className="key" draggable="true"  id="cNam7" onDragStart={(e) => (setDragging(e,lineA[7]))}>{lineA[7]} </div></div>
-                <div className="SEP">&nbsp;</div>
-                <div className="TAG"><div className="key"  draggable="true" id="cNam8" onDragStart={(e) => (setDragging(e,lineA[8]))}>{lineA[8]} </div></div>
-                <div className="SEP">&nbsp;</div>
-                <div className="TAG"><div className="key"  draggable="true" id="cNam9" onDragStart={(e) => (setDragging(e,lineA[9]))}>{lineA[9]} </div></div>
-                <div className="SEP">&nbsp;</div>
+                <div className="FIELD SEP">&nbsp;</div>
+                <div className="FIELD TAG"><div className="key" draggable="true" id="cNam0" onDragStart={(e) => (setDragging(e,lineA[0]))}>{lineA[0]} </div></div>
+                <div className="FIELD SEP">&nbsp;</div>
+                <div className="FIELD TAG"><div className="key"  draggable="true" id="cNam1" onDragStart={(e) => (setDragging(e,lineA[1]))}>{lineA[1]} </div></div>
+                <div className="FIELD SEP">&nbsp;</div>
+                <div className="FIELD TAG"><div className="key"  draggable="true" id="cNam2" onDragStart={(e) => (setDragging(e,lineA[2]))}>{lineA[2]} </div></div>
+                <div className="FIELD SEP">&nbsp;</div>
+                <div className="FIELD TAG"><div className="key" draggable="true"  id="cNam3" onDragStart={(e) => (setDragging(e,lineA[3]))}>{lineA[3]} </div></div>
+                <div className="FIELD SEP">&nbsp;</div>
+                <div className="FIELD TAG"><div className="key" draggable="true"  id="cNam4" onDragStart={(e) => (setDragging(e,lineA[4]))}>{lineA[4]}</div></div>
+                <div className="FIELD SEP">&nbsp;</div>
+                <div className="FIELD TAG"><div className="key" draggable="true"  id="cNam5" onDragStart={(e) => (setDragging(e,lineA[5]))}>{lineA[5]} </div></div>
+                <div className="FIELD SEP">&nbsp;</div>
+                <div className="FIELD TAG"><div className="key" draggable="true"  id="cNam6" onDragStart={(e) => (setDragging(e,lineA[6]))}>{lineA[6]} </div></div>
+                <div className="FIELD SEP">&nbsp;</div>
+                <div className="FIELD TAG"><div className="key" draggable="true"  id="cNam7" onDragStart={(e) => (setDragging(e,lineA[7]))}>{lineA[7]} </div></div>
+                <div className="FIELD SEP">&nbsp;</div>
+                <div className="FIELD TAG"><div className="key"  draggable="true" id="cNam8" onDragStart={(e) => (setDragging(e,lineA[8]))}>{lineA[8]} </div></div>
+                <div className="FIELD SEP">&nbsp;</div>
+                <div className="FIELD TAG"><div className="key"  draggable="true" id="cNam9" onDragStart={(e) => (setDragging(e,lineA[9]))}>{lineA[9]} </div></div>
+                <div className="FIELD SEP">&nbsp;</div>
             </div>
             <div className="attrLine">
-                <div className="SEP">&nbsp;</div>
-                <div className="TAG"><div className="key" draggable="true" id="cNam10">{lineB[0]}</div></div>
-                <div className="SEP">&nbsp;</div>
-                <div className="TAG"><div className="key"  draggable="true" id="cNam11">{lineB[1]}</div></div>
-                <div className="SEP">&nbsp;</div>
-                <div className="TAG"><div className="key"  draggable="true" id="cNam12">{lineB[2]}</div></div>
-                <div className="SEP">&nbsp;</div>
-                <div className="TAG"><div className="key" draggable="true"  id="cNam13">{lineB[3]}</div></div>
-                <div className="SEP">&nbsp;</div>
-                <div className="TAG"><div className="key" draggable="true"  id="cNam14">{lineB[4]}</div></div>
-                <div className="SEP">&nbsp;</div>
-                <div className="TAG"><div className="key" draggable="true"  id="cNam15">{lineB[5]}</div></div>
-                <div className="SEP">&nbsp;</div>
-                <div className="TAG"><div className="key" draggable="true"  id="cNam16">{lineB[6]}</div></div>
-                <div className="SEP">&nbsp;</div>
-                <div className="TAG"><div className="key" draggable="true"  id="cNam17">{lineB[7]}</div></div>
-                <div className="SEP">&nbsp;</div>
-                <div className="TAG"><div className="key"  draggable="true" id="cNam18">{lineB[8]}</div></div>
-                <div className="SEP">&nbsp;</div>
-                <div className="TAG"><div className="key"  draggable="true" id="cNam19">{lineB[9]}</div></div>
-                <div className="SEP">&nbsp;</div>
+                <div className="FIELD SEP">&nbsp;</div>
+                <div className="FIELD TAG"><div className="key" draggable="true" id="cNam10">{lineB[0]}</div></div>
+                <div className="FIELD SEP">&nbsp;</div>
+                <div className="FIELD TAG"><div className="key"  draggable="true" id="cNam11">{lineB[1]}</div></div>
+                <div className="FIELD SEP">&nbsp;</div>
+                <div className="FIELD TAG"><div className="key"  draggable="true" id="cNam12">{lineB[2]}</div></div>
+                <div className="FIELD SEP">&nbsp;</div>
+                <div className="FIELD TAG"><div className="key" draggable="true"  id="cNam13">{lineB[3]}</div></div>
+                <div className="FIELD SEP">&nbsp;</div>
+                <div className="FIELD TAG"><div className="key" draggable="true"  id="cNam14">{lineB[4]}</div></div>
+                <div className="FIELD SEP">&nbsp;</div>
+                <div className="FIELD TAG"><div className="key" draggable="true"  id="cNam15">{lineB[5]}</div></div>
+                <div className="FIELD SEP">&nbsp;</div>
+                <div className="FIELD TAG"><div className="key" draggable="true"  id="cNam16">{lineB[6]}</div></div>
+                <div className="FIELD SEP">&nbsp;</div>
+                <div className="FIELD TAG"><div className="key" draggable="true"  id="cNam17">{lineB[7]}</div></div>
+                <div className="FIELD SEP">&nbsp;</div>
+                <div className="FIELD TAG"><div className="key"  draggable="true" id="cNam18">{lineB[8]}</div></div>
+                <div className="FIELD SEP">&nbsp;</div>
+                <div className="FIELD TAG"><div className="key"  draggable="true" id="cNam19">{lineB[9]}</div></div>
+                <div className="FIELD SEP">&nbsp;</div>
             </div>
             </div>
             )
@@ -284,15 +284,15 @@ function TransferRow({ date,sender,reason,ref1,ref2 }) {
     return(
         <div className="attrLine">
             <div className="SYMB"> &nbsp;</div>
-            <div className="L150"> {date}</div>
-            <div className="SEP"> &nbsp;</div>
-            <div className="L150"> {sender}</div>
-            <div className="SEP"> &nbsp;</div>
-            <div className="L150"> {reason}</div>
-            <div className="SEP"> &nbsp;</div>
-            <div className="L150"> {ref1}</div>
-            <div className="SEP"> &nbsp;</div>
-            <div className="L150"> {ref2}</div>
+            <div className="FIELD XFER"> {date}</div>
+            <div className="FIELD SEP"> &nbsp;</div>
+            <div className="FIELD XFER"> {sender}</div>
+            <div className="FIELD SEP"> &nbsp;</div>
+            <div className="FIELD XFER"> {reason}</div>
+            <div className="FIELD SEP"> &nbsp;</div>
+            <div className="FIELD XFER"> {ref1}</div>
+            <div className="FIELD SEP"> &nbsp;</div>
+            <div className="FIELD XFER"> {ref2}</div>
         </div>)
 }
 
