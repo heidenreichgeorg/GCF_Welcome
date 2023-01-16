@@ -235,8 +235,9 @@ export default function Transfer() {
 
     const aNums = [0];
 
+    const tabName = 'TXNContent';
     return (
-        <Screen prevFunc={prevFunc} nextFunc={nextFunc} tabSelector={aNums} >
+        <Screen prevFunc={prevFunc} nextFunc={nextFunc} tabSelector={aNums} tabName={tabName}>
             <TransferRow/> 
             <TransferRow/> 
             <TransferRow/> 

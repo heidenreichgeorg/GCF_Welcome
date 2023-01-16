@@ -113,14 +113,15 @@ export default function Partner() {
     }
 
     let partnerPages = Object.keys(jReport).map((_,i)=>i==0?'block':'none'); // was <Svreen prev next partnerPages
+    const tabName = 'PartnerContent';
     return (
-        <Screen prevFunc={prevFunc} nextFunc={nextFunc} tabSelector={Object.keys(jReport).map((i)=>(jReport[i].name))} >
+        <Screen prevFunc={prevFunc} nextFunc={nextFunc} tabSelector={Object.keys(jReport).map((i)=>(jReport[i].name))} tabName={tabName}>
             
             <div className="attrLine">{page.GainLoss + ' ' + session.year}</div>
 
             {Object.keys(jReport).map((jPartner,partnerNo) => ( 
 
-                <div className="ulliTab" id={"PageContent"+partnerNo} style= {(partnerNo==0?{ 'display': 'block'}:{ 'display': 'none'})} >
+                <div className="ulliTab" id={tabName+partnerNo} style= {(partnerNo==0?{ 'display': 'block'}:{ 'display': 'none'})} >
                     
                     { shortReport.map((row,i)=> (
                         <HGB275Row jArgs={row} id={"Args"+i} />

@@ -46,7 +46,7 @@ import { useState, useEffect } from "react";
 
 // overall Screen frame for the React-based booking UI 
 
-export default function Screen({ children, prevFunc, nextFunc, tabSelector }) {
+export default function Screen({ children, prevFunc, nextFunc, tabSelector, tabName }) {
 
     
     let isControl=false;
@@ -117,7 +117,7 @@ export default function Screen({ children, prevFunc, nextFunc, tabSelector }) {
             <div className="attrLine">         
             <select type="radio" name="tabSelector">                          
                 {tabSelector.map((row,tabNum) => (
-                     <option value={row}  onClick={((e) => select('PageContent',{tabNum}))}>{row}</option>
+                     <option value={row}  onClick={((e) => select(tabName,{tabNum}))}>{row}</option>
                 ))}
             </select>
             </div>

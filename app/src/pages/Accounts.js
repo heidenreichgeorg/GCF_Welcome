@@ -42,10 +42,11 @@ export default function Accounts() {
     aPages[0]='block';
     let pageText =  ['Init', 'Close',  'Next'].map((name) =>( page[name] ));
 
+    const tabName = 'AccountsContent';
     return (
-        <Screen prevFunc={prevFunc} nextFunc={nextFunc} tabSelector={pageText} >
+        <Screen prevFunc={prevFunc} nextFunc={nextFunc} tabSelector={pageText} tabName={tabName}>
             { aStands.map((report,n)=>
-                <div className="ulliTab" id={"PageContent"+n} style= {{ 'display': aPages[n]}} >
+                <div className="ulliTab" id={tabName+n} style= {{ 'display': aPages[n]}} >
                     <div className="attrLine">{[page.AcctOpen,page.AcctClose,page.AcctNext][n] + ' ' + (parseInt(session.year)+1)}</div>
                     {report.map((row) => 
                         <AccountsRow am1={row.gLeft} tx1={row.nLeft} am2={row.gMidl} tx2={row.nMidl} am3={row.gRite} tx3={row.nRite} />                       

@@ -16,9 +16,20 @@ import Status from './pages/Status'
 import Transfer from './pages/Transfer'
 import { SessionProvider } from './modules/sessionmanager';
 
-
+function Report() { return (
+        <div>
+            <Partner />
+            <Balance show={1} />
+            <FixedAssets />
+        </div>
+    )
+}
 
 const router = createBrowserRouter([
+    {
+        path: '/report',
+        element: <Report />
+    },
     {
         path: '/accounts',
         element: <Accounts />

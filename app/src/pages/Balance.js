@@ -10,7 +10,7 @@ import { useSession } from '../modules/sessionmanager';
 
 
 
-export default function Balance() {
+export default function Balance({show}) {
 
     const { session, status } = useSession()   
     const [ sheet,  setSheet] = useState(null)
@@ -36,12 +36,13 @@ export default function Balance() {
     let report = pageNames.map((name) =>( makeBalance(sheet,name) ));
     let aPages = [];
     for(let p=1;p<report.length;p++) aPages[p]='none'; 
-    aPages[0]='block';
-
+    if(show && parseInt(show)>0) aPages[parseInt(show)]='block'; else aPages[0]='block';
+    
+    const tabName = 'BalanceContent';
     return (
-        <Screen prevFunc={prevFunc} nextFunc={nextFunc} tabSelector={pageText} >
+        <Screen prevFunc={prevFunc} nextFunc={nextFunc} tabSelector={pageText} tabName={tabName}>
             {report.map((balance,n) => ( 
-                <div className="ulliTab" id={"PageContent"+n} style= {{ 'display': aPages[n]}} >
+                <div className="ulliTab" id={tabName+n} style= {{ 'display': aPages[n]}} >
                     <div className="attrLine">{[page.BalanceOpen,page.BalanceClose,page.BalanceNext][n] + ' ' + (parseInt(session.year)+1)}</div>
                     {balance.map((row,i) => (
                         <BalanceRow jArgs={row} id={i} />    

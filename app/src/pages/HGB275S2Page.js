@@ -37,10 +37,12 @@ export default function HGB275S2Page() {
     let aPages = [];
     for(let p=1;p<report.length;p++) aPages[p]='none'; 
     aPages[0]='block';
+
+    const tabName = 'HGBContent';
     return (
-        <Screen prevFunc={prevFunc} nextFunc={nextFunc} tabSelector={aPages} >
+        <Screen prevFunc={prevFunc} nextFunc={nextFunc} tabSelector={aPages}  tabName={tabName}>
             {report.map((balance,n) => ( 
-                <div className="ulliTab" id={"PageContent"+n} style= {{ 'display': aPages[n]}} >
+                <div className="ulliTab" id={tabName+n} style= {{ 'display': aPages[n]}} >
                     <div className="attrLine">{page.GainLoss + ' ' + session.year}</div>
                     {balance.map((row,i) => (
                         <HGB275Row jArgs={row} id={"Args"+i} />    
