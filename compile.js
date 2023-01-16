@@ -1352,7 +1352,7 @@ function makePage(balance) {
             let client=gSchema.client;
 
 
-            page['header'] = de_DE['reportYear'] + HTMLSPACE + reportYear; // de_DE:
+            page['header'] = de_DE['reportYear'] + HTMLSPACE + (""+reportYear); // de_DE:
             page['client'] = client;
             page['register'] = register+HTMLSPACE+taxnumber;
             page['reference'] = iban+HTMLSPACE+reportYear;
@@ -1444,7 +1444,7 @@ function formatTXN(sessionId,reqBody) {
                     var i=jDebit[money].index;
                     bookingForm[i] = jDebit[money].value;
                 }
-            } else { console.log("compile.js formatTXN() rejects other fiscal year:"+year);
+            } else { console.dir("compile.js formatTXN() rejects other fiscal year:"+year);
                 return null;
             }
         } else console.log("compile.js formatTXN("+sessionId+") no BALANCE table ");

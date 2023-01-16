@@ -47,7 +47,7 @@ export default function Transfer() {
     function InputRow({ date,sender,reason,ref1,ref2 }) {
         return(
             <div className="attrLine">
-                <div className="SYMB"> &nbsp;</div>
+                <div className="FIELD SYMB"> &nbsp;</div>
                 <div className="FIELD XFER"> <input type="edit" id="cDate"   name="cDate"   defaultValue ={date} onDrop={ignore}  ref={refDate} /></div>
                 <div className="FIELD SEP"> &nbsp;</div>
                 <div className="FIELD XFER"> <input type="edit" id="cSender" name="cSender" defaultValue ={sender} onDrop={ignore} ref={refSender}/></div>

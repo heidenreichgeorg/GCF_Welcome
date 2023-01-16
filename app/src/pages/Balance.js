@@ -43,7 +43,7 @@ export default function Balance({show}) {
         <Screen prevFunc={prevFunc} nextFunc={nextFunc} tabSelector={pageText} tabName={tabName}>
             {report.map((balance,n) => ( 
                 <div className="ulliTab" id={tabName+n} style= {{ 'display': aPages[n]}} >
-                    <div className="attrLine">{[page.BalanceOpen,page.BalanceClose,page.BalanceNext][n] + ' ' + (parseInt(session.year)+1)}</div>
+                    <div className="attrLine">{[page.BalanceOpen,page.BalanceClose,page.BalanceNext][n] + ' ' + (parseInt(session.year))}</div>
                     {balance.map((row,i) => (
                         <BalanceRow jArgs={row} id={i} />    
                     ))}

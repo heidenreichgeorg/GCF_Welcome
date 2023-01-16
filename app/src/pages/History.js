@@ -136,7 +136,7 @@ function SigRow(row) {
         <div className="attrPair">
             <div className="attrLine" id="{id}">
                 <div className="FIELD SYMB"><label><input TYPE="CHECKBOX" onChange={event => handleChange(event.target,aRow,mRow)}/></label></div>
-                <div className="FIELD SYMB">{aRow[0]}</div>
+                <div className="FIELD TAX">{aRow[0]}</div>
                 <div className="FIELD SEP">&nbsp;</div>
                 <div className="FIELD LNAM">{aRow[1]}</div>
                 <div className="FIELD LNAM">{aRow[2]}</div>
