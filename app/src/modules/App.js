@@ -1,6 +1,6 @@
 /* global BigInt */
 
-import { D_Balance, D_Report, D_Page, X_ASSETS, X_EQLIAB, J_ACCT, COLMIN, DOUBLE, SCREENLINES } from '../terms.js'
+import { D_Balance, D_History, D_Report, D_Schema, D_Page, X_ASSETS, X_EQLIAB, X_INCOME, J_ACCT, COLMIN, DOUBLE, SCREENLINES } from '../terms.js'
 
 import { bigEUMoney, cents2EU } from './money'
 
@@ -149,6 +149,174 @@ export function symbolic(pat) {
         }
     }
     return res & 0x3FFFFFFFF;
+}
+
+
+export function makeStatusData(response) {
+
+    const page = response[D_Page];
+    let iFixed=0n;
+    let iEquity=0n;
+    let ass="{close:0}";
+    let eql="{close:0}";
+    let gls="{close:0}";
+
+    var jReport = response[D_Report];
+    console.log("makeStatusData from response D_Report"+JSON.stringify(Object.keys(jReport)));
+
+    var jHistory = response[D_History];
+    var gSchema = response[D_Schema];
+
+    var jAccounts = response[D_Balance];
+    // add three additional accounts: ASSETS, EQLIAB, GAINLOSS
+    if(jReport["xbrlAssets"].account) { 
+        ass = jReport["xbrlAssets"].account; 
+        console.log("ASSET "+JSON.stringify(ass)); 
+        jAccounts["xbrlAssets"]=ass;
+    }
+    if(jReport["xbrlEqLiab"].account) { 
+        eql = jReport["xbrlEqLiab"].account; 
+        console.log("EQLIB "+JSON.stringify(eql)); 
+        jAccounts["xbrlEqLiab"]=eql;
+    }
+    if(jReport["xbrlRegular"].account) { 
+        gls = jReport["xbrlRegular"].account; 
+        console.log("GALOS "+JSON.stringify(gls)); 
+        jAccounts["xbrlRegular"]=gls;
+    }
+    console.log("makeStatusData from response D_Balance"+JSON.stringify(Object.keys(jAccounts)));
+
+    console.log(JSON.stringify(response));
+    
+    // build three columns
+    let aLeft={};
+    let aMidl={};
+    let aRite={};
+
+    for (let name in jAccounts)   {
+        var account=jAccounts[name];
+        if(account.xbrl.length>1) {
+            var xbrl = account.xbrl.split('\.').reverse();
+            var xbrl_pre = xbrl.pop()+ "."+ xbrl.pop();
+            if(xbrl_pre===X_ASSETS) {
+                aLeft[name]=account;
+                if(account.xbrl.startsWith(jReport.xbrlFixed.xbrl)) { // accumulate fixed assets
+                    iFixed = iFixed + BigInt(account.init)+BigInt(account.debit)+BigInt(account.credit); 
+                }
+            }
+            if(xbrl_pre===X_INCOME) {
+                aMidl[name]=account;
+            }
+            if(xbrl_pre===X_EQLIAB) {
+                aRite[name]=account;
+                if(account.xbrl.startsWith(jReport.xbrlEquity.xbrl)) { // accumulate equity
+                    iEquity = iEquity + BigInt(account.init)+BigInt(account.debit)+BigInt(account.credit); 
+                }
+            }
+        }
+    }
+    
+    let maxCol = Object.keys(aLeft).length;
+    let maxCom = Object.keys(aMidl).length;
+    let maxCor = Object.keys(aRite).length;
+    let maxRow= SCREENLINES;
+    if(maxCol>maxRow) maxRow=maxCol;
+    if(maxCom>maxRow) maxRow=maxCom;
+    if(maxCor>maxRow) maxRow=maxCor;
+
+    let statusData = []; for(let i=0;i<=maxRow && i<=SCREENLINES;i++) statusData[i]={};
+    if(maxRow>SCREENLINES) maxRow=SCREENLINES; // 20221201
+    
+    let iLeft=0;
+    statusData[iLeft++].gLeft= page.Assets;
+
+    for (let name in aLeft)   {
+        var account=aLeft[name];
+        var yearEnd = account.yearEnd;
+        var iName = account.name;
+
+        console.log("STATUS.JS STATUSDATA LEFT "+iLeft+" "+name+"="+yearEnd);
+
+        if(iLeft<SCREENLINES) {
+            statusData[iLeft]={"gLeft":yearEnd,"nLeft":iName};
+        }
+        iLeft++;
+    }
+    for (let i=iLeft;i<maxRow && i<SCREENLINES;i++) { statusData[i]={ "gLeft":null, "nLeft": " " }; }
+
+
+    let iMidl=0;
+    statusData[iMidl++].gMidl= page.GainLoss;
+
+    for (let name in aMidl)   {
+        var account=aMidl[name];
+        var yearEnd = account.yearEnd;
+        var iName = account.name;
+
+        statusData[iMidl].gMidl = yearEnd;
+        statusData[iMidl].nMidl = iName;
+        iMidl++;
+    }
+    for (let i=iMidl;i<maxRow && i<SCREENLINES;i++) { statusData[i].gMidl=null; statusData[i].nMidl=' '; }
+
+
+    let iRite=0;
+    statusData[iRite++].gRite= page.eqliab;
+
+    for (let name in aRite)   {
+        var account=aRite[name];
+        var yearEnd = account.yearEnd;
+        var iName = account.name;
+
+        if(iRite<SCREENLINES) {
+            statusData[iRite].gRite = yearEnd;
+            statusData[iRite].nRite = iName;
+            iRite++;
+        }
+        
+    }
+    for (let i=iRite;i<maxRow && i<SCREENLINES;i++) { statusData[i].gRite=null; statusData[i].nRite=' '; }
+
+    // build fourth column with recent transactions
+
+   // let iHistory=Object.keys(jHistory).map((x) => (x));
+
+    if(jHistory && gSchema.Names && gSchema.Names.length>0) {
+        var names=gSchema.Names;
+        var aLen = gSchema.assets;
+        var eLen = gSchema.eqliab;
+
+        let hLen = Object.keys(jHistory).length;
+        var bLine=hLen;
+        var iTran=maxRow;
+
+        statusData[0].lTran= "Recent Transactions";
+
+        for (let hash in jHistory)  {
+
+            //console.log("Recent TXN("+hash+") #iTran="+iTran+ "      #bLine="+bLine+"    #maxRow="+maxRow);
+
+            if(bLine<maxRow && iTran>0) {
+        
+                let jPrettyTXN = prettyTXN(jHistory,hash,null,null,names,aLen,eLen);
+                jPrettyTXN.credit.shift();
+//                jPrettyTXN.debit.shift();
+                jPrettyTXN.debit.shift();
+                let aMount=jPrettyTXN.credit.concat(jPrettyTXN.debit);
+                aMount.push("-.--"); aMount.push("-.--"); aMount.push("-.--");
+
+                let sAmount = (aMount[0]+"  "+aMount[1]+"  "+aMount[2]+"  "+aMount[3]+ " ").slice(0,iCpField);
+
+                iTran--;
+                statusData[iTran].dTran=jPrettyTXN.entry[0].slice(2);
+                statusData[iTran].nTran=jPrettyTXN.entry[1].slice(0,16);
+                statusData[iTran].lTran= sAmount;                                
+            }
+            bLine--;
+        }
+    }
+    
+   return {report:statusData, ass:ass.yearEnd, eql:eql.yearEnd, gls:gls.yearEnd, fix:(""+iFixed), equity:(""+iEquity) };
 }
 
 

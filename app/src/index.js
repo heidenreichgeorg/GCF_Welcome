@@ -17,6 +17,7 @@ import Status from './pages/Status'
 import Transfer from './pages/Transfer'
 import { SessionProvider } from './modules/sessionmanager';
 
+import Gauge from './components/Gauge'
 
 
 function Report() { return (
