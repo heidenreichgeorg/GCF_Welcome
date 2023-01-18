@@ -2,7 +2,7 @@
 
 import { useEffect, useState  } from 'react';
 
-import { cents2EU, bigEUMoney,addEUMoney } from '../modules/money.mjs'
+import { cents2EU } from '../modules/money.mjs'
 import Screen from '../pages/Screen'
 import FooterRow from '../components/FooterRow'
 import { D_Balance, D_Page, D_Report, D_Schema, X_ASSETS, X_EQLIAB, SCREENLINES }  from '../terms.js';
@@ -27,8 +27,8 @@ export default function Balance({show}) {
 
     
     function prevFunc() {console.log("CLICK PREVIOUS"); window.location.href="https://"+session.server.addr+":3000/accounts?client="+session.client+"&year="+session.year; }
-    function nextFunc() {  console.log("CLICK NEXT");   window.location.href="https://"+session.server.addr+":3000/fixedAssets?client="+session.client+"&year="+session.year; }
-
+    function nextFunc() {  console.log("CLICK NEXT");   window.location.href="https://"+session.server.addr+":3000/fixedassets?client="+session.client+"&year="+session.year; }
+    
     let page = sheet[D_Page];
     
     let pageNames = [ 'init','yearEnd','next'];

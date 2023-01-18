@@ -9,6 +9,8 @@ import { cents2EU}  from '../modules/money';
 import { D_Balance, D_Page, D_Report, D_History, D_Schema, X_ASSETS, X_INCOME, X_EQLIAB, SCREENLINES } from '../terms.js'
 import { useSession } from '../modules/sessionmanager';
 
+import Gauge from './components/Gauge'
+
 
 export default function Status() {
     

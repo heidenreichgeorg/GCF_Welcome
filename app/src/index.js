@@ -8,6 +8,7 @@ import { MantineProvider } from '@mantine/core'
 
 import Accounts from './pages/Accounts'
 import Balance from './pages/Balance'
+import DashBoard from './pages/DashBoard'
 import FixedAssets from './pages/FixedAssets'
 import HGB275SPage from './pages/HGB275S2Page'
 import History from './pages/History'
@@ -15,6 +16,8 @@ import Partner from './pages/Partner'
 import Status from './pages/Status'
 import Transfer from './pages/Transfer'
 import { SessionProvider } from './modules/sessionmanager';
+
+
 
 function Report() { return (
         <div>
@@ -26,6 +29,14 @@ function Report() { return (
 }
 
 const router = createBrowserRouter([
+    {
+        path: '/gauge',
+        element: <Gauge percent={53} radius={100} strDim={"AV/B"}/>
+    },
+    {
+        path: '/dashboard',
+        element: <DashBoard />
+    },
     {
         path: '/report',
         element: <Report />

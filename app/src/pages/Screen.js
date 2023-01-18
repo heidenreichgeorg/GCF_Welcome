@@ -112,14 +112,22 @@ export default function Screen({ children, prevFunc, nextFunc, tabSelector, tabN
      
 // remove () from onload="updateScreen()", added {} instead of "",
 // there is no onLoad={updateScreen} and no     <div className="attrLine" onLoad="updateScreen()">
+    if(!tabSelector) return (
+        <div className="mTable">           
+            <div>              
+                {children}                
+            </div>
+        </div>
+    ); 
+    
     return (
         <div className="mTable">           
-            <div className="attrLine">         
-            <select type="radio" name="tabSelector">                          
-                {tabSelector.map((row,tabNum) => (
-                     <option value={row}  onClick={((e) => select(tabName,{tabNum}))}>{row}</option>
-                ))}
-            </select>
+            <div className="attrLine">                     
+                <select type="radio" name="tabSelector">                          
+                    {tabSelector.map((row,tabNum) => (
+                        <option value={row}  onClick={((e) => select(tabName,{tabNum}))}>{row}</option>
+                    ))}
+                </select>
             </div>
             <div>              
                 {children}                
