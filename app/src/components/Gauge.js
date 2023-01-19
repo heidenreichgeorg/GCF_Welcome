@@ -14,6 +14,7 @@ export default function Gauge ({ percent = 0, radius, strDim, color }) {
             <stop offset="15%" stopColor="#1267ff" stopOpacity="1"></stop>
             <stop offset="85%" stopColor="#98c0ff" stopOpacity="1"></stop>
             <text x={radius*0.85} y={2*radius-20}>{strDim}</text>
+            <text x={radius*0.70} y={radius+10} font-size={48} class={"caption"}>{percent}</text>
             <circle
                 className="gauge_base"
                 cx={radius}

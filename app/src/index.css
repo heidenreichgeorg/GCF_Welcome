@@ -18,6 +18,8 @@ input[type="radio"] {
 }
 input[type="radio"]::before {content: "#"; }
 
+input[type=range] { -webkit-appearance: none;  width: 200px; margin: 0; padding: 0; display: block; height: 50px; }
+
 .attrLine { width:990px; padding: 1px; float: left;               min-height: 16px; height: 17px; font-family :inherit; font-size: 11px; font-weight:400; text-align: center;}
 .attrPair {              padding: 1px; float: left; color:inherit;min-height: 48px;               font-family: inherit; font-size: 11px; font-weight:400; text-align: center; background-color: inherit; } 
 .attrLine:nth-child(even) { background: #c7e7ff;  border: 1px dotted gray;}
@@ -50,3 +52,4 @@ input[type="radio"]::before {content: "#"; }
 #slider { cursor: pointer;  left: 0;  margin: auto;  right: 0;  top: 58%;  width: 94%; }
 #lbl {  background-color: #4B4C51; border-radius: 2px; color: white; font-family: 'courier new'; font-size: 15pt; font-weight: bold; padding: 4px 4px 2px 4px; right: -48px; top: 57%; }
 #meter_needle { height: 40%; left: 0; margin: auto; position: absolute; right: 0; top: 10%;  transform-origin: bottom center;  /*orientation fix*/  transform: rotate(270deg); }
+.caption {color:#223377;}

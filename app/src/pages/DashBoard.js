@@ -7,6 +7,7 @@ import { useSession } from '../modules/sessionmanager';
 import { makeStatusData }  from '../modules/App';
 
 import Gauge from '../components/Gauge'
+import Slider from '../components/Slider'
 
 
 export default function DashBoard({value}) {
@@ -45,75 +46,20 @@ export default function DashBoard({value}) {
     return (
         <Screen prevFunc={prevFunc} nextFunc={nextFunc} >
 
-           
-            <Gauge percent={parseInt((100n*BigInt(fix))/BigInt(ass))} radius={90} strDim={"%fixed"}  color={"#0020FF"}/>
-            <Gauge percent={parseInt((100n*BigInt(tan))/BigInt(fix))} radius={90} strDim={"tan/fix"}  color={"#333344"}/>
-            <Gauge percent={parseInt((100n*BigInt(gls))/BigInt(ass))} radius={90} strDim={"%gain"}  color={"#22CC22"}/>
-            <Gauge percent={parseInt((100n*BigInt(eqt))/BigInt(ass))} radius={90} strDim={"%equity"} color={"#EE3311"}/> 
- 
-
+            <div classname="attrLine">
+                <Gauge percent={parseInt((100n*BigInt(fix))/BigInt(ass))} radius={90} strDim={"%fixed"}  color={"#0020FF"}/>
+                <Gauge percent={parseInt((100n*BigInt(tan))/BigInt(fix))} radius={90} strDim={"tan/fix"}  color={"#333344"}/>
+                <Gauge percent={parseInt((100n*BigInt(gls))/BigInt(ass))} radius={90} strDim={"%gain"}  color={"#66EEAA"}/>
+                <Gauge percent={parseInt((100n*BigInt(eqt))/BigInt(ass))} radius={90} strDim={"%equity"} color={"#EE3311"}/> 
+            </div>
+            <div classname="attrLine">
+            <Gauge percent={parseInt((100n*BigInt(gls))/BigInt(fix))} radius={90} strDim={"gain/fix"}  color={"#00FF00"}/>
+                <Gauge percent={parseInt((100n*BigInt(gls))/BigInt(eqt))} radius={90} strDim={"gain/eqt"}  color={"#CCCC22"}/>
+                <Slider value={parseInt((100n*BigInt(fix))/BigInt(eqt))} legend={"fix/eqt"}/>
+                <Gauge percent={parseInt((100n*BigInt(eqt))/BigInt(fix))} radius={90} strDim={"eqt/fix"} color={"#6040E0"}/> 
+            </div>
             
         </Screen>
         )
-/*
-<div id="ins1_wrapper">
-                <svg id="ins1_meter">
-                    <circle id="ins1_outline_curves" className="circle outline" cx="50%" cy="50%"></circle>                    
-                    <circle id="ins1_low" className="circle range" cx="50%" cy="50%" stroke="#FDE47F"></circle>                    
-                    <circle id="ins1_avg" className="circle range" cx="50%" cy="50%" stroke="#7CCCE5"></circle>                    
-                    <circle id="ins1_high" className="circle range" cx="50%" cy="50%" stroke="#E04644"></circle>                    
-                    <circle id="ins1_mask" className="circle" cx="50%" cy="50%" ></circle>                    
-                    <circle id="ins1_outline_ends" className="circle outline"
-                    cx="50%" cy="50%"></circle>
-                </svg>
-                <img id="ins1_meter_needle" src="gauge-needle.svg" alt=""></img>
-                <input id="ins1_slider" type="range" min="0" max="100" defaultValue="0" />
-                <label id="ins1_lbl" value="id" htmlFor="">0</label>
-            </div>
-        // slider
-    function init() {
-        var r = 250;
-        var circles = document.querySelectorAll('.circle');
-        var total_circles = circles.length;
-        for (var i = 0; i < total_circles; i++) {
-            circles[i].setAttribute('r', r);
-        }
-        
-        // Set meter's wrapper dimension 
-        var meter_dimension = (r * 2) + 100;
-        var wrapper = document.querySelector("#ins1_wrapper");
-        if(wrapper) {
-            wrapper.style.width = meter_dimension + "";
-            wrapper.style.height = meter_dimension + "";
-            
-            // Add strokes to circles  
-            var cf = 2 * Math.PI * r;
-            var semi_cf = cf / 2;
-            var semi_cf_1by3 = semi_cf / 3;
-            var semi_cf_2by3 = semi_cf_1by3 * 2;
-            document.querySelector("#ins1_outline_curves").setAttribute("stroke-dasharray", semi_cf + "," + cf);
-            document.querySelector("#ins1_low").setAttribute("stroke-dasharray", semi_cf + "," + cf);
-            document.querySelector("#ins1_avg").setAttribute("stroke-dasharray", semi_cf_2by3 + "," + cf);
-            document.querySelector("#ins1_high").setAttribute("stroke-dasharray", semi_cf_1by3 + "," + cf);
-            document.querySelector("#ins1_outline_ends").setAttribute("stroke-dasharray", 2 + "," + (semi_cf - 2));
-            document.querySelector("#ins1_mask").setAttribute("stroke-dasharray", semi_cf + "," + cf);
-            
-            // Bind range slider event
-            var slider = document.querySelector("#ins1_slider");
-            var lbl = document.querySelector("#ins1_lbl");
-            var mask = document.querySelector("#ins1_mask");
-            var meter_needle =  document.querySelector("#ins1_meter_needle");
-            
-            function range_change_event() {
-                var percent = slider.value;
-                var meter_value = semi_cf - ((percent * semi_cf) / 100);
-                mask.setAttribute("stroke-dasharray", meter_value + "," + cf);
-                meter_needle.style.transform = "rotate(" + 
-                    (270 + ((percent * 180) / 100)) + "deg)";
-                lbl.textContent = percent + "%";
-            }
-            slider.addEventListener("input", range_change_event);
-        } else console.dir("wrapper is null!");
-    }
-*/    
+   
 }
