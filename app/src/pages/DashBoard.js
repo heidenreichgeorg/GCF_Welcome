@@ -32,6 +32,7 @@ export default function DashBoard({value}) {
 
     let ass = sheet_status.ass;
     let fix = sheet_status.fix;
+    let tan = sheet_status.tan;
 
     let eql = sheet_status.ass;
     let eqt = sheet_status.equity;
@@ -39,15 +40,17 @@ export default function DashBoard({value}) {
     let gls = sheet_status.gls;
 
     console.dir("ass="+ass+"   fix="+fix);
+//            <Gauge percent={parseInt((100n*BigInt(fix))/BigInt(eqt))} radius={90} strDim={"fix/eqt"} color={"#33CCCC"}/> 
 
     return (
         <Screen prevFunc={prevFunc} nextFunc={nextFunc} >
 
            
             <Gauge percent={parseInt((100n*BigInt(fix))/BigInt(ass))} radius={90} strDim={"%fixed"}  color={"#0020FF"}/>
+            <Gauge percent={parseInt((100n*BigInt(tan))/BigInt(fix))} radius={90} strDim={"tan/fix"}  color={"#333344"}/>
             <Gauge percent={parseInt((100n*BigInt(gls))/BigInt(ass))} radius={90} strDim={"%gain"}  color={"#22CC22"}/>
-            <Gauge percent={parseInt((100n*BigInt(eqt))/BigInt(eql))} radius={90} strDim={"%equity"} color={"#EE3311"}/>
-
+            <Gauge percent={parseInt((100n*BigInt(eqt))/BigInt(ass))} radius={90} strDim={"%equity"} color={"#EE3311"}/> 
+ 
 
             
         </Screen>

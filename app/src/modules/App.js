@@ -155,8 +155,11 @@ export function symbolic(pat) {
 export function makeStatusData(response) {
 
     const page = response[D_Page];
+    
     let iFixed=0n;
     let iEquity=0n;
+    let iTan=0n;
+
     let ass="{close:0}";
     let eql="{close:0}";
     let gls="{close:0}";
@@ -200,8 +203,12 @@ export function makeStatusData(response) {
             var xbrl_pre = xbrl.pop()+ "."+ xbrl.pop();
             if(xbrl_pre===X_ASSETS) {
                 aLeft[name]=account;
+                let iClose=BigInt(account.init)+BigInt(account.debit)+BigInt(account.credit); ;
                 if(account.xbrl.startsWith(jReport.xbrlFixed.xbrl)) { // accumulate fixed assets
-                    iFixed = iFixed + BigInt(account.init)+BigInt(account.debit)+BigInt(account.credit); 
+                    iFixed = iFixed + iClose;
+                    if(account.xbrl.startsWith(jReport.xbrlTanFix.xbrl)) { // accumulate tangible fixed assets
+                        iTan = iTan + iClose;
+                    }
                 }
             }
             if(xbrl_pre===X_INCOME) {
@@ -316,7 +323,7 @@ export function makeStatusData(response) {
         }
     }
     
-   return {report:statusData, ass:ass.yearEnd, eql:eql.yearEnd, gls:gls.yearEnd, fix:(""+iFixed), equity:(""+iEquity) };
+   return {report:statusData, ass:ass.yearEnd, eql:eql.yearEnd, gls:gls.yearEnd, fix:(""+iFixed), equity:(""+iEquity), tan:(""+iTan)};
 }
 
 
