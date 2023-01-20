@@ -1,14 +1,19 @@
 
 
 
-// CAN ONLY DOCUMENT UP TO SIX PARTNERS
-const debug=1;
+const debug=2;
 const debugTax=1;
 const debugYield=1;
 
-
 // SETTING THIS WILL VIOLATE PRIVACY AT THE ADMIN CONSOLE !!! 
 const debugReport=1;
+
+
+
+// K2 accounts must go first in EQLIAB
+// K2.xbrl = ??limitedLiablePartners.VK  
+// equity accounts must always have the same partner sequence
+// CAN ONLY DOCUMENT UP TO SIX PARTNERS
 
 
 // table parsing
@@ -400,6 +405,7 @@ function initBalance() {
         xbrlEqlim:  {  level:3, xbrl: "de-gaap-ci_bs.eqLiab.equity.subscribed.limitedLiablePartners.KK", de_DE:'Kommanditkapital'},
         xbrlEVulp:  {  level:3, xbrl: "de-gaap-ci_bs.eqLiab.equity.subscribed.unlimitedLiablePartners.VK", de_DE:'Komplementär-VK'},
         xbrlEVlim:  {  level:3, xbrl: "de-gaap-ci_bs.eqLiab.equity.subscribed.limitedLiablePartners.VK", de_DE:'Kommanditisten-VK'},
+        xbrlEPRes:  {  level:3, xbrl: "de-gaap-ci_bs.eqLiab.equity.capRes", de_DE:'Kapitalrücklage'},
         xbrlUVAVA:  {  level:3, xbrl: "de-gaap-ci_bs.eqLiab.equity.subscribed.unlimitedLiablePartners.accumLoss", de_DE:'Verlust FA Komplem.'},
         xbrlLVAVA:  {  level:3, xbrl: "de-gaap-ci_bs.eqLiab.equity.subscribed.limitedLiablePartners.accumLoss", de_DE:'Verlust FA Kommmand.'},
         xbrlEquity: {  level:2, xbrl: "de-gaap-ci_bs.eqLiab.equity", de_DE:'Eigenkapital'},
@@ -569,13 +575,13 @@ function compile(sessionData) {
                                     try {
                                         // opening balance lines
                                         for(var xColumn=0;xColumn<gNames.length;xColumn++) {
-                                            var rawName = gNames[xColumn];
+                                            var rawName = gNames[xColumn].trim(); // 20230120
                                             var xbrl = result[D_XBRL][xColumn];
                                             var xdesc=""+xColumn; if(gDesc && gDesc[xColumn]) xdesc=gDesc[xColumn];
                                             if(rawName && rawName.length>1) {
                                                 result[D_Balance][rawName] = Account.makeAccount(rawName,xbrl,xdesc,xColumn);
                                             }
-                                            if(debug>1) console.log("0358 make("+rawName+","+xbrl+","+xdesc+","+xColumn+")");
+                                            if(debug>1) console.log("0358 makeAccount("+rawName+","+xbrl+","+xdesc+","+xColumn+")");
                                             
                                         };
                                     } catch(err) { console.dir("0359 FIRST REGULAR TXN INPUT "+err); }
@@ -728,13 +734,14 @@ function compile(sessionData) {
     
 /*          D_Partner[i] = { }
             compile
-                    id:   # 0-(N-1)
-                    vk    Name 'K2xx'
-                    gain: Nenner
-                    denom:Zaehler
-                    iVar  #Spalte K2xx
-                    iCap  #Spalte Fest/Kommanditkapital
-                    name  Name (Text in Spalte mit FK oder KK)
+                    id:     # 0-(N-1)
+                    varCap  Name 'K2xx'
+                    gain:   Nenner
+                    denom:  Zaehler
+                    iVar    #Spalte K2xx
+                    iCap    #Spalte Fest/Kommanditkapital
+                    capRes  Name RExx Rücklage
+                    name    Name (Text in Spalte mit FK oder KK)
 
             sendBalance
                     cyLoss Laufende Verluste aus Veraesserungen VAVA
@@ -749,13 +756,18 @@ function compile(sessionData) {
 */
 
                     // create partners structure
+
+                    // K2 accounts must go first
+                    // K2.xbrl = ??limitedLiablePartners.VK  
+                    // equity accounts must always have the same partner sequence
+
                     var pNum=0;
                     for(col=eqliab+1;col<shares.length;col++) {
                         if(shares[col] && arrXBRL[col].includes('limitedLiablePartners.VK')) {
                             var pShare = shares[col];
                             
                             if(isNaN(pShare)) pShare=" 0";                       
-                            partners[pNum]={ 'id':pNum, 'vk':gNames[col], 'gain':pShare, 'denom':basis, 'iVar':col, 'taxID':arrTaxID[col] };
+                            partners[pNum]={ 'id':pNum, 'varCap':gNames[col], 'gain':pShare, 'denom':basis, 'iVar':col, 'taxID':arrTaxID[col] };
                             pNum++; // GH20220206 
                         }
                     }
@@ -767,6 +779,16 @@ function compile(sessionData) {
                             if(shares[col] && (acc.includes('limitedLiablePartners.KK') || acc.includes('limitedLiablePartners.FK'))) {
                                 partners[pNum].iCap=col;
                                 partners[pNum].name=shares[col];
+                                pNum++;
+                            }
+                        }
+
+
+                        pNum=0;
+                        for(col=eqliab+1;col<shares.length;col++) {
+                            var acc = arrXBRL[col]+" ";
+                            if(acc.includes('eqLiab.equity.capRes')) {
+                                partners[pNum].capRes=gNames[col];
                                 pNum++;
                             }
                         }
@@ -827,12 +849,13 @@ function compile(sessionData) {
     } else console.error('0101 compile.js compile NO aoaCells');
 
 
-    
-        for(let key in result) {
-            if(debug) console.log('0386 compile.js compile() -> balance['+key+']'); 
-        }
 
-        if(debug)console.log("0388 COMPILED = "+JSON.stringify(Object.keys(result)));
+    for(let key in result) {
+        if(debug) console.log('0386 compile.js compile() -> balance['+key+']'); 
+    }
+
+    if(debug)console.log("0388 COMPILED = "+JSON.stringify(Object.keys(result)));
+
 
     let balance = sendBalance(result);
 
@@ -867,7 +890,7 @@ function unixYear() {
 
 
 
-// generate a copy of the balance, with all accounts closed 
+// in gResponse generate a copy of the balance, with all accounts closed 
 // and GAIN LOSS being distributed to partners
 function sendBalance(balance) {
     let bAccounts = balance[D_Balance];
@@ -1038,31 +1061,62 @@ function sendBalance(balance) {
 
     
     // GH20220206 MODIFY K2xx accounts 
+    // GH20230120 MODIFY RExx accounts 
     // substract KEST
     for (let id in partners) {
         var p=partners[id];
-        var varcap=bAccounts[p.vk];
-        varcap.income=p.income;
-        varcap.netIncomeOTC=p.netIncomeOTC;
-        varcap.netIncomeFin=p.netIncomeFin;
-        varcap.yearEnd=""+Account.bigSaldo(varcap);
-        
-        // GH 20221028 substract paid tax
-        let iYearEnd =  BigInt(varcap.yearEnd);
-        let iIncome  = BigInt(varcap.income);
-        let iTaxPaid = BigInt(p.tax);
-        varcap.next =   ""+(iYearEnd + iIncome - iTaxPaid); 
 
-        // 20221029 detailed partner account info
-        p.init = varcap.init;
-        p.credit = varcap.credit;
-        p.debit = varcap.debit;
-        p.yearEnd = varcap.yearEnd;
-        p.close =  ""+(iYearEnd + iIncome); 
-        p.next=varcap.next;
+        // varCap is the name of the variable account 'K2xx'
+        if(p && p.varCap) { 
+            // consolidate K2 variable capital
+            var varcap=bAccounts[p.varCap];
+            varcap.income=p.income;
+            varcap.netIncomeOTC=p.netIncomeOTC;
+            varcap.netIncomeFin=p.netIncomeFin;
+            varcap.yearEnd=""+Account.bigSaldo(varcap);
+
+            // GH 20221028 substract paid tax
+            let iYearEnd =  BigInt(varcap.yearEnd);
+            let iIncome  = BigInt(varcap.income);
+            let iTaxPaid = BigInt(p.tax);
+            varcap.next =   ""+(iYearEnd + iIncome - iTaxPaid); 
+
+            // 20221029 detailed partner account info
+            p.init = varcap.init;
+            p.credit = varcap.credit;
+            p.debit = varcap.debit;
+            p.yearEnd = varcap.yearEnd;
+            p.close =  ""+(iYearEnd + iIncome); 
+            p.next=varcap.next;
+
+            if(debugReport) console.log('compile sendBalance  '+JSON.stringify(p) + "\n ==>> MODIFY K2xx "+JSON.stringify(varcap));
+
+            if(p.capRes) {
+                // consolidate RE capital reserve
+                var rescap=bAccounts[p.capRes]; // index with name
+                console.dir("compile sendBalance partner "+p.name+ " CapitalReserve("+p.capRes+")="+JSON.stringify(rescap));
+
+                rescap.income="";
+                rescap.netIncomeOTC="";
+                rescap.netIncomeFin="";    
+                rescap.yearEnd=""+Account.bigSaldo(rescap);
+
+                let iResCredit = rescap.credit ? BigInt(rescap.credit) : 0n;
+                if(iResCredit!=0n) {
+                    p.credit = ""+BigInt(p.credit)+iResCredit;
+                }
+
+                let iResDebit  = rescap.debit ? BigInt(rescap.debit) : 0n;
+                if(iResDebit!=0n) {
+                    p.debit = ""+BigInt(p.debit)+iResDebit;
+                }
+                if(debugReport) console.log('compile sendBalance  '+JSON.stringify(p) + "\n ==>> MODIFY RExx "+JSON.stringify(rescap));
+            }
+                        
+    }  else console.dir('compile sendBalance NO CAPITAL ACCOUNTS FOR PARTNER #'+p);
 
 
-        if(debugReport) console.log('compile sendBalance  '+JSON.stringify(p) + "\n ==>> MODIFY K2xx "+JSON.stringify(varcap));
+        if(debugReport) console.log('compile sendBalance  '+JSON.stringify(p) + "\n ==>> MODIFY K2xx  RExx"+JSON.stringify(varcap));
     }
 
 
@@ -1167,7 +1221,7 @@ function sendBalance(balance) {
                 let p=partners[i];
                 let iCents=0n;
                 try {
-                    let varcap=gAccounts[p.vk];                   
+                    let varcap=gAccounts[p.varCap];                   
                     if(varcap) {
                         // if(debugReport) console.dir("sendBalance UPDATE CLOSING VAR "+JSON.stringify(p)+"Partner("+i+") "+JSON.stringify(varcap)); 
                         let name = varcap.name;
@@ -1245,7 +1299,7 @@ function distribute(iMoney,bPartner,target) {
                 let iShare = (iMoney * BigInt(p.gain)) / BigInt(p.denom);
                 shares[index1]=iShare;
                 cents[index1]=0n;
-                if(debugTax) console.log('0134 Sender.distribute #'+n+'='+index1+': '+sign+'*'+iShare+' to '+ p.vk+ " with "+p.gain+"/"+p.denom);
+                if(debugTax) console.log('0134 Sender.distribute #'+n+'='+index1+': '+sign+'*'+iShare+' to '+ p.varCap+ " with "+p.gain+"/"+p.denom);
                 index1++;
             }
         }

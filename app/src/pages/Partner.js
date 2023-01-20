@@ -132,6 +132,7 @@ export default function Partner() {
                     <FlexRow p={[' ']}/>    
                     <div className="attrLine">{ [''].map(function(){ 
                         initColumns(); 
+                        Object.keys(jReport).map((id)=>(console.log("ADDCOLUMNS "+JSON.stringify(jReport[id])))); 
                         Object.keys(jReport).map((id)=>(addColumns(jReport[id]))); 
                         return page.AcctHistory + ' ' + session.year})}
                     </div>                        

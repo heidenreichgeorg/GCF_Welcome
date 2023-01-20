@@ -227,7 +227,7 @@ D_REPORT = {
 }
 
 D_Partner = {
-i:{"id":i,"vk":"K2xx","gain":n,"denom":z,
+i:{"id":i,"varCap":"K2xx","gain":n,"denom":z,
 "iVar":31,"iCap":37,"name":name,
 "tax":s,"cyLoss":s,"income":s,"netIncomeFin":s,"netIncomeOTC":s,"init":s,"credit":s,"debit":s,"yearEnd":s,"close":s,"next":s},
 }
