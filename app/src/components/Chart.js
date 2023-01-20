@@ -6,28 +6,29 @@ export default function Chart({jValue, legend}) {
     const circumference = innerRadius * 2 * Math.PI;
     const arc = circumference * 0.75;
     const dashArray = `${arc} ${circumference}`;
-    const palette = ["33","77","BB","FF","11","55","99","DD","22","66","AA","EE","44"]
+    const palette = ["33","77","BB","FF","11","55","99","DD","22","66","AA","EE","44","88"]
     let max = 0;
     let valueKeys = Object.keys(jValue);
 
     var colArray=[];
+    
     valueKeys.map(function(key,i) { let val=parseInt(jValue[key]); 
                                     if(val>max) max=val;
-                                    let r=i%9;
-                                    let g=(i+3)%11;
-                                    let b=(i+7)%13;
+                                    let r=i%11;
+                                    let g=(i+3)%5;
+                                    let b=(i+7)%14;
                                     colArray.push("#"+palette[r]+palette[g]+palette[b])
                     });
-
+    var num = colArray.length;
     return (
-                <svg id="ins1_chart" width="180" height="160">
+                <svg id="ins1_chart" width={20+14*num} height="180">
                     {valueKeys.map((key,i) =>
                     (
-                        <line x1={20+10*i} y1={120} x2={20+10*i} y2={(120-120*parseInt(jValue[key])/max)} stroke={colArray[i] }
+                        <line x1={20+14*i} y1={140} x2={20+14*i} y2={(140-140*parseInt(jValue[key])/max)} stroke={colArray[i] }
                             strokeDasharray={dashArray} strokeLinecap="round" strokeWidth={strokeWidth} />
                     ))}
 
-                    <text x={10+5*colArray.length} y="140" text-anchor="middle"><tspan>{legend}</tspan></text>
+                    <text x={10+7*num} y="160" text-anchor="middle"><tspan>{legend}</tspan></text>
                 </svg>    
             
     );
