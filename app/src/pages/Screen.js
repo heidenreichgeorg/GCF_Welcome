@@ -87,7 +87,8 @@ export default function Screen({ children, prevFunc, nextFunc, tabSelector, tabN
         console.log("Screen select "+target+JSON.stringify(num));
 
         // eHistory is the tab to be displayed
-        let eHistory = document.getElementById(target+num.tabNum);
+        //let eHistory = document.getElementById(target+num.tabNum);
+        let eHistory = document.getElementById(target+num);
         var screen=eHistory;
         var style="none";
         
@@ -120,12 +121,14 @@ export default function Screen({ children, prevFunc, nextFunc, tabSelector, tabN
         </div>
     ); 
     
+    function makeTab(tabName,tabNum) { return (e) => { console.log("onClick("+tabName+","+tabNum+")"); select(tabName,tabNum)}}
+
     return (
         <div className="mTable">           
             <div className="attrLine">                     
-                <select type="radio" name="tabSelector">                          
+                <select type="radio" name={tabName}>                          
                     {tabSelector.map((row,tabNum) => (
-                        <option value={row}  onClick={((e) => select(tabName,{tabNum}))}>{row}</option>
+                        <option value={row} onClick={makeTab(tabName,tabNum)}>{row}</option>
                     ))}
                 </select>
             </div>

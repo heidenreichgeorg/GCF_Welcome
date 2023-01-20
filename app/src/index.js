@@ -22,18 +22,14 @@ import Gauge from './components/Gauge'
 
 function Report() { return (
         <div>
-            <Partner />
             <Balance show={1} />
             <FixedAssets />
+            <Partner />
         </div>
     )
 }
 
 const router = createBrowserRouter([
-    {
-        path: '/gauge',
-        element: <Gauge percent={53} radius={100} strDim={"AV/B"}/>
-    },
     {
         path: '/dashboard',
         element: <DashBoard />
