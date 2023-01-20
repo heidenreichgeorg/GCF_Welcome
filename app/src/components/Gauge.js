@@ -13,8 +13,8 @@ export default function Gauge ({ percent = 0, radius, strDim, color }) {
             <lineargradient id="grad" x1="0" y1="0" x2="1" y2="1"></lineargradient>
             <stop offset="15%" stopColor="#1267ff" stopOpacity="1"></stop>
             <stop offset="85%" stopColor="#98c0ff" stopOpacity="1"></stop>
-            <text x={radius*0.85} y={2*radius-20}>{strDim}</text>
-            <text x={radius*0.70} y={radius+10} font-size={48} class={"caption"}>{percent}</text>
+            <text x={radius} y={2*radius-20} text-anchor="middle">{strDim}</text>
+            <text x={radius} y={radius+10} font-size={48} class={"caption"} text-anchor="middle">{percent}</text>
             <circle
                 className="gauge_base"
                 cx={radius}

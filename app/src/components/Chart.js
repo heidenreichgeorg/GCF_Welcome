@@ -1,39 +1,33 @@
 import React from "react";
 
-export default function Slider({value, legend}) {
+export default function Chart({jValue, legend}) {
     const strokeWidth = 10;
     const innerRadius = 20;
     const circumference = innerRadius * 2 * Math.PI;
     const arc = circumference * 0.75;
     const dashArray = `${arc} ${circumference}`;
-    
-    value = ""+value;
-    let iValue = parseInt(value.substring(0,1));
+    const palette = ["33","77","BB","FF","11","55","99","DD","22","66","AA","EE","44"]
+    let max = 0;
+    let valueKeys = Object.keys(jValue);
+
+    var colArray=[];
+    valueKeys.map(function(key,i) { let val=parseInt(jValue[key]); 
+                                    if(val>max) max=val;
+                                    let r=i%9;
+                                    let g=(i+3)%11;
+                                    let b=(i+7)%13;
+                                    colArray.push("#"+palette[r]+palette[g]+palette[b])
+                    });
 
     return (
-                <svg id="ins1_meter" width="180" height="160">
-                    <line x1={40} y1={  5} x2={170} y2={  5} stroke={iValue>9 ? "#FF8F40" : "#777777"}
-                        strokeDasharray={dashArray} strokeLinecap="round" strokeWidth={strokeWidth} />
-                    <line x1={40} y1={ 17} x2={170} y2={ 17} stroke={iValue>8 ? "#FF8F40" : "#777777"}
-                        strokeDasharray={dashArray} strokeLinecap="round" strokeWidth={strokeWidth} />
-                    <line x1={40} y1={ 29} x2={170} y2={ 29} stroke={iValue>7 ? "#FF8F40" : "#777777"}
-                        strokeDasharray={dashArray} strokeLinecap="round" strokeWidth={strokeWidth} />
-                    <line x1={40} y1={ 41} x2={170} y2={ 41} stroke={iValue>6 ? "#FF8F40" : "#777777"}
-                        strokeDasharray={dashArray} strokeLinecap="round" strokeWidth={strokeWidth} />
-                    <line x1={40} y1={ 53} x2={170} y2={ 53} stroke={iValue>5 ? "#FF8F40" : "#777777"}
-                        strokeDasharray={dashArray} strokeLinecap="round" strokeWidth={strokeWidth} />
-                    <line x1={40} y1={ 65} x2={170} y2={ 65} stroke={iValue>4 ? "#FF8F40" : "#777777"}
-                        strokeDasharray={dashArray} strokeLinecap="round" strokeWidth={strokeWidth} />
-                    <line x1={40} y1={ 77} x2={170} y2={ 77} stroke={iValue>3 ? "#FF8F40" : "#777777"}
-                        strokeDasharray={dashArray} strokeLinecap="round" strokeWidth={strokeWidth} />
-                    <line x1={40} y1={ 89} x2={170} y2={ 89} stroke={iValue>2 ? "#FF8F40" : "#777777"}
-                        strokeDasharray={dashArray} strokeLinecap="round" strokeWidth={strokeWidth} />
-                    <line x1={40} y1={101} x2={170} y2={101} stroke={iValue>1 ? "#FF8F40" : "#777777"}
-                        strokeDasharray={dashArray} strokeLinecap="round" strokeWidth={strokeWidth} />
-                    <line x1={40} y1={113} x2={170} y2={113} stroke={iValue>0 ? "#FF8F40" : "#777777"}
-                        strokeDasharray={dashArray} strokeLinecap="round" strokeWidth={strokeWidth} />
+                <svg id="ins1_chart" width="180" height="160">
+                    {valueKeys.map((key,i) =>
+                    (
+                        <line x1={20+10*i} y1={120} x2={20+10*i} y2={(120-120*parseInt(jValue[key])/max)} stroke={colArray[i] }
+                            strokeDasharray={dashArray} strokeLinecap="round" strokeWidth={strokeWidth} />
+                    ))}
 
-                    <text x="90" y="140" text-anchor="middle"><tspan>{legend}</tspan></text>
+                    <text x={10+5*colArray.length} y="140" text-anchor="middle"><tspan>{legend}</tspan></text>
                 </svg>    
             
     );
