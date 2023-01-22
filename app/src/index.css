@@ -31,7 +31,7 @@ input[type=range] { -webkit-appearance: none;  width: 200px; margin: 0; padding:
 .SEP      { width: 1rem; text-align: center;  }		
 .TAG      { width: 2rem; text-align: left;  }		
 .SYMB     { width: 3rem;  text-align: left; }		
-.MOAM     { width:5.3rem; text-align: right; }
+.MOAM     { width:5.3rem; text-align: right; font-family:monospace; }
 .C100     { width: 6rem; }
 .R105     { width: 6rem; text-align: right; }
 .SNAM     { width: 7rem; text-align: left;  }

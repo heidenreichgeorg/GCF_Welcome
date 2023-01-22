@@ -1103,12 +1103,12 @@ function sendBalance(balance) {
 
                 let iResCredit = rescap.credit ? BigInt(rescap.credit) : 0n;
                 if(iResCredit!=0n) {
-                    p.credit = ""+BigInt(p.credit)+iResCredit;
+                    p.credit = ""+(BigInt(p.credit)+iResCredit);
                 }
 
                 let iResDebit  = rescap.debit ? BigInt(rescap.debit) : 0n;
                 if(iResDebit!=0n) {
-                    p.debit = ""+BigInt(p.debit)+iResDebit;
+                    p.debit = ""+(BigInt(p.debit)+iResDebit);
                 }
                 if(debugReport) console.log('compile sendBalance  '+JSON.stringify(p) + "\n ==>> MODIFY RExx "+JSON.stringify(rescap));
             }
