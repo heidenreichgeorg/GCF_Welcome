@@ -71,8 +71,9 @@ export default function Transfer() {
         e.currentTarget.value=e.dataTransfer.getData("text/plain");
         e.preventDefault();
     }
-    function AccountRow({ name1,amount1, name2,amount2, name3,amount3, name4,amount4, name5,amount5}) {
+    function AccountRow({ name1,amount1, name2,amount2, name3,amount3, name4,amount4, name5,amount5, name6,amount6, name7,amount7 }) {
         return(
+            <div>
             <div className="attrLine">
                 <div className="FIELD SEP"> &nbsp;</div>
                 <div className="FIELD SYMB"> <input type="text" id="cNam1" name="cNam1"   ref={rName1} defaultValue={name1} onDragOver={ignore}  onDrop={handleDrop}/></div>
@@ -87,9 +88,18 @@ export default function Transfer() {
                 <div className="FIELD SYMB"> <input type="text" id="cNam4" name="cNam4"   ref={rName4} defaultValue={name4} onDragOver={ignore}  onDrop={handleDrop}/></div>
                 <div className="FIELD MOAM"> <input type="edit" id="cAmt4" name="cAmt4"  ref={rAmount4} defaultValue={amount4} onDrop={ignore}  /></div>
                 <div className="FIELD SEP"> &nbsp;</div>
+            </div>
+            <div className="attrLine">
+                <div className="FIELD SEP"> &nbsp;</div>
                 <div className="FIELD SYMB"> <input type="text" id="cNam5" name="cNam5"   ref={rName5} defaultValue={name5} onDragOver={ignore}  onDrop={handleDrop}/></div>
                 <div className="FIELD MOAM"> <input type="edit" id="cAmt5" name="cAmt5"  ref={rAmount5} defaultValue={amount5} onDrop={ignore}  /></div>
-            </div>)
+                <div className="FIELD SEP"> &nbsp;</div>
+                <div className="FIELD SYMB"> <input type="text" id="cNam6" name="cNam6"   ref={rName6} defaultValue={name6} onDragOver={ignore}  onDrop={handleDrop}/></div>
+                <div className="FIELD MOAM"> <input type="edit" id="cAmt6" name="cAmt6"  ref={rAmount6} defaultValue={amount6} onDrop={ignore}  /></div>
+                <div className="FIELD SEP"> &nbsp;</div>
+                <div className="FIELD SYMB"> <input type="text" id="cNam7" name="cNam7"   ref={rName7} defaultValue={name7} onDragOver={ignore}  onDrop={handleDrop}/></div>
+                <div className="FIELD MOAM"> <input type="edit" id="cAmt7" name="cAmt7"  ref={rAmount7} defaultValue={amount7} onDrop={ignore}  /></div>
+            </div></div>)
     }
 
     
@@ -161,11 +171,15 @@ export default function Transfer() {
     const rAmount3=useRef({})
     const rAmount4=useRef({})
     const rAmount5=useRef({})
+    const rAmount6=useRef({})
+    const rAmount7=useRef({})
     const rName1=useRef({})
     const rName2=useRef({})
     const rName3=useRef({})
     const rName4=useRef({})
     const rName5=useRef({})
+    const rName6=useRef({})
+    const rName7=useRef({})
 
     function onBook(e) {
         e.preventDefault();
@@ -175,20 +189,24 @@ export default function Transfer() {
             rName2.current.value,
             rName3.current.value,
             rName4.current.value,
-            rName5.current.value]
+            rName5.current.value,
+            rName6.current.value,
+            rName7.current.value]
    
         let cAmounts = [ 
             rAmount1.current.value,
             rAmount2.current.value,
             rAmount3.current.value,
             rAmount4.current.value,
-            rAmount5.current.value]
+            rAmount5.current.value,
+            rAmount6.current.value,
+            rAmount7.current.value]
 
         console.log("BOOK N "+JSON.stringify(cNames));
         console.log("BOOK A "+JSON.stringify(cAmounts));
         
-        let flow = { 'credit': {}, 'debit':{} }
-        for(let i=0;i<5;i++) prepareTXN(sheet[D_Schema],flow,cNames[i],cAmounts[i]);
+        let flow = { 'credit':{}, 'debit':{} };
+        for(let i=0;i<7;i++) flow=prepareTXN(sheet[D_Schema],flow,cNames[i],cAmounts[i]);
 
         console.log("BOOK F "+JSON.stringify(flow));
         
@@ -255,6 +273,8 @@ export default function Transfer() {
                             name3={report.aNames[2]} amount3={report.aAmount[2]}
                             name4={report.aNames[3]} amount4={report.aAmount[3]}
                             name5={report.aNames[4]} amount5={report.aAmount[4]}
+                            name6={report.aNames[5]} amount6={report.aAmount[5]}
+                            name7={report.aNames[6]} amount7={report.aAmount[6]}
                 /> 
                 <TransferRow/> 
                 <TransferRow/> 

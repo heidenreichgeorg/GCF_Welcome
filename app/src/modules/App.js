@@ -46,7 +46,7 @@ export function prettyTXN(jHistory,hash,lPattern,aPattern,names,aLen,eLen) {
             }
             
             for(var j=J_ACCT;j<parts.length;j++) {
-                if(parts[j] && parts[j].length>0 && j!=aLen && j!=eLen) { 
+                if(parts[j] && parts[j].length>0 && j!=aLen && j!=eLen && parts[j]!='0') { 
                     
                     // GH20220307 EU-style numbers with two decimal digits
                     let strCents = parts[j].replace('.','').replace(',','');
@@ -106,29 +106,31 @@ export function prettyTXN(jHistory,hash,lPattern,aPattern,names,aLen,eLen) {
     return result;
 }
 
-export function prepareTXN(schema,flow,name,amount) {
+export function prepareTXN(schema,flow, name,amount) {
     
     var balanceNames=schema.Names;
     var aLen =       schema.assets;
     var eLen =       schema.eqliab;
 
 
-    let credit=flow.credit;
-    let debit = flow.debit;
-
+    var newCredit=flow.credit;
+    var newDebit=flow.debit;
 
     if(balanceNames && balanceNames.length>2) {
         for(var i=J_ACCT;i<balanceNames.length;i++) {
-            if(balanceNames[i] && balanceNames[i].length>0 && i!=aLen && i!=eLen && balanceNames[i]===name) { 
+            if(balanceNames[i] && balanceNames[i].length>0 && i!=aLen && i!=eLen && balanceNames[i]===name 
+                && amount && amount !='0') { 
                 
                 let iValue = bigEUMoney(amount);
                 let entry = { index:i, value: cents2EU(iValue) }
-                if(i<aLen && i!=eLen) credit[name]=entry;
-                if(i>aLen && i!=eLen) debit[name]= entry;
+                if(i<aLen && i!=eLen) {newCredit[name]=entry;}
+                if(i>aLen && i!=eLen) {newDebit[name]= entry;}
             }
         }
     }
-    
+
+    flow = { 'credit':newCredit, 'debit':newDebit };
+    console.dir("prepareTXN "+JSON.stringify(flow));
     return flow;
 }
 

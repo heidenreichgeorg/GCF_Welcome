@@ -17,12 +17,15 @@ import FooterRow from '../components/FooterRow'
 import { useSession } from '../modules/sessionmanager';
 import { cents2EU } from  '../modules/money'
 import { makeHGB275S2Report } from "../modules/App.js"
-import { REACT_APP_API_HOST, D_Balance, D_Partner, D_Page, SCREENLINES }  from '../terms.js';
+import { D_Balance, D_Partner, D_Page, SCREENLINES }  from '../terms.js';
+
+import { Report } from "../index.js"
 
 export default function Partner() {
 
     const { session, status } = useSession()   
     const [ sheet,  setSheet] = useState(null)
+    const [ showState,toggle] = useState(null)
  
     useEffect(() => {
         if(status !== 'success') return;
@@ -33,12 +36,12 @@ export default function Partner() {
         }
     }, [status])
 
+
+
     if(!sheet) return null; //'Loading...';
 
-    
     function prevFunc() {console.log("CLICK PREVIOUS"); window.location.href="https://"+session.server.addr+":3000/history?client="+session.client+"&year="+session.year; }
-//    function nextFunc() {  console.log("CLICK NEXT");   window.location.href="https://"+session.server.addr+":3000/status?client="+session.client+"&year="+session.year; }
-    function nextFunc() {  console.log("CLICK NEXT");   window.location.href="https://"+session.server.addr+":3000/report?client="+session.client+"&year="+session.year; }
+    function nextFunc() {  console.log("CLICK NEXT");   window.location.href="https://"+session.server.addr+":3000/status?client="+session.client+"&year="+session.year; }
     
     let page = sheet[D_Page];
     
@@ -118,6 +121,10 @@ export default function Partner() {
     return (
         <Screen prevFunc={prevFunc} nextFunc={nextFunc} tabSelector={Object.keys(jReport).map((i)=>(jReport[i].name))} tabName={tabName}>
             
+            <div id="fullReport" style={{'display':'none'}} >
+                <Report ></Report>
+            </div>
+
             <div className="attrLine">{page.GainLoss + ' ' + session.year}</div>
 
             {Object.keys(jReport).map((_,partnerNo) => ( 
@@ -165,7 +172,13 @@ export default function Partner() {
                     { filler.map((row) => (
                         <PartnerRow p={row}/>    
                     ))}    
-                    
+
+                    <div className="attrLine">
+                        <label classname="key" onClick={showReport}>Report</label>
+                        
+                    </div>
+
+
                     <FooterRow left={page["client"]}  right={page["register"]} prevFunc={prevFunc} nextFunc={nextFunc} miscFunc={handleJSONSave}/>
                     <FooterRow left={page["reference"]} right={page["author"]} prevFunc={prevFunc} nextFunc={nextFunc}/>
                 </div>
@@ -175,8 +188,11 @@ export default function Partner() {
         </Screen>
     )
     
+    function showReport(e) { console.log("SHOW"); let report=document.getElementById("fullReport"); if(report) report.style={'display':'block'};}
+    //function hideReport(e) { console.log("HIDE"); let report=document.getElementById("fullReport"); if(report) report.style={'display':'none'}; }
+
     function handleJSONSave() {
-        console.log("1110 Status.handleJSONSave sessionId = "+session.id);
+        console.log("1110 Partner.handleJSONSave sessionId = "+session.id);
         const rqOptions = { method: 'GET', headers: {  'Accept': 'application/json'}, mode:'cors'};
         try {
             

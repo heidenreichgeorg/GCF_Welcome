@@ -71,7 +71,7 @@ export default function History() {
 
     const tabName = 'HistoryContent';
     return (
-        <Screen prevFunc={prevFunc} nextFunc={nextFunc} tabSelector={isOpen ? [] : aPages } tabName={tabName}>
+        <Screen prevFunc={prevFunc} nextFunc={nextFunc} tabSelector={isOpen ? [] : aPages.map((_,n)=>(1+n)) } tabName={tabName}>
 
             {isOpen && (
                 <div>                    
@@ -83,7 +83,7 @@ export default function History() {
             { !isOpen && (<SearchForm token={strToken} ></SearchForm>) }
             
             {aPages.map((m,n) => ( 
-                <div className="ulliTab" id={tabName+n} style= {{ 'display': m}} >
+                <div className="ulliTab" id={tabName+n} style= {{ 'display': m }} >
                     { !isOpen && (sHistory.slice(n*SCREEN_TXNS,(n+1)*SCREEN_TXNS).map((row) => (  <SigRow row={row}/>  )))}
                     <div className="attrline">&nbsp;</div>
                     <FooterRow left={page["client"]}  right={page["register"]} prevFunc={prevFunc} nextFunc={nextFunc}/>

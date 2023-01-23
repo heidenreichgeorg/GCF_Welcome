@@ -20,11 +20,10 @@ import { SessionProvider } from './modules/sessionmanager';
 import Gauge from './components/Gauge'
 
 
-function Report() { return (
+export function Report() { return (
         <div>
             <Balance show={1} />
             <FixedAssets />
-            <Partner />
         </div>
     )
 }
