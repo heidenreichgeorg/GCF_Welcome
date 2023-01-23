@@ -114,7 +114,7 @@ function handleChange(target,aRow,mRow) {
             console.log("SELECT "+id);
             aSelText[id]=aRow;
             aSelMoney[id]=mRow;
-            aSelSaldo[id]="123,45";
+            aSelSaldo[id]="0";
         }
     }
 }
