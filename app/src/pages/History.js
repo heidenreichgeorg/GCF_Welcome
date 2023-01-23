@@ -26,6 +26,7 @@ var funcShowReceipt=null;
 var funcHideReceipt=null;
 var aSelText = {};
 var aSelMoney = {};
+var aSelSaldo = {};
 
 
 export default function History() {
@@ -68,6 +69,7 @@ export default function History() {
     for(let p=1;p<sPages-1;p++) aPages[p]='none'; 
     aPages[0]='block';
    
+let sum ={ value:" 12,34"};
 
     const tabName = 'HistoryContent';
     return (
@@ -76,7 +78,7 @@ export default function History() {
             {isOpen && (
                 <div>                    
                     <button onClick={() => funcHideReceipt()}>Belege</button>
-                    { Object.keys(aSelText).map((sym,i) => ( aSelText[sym] ? TXNReceipt(sym,i) : "")) }
+                    { Object.keys(aSelText).map((sym) => ( aSelText[sym] ? TXNReceipt(sym,sum) : "" )) }
                 </div>
             )}
 
@@ -84,7 +86,7 @@ export default function History() {
             
             {aPages.map((m,n) => ( 
                 <div className="ulliTab" id={tabName+n} style= {{ 'display': m }} >
-                    { !isOpen && (sHistory.slice(n*SCREEN_TXNS,(n+1)*SCREEN_TXNS).map((row) => (  <SigRow row={row}/>  )))}
+                    { !isOpen && (sHistory.slice(n*SCREEN_TXNS,(n+1)*SCREEN_TXNS).map((row) => (  <SigRow row={row} index={n}/>  )))}
                     <div className="attrline">&nbsp;</div>
                     <FooterRow left={page["client"]}  right={page["register"]} prevFunc={prevFunc} nextFunc={nextFunc}/>
                     <FooterRow left={page["reference"]} right={page["author"]} prevFunc={prevFunc} nextFunc={nextFunc}/>
@@ -106,36 +108,46 @@ function handleChange(target,aRow,mRow) {
             console.log("DESELECT "+id);
             aSelText[id]=null;
             aSelMoney[id]=null;
+            aSelSaldo[id]=null;
             target.value='';
         } else  {
             console.log("SELECT "+id);
             aSelText[id]=aRow;
             aSelMoney[id]=mRow;
+            aSelSaldo[id]="123,45";
         }
     }
 }
 
-function SigRow(row) {
+function SigRow({row,index}) {
     //console.log("SigRow "+JSON.stringify(row.row))  
 
     let aRow = [0n,0n,0n,0n,0n,0n]
-    try { let saRow = row.row.sig;
+    try { let saRow = row.sig;
         aRow = saRow.split(CSEP);
      } catch(err) {}
     
     let mRow =  [0n,0n,0n,0n,0n,0n]
-    try { let smRow = row.row.money;
+    try { let smRow = row.money;
         mRow = smRow.split(CSEP);
     } catch(err) {}
 
     let saldo="";
-    if(isNaN(row.row.saldo)) saldo="-,--";
-    else saldo = cents2EU(row.row.saldo); // cents2EU
+    if(isNaN(row.saldo)) saldo="-,--";
+    else saldo = cents2EU(row.saldo); // cents2EU
+
+    let id= ((aRow[0].substring(4).replace(/\D/g, ""))+symbolic(aRow.join('')+mRow.join('')));
+
+    var selectAll = getParam("SELECTALL");
+    if(selectAll && selectAll.length<1) selectAll=null;
+    if(selectAll) { aSelText[id]=aRow;  aSelMoney[id]=mRow; aSelSaldo[id]=""+saldo;
+}
 
     return (
         <div className="attrPair">
-            <div className="attrLine" id="{id}">
-                <div className="FIELD SYMB"><label><input TYPE="CHECKBOX" onChange={event => handleChange(event.target,aRow,mRow)}/></label></div>
+            <div className="attrLine" id={id}>
+                <div className="FIELD SYMB"><label><input TYPE="CHECKBOX" onChange={event => handleChange(event.target,aRow,mRow)} checked={selectAll?"checked":""}/>
+                                        </label></div>
                 <div className="FIELD TAX">{aRow[0]}</div>
                 <div className="FIELD SEP">&nbsp;</div>
                 <div className="FIELD LNAM">{aRow[1]}</div>
@@ -242,8 +254,9 @@ function SearchForm(token) {
     )
 }
 
-function TXNReceipt(sym,i) {
+function TXNReceipt(sym,sum) {
     let amounts = aSelMoney[sym];
+    let level7="";
     let level6="";
     let level5="";
     let level4="";
@@ -251,14 +264,17 @@ function TXNReceipt(sym,i) {
     let level2="";
     let level1="";
     let level0="";
+    level0=aSelSaldo[sym]; 
     if(amounts) { 
-        if(amounts.length>0) { level6=amounts[0];
-            if(amounts.length>0) { level5=amounts[1];
-                if(amounts.length>0) { level4=amounts[2];
-                    if(amounts.length>1) { level3=amounts[3];
-                        if(amounts.length>2) { level2=amounts[4];
-                            if(amounts.length>3) { level1=amounts[5];
-                                if(amounts.length>4) { level0=amounts[6];
+        if(amounts.length>0) { level7=amounts[0];
+            if(amounts.length>1) { level6=amounts[1];
+                if(amounts.length>2) { level5=amounts[2];
+                    if(amounts.length>3) { level4=amounts[3];
+                        if(amounts.length>4) { level3=amounts[4];
+                            if(amounts.length>5) { level2=amounts[5];
+                                if(amounts.length>6) { level1=amounts[6];
+                                    
+                                    
                                 }
                             }
                         }
@@ -271,15 +287,16 @@ function TXNReceipt(sym,i) {
     return(
         <div className="ulliTab" id="PageContentReceipt">
             <div className="attrPair">
-                <BalanceRow text={aSelText[sym].join(' ')} level6={level6} level5={level5} level4={level4} level3={level3} level2={level2} level1={level1} level0={level0}/>
+                <BalanceRow text={aSelText[sym].join(' ')} level7={level7} level6={level6} level5={level5} level4={level4} level3={level3} level2={level2} level1={level1} level0={level0}/>
             </div>
         </div>
 )}      
 
-function BalanceRow({text,level6,level5,level4,level3,level2,level1,level0}) { 
+function BalanceRow({text,level7,level6,level5,level4,level3,level2,level1,level0}) { 
     return (
         <div className="attrLine">
             <div className="FIELD L280">{text}</div>
+            <div className="FIELD MOAM">{level7}</div>
             <div className="FIELD MOAM">{level6}</div>
             <div className="FIELD MOAM">{level5}</div>
             <div className="FIELD MOAM">{level4}</div>
