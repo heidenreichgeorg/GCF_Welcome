@@ -52,6 +52,9 @@ export default function DashBoard({value}) {
     let iCur = BigInt(ass)-BigInt(fix);
     jValue.currency = ""+iCur;
 
+    function prevFunc() {console.log("CLICK PREVIOUS"); window.location.href="https://"+session.server.addr+":3000/balance?client="+session.client+"&year="+session.year; }
+    function nextFunc() {  console.log("CLICK NEXT");   window.location.href="https://"+session.server.addr+":3000/fixedassets?client="+session.client+"&year="+session.year; }
+
     return (
         <Screen prevFunc={prevFunc} nextFunc={nextFunc} >
 

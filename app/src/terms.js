@@ -12,15 +12,16 @@ export const  D_SteuerID = "SteuerID";
 export const  D_Adressen="Adressen";
 
 
-
 export const  X_ASSETS = 'de-gaap-ci_bs.ass';
 export const  X_EQLIAB = 'de-gaap-ci_bs.eqLiab';
+export const  X_EQUITY = 'de-gaap-ci_bs.eqLiab.equity';
 export const  X_INCOME = 'de-gaap-ci_is.netIncome';
-export const  X_INCOME_REGULAR = 'is.netIncome.regular';
+export const  X_INCOME_REGULAR = 'de-gaap-ci_is.netIncome.regular';
 export const  X_INCOME_REGULAR_OTC = 'is.netIncome.regular.operatingTC';
 export const  X_INCOME_REGULAR_FIN = 'is.netIncome.regular.fin';
 export const  X_OTC_OTHER_REVENUE = 'regular.operatingTC.otherOpRevenue';
 export const  X_ASSET_TAX = 'ass.currAss.receiv.other.otherTaxRec';
+export const  X_ASSET_CAPTAX='de-gaap-ci_bs.ass.currAss.receiv.other.otherTaxRec.CapTax';
 
 
 export const  J_ACCT=6;

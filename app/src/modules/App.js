@@ -1,6 +1,6 @@
 /* global BigInt */
 
-import { D_Balance, D_History, D_Report, D_Schema, D_Page, X_ASSETS, X_EQLIAB, X_INCOME, J_ACCT, COLMIN, DOUBLE, SCREENLINES } from '../terms.js'
+import { D_Balance, D_History, D_Report, D_Schema, D_Page, X_ASSETS, X_EQLIAB, X_EQUITY, X_INCOME, X_INCOME_REGULAR, J_ACCT, COLMIN, DOUBLE, SCREENLINES } from '../terms.js'
 
 import { bigEUMoney, cents2EU } from './money'
 
@@ -50,7 +50,7 @@ export function prettyTXN(jHistory,hash,lPattern,aPattern,names,aLen,eLen) {
                     
                     // GH20220307 EU-style numbers with two decimal digits
                     let strCents = parts[j].replace('.','').replace(',','');
-                    console.log("strCents="+strCents);
+                      //console.log("strCents="+strCents);
                     let item = BigInt(strCents); 
 
                     // GH20220703
@@ -154,7 +154,10 @@ export function symbolic(pat) {
 }
 
 
+
 export function makeStatusData(response) {
+
+    const debug=null;
 
     const page = response[D_Page];
     
@@ -167,7 +170,7 @@ export function makeStatusData(response) {
     let gls="{close:0}";
 
     var jReport = response[D_Report];
-    console.log("makeStatusData from response D_Report"+JSON.stringify(Object.keys(jReport)));
+    if(debug) console.log("makeStatusData from response D_Report"+JSON.stringify(Object.keys(jReport)));
 
     var jHistory = response[D_History];
     var gSchema = response[D_Schema];
@@ -176,22 +179,22 @@ export function makeStatusData(response) {
     // add three additional accounts: ASSETS, EQLIAB, GAINLOSS
     if(jReport["xbrlAssets"].account) { 
         ass = jReport["xbrlAssets"].account; 
-        console.log("ASSET "+JSON.stringify(ass)); 
+        if(debug) console.log("ASSET "+JSON.stringify(ass)); 
         jAccounts["xbrlAssets"]=ass;
     }
     if(jReport["xbrlEqLiab"].account) { 
         eql = jReport["xbrlEqLiab"].account; 
-        console.log("EQLIB "+JSON.stringify(eql)); 
+        if(debug) console.log("EQLIB "+JSON.stringify(eql)); 
         jAccounts["xbrlEqLiab"]=eql;
     }
     if(jReport["xbrlRegular"].account) { 
         gls = jReport["xbrlRegular"].account; 
-        console.log("GALOS "+JSON.stringify(gls)); 
+        if(debug) console.log("GALOS "+JSON.stringify(gls)); 
         jAccounts["xbrlRegular"]=gls;
     }
-    console.log("makeStatusData from response D_Balance"+JSON.stringify(Object.keys(jAccounts)));
+    if(debug) console.log("makeStatusData from response D_Balance"+JSON.stringify(Object.keys(jAccounts)));
 
-    console.log(JSON.stringify(response));
+    if(debug) console.log(JSON.stringify(response));
     
     // build three columns
     let aLeft={};
@@ -237,17 +240,17 @@ export function makeStatusData(response) {
     if(maxRow>SCREENLINES) maxRow=SCREENLINES; // 20221201
     
     let iLeft=0;
-    statusData[iLeft++].gLeft= page.Assets;
+    
 
     for (let name in aLeft)   {
         var account=aLeft[name];
         var yearEnd = account.yearEnd;
         var iName = account.name;
 
-        console.log("STATUS.JS STATUSDATA LEFT "+iLeft+" "+name+"="+yearEnd);
+        if(debug) console.log("STATUS.JS STATUSDATA LEFT "+iLeft+" "+name+"="+yearEnd);
 
         if(iLeft<SCREENLINES) {
-            statusData[iLeft]={"gLeft":yearEnd,"nLeft":iName};
+            statusData[iLeft]={"gLeft":yearEnd,"nLeft":iName, "tLeft":(account.xbrl!=X_ASSETS)?"A":""};
         }
         iLeft++;
     }
@@ -255,7 +258,7 @@ export function makeStatusData(response) {
 
 
     let iMidl=0;
-    statusData[iMidl++].gMidl= page.GainLoss;
+    
 
     for (let name in aMidl)   {
         var account=aMidl[name];
@@ -264,13 +267,14 @@ export function makeStatusData(response) {
 
         statusData[iMidl].gMidl = yearEnd;
         statusData[iMidl].nMidl = iName;
+        statusData[iMidl].tMidl = (account.xbrl!=X_INCOME_REGULAR)?'G':'';
         iMidl++;
     }
     for (let i=iMidl;i<maxRow && i<SCREENLINES;i++) { statusData[i].gMidl=null; statusData[i].nMidl=' '; }
 
 
     let iRite=0;
-    statusData[iRite++].gRite= page.eqliab;
+    
 
     for (let name in aRite)   {
         var account=aRite[name];
@@ -280,6 +284,7 @@ export function makeStatusData(response) {
         if(iRite<SCREENLINES) {
             statusData[iRite].gRite = yearEnd;
             statusData[iRite].nRite = iName;
+            statusData[iRite].tRite = !(account.xbrl==X_EQLIAB)?(account.xbrl.startsWith(X_EQUITY))?'E':'L':'';
             iRite++;
         }
         
@@ -303,7 +308,7 @@ export function makeStatusData(response) {
 
         for (let hash in jHistory)  {
 
-            //console.log("Recent TXN("+hash+") #iTran="+iTran+ "      #bLine="+bLine+"    #maxRow="+maxRow);
+            if(debug) console.log("Recent TXN("+hash+") #iTran="+iTran+ "      #bLine="+bLine+"    #maxRow="+maxRow);
 
             if(bLine<maxRow && iTran>0) {
         

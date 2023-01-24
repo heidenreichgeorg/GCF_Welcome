@@ -5,6 +5,7 @@ HTTPS
 download JSON function
 
 for each account in D_Balance with XBRL=de-gaap-ci_bs.ass.currAss.receiv.other.otherTaxRec.CapTax
+        account.xbrl==X_ASSET_CAPTAX
 
     for each partner in D_Partner take gain/denom
 */
@@ -17,9 +18,7 @@ import FooterRow from '../components/FooterRow'
 import { useSession } from '../modules/sessionmanager';
 import { cents2EU } from  '../modules/money'
 import { makeHGB275S2Report } from "../modules/App.js"
-import { D_Balance, D_Partner, D_Page, SCREENLINES }  from '../terms.js';
-
-import { Report } from "../index.js"
+import { X_ASSET_CAPTAX, D_Balance, D_Partner, D_Page, SCREENLINES }  from '../terms.js';
 
 export default function Partner() {
 
@@ -40,7 +39,7 @@ export default function Partner() {
 
     if(!sheet) return null; //'Loading...';
 
-    function prevFunc() {console.log("CLICK PREVIOUS"); window.location.href="https://"+session.server.addr+":3000/history?client="+session.client+"&year="+session.year; }
+    function prevFunc() {console.log("CLICK PREVIOUS"); window.location.href="https://"+session.server.addr+":3000/operations?client="+session.client+"&year="+session.year; }
     function nextFunc() {  console.log("CLICK NEXT");   window.location.href="https://"+session.server.addr+":3000/status?client="+session.client+"&year="+session.year; }
     
     let page = sheet[D_Page];
@@ -63,7 +62,7 @@ export default function Partner() {
         while(iSum<taxPaid && ifix<20n) {
             iSum=0n;
             var cFix=ifix;
-            let taxAccounts = Object.keys(jBalance).filter((name)=>jBalance[name].xbrl==='de-gaap-ci_bs.ass.currAss.receiv.other.otherTaxRec.CapTax');
+            let taxAccounts = Object.keys(jBalance).filter((name)=>jBalance[name].xbrl==X_ASSET_CAPTAX); // GH20230124
             taxAccounts.map(function(name) { 
                     let iPosition = 4n + BigInt(jBalance[name].yearEnd+"0");
                     if(iSum+cFix>=taxPaid) cFix=0n;
@@ -121,10 +120,6 @@ export default function Partner() {
     return (
         <Screen prevFunc={prevFunc} nextFunc={nextFunc} tabSelector={Object.keys(jReport).map((i)=>(jReport[i].name))} tabName={tabName}>
             
-            <div id="fullReport" style={{'display':'none'}} >
-                <Report ></Report>
-            </div>
-
             <div className="attrLine">{page.GainLoss + ' ' + session.year}</div>
 
             {Object.keys(jReport).map((_,partnerNo) => ( 
@@ -181,12 +176,20 @@ export default function Partner() {
 
                     <FooterRow left={page["client"]}  right={page["register"]} prevFunc={prevFunc} nextFunc={nextFunc} miscFunc={handleJSONSave}/>
                     <FooterRow left={page["reference"]} right={page["author"]} prevFunc={prevFunc} nextFunc={nextFunc}/>
+
+
                 </div>
 
             ))} 
 
         </Screen>
     )
+    /*
+    
+                    <div id="fullReport" style={{'display':'none'}} >
+                        <Report ></Report>
+                    </div>
+    */
     
     function showReport(e) { console.log("SHOW"); let report=document.getElementById("fullReport"); if(report) report.style={'display':'block'};}
     //function hideReport(e) { console.log("HIDE"); let report=document.getElementById("fullReport"); if(report) report.style={'display':'none'}; }

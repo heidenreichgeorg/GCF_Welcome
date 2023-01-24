@@ -13,6 +13,7 @@ import FixedAssets from './pages/FixedAssets'
 import HGB275SPage from './pages/HGB275S2Page'
 import History from './pages/History'
 import Partner from './pages/Partner'
+import Operations from './pages/Operations'
 import Status from './pages/Status'
 import Transfer from './pages/Transfer'
 import { SessionProvider } from './modules/sessionmanager';
@@ -22,6 +23,7 @@ import Gauge from './components/Gauge'
 
 export function Report() { return (
         <div>
+            <Partner />
             <Balance show={1} />
             <FixedAssets />
         </div>
@@ -54,12 +56,16 @@ const router = createBrowserRouter([
         element: <HGB275SPage />
     },
     {
-        path: '/partner',
-        element: <Partner />
-    },
-    {
         path: '/history',
         element: <History />
+    },
+    {
+        path: '/operations',
+        element: <Operations />
+    },
+    {
+        path: '/partner',
+        element: <Partner />
     },
     {
         path: "/",
