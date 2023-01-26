@@ -17,5 +17,10 @@
   },
   "devDependencies": {
     "BigInt": "^5.5.3"
+  },
+  "scripts": {
+    "backend": "node server.js root=c:\\Privat config=bookingpages",
+    "frontend": "cd app && npm start",
+    "start": ""
   }
 }

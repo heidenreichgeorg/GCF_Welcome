@@ -2,8 +2,8 @@ import { useEffect, useState } from 'react';
 
 import Screen from '../pages/Screen'
 import FooterRow from '../components/FooterRow'
-import { makeStatusData }  from '../modules/App';
-import { cents2EU }  from '../modules/money';
+import { makeOperationsForm }  from '../modules/App';
+import { cents2EU, bigEUMoney }  from '../modules/money';
 
 import { D_Page } from '../terms.js'
 import { useSession } from '../modules/sessionmanager';
@@ -17,11 +17,10 @@ export default function Operations() {
     const { session, status } = useSession()
 
     const [txn,setTxn] = useState()
-    const [amount,setAmount] = useState()
 
     useEffect(() => {
-        setTxn({});
-        setAmount("0");
+        setTxn({'add':{},'sub':{},'diff':"0"});
+        
         if(status !== 'success') return;
         setYear(session.year);
         setClient(session.client);
@@ -38,7 +37,7 @@ export default function Operations() {
     function nextFunc() {  console.log("CLICK NEXT");   window.location.href="https://"+session.server.addr+":3000/partner?client="+client+"&year="+year; }
       
     let page = sheet[D_Page];
-    let sheet_status = makeStatusData(sheet);
+    let sheet_status = makeOperationsForm(sheet,txn);
     let report = sheet_status.report;
 
     const aNums = [0];
@@ -46,15 +45,16 @@ export default function Operations() {
         <Screen prevFunc={prevFunc} nextFunc={nextFunc} tabSelector={aNums} >
             {
                 report.map((row,l) => (
-                    <StatusRow am1={row.gLeft} tx1={row.nLeft} tt1={row.tLeft} 
-                               am2={row.gMidl} tx2={row.nMidl} tt2={row.tMidl} 
-                               am3={row.gRite} tx3={row.nRite} tt3={row.tRite} /> 
+                    <StatusRow am1={row.gAsset}  tx1={row.nAsset}  tt1={row.tAsset} 
+                               am2={row.gLiab}   tx2={row.nLiab}   tt2={row.tLiab} 
+                               am3={row.gGain}   tx3={row.nGain}   tt3={row.tGain}
+                               am4={row.gEquity} tx4={row.nEquity} tt4={row.tEquity} /> 
                 ))
             }
             <div className="attrLine">
                 <form onSubmit={(e)=>(console.log("SEARCH "+JSON.stringify(e.target)))} >                
                     <div className="FIELD MOAM"></div>                
-                    <div className="FIELD LTXT">Amount:<input type='edit' name='AMOUNT' onClick={(event)=>setAmount(event.target.value)}/>&nbsp;</div> 
+                    
                 </form>
             </div>
 
@@ -63,31 +63,45 @@ export default function Operations() {
         </Screen>
     )   
 
-    function StatusRow({ am1,tx1,tt1, am2, tx2,tt2, am3, tx3,tt3, d, n, l}) {
+    function StatusRow({ am1,tx1,tt1, am2, tx2,tt2, am3, tx3,tt3, am4, tx4, tt4}) {
         return(
             <div className="attrLine">
                 <div className="FIELD SEP"> &nbsp;</div>
-                <div className="FIELD MOAM">{tt1}</div>
-                <div className="FIELD SYMB" onClick={(e)=>showAccount(tx1,amount)}> {tx1}</div>
+                <div className="FIELD MOAM">{(tt1=='A')?(<input style={{'textAlign':'right'}} defaultValue={cents2EU(am1)} onChange={(e)=>addAccount(tx1,e.target.value)}/>):""}</div>
+                <div className="FIELD SYMB">{tx1}</div>
                 <div className="FIELD SEP"> &nbsp;</div>
                 <div className="FIELD SEP"> &nbsp;</div>
-                <div className="FIELD MOAM">{tt2}</div>
-                <div className="FIELD SYMB" onClick={(e)=>showAccount(tx2,amount)}> {tx2}</div>
+                <div className="FIELD MOAM">{(tt2=='L')?(<input style={{'textAlign':'right'}} defaultValue={cents2EU(am2)} onChange={(e)=>subAccount(tx2,e.target.value)}/>):""}</div>
+                <div className="FIELD SYMB">{tx2}</div>
                 <div className="FIELD SEP"> &nbsp;</div>
                 <div className="FIELD SEP"> &nbsp;</div>
-                <div className="FIELD MOAM">{tt3}</div>
-                <div className="FIELD SYMB" onClick={(e)=>showAccount(tx3,amount)}> {tx3}</div>
+                <div className="FIELD MOAM">{(tt3=='G')?(<text style={{'textAlign':'right'}} defaultValue={cents2EU(am3)}/>):""}</div>
+                <div className="FIELD SYMB" onClick={(e)=>setsubAccount(tx3,cents2EU(txn.diff))}>{tx3}</div>
                 <div className="FIELD SEP"> &nbsp;</div>
                 <div className="FIELD SEP"> &nbsp;</div>
-                <div className="FIELD SYMB"> {d}</div>
-                <div className="FIELD SNAM"> {n}</div>
-                <div className="FIELD LTXT">{l}</div>
+                <div className="FIELD MOAM">{(tt4=='E')?(<text style={{'textAlign':'right'}} defaultValue={cents2EU(am4)}/>):""}</div>
+                <div className="FIELD SYMB" onClick={(e)=>setsubAccount(tx4,cents2EU(txn.diff))}>{tx4}</div>
+                <div className="FIELD SEP">.</div>
             </div>
         )
     }
 
-    function addAccount(shrtName,a) { txn[shrtName]=a; return txn; }
-    function showAccount(shrtName,a) { setTxn(addAccount(shrtName,a)); console.log("NOTIFY("+amount+") "+JSON.stringify(txn)); }
+    
+    function setDiff(txn) {
+        var iValue=0n; 
+        Object.keys(txn.add).map((name)=>(iValue=iValue+bigEUMoney(txn.add[name]))); 
+        Object.keys(txn.sub).map((name)=>(iValue=iValue-bigEUMoney(txn.sub[name]))); 
+        txn.diff=""+iValue;
+        return txn;
+    }
+
+    function plusAccount(shrtName,a) { txn.add[shrtName]=a; return txn; }
+    function addAccount(shrtName,a) { setTxn(setDiff(plusAccount(shrtName,a))); console.log("ADD("+a+") "+JSON.stringify(txn)); }
+    
+    function minusAccount(shrtName,a) { txn.sub[shrtName]=a; return txn; }
+    function subAccount(shrtName,a) { setTxn(setDiff(minusAccount(shrtName,a))); console.log("SUB("+a+") "+JSON.stringify(txn)); }
+
+    function setsubAccount(shrtName,a) { setTxn(setDiff(minusAccount(shrtName,a))); console.log("SET("+a+") "+JSON.stringify(txn)); sheet_status = makeOperationsForm(sheet,txn); }
     
 }
 
