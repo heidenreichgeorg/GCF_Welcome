@@ -236,7 +236,7 @@ export function makeOperationsForm(response,formAdd,formSub) {
     let maxCom = Object.keys(aGain).length;
     let maxCor = Object.keys(aLiab).length;
     let maxCoe = Object.keys(aEquity).length;
-    let maxRow= SCREENLINES;
+    let maxRow= SCREENLINES-1;
     if(maxCol>maxRow) maxRow=maxCol;
     if(maxCom>maxRow) maxRow=maxCom;
     if(maxCor>maxRow) maxRow=maxCor;
@@ -419,7 +419,7 @@ export function makeStatusData(response) {
     let maxCol = Object.keys(aLeft).length;
     let maxCom = Object.keys(aMidl).length;
     let maxCor = Object.keys(aRite).length;
-    let maxRow= SCREENLINES;
+    let maxRow= SCREENLINES-1;
     if(maxCol>maxRow) maxRow=maxCol;
     if(maxCom>maxRow) maxRow=maxCom;
     if(maxCor>maxRow) maxRow=maxCor;
@@ -693,7 +693,7 @@ export function makeHGB275S2Report(response) {
         iRite=fillRight(balance,performanceBP,page.CapMargin,22,3);
         
         }
-    while(iRite<=SCREENLINES && iLeft<=SCREENLINES) {
+    while(iRite<=SCREENLINES-1 && iLeft<=SCREENLINES-1) {
         balance.push({  });
         iLeft++;
         iRite++;

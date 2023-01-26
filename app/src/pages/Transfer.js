@@ -259,7 +259,6 @@ export default function Transfer() {
             <TransferRow/> 
             <TransferRow/> 
             <TransferRow/> 
-            <TransferRow/> 
             <TransferRow date={report.date} sender={report.sender} reason={report.reason} ref1={report.ref1} ref2={report.ref2} />    
             <TransferRow date={report.lTran[0]} sender={report.lTran[1]} reason={report.lTran[2]} ref1={report.lTran[3]} ref2={report.lTran[4]} />    
             <TransferRow/> 

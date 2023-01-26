@@ -87,7 +87,7 @@ export default function Partner() {
 
     let jLength = 22; // Object.keys(jReport).length  + 2 + Object.keys(aTax).length;
     let  filler=[];
-    for(let p=jLength;p<SCREENLINES+1;p++) {
+    for(let p=jLength;p<SCREENLINES;p++) {
         filler.push({});
     }
     
