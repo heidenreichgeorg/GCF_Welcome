@@ -154,7 +154,7 @@ export function symbolic(pat) {
 }
 
 
-export function makeOperationsForm(response,form) {
+export function makeOperationsForm(response,formAdd,formSub) {
 
     const debug=null;
 
@@ -254,7 +254,7 @@ export function makeOperationsForm(response,form) {
         if(debug) console.log("STATUS.JS STATUSDATA LEFT "+iAsset+" "+name+"="+yearEnd);
 
         if(iAsset<SCREENLINES) {
-            statusData[iAsset]={"gAsset":form[iName],"nAsset":iName, "tAsset":(account.xbrl!=X_ASSETS)?"A":""};
+            statusData[iAsset]={"gAsset":formAdd[iName],"nAsset":iName, "tAsset":(account.xbrl!=X_ASSETS)?"A":""};
         }
         iAsset++;
     }
@@ -266,7 +266,7 @@ export function makeOperationsForm(response,form) {
         var account=aLiab[name];
         var iName = account.name;
         if(iLiab<SCREENLINES) {
-            statusData[iLiab].gLiab = form[iName];
+            statusData[iLiab].gLiab = formSub[iName];
             statusData[iLiab].nLiab = iName;
             statusData[iLiab].tLiab = !(account.xbrl==X_EQLIAB)?(account.xbrl.startsWith(X_EQUITY))?'E':'L':'';
             iLiab++;
@@ -280,7 +280,7 @@ export function makeOperationsForm(response,form) {
     for (let name in aGain)   {
         var account=aGain[name];
         var iName = account.name;
-        statusData[iGain].gGain = form[iName];
+        statusData[iGain].gGain = formSub[iName]; 
         statusData[iGain].nGain = iName;
         statusData[iGain].tGain = (account.xbrl!=X_INCOME_REGULAR)?'G':'';
         iGain++;
@@ -292,7 +292,7 @@ export function makeOperationsForm(response,form) {
     for (let name in aEquity)   {
         var account=aEquity[name];
         var iName = account.name;
-        statusData[nEquity].gEquity = form[iName];
+        statusData[nEquity].gEquity = formSub[iName];
         statusData[nEquity].nEquity = iName;
         statusData[nEquity].tEquity = account.xbrl!=X_EQUITY?'E':'E';
         nEquity++;
