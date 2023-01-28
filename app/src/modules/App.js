@@ -106,6 +106,7 @@ export function prettyTXN(jHistory,hash,lPattern,aPattern,names,aLen,eLen) {
     return result;
 }
 
+// puts one name/amount apri into the flow structure
 export function prepareTXN(schema,flow, name,amount) {
     
     var balanceNames=schema.Names;
@@ -236,7 +237,7 @@ export function makeOperationsForm(response,formAdd,formSub) {
     let maxCom = Object.keys(aGain).length;
     let maxCor = Object.keys(aLiab).length;
     let maxCoe = Object.keys(aEquity).length;
-    let maxRow= SCREENLINES-1;
+    let maxRow= SCREENLINES-2;
     if(maxCol>maxRow) maxRow=maxCol;
     if(maxCom>maxRow) maxRow=maxCom;
     if(maxCor>maxRow) maxRow=maxCor;
@@ -730,4 +731,27 @@ function fillRight(balance,cValue,iName,iRite,level) {
         iRite++;
     }
     return iRite;
+}
+
+
+export function book(jTXN,session) {
+
+    const requestOptions = {
+        method: 'POST',
+        headers: {  'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'mode':'cors'
+                  },
+        body: JSON.stringify(jTXN)
+    };
+
+    fetch(`${process.env.REACT_APP_API_HOST}/BOOK?sessionId=${session.id}`, requestOptions)
+    .then(data => data.json())
+    .then(body => { console.log("BOOK RESULT "+JSON.stringify(body));
+    
+            let urlCommand = process.env.REACT_APP_API_HOST+"/LATEST?client="+body.client+"&year="+body.year+"&ext=JSON";
+            console.log("BOOK RELOAD "+urlCommand);
+            fetch(urlCommand)
+            .then(res => {console.log("BOOK REFRESH "+JSON.stringify(res.body))})
+        });
 }

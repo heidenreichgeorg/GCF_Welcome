@@ -2,7 +2,7 @@
 
 export default function FooterRow({left,right,prevFunc,nextFunc,miscFunc=null}) {
     return(
-        <div className="attrLine">
+        <div className="attrRow">
             <div className="FIELD IDNT" onClick={(() => miscFunc())}>&nbsp;&nbsp;</div>
             <div className="key" onClick={(() => prevFunc())}>&lt;&lt;</div>
             <div className="FIELD L280">{left}</div>

@@ -69,7 +69,7 @@ export default function History() {
     for(let p=1;p<sPages-1;p++) aPages[p]='none'; 
     aPages[0]='block';
    
-let sum ={ value:" 12,34"};
+    let sum ={ value:" 12,34"};
 
     const tabName = 'HistoryContent';
     return (
@@ -140,13 +140,13 @@ function SigRow({row,index}) {
 
     var selectAll = getParam("SELECTALL");
     if(selectAll && selectAll.length<1) selectAll=null;
-    if(selectAll) { aSelText[id]=aRow;  aSelMoney[id]=mRow; aSelSaldo[id]=""+saldo;
-}
-
+    if(selectAll) { aSelText[id]=aRow;  aSelMoney[id]=mRow; aSelSaldo[id]=""+saldo; }
+// checked={(selectAll||aSelMoney[id])?"checked":""}
+    var checked=(aSelSaldo[id]!=null);
     return (
         <div className="attrPair">
             <div className="attrLine" id={id}>
-                <div className="FIELD SYMB"><label><input TYPE="CHECKBOX" onChange={event => handleChange(event.target,aRow,mRow)} checked={selectAll?"checked":""}/>
+                <div className="FIELD SYMB"><label><input TYPE="CHECKBOX" onChange={(event) => handleChange(event.target,aRow,mRow)} defaultChecked={checked} />
                                         </label></div>
                 <div className="FIELD TAX">{aRow[0]}</div>
                 <div className="FIELD SEP">&nbsp;</div>

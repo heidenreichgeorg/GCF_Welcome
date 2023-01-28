@@ -2,7 +2,7 @@ import { useEffect, useState, useRef  } from 'react';
 
 import FooterRow from '../components/FooterRow'
 import Screen from '../pages/Screen'
-import { prettyTXN, prepareTXN }  from '../modules/App';
+import { book, prettyTXN, prepareTXN }  from '../modules/App';
 import { J_ACCT, D_Page, D_History, D_Schema, CSEP } from '../terms.js'
 import { useSession } from '../modules/sessionmanager';
 
@@ -357,26 +357,4 @@ function makeTransferData(response,iSelected) {
         }
     }  
    return transferData;
-}
-
-function book(jTXN,session) {
-
-    const requestOptions = {
-        method: 'POST',
-        headers: {  'Accept': 'application/json',
-                    'Content-Type': 'application/json',
-                    'mode':'cors'
-                  },
-        body: JSON.stringify(jTXN)
-    };
-
-    fetch(`${process.env.REACT_APP_API_HOST}/BOOK?sessionId=${session.id}`, requestOptions)
-    .then(data => data.json())
-    .then(body => { console.log("BOOK RESULT "+JSON.stringify(body));
-    
-            let urlCommand = process.env.REACT_APP_API_HOST+"/LATEST?client="+body.client+"&year="+body.year+"&ext=JSON";
-            console.log("BOOK RELOAD "+urlCommand);
-            fetch(urlCommand)
-            .then(res => {console.log("BOOK REFRESH "+JSON.stringify(res.body))})
-        });
 }

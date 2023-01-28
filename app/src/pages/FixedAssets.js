@@ -1,4 +1,4 @@
-// global BigInt 
+/* global BigInt */
 
 import { useEffect, useState, useRef  } from 'react';
 import Screen from '../pages/Screen'
@@ -42,7 +42,7 @@ export default function FixedAssets() {
         filler.push({});
     }
     
-    var iRest = 0;
+    var iRest = 0n;
 
     return (
         <Screen prevFunc={prevFunc} nextFunc={nextFunc} tabSelector={aPages} >
@@ -59,7 +59,7 @@ export default function FixedAssets() {
 
                 {Object.keys(jAssets).map(function(key) {
                     var row = jAssets[key];
-                    iRest+=parseInt(row.rest);
+                    iRest+=BigInt(row.rest);
                     return (
                         <FixedAssetsRow p={{idnt:row.idnt,type:row.type,date:row.date,
                             init:cents2EU(row.init),
@@ -74,7 +74,7 @@ export default function FixedAssets() {
                 <FixedAssetsRow p={{ 'idnt':jReport.xbrlFixed.de_DE, 'type':' ', 'date':session.year+"-12-31",
                         'init':' ', 
                         'nmbr':' ',
-                        'rest':parseFloat(iRest)/100.0,
+                        'rest':cents2EU(iRest),
                         'current':' ',
                         'cost':' ' } }
                 />
