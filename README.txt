@@ -12,10 +12,10 @@ Server process reads TABLE (e.g. MS Excel (TM)) with accounting history in Euros
  Column  'A' is a simple hash code that may be used as a signature for that transaction
  Column  'B' is the date of the transaction
  Column  'C' should be the money sender or money recipient 
- Column  'D' should be the Equity/Liability/Gain/Cost account that is affected
- Column  'E' should be the reason or keyword for the transaction
+ Column  'D' should be the Equity/Liability/Gain/Cost reference account that is affected
+ Column  'E' should be the general reason or keyword for the transaction
  Column  'F' should be the referring date interval e.g.month/quarter/year or an external identification code for that transaction 
- Columns 'G' and subsequent columns shall be asset accounts, preferably starting with fixed assets then currecny assets and then claims
+ Columns 'G' and subsequent columns shall be  accounts, preferably starting with fixed assets then currency assets and then claims
  The limiting columns is then called ASSETS
  Subsequent columns shall be for Gain/Loss accounts i.e. revenues and cost
  The limiting columns is then called EQLIAB
@@ -130,7 +130,7 @@ D_REPORT = {
         "Sender",
         "Konto",
         "SVWZ1",
-        "SVWZ2",
+        "refTime",
         "REAL1",
         "REAL2",
         "Aktiendepot",

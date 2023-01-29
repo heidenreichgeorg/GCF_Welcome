@@ -47,7 +47,10 @@ export default function Accounts() {
         <Screen prevFunc={prevFunc} nextFunc={nextFunc} tabSelector={pageText} tabName={tabName}>
             { aStands.map((report,n)=>
                 <div className="ulliTab" id={tabName+n} style= {{ 'display': aPages[n]}} >
-                    <div className="attrLine">{[page.AcctOpen,page.AcctClose,page.AcctNext][n] + ' ' + (parseInt(session.year)+1)}</div>
+                    <div className="attrLine">{[
+                        page.AcctOpen+' '+session.year,
+                        page.AcctClose+' '+session.year,
+                        page.AcctNext+' '+(parseInt(session.year)+1)][n]}</div>
                     {report.map((row) => 
                         <AccountsRow am1={row.gLeft} tx1={row.nLeft} am2={row.gMidl} tx2={row.nMidl} am3={row.gRite} tx3={row.nRite} />                       
                     )}                    

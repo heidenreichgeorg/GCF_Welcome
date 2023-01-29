@@ -1188,8 +1188,8 @@ function sendBalance(balance) {
             closeIncome['date']='31.12.'+year;
             closeIncome['sender']='System';
             closeIncome['refAcct']=de_DE['GainLoss'];
-            closeIncome['svwz']=de_DE['NextYear'];
-            closeIncome['svwz2']=de_DE['Closing'];
+            closeIncome['reason']=de_DE['Closing'];
+            closeIncome['refTime']=de_DE['NextYear'];
 
             let yearEnd = gReport.xbrlRegular.account.yearEnd;
             if(debugReport) console.log("sendBalance CLOSING income "+yearEnd);
@@ -1454,8 +1454,8 @@ function formatTXN(sessionId,reqBody) {
     var jDate  = reqBody.date;
     var jSender= reqBody.sender;
     var jAcct  = reqBody.refAcct;
-    var jSVWZ  = reqBody.svwz;
-    var jSVWZ2 = reqBody.svwz2;
+    var jSVWZ  = reqBody.reason;
+    var jSVWZ2 = reqBody.refTime;
     var jCredit= reqBody.credit;
     var jDebit = reqBody.debit;
     var bookingForm=null;

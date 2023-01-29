@@ -1,5 +1,7 @@
 /* global BigInt */
 
+// .refAcct;var jSVWZ  = reqBody.reason;var jSVWZ2 = reqBody.refTime;
+
 import { useEffect, useState, useRef } from 'react';
 
 import Screen from '../pages/Screen'
@@ -15,7 +17,7 @@ export default function Operations() {
     const [sheet, setSheet]  = useState() // returns a pair with object-location plus setter function for that location
     const [ year, setYear]   = useState()
     const [client,setClient] = useState()
-    const [txn,setTxn] = useState({'add':{},'sub':{},'diff':"0", 'date':"", 'sender':"", 'reason':"", 'ref1':"", 'ref2':""  })
+    const [txn,setTxn] = useState({'add':{},'sub':{},'diff':"0", 'date':"", 'sender':"", 'refAcct':"", 'reason':"", 'refTime':""  })
 
     const { session, status } = useSession()
 
@@ -56,7 +58,7 @@ export default function Operations() {
         txn.credit = flow.credit;
         txn.debit = flow.debit;
         
-        // reason ref1 ref2 missing
+        // refAcct reason refTime missing
 
         console.log("BOOK B "+JSON.stringify(txn));
 
@@ -71,7 +73,7 @@ export default function Operations() {
    /*
    
 20230127212142120
-0610 app.post BOOK jTXN('{"add":{"COGK":"139000"},"sub":{"NKHA":"10000","MIET":"129000"},"diff":"0","date":"2023-02-02","sender":"Ferguson","reason":"MIET","ref1":"Eifelweg22","ref2":"Februar2023","credit":{"COGK":{"index":10,"value":"139.000,00"}},"debit":{"NKHA":{"index":24,"value":"10.000,00"},"MIET":{"index":16,"value":"129.000,00"}}}')
+0610 app.post BOOK jTXN('{"add":{"COGK":"139000"},"sub":{"NKHA":"10000","MIET":"129000"},"diff":"0","date":"2023-02-02","sender":"Ferguson","refAcct":"MIET","reason":"Eifelweg22","refTime":"Februar2023","credit":{"COGK":{"index":10,"value":"139.000,00"}},"debit":{"NKHA":{"index":24,"value":"10.000,00"},"MIET":{"index":16,"value":"129.000,00"}}}')
 0617 app.post BOOK NO OLD session MUST SET req.body.sessionId
    */
     }
@@ -95,7 +97,7 @@ export default function Operations() {
                                am4={row.gEquity} tx4={row.nEquity} tt4={row.tEquity} /> 
                 ))
             }
-            <InputRow date={txn.date} sender={txn.sender} reason={txn.reason} ref1={txn.ref1} ref2={txn.ref2}/>    
+            <InputRow date={txn.date} sender={txn.sender} refAcct={txn.refAcct} reason={txn.reason} refTime={txn.refTime}/>    
             
             <FooterRow left={page["client"]}  right={page["register"]} prevFunc={prevFunc} nextFunc={nextFunc}/>
             <FooterRow left={page["reference"]} right={page["author"]} prevFunc={prevFunc} nextFunc={nextFunc}/>
@@ -125,7 +127,7 @@ export default function Operations() {
         )
     }
  
-    function InputRow({ date,sender,reason,ref1,ref2 }) {
+    function InputRow({ date,sender,refAcct,reason,refTime }) {
         return(
             <div className="attrRow">
                 <div className="FIELD SYMB"> &nbsp;</div>
@@ -133,11 +135,11 @@ export default function Operations() {
                 <div className="FIELD SEP">&nbsp;</div>
                 <div className="FIELD XFER"><input type="edit" id="cSender" name="cSender" defaultValue ={sender} onChange={(e)=>addTXNData('sender',e.target.value)} onDrop={ignore} /></div>
                 <div className="FIELD SEP">&nbsp;</div>
-                <div className="FIELD XFER"><input type="edit" id="cReason" name="cReason" defaultValue ={reason} onChange={(e)=>addTXNData('reason',e.target.value)} onDrop={ignore} /></div>
+                <div className="FIELD XFER"><input type="edit" id="cReason" name="cReason" defaultValue ={refAcct} onChange={(e)=>addTXNData('refAcct',e.target.value)} onDrop={ignore} /></div>
                 <div className="FIELD SEP">&nbsp;</div>
-                <div className="FIELD XFER"><input type="edit" id="cRef1"   name="cRef1"   defaultValue ={ref1}   onChange={(e)=>addTXNData('ref1',e.target.value)} onDrop={ignore} /></div>
+                <div className="FIELD XFER"><input type="edit" id="cRef1"   name="cRef1"   defaultValue ={reason}   onChange={(e)=>addTXNData('reason',e.target.value)} onDrop={ignore} /></div>
                 <div className="FIELD SEP">&nbsp;</div>
-                <div className="FIELD XFER"><input type="edit" id="cRef2"   name="cRef2"   defaultValue ={ref2}   onChange={(e)=>addTXNData('ref2',e.target.value)} onDrop={ignore} /></div>
+                <div className="FIELD XFER"><input type="edit" id="cRef2"   name="cRef2"   defaultValue ={refTime}   onChange={(e)=>addTXNData('refTime',e.target.value)} onDrop={ignore} /></div>
             </div>)
     }
     
