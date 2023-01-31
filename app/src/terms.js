@@ -37,6 +37,6 @@ export const  SCREENLINES=23;
 
 
 
-export const REACT_APP_API_HOST=`192.168.178.28:81`
+//export const REACT_APP_API_HOST=`192.168.178.28:81`
 
 

@@ -33,9 +33,13 @@ const HTTP_OK = 200;
 const HTTP_WRONG = 400;
 
 // Modules
+// const https = require('https');
+
+const fs = require('fs');
+
 const express = require('express');
 const app = express();
-const fs = require('fs');
+
 const qr = require('qrcode');
 const ejs = require("ejs");
 const path = require('path');
@@ -87,9 +91,12 @@ app.listen(PORT, () => {
     console.log(`Local     http://localhost:${PORT}/welcomedrop`); 
 })
 
-
-
-
+/*
+let secureServer = https.createServer(
+        {  key:fs.readFileSync("key.pem"),
+          cert:fs.readFileSync("cert.pem") },
+    app);
+*/
 
 
 

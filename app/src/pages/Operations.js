@@ -131,7 +131,7 @@ export default function Operations() {
         return(
             <div className="attrRow">
                 <div className="FIELD SYMB"> &nbsp;</div>
-                <div className="FIELD XFER"><input type="edit" id="cDate"   name="cDate"   defaultValue ={date}   onChange={(e)=>addTXNData('date',e.target.value)} onDrop={ignore} /></div>
+                <div className="FIELD XFER"><input type="date" id="cDate"   name="cDate"   defaultValue ={date}   onChange={(e)=>addTXNData('date',e.target.value)} onDrop={ignore} /></div>
                 <div className="FIELD SEP">&nbsp;</div>
                 <div className="FIELD XFER"><input type="edit" id="cSender" name="cSender" defaultValue ={sender} onChange={(e)=>addTXNData('sender',e.target.value)} onDrop={ignore} /></div>
                 <div className="FIELD SEP">&nbsp;</div>

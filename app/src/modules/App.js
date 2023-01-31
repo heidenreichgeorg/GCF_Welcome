@@ -353,6 +353,8 @@ export function makeStatusData(response) {
     let iFixed=0n;
     let iEquity=0n;
     let iTan=0n;
+    let iLia=0n;
+    let iCur=0n;
 
     let ass="{close:0}";
     let eql="{close:0}";
@@ -403,6 +405,8 @@ export function makeStatusData(response) {
                     if(account.xbrl.startsWith(jReport.xbrlTanFix.xbrl)) { // accumulate tangible fixed assets
                         iTan = iTan + iClose;
                     }
+                } else if(account.xbrl.startsWith(jReport.xbrlAcurr.xbrl)) { // accumulate current assets#
+                    iCur = iCur + iClose;
                 }
             }
             if(xbrl_pre===X_INCOME) {
@@ -410,8 +414,12 @@ export function makeStatusData(response) {
             }
             if(xbrl_pre===X_EQLIAB) {
                 aRite[name]=account;
+                var iClose = BigInt(account.init)+BigInt(account.debit)+BigInt(account.credit); 
                 if(account.xbrl.startsWith(jReport.xbrlEquity.xbrl)) { // accumulate equity
-                    iEquity = iEquity + BigInt(account.init)+BigInt(account.debit)+BigInt(account.credit); 
+                    iEquity = iEquity + iClose;
+                }
+                else if(account.xbrl.startsWith(jReport.xbrlLiab.xbrl)) {
+                    iLia = iLia + iClose;
                 }
             }
         }
@@ -519,7 +527,7 @@ export function makeStatusData(response) {
         }
     }
     
-   return {report:statusData, ass:ass.yearEnd, eql:eql.yearEnd, gls:gls.yearEnd, fix:(""+iFixed), equity:(""+iEquity), tan:(""+iTan)};
+   return {report:statusData, ass:ass.yearEnd, eql:eql.yearEnd, gls:gls.yearEnd, fix:(""+iFixed), equity:(""+iEquity), tan:(""+iTan), cur:(""+iCur), lia:(""+iLia)};
 }
 
 

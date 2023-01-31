@@ -25,7 +25,8 @@ export default function Chart({jValue, legend}) {
                     {valueKeys.map((key,i) =>
                     (
                         <line x1={20+14*i} y1={140} x2={20+14*i} y2={(140-140*parseInt(jValue[key])/max)} stroke={colArray[i] }
-                            strokeDasharray={dashArray} strokeLinecap="round" strokeWidth={strokeWidth} />
+                        strokeDasharray={dashArray} 
+                            strokeLinecap="round" strokeWidth={strokeWidth} />
                     ))}
 
                     <text x={10+7*num} y="160" text-anchor="middle"><tspan>{legend}</tspan></text>

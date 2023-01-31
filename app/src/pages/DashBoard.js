@@ -7,9 +7,10 @@ import { useSession } from '../modules/sessionmanager';
 import { makeStatusData }  from '../modules/App';
 import { D_FixAss }  from '../terms.js';
 
-import Gauge from '../components/Gauge'
-import Slider from '../components/Slider'
 import Chart from '../components/Chart'
+import Gauge from '../components/Gauge'
+import Relation from '../components/Relation'
+import Slider from '../components/Slider'
 
 
 export default function DashBoard({value}) {
@@ -40,10 +41,11 @@ export default function DashBoard({value}) {
     let report = sheet_status.report;
 
     let ass = sheet_status.ass;
+    let cur = sheet_status.cur;
     let fix = sheet_status.fix;
     let tan = sheet_status.tan;
 
-    let eql = sheet_status.ass;
+    let lia = sheet_status.lia;
     let eqt = sheet_status.equity;
 
     let gls = sheet_status.gls;
@@ -71,6 +73,10 @@ export default function DashBoard({value}) {
                 <Slider value={parseInt((100n*BigInt(fix))/BigInt(eqt))} legend={"fix/eqt"}/>
                 <Gauge percent={parseInt((100n*BigInt(eqt))/BigInt(fix))} radius={90} strDim={"eqt/fix"} color={"#6040E0"}/> 
                 <Chart jValue={jValue} legend={"assets"}/>
+                <Relation scale={ass} left={cur} right={lia} legend={"cash/debt"} />
+            </div>
+            <div classname="attrLine">
+                <Relation scale={ass} left={fix} right={eqt} legend={"fix/eqt"} />
             </div>
             
         </Screen>

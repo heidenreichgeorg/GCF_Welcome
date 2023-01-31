@@ -31,16 +31,20 @@ These commands also resolve the error ERR_CERT_WEAK_SIGNATURE_ALGORITHM returned
 7. In app/package.json  DEFINE "scripts": { "start": "set HTTPS=true&&react-scripts start", ...
 
 
-FOR BACKEND SERVER
+FOR BACKEND SERVER (Jan 31, 2023)
 
-8. create a new certificate in c:\workspace\sec for www.bexar.de
-New-SelfSignedCertificate -Subject "www.bexar.de" -CertStoreLocation c:\workspace\sec
+8. create a new certificate in c:\workspace\sec for www.cashtop.de
+New-SelfSignedCertificate -Subject "www.cashtop.de" -CertStoreLocation c:\workspace\sec
 
-9. remove old certificate
+
+9. remove old certificate for backend port 81
 netsh http delete sslcert ipport=0.0.0.0:81
 
 
-10. netsh http add sslcert ipport=0.0.0.0:81   appid='{214124cd-d05b-4309-9af9-9caa44b2b74a}' certhash=E2924D13A1D0EEDDBD28B741FAA4F80539E46D77
+10. bind new cert to Port 81 for backend, invent an app-id to bind it later, use the cert hash optained from   ls cert:\LocalMachine\My
+netsh http add sslcert ipport=0.0.0.0:81   appid='{214524cd-d65b-4309-9af7-9caa48b2b79a}' certhash=20747ED182AA326887E674B41ACA78557484FF78
+
+
 */
 import { useState, useEffect } from "react";
 

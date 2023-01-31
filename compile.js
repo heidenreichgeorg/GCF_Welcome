@@ -389,7 +389,7 @@ function initBalance() {
         xbrlTanFix : { level:3, xbrl: "de-gaap-ci_bs.ass.fixAss.tan", de_DE:'Sachanlagen'},
         xbrlFinFix : { level:3, xbrl: "de-gaap-ci_bs.ass.fixAss.fin", de_DE:'Finanzanlagen'},
         xbrlFixed  : { level:2, xbrl: "de-gaap-ci_bs.ass.fixAss", de_DE:'Anlagevermögen'},
-        abrlABank: {   level:4, xbrl: "de-gaap-ci_bs.ass.currAss.cashEquiv.bank", de_DE:'Bankkonto'},
+        abrlABank:  {   level:4, xbrl: "de-gaap-ci_bs.ass.currAss.cashEquiv.bank", de_DE:'Bankkonto'},
         abrlAmoney: {  level:3, xbrl: "de-gaap-ci_bs.ass.currAss.cashEquiv", de_DE:'Geldinstr.'},
         xbrlPaidTax: { level:4, xbrl: "de-gaap-ci_bs.ass.currAss.receiv.other.otherTaxRec", de_DE:'gezahlte Steuer'},     
         // KESO KEST AQST= de-gaap-ci_bs.ass.currAss.receiv.other.otherTaxRec.CapTax 
