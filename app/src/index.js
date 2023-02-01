@@ -88,7 +88,7 @@ root.render(
             <SessionProvider
                 onLoading={'Loading session...'}
                 location={ router.state.location }
-                server={ window.location.origin.replace('3000','81')} //.split('//')[1]
+                 // server={ window.location.origin.replace('3000','8080')} was 81
                 >
                 <RouterProvider router={router} />
             </SessionProvider>

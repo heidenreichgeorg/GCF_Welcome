@@ -44,6 +44,16 @@ netsh http delete sslcert ipport=0.0.0.0:81
 10. bind new cert to Port 81 for backend, invent an app-id to bind it later, use the cert hash optained from   ls cert:\LocalMachine\My
 netsh http add sslcert ipport=0.0.0.0:81   appid='{214524cd-d65b-4309-9af7-9caa48b2b79a}' certhash=20747ED182AA326887E674B41ACA78557484FF78
 
+-------------------------------
+A) INSTALL MKCERT 
+npm install mkcert
+
+B) GENERATE A CERTIFICATE-AUTHORITY
+node .\node_modules\mkcert/src/cli.js create-ca
+
+C) CREATE A CERTFICATE
+node .\node_modules\mkcert/src/cli.js create-cert
+
 
 */
 import { useState, useEffect } from "react";

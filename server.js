@@ -33,7 +33,7 @@ const HTTP_OK = 200;
 const HTTP_WRONG = 400;
 
 // Modules
-// const https = require('https');
+const https = require('https');
 
 const fs = require('fs');
 
@@ -53,7 +53,7 @@ const cors = require('cors');
 
 app.use(bodyParser.json({limit: '900kb'}));
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(cors())
+app.use(cors({origin: true}))
 
 const { networkInterfaces } = require('os');
 
@@ -81,6 +81,47 @@ app.use(express.static(__dirname));
 const PORT = 81;
 
 
+/*
+
+BACKEND HTTPS for nodeJS
+
+-------------------------------
+A) INSTALL MKCERT 
+npm install mkcert
+
+B) GENERATE A CERTIFICATE-AUTHORITY
+node .\node_modules\mkcert/src/cli.js create-ca
+
+C) CREATE A CERTIFICATE
+node .\node_modules\mkcert/src/cli.js create-cert
+*/
+
+let secureServer = https.createServer(
+        {  key:fs.readFileSync("../sec/test-cert.key"),
+          cert:fs.readFileSync("../sec/test-cert.crt") },
+          app
+          /* OR
+          (req, res) => {
+            res.statusCode = 200;
+            res.setHeader('Content-Type', 'text/plain');
+            res.end('Hello Secure World\n');
+          }
+          */
+          );
+
+
+              
+let secPort=8080;
+let secHostname="localhost";
+
+secureServer.listen(secPort, secHostname, (req,res) => {
+            console.log('Secure server receives at https://${secHostname}:${secPort}/');
+          });
+
+
+
+
+
 // show convenience link to create and load a new browser window
 app.listen(PORT, () => { 
     console.log("\n\n");
@@ -90,17 +131,6 @@ app.listen(PORT, () => {
     console.log(`Global    http://${localhost().addr}:${PORT}/LATEST`); 
     console.log(`Local     http://localhost:${PORT}/welcomedrop`); 
 })
-
-/*
-let secureServer = https.createServer(
-        {  key:fs.readFileSync("key.pem"),
-          cert:fs.readFileSync("cert.pem") },
-    app);
-*/
-
-
-
-
 
 
 
