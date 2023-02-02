@@ -94,6 +94,8 @@ node .\node_modules\mkcert/src/cli.js create-ca
 
 C) CREATE A CERTIFICATE
 node .\node_modules\mkcert/src/cli.js create-cert
+
+D) 
 */
 
 let secureServer = https.createServer(
@@ -115,7 +117,7 @@ let secPort=8080;
 let secHostname="localhost";
 
 secureServer.listen(secPort, secHostname, (req,res) => {
-            console.log('Secure server receives at https://${secHostname}:${secPort}/');
+            console.log(`Secure server receives at https://${secHostname}:${secPort}/`);
           });
 
 

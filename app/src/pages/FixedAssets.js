@@ -54,7 +54,8 @@ export default function FixedAssets() {
                         'nmbr':'Anzahl',
                         'rest':'Zeitwert',
                         'current':'Anzahl',
-                        'cost':'Stückpreis'} } />
+                        'cost':'Stückpreis',
+                        'gain':'Ertrag'} } />
 
 
                 {Object.keys(jAssets).map(function(key) {
@@ -65,7 +66,8 @@ export default function FixedAssets() {
                             init:cents2EU(row.init),
                             nmbr:row.nmbr,
                             rest:cents2EU(row.rest),
-                            cost:cents2EU(row.cost)
+                            cost:cents2EU(row.cost),
+                            gain:cents2EU(row.gain)
                             }} />
                     )
                     })
@@ -94,7 +96,6 @@ export default function FixedAssets() {
 }
     function FixedAssetsRow(mRow) {
         console.log("FixedAssetsRow mRow="+JSON.stringify(mRow));
-        //let unitPrice = (mRow.p.nmbr && mRow.p.nmbr>0)?cents2EU(bigEUMoney(mRow.p.cost).cents/parseInt(mRow.p.nmbr)):"--";
         return (
             <div className="attrLine">
                 <div className="FIELD LNAM">{mRow.p.idnt}</div>
@@ -104,6 +105,7 @@ export default function FixedAssets() {
                 <div className="FIELD MOAM">{mRow.p.nmbr}</div>
                 <div className="FIELD MOAM">{mRow.p.rest}</div>
                 <div className="FIELD MOAM">{mRow.p.cost}</div>
+                <div className="FIELD MOAM">{mRow.p.gain}</div>
             </div>        
         )
     }
