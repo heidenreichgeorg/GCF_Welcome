@@ -28,7 +28,7 @@ export default function Status() {
         }
     }, [status])
 
-    if(!sheet) return null; // 'Loading...';
+    if(!sheet) return 'Loading Status...';
    
     function prevFunc() {console.log("CLICK PREVIOUS"); window.location.href="https://"+session.server.addr+":3000/partner?client="+client+"&year="+year; }
     function nextFunc() {  console.log("CLICK NEXT");   window.location.href="https://"+session.server.addr+":3000/transfer?client="+client+"&year="+year; }

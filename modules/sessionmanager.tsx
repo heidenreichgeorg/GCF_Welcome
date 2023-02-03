@@ -8,7 +8,7 @@ type Session = {
 
 }
 
-export const REACT_APP_API_HOST="https://localhost:8080/"
+export const REACT_APP_API_HOST="http://localhost:3000/backend/"
 
 const SessionContext = createContext<Session>({})
 
@@ -43,15 +43,15 @@ export function SessionProvider({ children,  location, default_value, onLoading,
             }
         } else { 
             // PUT REAL IP ADDR or DNS NAME OF BACKEND INTO .env file
-            //fetch(`${process.env.REACT_APP_API_HOST}/SESSION${strSearch}`,  
-            fetch(`${REACT_APP_API_HOST}/SESSION?${strSearch}`,  
+            //fetch(`${process.env.REACT_APP_API_HOST}SESSION${strSearch}`,  
+            fetch(`${REACT_APP_API_HOST}SESSION?${strSearch}`,  
             {mode:'cors'}) // CORS 20230114
             .then(data => data.json())
             .then(data => {
                 let len=0;
                 setSession(data);
                 sessionStorage.setItem('session',JSON.stringify(data));
-                //console.log("*   WARM       "+(data && data.sheetCells && (len=data.sheetCells.length)>2)?(data.sheetCells[len-1].join(" ")):".");
+                console.log("*   WARM       "+(data && data.sheetCells && (len=data.sheetCells.length)>2)?(data.sheetCells[len-1].join(" ")):".");
                 setStatus('success');
             })
             .catch(() => {

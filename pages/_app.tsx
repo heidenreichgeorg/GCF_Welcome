@@ -9,7 +9,6 @@ export default function App({ Component, pageProps }: AppProps) {
     <SessionProvider
         onLoading={'Loading session...'}
         location={ router.query }
-          // server={ window.location.origin.replace('3000','8080')} was 81
         >
       <Component {...pageProps} />
     </SessionProvider>

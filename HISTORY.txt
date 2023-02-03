@@ -6,5 +6,6 @@
 # In 2021 the server was ported to nodeJS/express which sends the same (huge) JSON packet to the 14 client pages in JavaScript
 # In 2022 the frontend based on React was added and the persistent data now resides in Google Firebase Bucket Storage
 #         the server runs NODE JS on Amazon Web Services while the old client uses JavaScript/BE and another client uses React/FE
+# In 2023 both BE and FE were migrated to typescript and BE is now running as pages/backend under the same server:port
 #
 
