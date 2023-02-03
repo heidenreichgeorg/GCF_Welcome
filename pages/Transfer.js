@@ -3,10 +3,8 @@ import { useEffect, useState, useRef  } from 'react';
 import FooterRow from '../components/FooterRow'
 import Screen from '../pages/Screen'
 import { book, prettyTXN, prepareTXN }  from '../modules/App';
-import { J_ACCT, D_Page, D_History, D_Schema, CSEP } from '../terms.js'
+import { J_ACCT, D_Page, D_History, D_Schema, CSEP } from '../modules/terms.js'
 import { useSession } from '../modules/sessionmanager';
-
-
 
 export default function Transfer() {
 

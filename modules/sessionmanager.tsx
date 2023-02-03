@@ -1,23 +1,30 @@
 
 // PUT REAL IP ADDR or DNS NAME OF BACKEND INTO .env file
 
-import { createContext, useContext, useEffect, useState } from "react";
+import { ParsedUrlQuery,stringify } from "querystring";
+import { createContext, ReactNode, useContext, useEffect, useState } from "react";
 
-const SessionContext = createContext()
+type Session = {
+
+}
+
+export const REACT_APP_API_HOST="https://localhost:8080/"
+
+const SessionContext = createContext<Session>({})
 
 export function useSession() {
     return useContext(SessionContext)
 }
-export function SessionProvider({ children,  location, default_value, onLoading, onError, server }) {
+
+export function SessionProvider({ children,  location, default_value, onLoading, onError }: { children: ReactNode, location: ParsedUrlQuery, default_value?:Session, onLoading?: string, onError?: string }) {
 
     const [session, setSession] = useState(default_value)
 
     const [status, setStatus] = useState('loading')
 
-    let strSearch = location.search;
-    console.log("SessionProvider location="+JSON.stringify(location))
-    console.log("SessionProvider server="+JSON.stringify(server));
-    //console.log("SessionProvider process="+process.env.REACT_APP_API_HOST);
+    let strSearch = stringify(location);
+    console.log("SessionProvider host="+REACT_APP_API_HOST);
+    console.log("SessionProvider location="+strSearch)
 
     useEffect(() => {
         
@@ -36,7 +43,8 @@ export function SessionProvider({ children,  location, default_value, onLoading,
             }
         } else { 
             // PUT REAL IP ADDR or DNS NAME OF BACKEND INTO .env file
-            fetch(`${process.env.REACT_APP_API_HOST}/SESSION${strSearch}`,  
+            //fetch(`${process.env.REACT_APP_API_HOST}/SESSION${strSearch}`,  
+            fetch(`${REACT_APP_API_HOST}/SESSION?${strSearch}`,  
             {mode:'cors'}) // CORS 20230114
             .then(data => data.json())
             .then(data => {
@@ -52,8 +60,6 @@ export function SessionProvider({ children,  location, default_value, onLoading,
         }
     
     }, [])
-
-
 
     return (
         <SessionContext.Provider

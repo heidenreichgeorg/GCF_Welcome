@@ -1,6 +1,6 @@
 /* global BigInt */
 
-import { D_Balance, D_History, D_Report, D_Schema, D_Page, X_ASSETS, X_EQLIAB, X_EQUITY, X_INCOME, X_INCOME_REGULAR, J_ACCT, COLMIN, DOUBLE, SCREENLINES } from '../terms.js'
+import { D_Balance, D_History, D_Report, D_Schema, D_Page, X_ASSETS, X_EQLIAB, X_EQUITY, X_INCOME, X_INCOME_REGULAR, J_ACCT, COLMIN, DOUBLE, SCREENLINES } from '../modules/terms.js'
 
 import { bigEUMoney, cents2EU } from './money'
 
