@@ -2,7 +2,7 @@
 
 
 import { useEffect, useState  } from 'react';
-import Screen from '../pages/Screen'
+import Screen from './Screen'
 import { useSession } from '../modules/sessionmanager';
 import { makeStatusData }  from '../modules/App';
 import { D_FixAss }  from '../modules/terms.js';

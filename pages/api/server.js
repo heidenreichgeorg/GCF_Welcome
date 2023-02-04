@@ -29,10 +29,8 @@ const PORT = 81;
 const ReactPort = 3000;
 
 
-const processArgv = { "root":"C:\\Privat", "config":"bookingpages" }
-// const config = init(app,process.argv); // GH20221003 do that per module
-setRoot(processArgv.root);
-let config=processArgv.config;
+const config = init(/*app,*/ process.argv); // GH20221003 do that per module
+
 
 // session management
 var allSession = null; // LIFO
@@ -97,7 +95,7 @@ function sy_findSessionId(client,year) {
                 console.log("0806  FOUND => (SESSION  "+showRecent(session)+" client="+session.client+","+session.year+")");
             }
         }
-        else    console.log("0805  FOUND EMPTY SESSION   (client="+client+","+year+")");
+        else    console.log("0805  FOUND EMPTY SESSION   (client="+client+",year="+year+")");
     });
     if(result) return result.id;
     else return null;

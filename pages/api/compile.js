@@ -196,7 +196,7 @@ function bigCost(idnt,nmbr,init) {
 //import { argv } from 'process';
 var autoSave=36000000; // seconds, defaults to ten-hourly-save
 
-function init(app, argv) {
+function init(/*app,*/ argv) {
 
     console.log(JSON.stringify(argv));
 

@@ -4,9 +4,7 @@ import { useRouter } from 'next/router'
 import { ParsedUrlQuery,stringify } from "querystring";
 import { createContext, ReactNode, useContext, useEffect, useState } from "react";
 
-type Session = {
-
-}
+type Session = { }
 
 export const REACT_APP_API_HOST="http://localhost:3000/api/"
 
@@ -24,10 +22,10 @@ export function SessionProvider({ children,  default_value, onLoading, onError }
     const [status, setStatus] = useState('loading')
 
     const router = useRouter()
-    console.log("Sessionprovider "+stringify(router.query));
+    console.log("0001 Sessionprovider "+stringify(router.query));
     let strSearch = router.asPath.split('?')[1];
-    console.log("SessionProvider host="+REACT_APP_API_HOST);
-    console.log("SessionProvider query="+strSearch)
+    console.log("0002 SessionProvider host="+REACT_APP_API_HOST);
+    console.log("0003 SessionProvider query="+strSearch)
 
     useEffect(() => {
         
