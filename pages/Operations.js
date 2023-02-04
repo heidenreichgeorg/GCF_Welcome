@@ -9,7 +9,7 @@ import FooterRow from '../components/FooterRow'
 import { book, makeOperationsForm, prepareTXN }  from '../modules/App';
 import { cents2EU, bigEUMoney }  from '../modules/money';
 
-import { D_Page, D_Schema } from '../terms.js'
+import { D_Page, D_Schema } from '../modules/terms.js'
 import { useSession } from '../modules/sessionmanager';
 
 export default function Operations() {
@@ -39,8 +39,8 @@ export default function Operations() {
     }
 
   
-    function prevFunc() {console.log("CLICK PREVIOUS"); window.location.href="https://"+session.server.addr+":3000/history?client="+client+"&year="+year; }
-    function nextFunc() {  console.log("CLICK NEXT");   window.location.href="https://"+session.server.addr+":3000/partner?client="+client+"&year="+year; }
+    function prevFunc() {console.log("CLICK PREVIOUS"); window.location.href="/History?client="+client+"&year="+year; }
+    function nextFunc() {  console.log("CLICK NEXT");   window.location.href="/Partner?client="+client+"&year="+year; }
       
     let page = sheet[D_Page];
     let sheet_status = makeOperationsForm(sheet,txn.add,txn.sub);

@@ -1,4 +1,4 @@
-
+import { useRouter } from 'next/router'
 // PUT REAL IP ADDR or DNS NAME OF BACKEND INTO .env file
 
 import { ParsedUrlQuery,stringify } from "querystring";
@@ -8,7 +8,7 @@ type Session = {
 
 }
 
-export const REACT_APP_API_HOST="http://localhost:3000/backend/"
+export const REACT_APP_API_HOST="http://localhost:3000/api/"
 
 const SessionContext = createContext<Session>({})
 
@@ -16,15 +16,18 @@ export function useSession() {
     return useContext(SessionContext)
 }
 
-export function SessionProvider({ children,  location, default_value, onLoading, onError }: { children: ReactNode, location: ParsedUrlQuery, default_value?:Session, onLoading?: string, onError?: string }) {
+export function SessionProvider({ children,  default_value, onLoading, onError }:
+     { children: ReactNode, default_value?:Session, onLoading?: string, onError?: string }) {
 
     const [session, setSession] = useState(default_value)
 
     const [status, setStatus] = useState('loading')
 
-    let strSearch = stringify(location);
+    const router = useRouter()
+    console.log("Sessionprovider "+stringify(router.query));
+    let strSearch = router.asPath.split('?')[1];
     console.log("SessionProvider host="+REACT_APP_API_HOST);
-    console.log("SessionProvider location="+strSearch)
+    console.log("SessionProvider query="+strSearch)
 
     useEffect(() => {
         

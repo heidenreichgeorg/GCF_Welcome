@@ -5,7 +5,7 @@ import Screen from '../pages/Screen'
 import FooterRow from '../components/FooterRow'
 import { useSession } from '../modules/sessionmanager';
 import { cents2EU } from '../modules/money';
-import { D_FixAss, D_Report, D_Page, SCREENLINES }  from '../terms.js';
+import { D_FixAss, D_Report, D_Page, SCREENLINES }  from '../modules/terms.js';
 
 export default function FixedAssets() {
 
@@ -24,8 +24,8 @@ export default function FixedAssets() {
     if(!sheet) return null; //'Loading...';
 
     
-    function prevFunc() {console.log("CLICK PREVIOUS"); window.location.href="https://"+session.server.addr+":3000/dashboard?client="+session.client+"&year="+session.year; }
-    function nextFunc() {  console.log("CLICK NEXT");   window.location.href="https://"+session.server.addr+":3000/hgb275s?client="+session.client+"&year="+session.year; }
+    function prevFunc() {console.log("CLICK PREVIOUS"); window.location.href="/Dashboard?client="+session.client+"&year="+session.year; }
+    function nextFunc() {  console.log("CLICK NEXT");   window.location.href="/HGB275S2Page?client="+session.client+"&year="+session.year; }
     
     let page = sheet[D_Page];
     var jReport = sheet[D_Report];

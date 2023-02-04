@@ -2,23 +2,12 @@
 
 import { useEffect, useState } from 'react';
 
-import { D_History, D_Page, D_Schema, SCREENLINES }  from '../terms.js';
+import { D_History, D_Page, D_Schema, SCREENLINES }  from '../modules/terms.js';
 import Screen from '../pages/Screen'
 import FooterRow from '../components/FooterRow'
 import { cents2EU }  from '../modules/money';
 import { CSEP, getParam, prettyTXN, symbolic }  from '../modules/App';
 import { useSession } from '../modules/sessionmanager';
-
-/* REACT-BOOTSTRAP
-Accordion, AccordionButton, AccordionCollapse, AccordionContext, Alert, Anchor, Badge, Breadcrumb, BreadcrumbItem,
-Button,ButtonGroup, ButtonToolbar, Card, CardGroup, CardImg, Carousel, CarouselItem, CloseButton, Col, Collapse, 
-Container, Dropdown,DropdownButton, Fade, Figure, FloatingLabel, Form, FormCheck, FormControl, FormFloating, FormGroup, 
-FormLabel, FormSelect, FormText, Image, InputGroup, ListGroup, ListGroupItem, Modal, ModalBody, ModalDialog, ModalFooter,
-ModalHeader, ModalTitle, Nav, NavDropdown, NavItem, NavLink, Navbar, NavbarBrand, Offcanvas, OffcanvasBody, OffcanvasHeader,
-OffcanvasTitle, Overlay, OverlayTrigger, PageItem,Pagination, Placeholder, PlaceholderButton, Popover, PopoverBody, PopoverHeader,
-ProgressBar, Ratio, Row, SSRProvider, Spinner, SplitButton, Stack, Tab, TabContainer, TabContent, TabPane, Table, Tabs,
- ThemeProvider, Toast, ToastBody, ToastContainer, ToastHeader, ToggleButton, ToggleButtonGroup, Tooltip, useAccordionButton)
-*/
 
 const SCREEN_TXNS=1+parseInt(SCREENLINES/3);
 
@@ -56,8 +45,8 @@ export default function History() {
 
     console.log("session.server="+JSON.stringify(session.server));
 
-    function prevFunc() {console.log("CLICK PREVIOUS"); window.location.href="https://"+session.server.addr+":3000/hgb275s?client="+session.client+"&year="+session.year; }
-    function nextFunc() {  console.log("CLICK NEXT");   window.location.href="https://"+session.server.addr+":3000/operations?client="+session.client+"&year="+session.year; }
+    function prevFunc() {console.log("CLICK PREVIOUS"); window.location.href="/HGB275S2Page?client="+session.client+"&year="+session.year; }
+    function nextFunc() {  console.log("CLICK NEXT");   window.location.href="/Operations?client="+session.client+"&year="+session.year; }
 
     let page = sheet[D_Page];
     let sHistory=makeHistory(sheet);

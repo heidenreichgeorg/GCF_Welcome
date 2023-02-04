@@ -5,7 +5,7 @@ import { useEffect, useState  } from 'react';
 import { cents2EU } from '../modules/money.mjs'
 import Screen from '../pages/Screen'
 import FooterRow from '../components/FooterRow'
-import { D_Balance, D_Page, D_Report, D_Schema, X_ASSETS, X_EQLIAB, SCREENLINES }  from '../terms.js';
+import { D_Balance, D_Page, D_Report, D_Schema, X_ASSETS, X_EQLIAB, SCREENLINES }  from '../modules/terms.js';
 import { useSession } from '../modules/sessionmanager';
 
 
@@ -26,8 +26,8 @@ export default function Balance({show}) {
     if(!sheet) return null; //'Loading...';
 
     
-    function prevFunc() {console.log("CLICK PREVIOUS"); window.location.href="https://"+session.server.addr+":3000/accounts?client="+session.client+"&year="+session.year; }
-    function nextFunc() {  console.log("CLICK NEXT");   window.location.href="https://"+session.server.addr+":3000/dashboard?client="+session.client+"&year="+session.year; }
+    function prevFunc() {console.log("CLICK PREVIOUS"); window.location.href="/Accounts?client="+session.client+"&year="+session.year; }
+    function nextFunc() {  console.log("CLICK NEXT");   window.location.href="/Dashboard?client="+session.client+"&year="+session.year; }
     
     let page = sheet[D_Page];
     

@@ -5,7 +5,7 @@ import Screen from '../pages/Screen'
 import FooterRow from '../components/FooterRow'
 import { cents2EU}  from '../modules/money';
 
-import { D_Balance, D_Page, D_Report, X_ASSETS, X_INCOME, X_EQLIAB, SCREENLINES } from '../terms.js'
+import { D_Balance, D_Page, D_Report, X_ASSETS, X_INCOME, X_EQLIAB, SCREENLINES } from '../modules/terms.js'
 import { useSession } from '../modules/sessionmanager';
 
 export default function Accounts() {
@@ -30,8 +30,8 @@ export default function Accounts() {
     if(!sheet) return null; // 'Loading...';
 
     
-    function prevFunc() {console.log("CLICK PREVIOUS"); window.location.href="https://"+session.server.addr+":3000/transfer?client="+client+"&year="+year; }
-    function nextFunc() {  console.log("CLICK NEXT");   window.location.href="https://"+session.server.addr+":3000/balance?client="+client+"&year="+year; }
+    function prevFunc() {console.log("CLICK PREVIOUS"); window.location.href="/Transfer?client="+client+"&year="+year; }
+    function nextFunc() {  console.log("CLICK NEXT");   window.location.href="/Balance?client="+client+"&year="+year; }
 
     let page = sheet[D_Page];
 

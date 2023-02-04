@@ -8,6 +8,7 @@ import { makeStatusData }  from '../modules/App';
 import { cents2EU }  from '../modules/money';
 
 import { D_Page } from '../modules/terms.js'
+import { useRouter } from 'next/router';
 
 export default function Status() {
     
@@ -29,9 +30,11 @@ export default function Status() {
     }, [status])
 
     if(!sheet) return 'Loading Status...';
-   
-    function prevFunc() {console.log("CLICK PREVIOUS"); window.location.href="https://"+session.server.addr+":3000/partner?client="+client+"&year="+year; }
-    function nextFunc() {  console.log("CLICK NEXT");   window.location.href="https://"+session.server.addr+":3000/transfer?client="+client+"&year="+year; }
+    
+    function prevFunc() {console.log("CLICK PREVIOUS"); window.location.href="/Partner?client="+client+"&year="+year; } 
+    function nextFunc() {  console.log("CLICK NEXT");   window.location.href="/Transfer?client="+client+"&year="+year; }
+//    function prevFunc() {console.log("CLICK PREVIOUS"); window.location.href="https://"+session.server.addr+":3000/partner?client="+client+"&year="+year; }
+//    function nextFunc() {  console.log("CLICK NEXT");   window.location.href="https://"+session.server.addr+":3000/transfer?client="+client+"&year="+year; }
 
     function handleXLSave() {
         console.log("1110 Status.handleXLSave sessionId = "+session.id);

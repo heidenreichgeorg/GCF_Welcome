@@ -5,7 +5,7 @@ import { useEffect, useState  } from 'react';
 import Screen from '../pages/Screen'
 import { useSession } from '../modules/sessionmanager';
 import { makeStatusData }  from '../modules/App';
-import { D_FixAss }  from '../terms.js';
+import { D_FixAss }  from '../modules/terms.js';
 
 import Chart from '../components/Chart'
 import Gauge from '../components/Gauge'
@@ -27,8 +27,8 @@ export default function DashBoard({value}) {
 
     if(!sheet) return null; //'Loading...';
 
-    function prevFunc() {console.log("CLICK PREVIOUS"); window.location.href="https://"+session.server.addr+":3000/balance?client="+session.client+"&year="+session.year; }
-    function nextFunc() {  console.log("CLICK NEXT");   window.location.href="https://"+session.server.addr+":3000/fixedAssets?client="+session.client+"&year="+session.year; }
+    function prevFunc() {console.log("CLICK PREVIOUS"); window.location.href="/Balance?client="+session.client+"&year="+session.year; }
+    function nextFunc() {  console.log("CLICK NEXT");   window.location.href="/FixedAssets?client="+session.client+"&year="+session.year; }
     
     let jValue={};
     let jAssets = sheet[D_FixAss];
