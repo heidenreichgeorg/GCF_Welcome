@@ -108,8 +108,9 @@ export default function Screen({ children, prevFunc, nextFunc, tabSelector, tabN
         
         if(!eHistory) { 
             screen=document.getElementById(target+'0'); 
-            style="block"; 
-            document.getElementById('windowBorder').className="witBorder"; 
+            style="block";             
+            let border = document.getElementById('windowBorder');
+            if(border) border.className="witBorder"; 
         } 
         
         // switch OFF each tab
@@ -121,7 +122,8 @@ export default function Screen({ children, prevFunc, nextFunc, tabSelector, tabN
         // switch ON the selected tab
         if(eHistory) {
             eHistory.style.display="block";
-            document.getElementById('windowBorder').className="dosBorder"; 
+            let border = document.getElementById('windowBorder');
+            if(border) border.className="dosBorder"; 
         }
     }
      

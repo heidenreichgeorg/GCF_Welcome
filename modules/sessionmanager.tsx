@@ -6,7 +6,7 @@ import { createContext, ReactNode, useContext, useEffect, useState } from "react
 
 type Session = { }
 
-export const REACT_APP_API_HOST="http://localhost:3000/api/"
+export const REACT_APP_API_HOST="http://localhost:3000/api"
 
 const SessionContext = createContext<Session>({})
 
@@ -27,8 +27,7 @@ export function SessionProvider({ children,  default_value, onLoading, onError }
     console.log("0002 SessionProvider host="+REACT_APP_API_HOST);
     console.log("0003 SessionProvider query="+strSearch)
 
-    useEffect(() => {
-        
+    useEffect(() => {      
         setStatus('loading')
         let browserItem = sessionStorage.getItem('session');
         if(browserItem!=null && browserItem.length>256) {
@@ -44,8 +43,8 @@ export function SessionProvider({ children,  default_value, onLoading, onError }
             }
         } else { 
             // PUT REAL IP ADDR or DNS NAME OF BACKEND INTO .env file
-            //fetch(`${process.env.REACT_APP_API_HOST}SESSION${strSearch}`,  
-            fetch(`${REACT_APP_API_HOST}SESSION?${strSearch}`,  
+            //fetch(`${process.env.REACT_APP_API_HOST}/SESSION${strSearch}`,  
+            fetch(`${REACT_APP_API_HOST}/SESSION?${strSearch}`,  
             {mode:'cors'}) // CORS 20230114
             .then(data => data.json())
             .then(data => {

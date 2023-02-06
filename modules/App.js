@@ -1,7 +1,7 @@
 /* global BigInt */
 
 import { D_Balance, D_History, D_Report, D_Schema, D_Page, X_ASSETS, X_EQLIAB, X_EQUITY, X_INCOME, X_INCOME_REGULAR, J_ACCT, COLMIN, DOUBLE, SCREENLINES } from '../modules/terms.js'
-
+import { REACT_APP_API_HOST } from "../modules/sessionmanager"
 import { bigEUMoney, cents2EU } from './money'
 
 const HTMLSPACE=" "; 
@@ -741,6 +741,7 @@ function fillRight(balance,cValue,iName,iRite,level) {
     return iRite;
 }
 
+// BOOK B {"add":{"COGK":"-8330"},"sub":{"NKG":"-8330"},"diff":"0","date":"2023-02-06","sender":"BundesanzeigerV","refAcct":"R63802132","reason":"K100602625","refTime":"2023","credit":{"COGK":{"index":10,"value":"-83,30"}},"debit":{"NKG":{"index":19,"value":"-83,30"}}}
 
 export function book(jTXN,session) {
 
@@ -753,11 +754,11 @@ export function book(jTXN,session) {
         body: JSON.stringify(jTXN)
     };
 
-    fetch(`${process.env.REACT_APP_API_HOST}/BOOK?sessionId=${session.id}`, requestOptions)
+    fetch(`${REACT_APP_API_HOST}/BOOK?sessionId=${session.id}`, requestOptions)
     .then(data => data.json())
     .then(body => { console.log("BOOK RESULT "+JSON.stringify(body));
     
-            let urlCommand = process.env.REACT_APP_API_HOST+"/LATEST?client="+body.client+"&year="+body.year+"&ext=JSON";
+            let urlCommand = REACT_APP_API_HOST+"/LATEST?client="+body.client+"&year="+body.year+"&ext=JSON";
             console.log("BOOK RELOAD "+urlCommand);
             fetch(urlCommand)
             .then(res => {console.log("BOOK REFRESH "+JSON.stringify(res.body))})

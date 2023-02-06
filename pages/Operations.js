@@ -62,7 +62,13 @@ export default function Operations() {
 
         console.log("BOOK B "+JSON.stringify(txn));
 
+        // GH20230205
+        // WITH SERVER-SIDE SESSION MANAGEMENT
         txn.sessionId = session.id; // won't book otherwise
+        // WITH CLIENT-SIDE CLIENT/YEAR as PRIM KEY
+        txn.year=year;
+        txn.client=client;
+
 
         book(txn,session); 
 
