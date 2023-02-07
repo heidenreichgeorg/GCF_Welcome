@@ -196,7 +196,7 @@ function bigCost(idnt,nmbr,init) {
 //import { argv } from 'process';
 var autoSave=36000000; // seconds, defaults to ten-hourly-save
 
-function init(/*app,*/ argv) {
+export function init(/*app,*/ argv) {
 
     console.log(JSON.stringify(argv));
 
@@ -369,7 +369,7 @@ function init(/*app,*/ argv) {
 
     return processArgv(argv);
 }
-module.exports['init']=init;
+
 
 
 async function sendFile(sig, response) {  
@@ -1494,9 +1494,9 @@ function bigAsset(row,iAssets) {
 }
 
 
-function formatTXN(sessionId,reqBody) {
+export function formatTXN(session,reqBody) {
 
-    if(debug) console.log("compile.js formatTXN("+sessionId+") book "+JSON.stringify(reqBody));
+    if(debug) console.log("compile.js formatTXN("+session.id+") book "+JSON.stringify(reqBody));
 
     var jFlag  = reqBody.flag; if(!jFlag) jFlag=0;
     var jDate  = reqBody.date;
@@ -1508,7 +1508,10 @@ function formatTXN(sessionId,reqBody) {
     var jDebit = reqBody.debit;
     var bookingForm=null;
 
-    let session = Server.getSession(sessionId);
+
+    let sessionId=session.id;
+    //let session = Server.getSession(sessionId);
+    
     if(session) {
         if(debug) console.dir("compile.js formatTXN("+sessionId+") book "+JSON.stringify(reqBody));
 

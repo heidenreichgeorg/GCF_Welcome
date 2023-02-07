@@ -693,7 +693,7 @@ module.exports['getClientDir']=getClientDir;
 
 
 
-function symbolic(pat) {
+export function symbolic(pat) {
     var res = 0;
     if(pat) {
         var sequence = ' '+pat+pat+pat;
@@ -704,5 +704,5 @@ function symbolic(pat) {
     }
     return res & 0x3FFFFFF;
 }
-module.exports['symbolic']=symbolic;
+
 

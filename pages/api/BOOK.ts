@@ -1,9 +1,14 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next'
 
-import  { formatTXN } from './compile'
-import  {  localhost, save2Bucket, signIn, strSymbol, timeSymbol } from './server'
+import  { formatTXN,init  } from './compile'
+import  { localhost, save2Bucket, setSession, signIn, strSymbol, timeSymbol } from './server'
 import  { symbolic } from './sheets'
+
+// localhost, save2Bucket
+
+
+let config;
 
 
 // data that can be computed synchronously
@@ -20,17 +25,20 @@ export default function handler(
   //res.set('Access-Control-Allow-Origin', '*');
   console.log("BOOK.handler "+JSON.stringify(req.query));
 
-  if(req && req.query && req.socket) {       
-      
-      reqBody = req.body;
-      client =  req.body.client;
-      year = req.body.year;
-      const query:JSON = <JSON><unknown> { "ext":"JSON", "client":client, "year":year  };
-      console.log("    BOOK.handler "+JSON.stringify(query));
-      sessionTime=timeSymbol();
-      nextSessionId= strSymbol(sessionTime+client+year+sessionTime);
+  config =  init(/*app,*/ process.argv); // GH20221003 do that per module
 
-      signIn(query,req.socket.remoteAddress,res,bookTransaction); 
+  if(req && req.query && req.socket) {       
+
+
+    reqBody = req.body;
+    client =  req.body.client;
+    year = req.body.year;
+    const query:JSON = <JSON><unknown> { "ext":"JSON", "client":client, "year":year  };
+    console.log("    BOOK.handler "+JSON.stringify(query));
+    sessionTime=timeSymbol();
+    nextSessionId= strSymbol(sessionTime+client+year+sessionTime);
+
+      signIn(config,query,req.socket.remoteAddress,res,bookTransaction); 
   }
   else res.json({ id: '0123', code : "NO VALID QUERY"})
 }
@@ -60,13 +68,13 @@ function bookTransaction(session:any, res:NextApiResponse<any>) {
           // state change in YYYYCCCC.json
 
 
-          /* PROTOTYPE DOES  NOT  BOOK
+          
           let serverAddr = localhost();
           // async
-          save2Bucket(session,client,year)
+          save2Bucket(config,session,client,year)
               .then(result => { if(res) res.json({url:serverAddr+'/LATEST', client, year, 'result':result  })
               });
-                */
+                
 
         } else {
             result="NO SESSION ID";
@@ -84,7 +92,7 @@ function bookTransaction(session:any, res:NextApiResponse<any>) {
 const debug=true;
 const debugWrite=true;
 
-function bookSheet(session:any,tBuffer:String[],sessionTime:String,nextSessionId:String) {
+function bookSheet(session:any,tBuffer:string[]|null,sessionTime:String,nextSessionId:String) {
 
   if(session) {
       if(session.sheetName) {
@@ -98,7 +106,7 @@ function bookSheet(session:any,tBuffer:String[],sessionTime:String,nextSessionId
               
               if(tBuffer) {
                   // add hash
-                  if(parseInt(tBuffer[0])>0) tBuffer[0]=symbolic(tBuffer.join('')); 
+                  if(parseInt(tBuffer[0])>0) tBuffer[0]=(""+symbolic(tBuffer.join(''))); 
 
                   numLines = session.sheetCells.push(tBuffer); 
 
@@ -112,7 +120,7 @@ function bookSheet(session:any,tBuffer:String[],sessionTime:String,nextSessionId
                       console.log("1454 sheets.bookSheet NEW keys="+JSON.stringify(Object.keys(session.sheetCells).map((i)=>(session.sheetCells[i][0]))));
                   }
 
-                  Server.setSession(session);
+                  setSession(session);
 
                   if(debugWrite) console.dir("1456 sheets.bookSheet SET SESSION  "+session.id + " "+session.client + " "+session.year + " --> "+JSON.stringify(Object.keys(session)));
                   
@@ -121,9 +129,9 @@ function bookSheet(session:any,tBuffer:String[],sessionTime:String,nextSessionId
           }
           else if(debugWrite) console.dir("1453 sheets.bookSheet SAVE NO DATA ("+client+","+year+")") ;
       }
-      else if(debug) console.log("1455 sheets.bookSheet SAVE NO sheetName"+sessionId);
+      else if(debug) console.log("1455 sheets.bookSheet SAVE NO sheetName"+session.id);
   }
-  else if(debug) console.log("1457 sheets.bookSheet SAVE NO session"+sessionId);
+  else if(debug) console.log("1457 sheets.bookSheet SAVE NO session");
 
   return session;
 }

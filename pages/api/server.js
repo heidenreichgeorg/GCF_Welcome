@@ -29,7 +29,6 @@ const PORT = 81;
 const ReactPort = 3000;
 
 
-const config = init(/*app,*/ process.argv); // GH20221003 do that per module
 
 
 // session management
@@ -121,7 +120,7 @@ module.exports['sy_findSessionId']=sy_findSessionId;
 app.get("/LATEST", (req, res) => { 
 
     if(req && req.query && req.socket) {        
-        signIn(req.query,req.socket.remoteAddress,res,startSessionDisplay);
+        signIn(config,config,req.query,req.socket.remoteAddress,res,startSessionDisplay);
         // exit via startSession and sendDisplay
     }
     else {
@@ -150,7 +149,7 @@ app.get('/SESSION', (req, res) => {   // CORS 20230114
 
         //COLD START: LOAD FROM LATEST FILE
         if(!(sessionId=sy_findSessionId(query.client,query.year))) {
-            signIn(query,req.socket.remoteAddress,res,startSessionJSON); 
+            signIn(config,config,query,req.socket.remoteAddress,res,startSessionJSON); 
             // exit via startSession and res.JSON
             
         // WARM START : FOUND EXISTING ID
@@ -381,7 +380,7 @@ function orderRecentFiles(dir,ext) {
 
 let fbConfig=null;
 
-function loadFBConfig() {
+function loadFBConfig(config) {
     var fbConfig=null;
     if(config!=null) {
         const dir = getRoot(); 
@@ -400,10 +399,10 @@ function loadFBConfig() {
 
 
 
-export function fbDownload(client,year,callBack,res) {
+export function fbDownload(config,client,year,callBack,res) {
     if(config) {
         // FIREBASE
-        const fbConfig = loadFBConfig();
+        const fbConfig = loadFBConfig(config);
         if(fbConfig) {        
             FB.accessFirebase(FB.bucketDownload,fbConfig,client,year,null,callBack,res);
             return "fbDownload";
@@ -416,13 +415,13 @@ export function fbDownload(client,year,callBack,res) {
 
 
 
-async function save2Bucket(session,client,year) {
+export async function save2Bucket(config,session,client,year) {
 
     if(config) {
         console.log("0032 save2Bucket Start saving("+JSON.stringify(Object.keys(session))+") to FB for "+client+","+year);        
 
         // FIREBASE
-        const fbConfig = loadFBConfig();
+        const fbConfig = loadFBConfig(config);
         if(fbConfig) {
             // 20221206
             // session.fireBase = fbConfig.storageBucket;
@@ -442,7 +441,6 @@ async function save2Bucket(session,client,year) {
         }
     } else return "save2Bucket NO CONFIG PARAMETER";
 }
-module.exports['save2Bucket']=save2Bucket;
 
 /*
 // use WELCOMEDROP instead !!!
@@ -498,7 +496,7 @@ app.post("/UPLOAD", (req, res) => {
 
             // PERSISTENT FB CLOUD FILE STORAGE
             // SETS SESSION AFTER WRITE
-            save2Bucket(sessionData,client,year);
+            save2Bucket(config,sessionData,client,year);
 
             
             // 20221202 what if config==null and no bucket shall be used?
@@ -535,7 +533,8 @@ app.post("/UPLOAD", (req, res) => {
 */
 
 // load JSON file from Firebase storage
-export function signIn(query,remote,res,startSessionCB) {
+export function signIn(config,query,remote,res,startSessionCB) {
+
     let base =  getRoot();
     //console.log("0010 signIn at base "+base+"  for "+JSON.stringify(query));
 
@@ -557,7 +556,7 @@ export function signIn(query,remote,res,startSessionCB) {
             }
             else {
                 console.log ( "0014 signIn READ BUCKET FOR COLD id ="+id);
-                fbDownload(client,year,startSessionCB,res); // avoid double response
+                fbDownload(config,client,year,startSessionCB,res); // avoid double response
             }
                         
         } else console.log ( "0027 signIn file no valid year for query="+JSON.stringify(query)+",addr="+remote);
