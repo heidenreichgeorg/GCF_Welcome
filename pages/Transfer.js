@@ -2,7 +2,7 @@ import { useEffect, useState, useRef  } from 'react';
 
 import FooterRow from '../components/FooterRow'
 import Screen from '../pages/Screen'
-import { book, prettyTXN, prepareTXN }  from '../modules/App';
+import { book, prettyTXN, prepareTXN }  from '../modules/writeModule';
 import { J_ACCT, D_Page, D_History, D_Schema, CSEP } from '../modules/terms.js'
 import { useSession } from '../modules/sessionmanager';
 

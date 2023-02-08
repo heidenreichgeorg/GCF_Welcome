@@ -4,7 +4,7 @@ const { networkInterfaces } = require('os');
 const nets = networkInterfaces();
 
 
-import { strSymbol,timeSymbol } from './App.js'
+import { strSymbol,timeSymbol } from './writeModule.js'
 import { fbDownload } from './fireBaseBucket.js'
 import { compile } from './compile.js'
 import { PORT } from './terms.js'
@@ -72,7 +72,7 @@ export function startSessionJSON(session,res) {
 
 var SERVEROOT= '/data/sessions/';
 const Slash = '/';
-function setRoot(root) {  
+export function setRoot(root) {  
     if(root.slice(-1)==='/' || root.slice(-1)==='\\') {
         SERVEROOT=root; 
     } else {
@@ -82,7 +82,7 @@ function setRoot(root) {
     console.log("App.setRoot = "+SERVEROOT);
 }
 
-function getRoot() {  return SERVEROOT; }
+export function getRoot() {  return SERVEROOT; }
 
 export function init(/*app,*/ argv) {
 
@@ -173,7 +173,7 @@ function sy_findSessionId(client,year) {
     else return null;
 }
 
-function localhost() {
+export function localhost() {
     let instance="127.0.0.1";
     var results = [];
     for (const name of Object.keys(nets)) {

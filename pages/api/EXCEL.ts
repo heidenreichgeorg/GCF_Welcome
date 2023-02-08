@@ -1,9 +1,9 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next'
 
-import  { init, signIn, sendFile  } from '../../modules/sessionModule'
-import  { strSymbol, timeSymbol } from '../../modules/App'
-import  { xlsxWrite  } from './sheets'
+import  { init, signIn  } from '../../modules/sessionModule'
+import  { sendFile, strSymbol, timeSymbol } from '../../modules/writeModule'
+import  { xlsxWrite  } from '../../modules/sheets'
 
 let config:string|null;
 
@@ -74,7 +74,7 @@ function downloadExcel(session:any, res:NextApiResponse<any>) {
 
                     console.log("1640 GET /EXCEL JSON "+JSON.stringify(fileSig));
 
-                    //sendFile(fileSig, res);
+                    sendFile(fileSig, res);
                         // close file
                     return;
                 } else console.log("1621 GET /EXCEL NO CLIENT NO YEAR"+JSON.stringify(Object.keys(session)));

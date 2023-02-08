@@ -24,11 +24,11 @@ const J_ACCT = 6; // first account
 const J_MINROW=7;
 
 const Buffer = require('buffer' );
-const fs = require('fs');
 
-const Account = require('../.old/account');
 
-const Sheets = require('../pages/api/sheets'); // setting root attribute
+const Account = require('./account');
+
+const Sheets = require('./sheets'); // setting root attribute
 //const Server = require('../.old/server');
 
 const HTMLSPACE=" "; 
@@ -364,26 +364,6 @@ var autoSave=36000000; // seconds, defaults to ten-hourly-save
     });
 */
 
-
-export async function sendFile(sig, response) {  
-    // Check if file specified by the filePath exists
-    fs.exists(sig.serverFile, function (exists) {
-        if (exists) {
-            // Content-type is very interesting part that guarantee that
-            // Web browser will handle response in an appropriate manner.
-            //response.writeHead(200, {
-            //    "Content-Type": "application/octet-stream",
-            //    "Content-Disposition": "attachment; filename=" + sig.serverFile
-            //});
-            if(debug) console.log("1650 TRANSFER "+sig.serverFile);
-            fs.createReadStream(sig.serverFile).pipe(response);
-            if(debug) console.log("1660 PIPING "+sig.serverFile);
-            return;
-        }
-        response.writeHead(400, { "Content-Type": "text/plain" });
-        response.end("ERROR File does not exist");
-    });
-}
 
 // XBRL
 function initBalance() {

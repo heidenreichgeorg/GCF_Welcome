@@ -1,5 +1,6 @@
+
 // local fileSystem
-const fs = require('fs');
+import * as fs from 'fs';
 
 
 /*
@@ -32,7 +33,7 @@ const MAIN = "main.json";
 import * as fbApp from 'firebase/app'
 import * as fbStorage from 'firebase/storage'
 import * as fbAuth  from "firebase/auth"
-import * as FS from 'firebase/firestore'; 
+//import * as FS from 'firebase/firestore'; 
 
 //const {Datastore} = require('@google-cloud/datastore');
 
