@@ -8,7 +8,7 @@ import  { symbolic } from './sheets'
 // localhost, save2Bucket
 
 
-let config;
+let config:string|null;
 
 
 // data that can be computed synchronously

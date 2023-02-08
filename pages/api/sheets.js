@@ -536,12 +536,12 @@ module.exports['makeXLTabs']=makeXLTabs;
 
 
 
-function xlsxWrite(sessionId) {
+export function xlsxWrite(session) {
 
     let sheetFile = "BOOKING.xlsx"
     let client="client";
     let year="YYYY";
-    var session = Server.getSession(sessionId);
+    
     if(session) {
        
         // return 'serverFile':sheetFile
@@ -615,13 +615,13 @@ function xlsxWrite(sessionId) {
                 console.log("1403 sheets.xlsxWrite NO sheetFile and NOT writing");
             }
         } else {
-            console.log("1401 sheets.xlsxWrite NO SESSION "+sessionId);
+            console.log("1401 sheets.xlsxWrite NO SESSION ");
         }
 
         // return csv;
-        return {'serverFile':sheetFile, 'localFile': (client+year+".xlsx"),'id':sessionId};
+        return {'serverFile':sheetFile, 'localFile': (client+year+".xlsx") };
     }
-module.exports['xlsxWrite']=xlsxWrite;
+
 
 
 
@@ -640,7 +640,7 @@ function makeTax(jBalance,partner,index,fix) {
 }
 
 
-function bigEUMoney(strSet) {
+export function bigEUMoney(strSet) {
     var euros=0n;
     var cents=0n;
     var factor=1n;
@@ -666,7 +666,7 @@ function bigEUMoney(strSet) {
     }
     return result;        
 }
-module.exports['bigEUMoney']=bigEUMoney;
+
 
 
 
@@ -689,7 +689,7 @@ function makeSum(xSheet,a1Cell,a1From,a1To) {
 function getClientDir(client) {
     return getRoot()+client+Slash; 
 }
-module.exports['getClientDir']=getClientDir;
+
 
 
 

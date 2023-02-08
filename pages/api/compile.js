@@ -372,7 +372,7 @@ export function init(/*app,*/ argv) {
 
 
 
-async function sendFile(sig, response) {  
+export async function sendFile(sig, response) {  
     // Check if file specified by the filePath exists
     fs.exists(sig.serverFile, function (exists) {
         if (exists) {

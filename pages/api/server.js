@@ -13,6 +13,7 @@ import { getRoot, setRoot } from "./sheets"
 
 import { init, compile } from "./compile"
 
+//const qr = require('qrcode');
 
 // local fileSystem
 const fs = require('fs');
@@ -222,12 +223,7 @@ function sendDisplay(session,res) {
     if(sessionId) {
 
         let localHost = localhost();
-        /*
-        let loginInfo = jLoginURL(session);
-        let usrLogin = loginInfo.url;
-        let postFix = loginInfo.postFix;
-         OLD SERVER let url = localHost.addr + ":" + localHost.port + usrLogin;
-         */
+        
         let url = "https://"+localHost.addr + ":" + ReactPort + "/status?client="+client+"&year="+year;
 
         
@@ -263,6 +259,8 @@ function sendDisplay(session,res) {
 
     }
 }
+
+
 
 
 /*
@@ -655,7 +653,7 @@ const https = require('https');
 const express = require('express');
 const app = express();
 
-const qr = require('qrcode');
+
 const ejs = require("ejs");
 const path = require('path');
 
