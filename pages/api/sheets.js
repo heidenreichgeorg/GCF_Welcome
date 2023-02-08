@@ -45,21 +45,6 @@ const COLMIN = 2;
 
 
 
-var SERVEROOT= '/data/sessions/';
-const Slash = '/';
-export function setRoot(root) {  
-    if(root.slice(-1)==='/' || root.slice(-1)==='\\') {
-        SERVEROOT=root; 
-    } else {
-        SERVEROOT=root+'/';
-    }
-
-    console.log("Sheets.setRoot = "+SERVEROOT);
-}
-
-export function getRoot() {  return SERVEROOT; }
-
-
 
 
 

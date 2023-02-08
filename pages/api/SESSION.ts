@@ -3,8 +3,8 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 
 
 
-import  { signIn, startSessionJSON } from './server'
-import  { init } from './compile'
+import  { init, signIn, startSessionJSON } from '../../modules/sessionModule'
+
 
 let config = null;
 

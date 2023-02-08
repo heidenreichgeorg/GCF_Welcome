@@ -1,7 +1,7 @@
 /* global BigInt */
 
-import { D_Balance, D_History, D_Report, D_Schema, D_Page, X_ASSETS, X_EQLIAB, X_EQUITY, X_INCOME, X_INCOME_REGULAR, J_ACCT, COLMIN, DOUBLE, SCREENLINES } from '../modules/terms.js'
-import { REACT_APP_API_HOST } from "../modules/sessionmanager"
+import { D_Balance, D_History, D_Report, D_Schema, D_Page, X_ASSETS, X_EQLIAB, X_EQUITY, X_INCOME, X_INCOME_REGULAR, J_ACCT, COLMIN, DOUBLE, SCREENLINES } from './terms.js'
+import { REACT_APP_API_HOST } from "./sessionmanager"
 import { bigEUMoney, cents2EU } from './money'
 
 const HTMLSPACE=" "; 
@@ -9,6 +9,9 @@ const HTMLSPACE=" ";
 export const CSEP = ';';
 export const S_COLUMN = 15;
 export const iCpField = 35;
+
+
+
 
 export function prettyTXN(jHistory,hash,lPattern,aPattern,names,aLen,eLen) {
 
@@ -764,3 +767,38 @@ export function book(jTXN,session) {
             .then(res => {console.log("BOOK REFRESH "+JSON.stringify(res.body))})
         });
 }
+
+
+// PURE FUNCTIONS
+
+export function strSymbol(pat) {
+    let cypher = "BC0DF1GH2JK3LM4NP5QR6ST7VW8XZ9A";
+    let base=31;
+    var res = 0;
+    var out = [];
+    if(!pat) pat = timeSymbol();
+    {
+        let factor = 23;
+        var sequence = ' '+pat+pat+pat;
+        for(let p=0;p<sequence.length && p<80;p++) {
+            res = ((res*factor + sequence.charCodeAt(p)) & 0x1FFFFFFF);
+            let index = res % base;
+            out.push(cypher.charAt(index))
+        }
+    }
+    return out.join('');
+}
+
+
+
+export function timeSymbol() { 
+    var u = new Date(Date.now()); 
+    return ''+ u.getUTCFullYear()+
+      ('0' + (1+u.getUTCMonth())).slice(-2) +
+      ('0' + u.getUTCDate()).slice(-2) + 
+      ('0' + u.getUTCHours()).slice(-2) +
+      ('0' + u.getUTCMinutes()).slice(-2) +
+      ('0' + u.getUTCSeconds()).slice(-2) +
+      (u.getUTCMilliseconds() / 1000).toFixed(3).slice(2, 5);
+};     
+

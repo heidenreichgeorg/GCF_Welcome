@@ -26,10 +26,10 @@ const J_MINROW=7;
 const Buffer = require('buffer' );
 const fs = require('fs');
 
-const Account = require('../../.old/account');
+const Account = require('../.old/account');
 
-const Sheets = require('./sheets'); // setting root attribute
-const Server = require('./server');
+const Sheets = require('../pages/api/sheets'); // setting root attribute
+//const Server = require('../.old/server');
 
 const HTMLSPACE=" "; 
 
@@ -196,9 +196,6 @@ function bigCost(idnt,nmbr,init) {
 //import { argv } from 'process';
 var autoSave=36000000; // seconds, defaults to ten-hourly-save
 
-export function init(/*app,*/ argv) {
-
-    console.log(JSON.stringify(argv));
 
     /*
     // GENERAL request for current session data
@@ -366,10 +363,6 @@ export function init(/*app,*/ argv) {
         jTerms[id]={'de_DE':de_DE[id]}
     });
 */
-
-    return processArgv(argv);
-}
-
 
 
 export async function sendFile(sig, response) {  
@@ -1560,32 +1553,6 @@ export function formatTXN(session,reqBody) {
 
 }
 
-
-function processArgv(processArgv) {
-    let config=null;
-    processArgv.forEach(function (val, index, array) {
-        if(debug>1) console.log("0000 Starting server " + index + ': ' + val);
-        let attribute=val.split('=');
-        if(index>1 && attribute && attribute.length>1) {
-            if(debug>1) console.log("0002 Attribute " + index + ': ' + val);
-            if(attribute[0].toLowerCase()==='root') {
-                Sheets.setRoot(attribute[1]);
-                console.log("0004 Starting server SET ROOT TO " + Sheets.getRoot());
-            }        
-            else if(attribute[0].toLowerCase()==='config') {
-                config = attribute[1];
-                console.log("0006 Starting server SET FIREBASE CONFIG " + config);
-            }        
-            else if(attribute[0].toLowerCase()==='auto') {
-                let autoSec = parseInt(attribute[1]);
-                autoSave = autoSec * 1000;
-                console.log("0008 Starting server SET autoSave " + autoSec+ " [sec.]");
-            }        
-        }
-    });
-
-    return config;
-}
 
 
 

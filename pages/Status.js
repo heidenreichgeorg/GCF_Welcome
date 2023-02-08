@@ -8,7 +8,6 @@ import { makeStatusData }  from '../modules/App';
 import { cents2EU }  from '../modules/money';
 
 import { D_Page } from '../modules/terms.js'
-import { useRouter } from 'next/router';
 
 export default function Status() {
     
@@ -33,14 +32,12 @@ export default function Status() {
     
     function prevFunc() {console.log("CLICK PREVIOUS"); window.location.href="/Partner?client="+client+"&year="+year; } 
     function nextFunc() {  console.log("CLICK NEXT");   window.location.href="/Transfer?client="+client+"&year="+year; }
-//    function prevFunc() {console.log("CLICK PREVIOUS"); window.location.href="https://"+session.server.addr+":3000/partner?client="+client+"&year="+year; }
-//    function nextFunc() {  console.log("CLICK NEXT");   window.location.href="https://"+session.server.addr+":3000/transfer?client="+client+"&year="+year; }
 
     function handleXLSave() {
         console.log("1110 Status.handleXLSave sessionId = "+session.id);
         const rqOptions = { method: 'GET', headers: {  'Accept': 'application/octet-stream'}, mode:'cors'};
         try {            
-            fetch(`${process.env.REACT_APP_API_HOST}/EXCEL?sessionId=${session.id}`, rqOptions)
+            fetch(`${REACT_APP_API_HOST}/EXCEL?client=${client}&year=${year}`, rqOptions)
             .then((response) => response.blob())
             .then((blob) => URL.createObjectURL(blob))
             .then((url) => console.log("1120 handleXLSave URL= "+ makeXLSButton(url,session.client,session.year)))
@@ -61,8 +58,8 @@ export default function Status() {
                 a.innerHTML = "Download";
                 document.body.appendChild(a); 
                 console.log("1198 downloadButton make button");
-            } console.log("1197 makeXLSButton XLSX client("+client+"), NO year");
-        } console.log("1195 makeXLSButton XLSX NO client");
+            } else console.log("1197 makeXLSButton XLSX client("+client+"), NO year");
+        } else console.log("1195 makeXLSButton XLSX NO client");
         return url;
     };
       

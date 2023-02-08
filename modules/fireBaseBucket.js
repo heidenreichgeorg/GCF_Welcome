@@ -1,3 +1,7 @@
+// local fileSystem
+const fs = require('fs');
+
+
 /*
 
 bookingpages-a0a7c
@@ -34,7 +38,7 @@ import * as FS from 'firebase/firestore';
 
 const https = require('https');
 
-
+import { getRoot } from "./sessionModule"
 
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -355,3 +359,40 @@ async function markActive(client) {
     console.error('ERROR:', err);
   });
 }
+
+
+let fbConfig=null;
+
+function loadFBConfig(config,dir) {
+    var fbConfig=null;
+    if(config!=null) {
+        
+        //let fileName = getMostRecentFile(dir,"json");
+        let fileName = config+".json";
+        if(fileName) {
+            console.log("0022 loadFBConfig from "+fileName);
+            fbConfig = JSON.parse(fs.readFileSync(dir+fileName, 'utf8'));
+        } else {
+            console.log("0023 loadFBConfig NO JSON in "+dir);
+            return null;
+        }
+    }
+    return fbConfig;
+} 
+
+
+
+export function fbDownload(config,client,year,callBack,res,root) {
+    if(config) {
+        // FIREBASE
+        const fbConfig = loadFBConfig(config,root);
+        if(fbConfig) {        
+            accessFirebase(bucketDownload,fbConfig,client,year,null,callBack,res);
+            return "fbDownload";
+        } else {
+            console.log("0033 server.fbDownload NO FIREBASE CONFIG")
+            return null;
+        }
+    } else return null;
+}
+

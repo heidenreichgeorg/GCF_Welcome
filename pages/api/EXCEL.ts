@@ -1,8 +1,8 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next'
 
-import  { init, sendFile  } from './compile'
-import  { signIn, strSymbol, timeSymbol } from './server'
+import  { init, signIn, sendFile  } from '../../modules/sessionModule'
+import  { strSymbol, timeSymbol } from '../../modules/App'
 import  { xlsxWrite  } from './sheets'
 
 let config:string|null;
@@ -10,8 +10,8 @@ let config:string|null;
 
 // data that can be computed synchronously
 let reqBody:String[] | null;
-let client = "";
-let year="";
+var client:string|string[]|undefined;
+var year:string|string[]|undefined;
 let sessionTime="";
 let nextSessionId= "";
 
@@ -30,9 +30,9 @@ export default function handler(
   if(req && req.query && req.socket) {       
 
 
-    reqBody = req.body;
-    client =  req.body.client;
-    year = req.body.year;
+    
+    client =  req.query.client;
+    year = req.query.year;
     const query:JSON = <JSON><unknown> { "ext":"JSON", "client":client, "year":year  };
     console.log("    EXCEL.handler "+JSON.stringify(query));
 
