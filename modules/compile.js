@@ -1104,6 +1104,7 @@ function sendBalance(balance) {
             p.close =  ""+(iYearEnd + iIncome); 
             p.next=varcap.next;
 
+
             if(debugReport) console.log('compile sendBalance  '+JSON.stringify(p) + "\n ==>> MODIFY K2xx "+JSON.stringify(varcap));
 
             if(p.capRes) {

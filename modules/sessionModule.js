@@ -1,7 +1,7 @@
 
-const { networkInterfaces } = require('os');
+import { networkInterfaces } from 'os';
 
-const nets = networkInterfaces();
+
 
 
 import { strSymbol,timeSymbol } from './writeModule.js'
@@ -11,11 +11,15 @@ import { PORT } from './terms.js'
 
 const debug=null;
 
+var nets;
+
 // load JSON file from Firebase storage
 export function signIn(config,query,remote,res,startSessionCB) {
+    
+    nets = networkInterfaces();
 
     let base =  getRoot();
-    //console.log("0010 signIn at base "+base+"  for "+JSON.stringify(query));
+    console.log("0010  signIn at base "+base+"  for "+JSON.stringify(query));
 
     if(query && query.client && query.client.length>2 ) { // && (query.client == "[a-zA-Z0-9]")) {
 

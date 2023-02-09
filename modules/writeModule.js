@@ -7,6 +7,8 @@ import { REACT_APP_API_HOST } from "./sessionmanager"
 import { bigEUMoney, cents2EU } from './money'
 import { accessFirebase,loadFBConfig } from './fireBaseBucket'
 
+const debug=null;
+
 const HTMLSPACE=" "; 
 
 export const CSEP = ';';

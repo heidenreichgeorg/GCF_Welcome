@@ -3,15 +3,12 @@ const debug=1;
 
 // setting this will violate privacy 
 const debugWrite=1;
+const CSEP = ';';
+const CEND = '|';
 
-/*
-const HTTP_OK = 200;
-module.exports['HTTP_OK']=HTTP_OK;
+import * as  XLSX from 'xlsx'
 
-
-const HTTP_WRONG = 400;
-module.exports['HTTP_WRONG']=HTTP_WRONG;
-*/
+import { getRoot,Slash } from './sessionModule'
 
 // EXCEL interface
 
@@ -29,10 +26,6 @@ module.exports['HTTP_WRONG']=HTTP_WRONG;
 //const D_Schema = "Schema"; // includes .Names .total
 //const Compiler=require("./compile.js");
 
-const CSEP = ';';
-const CEND = '|';
-
-//const XLSX = require('xlsx');
 
 //const Server = require('../pages/api/server.js/index.js');
 
@@ -210,7 +203,7 @@ function makeWorkBook(jExcel,sheetName,year,aLen,eLen) {
             if(debug) console.log("1480 sheets.makeWorkBook CREATE new workbook for ("+sheetName+")");
         }
     
-        for(tabName in jExcel) {
+        for(var tabName in jExcel) {
             let jSheet = jExcel[tabName];
             let formulae;
             let rows=0;
@@ -307,7 +300,7 @@ function makeXLTabs(sheetCells,jAssets,jHistory,jSchema,jPartner,jBalance,jXBRL,
     }
     
     function pushNET(arr,line){
-        arr.push(Object.keys(line).map((key,i)=>(i>J_ACCT?parseFloat(line[key])/100.0:line[key])));
+        arr.push(Object.keys(line).map((key,i)=>(i>J_ACCT?(isNaN(line[key])?'0':parseFloat(line[key])/100.0):line[key])));
     }
     
     
