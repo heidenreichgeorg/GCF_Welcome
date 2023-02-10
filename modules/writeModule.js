@@ -5,7 +5,9 @@ import * as fs from 'fs';
 import {  J_ACCT, COLMIN, DOUBLE } from './terms.js'
 import { REACT_APP_API_HOST } from "./sessionmanager"
 import { bigEUMoney, cents2EU } from './money'
-import { accessFirebase,loadFBConfig } from './fireBaseBucket'
+import { accessFirebase,bucketUpload,loadFBConfig } from './fireBaseBucket'
+import { setSession } from './sessionModule'
+import { compile } from './compile'
 
 const debug=null;
 
@@ -220,19 +222,19 @@ export function timeSymbol() {
 };     
 
 
-export async function save2Bucket(config,session,client,year) {
+export async function save2Bucket(config,session,client,year,root) {
 
     if(config) {
         console.log("0032 save2Bucket Start saving("+JSON.stringify(Object.keys(session))+") to FB for "+client+","+year);        
 
         // FIREBASE
-        const fbConfig = loadFBConfig(config);
+        const fbConfig = loadFBConfig(root,config);
         if(fbConfig) {
             // 20221206
             // session.fireBase = fbConfig.storageBucket;
 
             // async, setSession and compile
-            accessFirebase(FB.bucketUpload,fbConfig,client,year,session,startSessionDisplay,null);
+            accessFirebase(bucketUpload,fbConfig,client,year,session,startSessionDisplay,null);
                 
             if(debug) {
                 console.log("0034 save2Bucket session.sheetcells keys="+JSON.stringify(Object.keys(session.sheetCells).map((i)=>(session.sheetCells[i][0]))));
@@ -247,3 +249,27 @@ export async function save2Bucket(config,session,client,year) {
     } else return "save2Bucket NO CONFIG PARAMETER";
 }
 
+
+
+function startSessionDisplay(session,res) {
+
+    console.log("0018 startSessionDisplay="+JSON.stringify(Object.keys(session))); 
+
+    // START A NEW SESSION
+    let time = timeSymbol();
+    let year=session.year;
+    let client = session.client;
+    let sessionId = strSymbol(time+client+year+time);
+    session.id=sessionId;
+    session.generated = compile(session);
+
+    setSession(session);
+
+    console.log("0020 startSessionDisplay("+client+","+year+") SUCCESS sessionId="+sessionId); 
+
+    // 20221207
+    if(res) {
+        console.log("0022 startSessionDisplay("+client+","+year+") sendDisplay"); 
+        sendDisplay(session,res);
+    }
+}

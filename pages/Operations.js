@@ -6,9 +6,9 @@ import { useEffect, useState, useRef } from 'react';
 
 import Screen from '../pages/Screen'
 import FooterRow from '../components/FooterRow'
-import { book, makeOperationsForm, prepareTXN }  from '../modules/App';
+import { makeOperationsForm }  from '../modules/App';
 import { cents2EU, bigEUMoney }  from '../modules/money';
-
+import { book, prepareTXN } from '../modules/writeModule';
 import { D_Page, D_Schema } from '../modules/terms.js'
 import { useSession } from '../modules/sessionmanager';
 

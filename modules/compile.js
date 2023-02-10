@@ -233,7 +233,7 @@ var autoSave=36000000; // seconds, defaults to ten-hourly-save
 
                 
                 // async
-                Server.save2Bucket(session,client,year)
+                Server.save2Bucket(session,client,year,root)
                     .then(result => { if(res) res.json({url:serverAddr+'/LATEST', client, year, 'result':result  })
                     });
 

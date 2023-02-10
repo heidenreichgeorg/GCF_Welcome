@@ -3,7 +3,7 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 
 import  { formatTXN  } from '../../modules/compile'
 
-import  { init,localhost,setSession,signIn } from '../../modules/sessionModule'
+import  { getRoot,init,localhost,setSession,signIn } from '../../modules/sessionModule'
 import  { save2Bucket, strSymbol, timeSymbol } from '../../modules/writeModule'
 import  { symbolic } from '../../modules/sheets'
 
@@ -25,9 +25,11 @@ export default function handler(
   res: NextApiResponse<any>
 ) {
   //res.set('Access-Control-Allow-Origin', '*');
-  console.log("BOOK.handler "+JSON.stringify(req.query));
+  console.log("BOOK.handler query="+JSON.stringify(req.query));
 
   config =  init(/*app,*/ process.argv); // GH20221003 do that per module
+
+  console.log("BOOK.handler config="+config);
 
   if(req && req.query && req.socket) {       
 
@@ -51,7 +53,7 @@ function bookTransaction(session:any, res:NextApiResponse<any>) {
     let sessionId = session.id; 
     let arrTransaction = formatTXN(session,reqBody);
   
-    console.log("0610 app.post BOOK jTXN('"+(arrTransaction?JSON.stringify(arrTransaction.join(';')):"---")+"')");
+    console.log("0610 app.post BOOK config("+config+")");
 
     var result="SERVER BOOKED";
     
@@ -73,7 +75,7 @@ function bookTransaction(session:any, res:NextApiResponse<any>) {
           
           let serverAddr = localhost();
           // async
-          save2Bucket(config,session,client,year)
+          save2Bucket(config,session,client,year,getRoot())
               .then(result => { if(res) res.json({url:serverAddr+'/LATEST', client, year, 'result':result  })
               });
                 

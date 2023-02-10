@@ -39,7 +39,7 @@ import * as fbAuth  from "firebase/auth"
 
 const https = require('https');
 
-import { getRoot } from "./sessionModule"
+
 
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -327,7 +327,6 @@ function fireWrite(session) {
 
   } else console.error("Firebase fireWrite SKIP");
 }
-module.exports['fireWrite']=fireWrite;
 
 
 async function markActive(client) {
@@ -364,15 +363,15 @@ async function markActive(client) {
 
 let fbConfig=null;
 
-function loadFBConfig(config,dir) {
+export function loadFBConfig(dir,config) {
     var fbConfig=null;
-    if(config!=null) {
+    if(config && dir) {
         
         //let fileName = getMostRecentFile(dir,"json");
-        let fileName = config+".json";
+        let fileName = dir+config+".json";
         if(fileName) {
             console.log("0022 loadFBConfig from "+fileName);
-            fbConfig = JSON.parse(fs.readFileSync(dir+fileName, 'utf8'));
+            fbConfig = JSON.parse(fs.readFileSync(fileName, 'utf8'));
         } else {
             console.log("0023 loadFBConfig NO JSON in "+dir);
             return null;
@@ -386,7 +385,7 @@ function loadFBConfig(config,dir) {
 export function fbDownload(config,client,year,callBack,res,root) {
     if(config) {
         // FIREBASE
-        const fbConfig = loadFBConfig(config,root);
+        const fbConfig = loadFBConfig(root,config);
         if(fbConfig) {        
             accessFirebase(bucketDownload,fbConfig,client,year,null,callBack,res);
             return "fbDownload";
