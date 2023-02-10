@@ -94,7 +94,7 @@ export default function Partner() {
     let hgbReport = makeHGB275S2Report(sheet) ;
     let shortReport = hgbReport.filter((line,l) => line.tx1 && l<15);
 
-    let jPage =  {'name':'Summe', 
+    let jPage =  {'name':'Gesamthand', 
             'init':0, 
             'credit':0,
             'debit':0,
@@ -154,7 +154,7 @@ export default function Partner() {
                     
                     <PartnerRow p={jPage}/>    
 
-                    <FlexRow p={[' ']}/>    
+                    <FlexRow p={['Steuerbescheinigung '+session.year]}/>    
                                         
                     { taxDetails.map((row,i) => ((i==partnerNo)?
                         
@@ -251,15 +251,15 @@ function PartnerRow(mRow) {
     console.log("PartnerRow mRow="+JSON.stringify(mRow));
     return (
         <div className="attrLine">
-            <div className="FIELD SYMB">{mRow.p.name}</div>
+            <div className="FIELD SNAM">{mRow.p.name}</div>
             <div className="FIELD MOAM">{cents2EU(mRow.p.init)}</div>
             <div className="FIELD MOAM">{cents2EU(mRow.p.credit)}</div>
             <div className="FIELD MOAM">{cents2EU(mRow.p.debit)}</div>
             <div className="FIELD MOAM">{cents2EU(mRow.p.yearEnd)}</div>
-            <div className="FIELD MOAM">{cents2EU(mRow.p.netIncomeOTC)}</div>
-            <div className="FIELD MOAM">{cents2EU(mRow.p.netIncomeFin)}</div>
+            <div className="FIELD MONY">{cents2EU(mRow.p.netIncomeOTC)}</div>
+            <div className="FIELD MONY">{cents2EU(mRow.p.netIncomeFin)}</div>
             <div className="FIELD MOAM">{cents2EU(mRow.p.close)}</div>
-            <div className="FIELD MOAM">{cents2EU(mRow.p.tax)}</div>
+            <div className="FIELD MONY">{cents2EU(mRow.p.tax)}</div>
             <div className="FIELD MOAM">{cents2EU(mRow.p.next)}</div>
         </div>
     )

@@ -6,7 +6,8 @@ import { D_History, D_Page, D_Schema, SCREENLINES }  from '../modules/terms.js';
 import Screen from '../pages/Screen'
 import FooterRow from '../components/FooterRow'
 import { cents2EU }  from '../modules/money';
-import { CSEP, getParam, prettyTXN, symbolic }  from '../modules/App';
+import { CSEP, getParam, symbolic }  from '../modules/App';
+import { prettyTXN }  from '../modules/writeModule';
 import { useSession } from '../modules/sessionmanager';
 
 const SCREEN_TXNS=1+parseInt(SCREENLINES/3);

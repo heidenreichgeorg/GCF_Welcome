@@ -1,5 +1,6 @@
 
 import { D_Balance, D_History, D_Report, D_Schema, D_Page, X_ASSETS, X_EQLIAB, X_EQUITY, X_INCOME, X_INCOME_REGULAR, SCREENLINES } from './terms.js'
+import { cents2EU }  from '../modules/money.mjs';
 import { iCpField, prettyTXN } from './writeModule'
 
 
