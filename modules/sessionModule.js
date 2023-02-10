@@ -179,6 +179,19 @@ function sy_findSessionId(client,year) {
     else return null;
 }
 
+
+function showRecent(aSession) {
+    // show recent transaction
+    let prev="";
+    if(aSession && aSession.sheetCells) {
+        let len=aSession.sheetCells.length;
+        let aPrev=aSession.sheetCells[len-1];
+        prev= aPrev[1];
+        aPrev.map((field,i)=>((i>5 && field.length>2) ? (prev=prev+" "+field):""));
+    }
+    return prev;
+}
+
 export function localhost() {
     let instance="127.0.0.1";
     var results = [];

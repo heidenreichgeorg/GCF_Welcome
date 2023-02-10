@@ -139,7 +139,7 @@ export default function Partner() {
                         return page.AcctHistory + ' ' + session.year})}
                     </div>                        
 
-                    <PartnerRow p={ {'name':page.Name, 
+                    <PartnerTitleRow p={ {'name':page.Name, 
                             'init':page.Init, 
                             'credit':page.Credit,
                             'debit':page.Debit,
@@ -199,7 +199,7 @@ export default function Partner() {
         const rqOptions = { method: 'GET', headers: {  'Accept': 'application/json'}, mode:'cors'};
         try {
             
-            fetch(`${REACT_APP_API_HOST}/DOWNLOAD?sessionId=${session.id}`, rqOptions)
+            fetch(`${REACT_APP_API_HOST}/DOWNLOAD?client=${session.client}&year=${session.year}`, rqOptions)
             .then((response) => response.blob())
             .then((blob) => URL.createObjectURL(blob))
             .then((url) => console.log("1120 handleJSONSave URL= "+ makeJSONButton(url)))
@@ -261,6 +261,24 @@ function PartnerRow(mRow) {
             <div className="FIELD MOAM">{cents2EU(mRow.p.close)}</div>
             <div className="FIELD MONY">{cents2EU(mRow.p.tax)}</div>
             <div className="FIELD MOAM">{cents2EU(mRow.p.next)}</div>
+        </div>
+    )
+}
+
+function PartnerTitleRow(mRow) {
+    console.log("PartnerTitleRow mRow="+JSON.stringify(mRow));
+    return (
+        <div className="attrLine">
+            <div className="FIELD SNAM">{mRow.p.name}</div>
+            <div className="FIELD TEAM">{cents2EU(mRow.p.init)}</div>
+            <div className="FIELD TEAM">{cents2EU(mRow.p.credit)}</div>
+            <div className="FIELD TEAM">{cents2EU(mRow.p.debit)}</div>
+            <div className="FIELD TEAM">{cents2EU(mRow.p.yearEnd)}</div>
+            <div className="FIELD TENY">{cents2EU(mRow.p.netIncomeOTC)}</div>
+            <div className="FIELD TENY">{cents2EU(mRow.p.netIncomeFin)}</div>
+            <div className="FIELD TEAM">{cents2EU(mRow.p.close)}</div>
+            <div className="FIELD TENY">{cents2EU(mRow.p.tax)}</div>
+            <div className="FIELD TEAM">{cents2EU(mRow.p.next)}</div>
         </div>
     )
 }

@@ -69,7 +69,7 @@ function downloadJSON(session:any, res:NextApiResponse<any>) {
         if(year && client) {
 
             // 20220520 server-side XLSX
-            console.log("1510 app.post DOWNLOAD XLSX for year"+year);
+            console.log("1510 app.post DOWNLOAD JSON for year"+year);
 
             let sessionTime=timeSymbol();
             let monthYearHour = sessionTime.slice(4,10);
@@ -82,10 +82,10 @@ function downloadJSON(session:any, res:NextApiResponse<any>) {
             // download JSON
             let fileName = session.year+session.client+monthYearHour+'.json';
             console.log("1540 app.post DOWNLOAD download JSON as "+fileName);
-            res.writeHead(HTTP_OK,{
-                'Content-Type': 'application/json; charset=utf-8',
-                'Content-Disposition': 'attachment fileName="'+fileName+'"'
-            });
+            res.setHeader('status',HTTP_OK);
+            res.setHeader('Content-Type', 'application/json; charset=utf-8');
+            res.setHeader('Content-Disposition','attachment fileName="'+fileName+'"');
+                
             res.json(session);    
 
         } else {

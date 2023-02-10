@@ -32,6 +32,8 @@ input[type=range] { -webkit-appearance: none;  width: 200px; margin: 0; padding:
 .SEP      { width: 1rem; text-align: center;  }		
 .TAG      { width: 2rem; text-align: left;  }		
 .SYMB     { width: 3rem;  text-align: left; }		
+.TEAM     { width:5.3rem; text-align: right; }
+.TENY     { width: 7rem;  text-align: right; }
 .MOAM     { width:5.3rem; text-align: right; font-family:monospace; }
 .MONY     { width: 7rem; text-align: right; font-family:monospace; }
 .C100     { width: 6rem; }

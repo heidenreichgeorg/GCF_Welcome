@@ -118,7 +118,7 @@ let de_DE = {
     InterestCost:"Zinskosten",
     IncomeTax:   "Einkommensteuer",
     CapTax:      "Ertragssteuer",
-    PaidTax:     "Ges.Steuerforderung",
+    PaidTax:     "Steuerforderung",
     FinYield:    "außerordentl.Ergebnis",
     OpAssets:    "betriebsnotw.Vermögen",
     AvgCurrent:  "mittl. Umlaufvermögen",

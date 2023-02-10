@@ -6,8 +6,8 @@ import { D_History, D_Page, D_Schema, SCREENLINES }  from '../modules/terms.js';
 import Screen from '../pages/Screen'
 import FooterRow from '../components/FooterRow'
 import { cents2EU }  from '../modules/money';
-import { CSEP, getParam, symbolic }  from '../modules/App';
-import { prettyTXN }  from '../modules/writeModule';
+import { getParam, symbolic }  from '../modules/App';
+import { CSEP,prettyTXN }  from '../modules/writeModule';
 import { useSession } from '../modules/sessionmanager';
 
 const SCREEN_TXNS=1+parseInt(SCREENLINES/3);
@@ -76,7 +76,7 @@ export default function History() {
             
             {aPages.map((m,n) => ( 
                 <div className="ulliTab" id={tabName+n} style= {{ 'display': m }} >
-                    { !isOpen && (sHistory.slice(n*SCREEN_TXNS,(n+1)*SCREEN_TXNS).map((row) => (  <SigRow row={row} index={n}/>  )))}
+                    { !isOpen && (sHistory.slice(n*SCREEN_TXNS,(n+1)*SCREEN_TXNS).map((row) => (  <SigRow row={row} index={n} client={session.client}  year={session.year}/>  )))}
                     <div className="attrline">&nbsp;</div>
                     <FooterRow left={page["client"]}  right={page["register"]} prevFunc={prevFunc} nextFunc={nextFunc}/>
                     <FooterRow left={page["reference"]} right={page["author"]} prevFunc={prevFunc} nextFunc={nextFunc}/>
@@ -109,13 +109,11 @@ function handleChange(target,aRow,mRow) {
     }
 }
 
-function SigRow({row,index}) {
-    //console.log("SigRow "+JSON.stringify(row.row))  
-
+function SigRow({row,index,client,year}) {
     let aRow = [0n,0n,0n,0n,0n,0n]
     try { let saRow = row.sig;
         aRow = saRow.split(CSEP);
-     } catch(err) {}
+     } catch(err) {  aRow=[""+index+client+year,""+year+index+client] }
     
     let mRow =  [0n,0n,0n,0n,0n,0n]
     try { let smRow = row.money;

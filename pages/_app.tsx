@@ -6,9 +6,10 @@ import { SessionProvider } from '../modules/sessionmanager'
 
 export default function App({ Component, pageProps }: AppProps) {
   const router = useRouter()
-  return <>
+  return (
+  <div id="windowBorder" className="dosBorder">
     <SessionProvider onLoading={'Loading session...'} >
       <Component {...pageProps} />
     </SessionProvider>
-  </>
+  </div>)
 }
