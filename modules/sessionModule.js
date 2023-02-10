@@ -1,8 +1,4 @@
-
 import { networkInterfaces } from 'os';
-
-
-
 
 import { strSymbol,timeSymbol } from './writeModule.js'
 import { fbDownload } from './fireBaseBucket.js'
@@ -38,15 +34,18 @@ export function signIn(config,query,remote,res,startSessionCB) {
             if(id=sy_findSessionId(client,''+year)) {
                 console.log ( "0012 signIn FOUND WARM id ="+id);
                 sendDisplay( getSession(id), res);
-            }
-            else {
+            } else {
                 console.log ( "0014 signIn READ BUCKET FOR COLD id ="+id);
                 fbDownload(config,client,year,startSessionCB,res,getRoot()); // avoid double response
             }
                         
         } else console.log ( "0027 signIn file no valid year for query="+JSON.stringify(query)+",addr="+remote);
 
-    } else console.log ( "0029 signIn file no valid client for query="+JSON.stringify(query)+",addr="+remote);
+    } else {
+        console.log ( "0029 signIn file no valid client for query="+JSON.stringify(query)+",addr="+remote);
+
+        res.send("FORWARD FILE");
+    }
 
     return null;
 }
