@@ -15,7 +15,7 @@ for each account in D_Balance with XBRL=de-gaap-ci_bs.ass.currAss.receiv.other.o
 import { useEffect, useState   } from 'react';
 import Screen from '../pages/Screen'
 import FooterRow from '../components/FooterRow'
-import { useSession } from '../modules/sessionmanager';
+import { REACT_APP_API_HOST,useSession } from '../modules/sessionmanager';
 import { cents2EU } from  '../modules/money'
 import { makeHGB275S2Report } from "../modules/App.js"
 import { X_ASSET_CAPTAX, D_Balance, D_Partner, D_Page, SCREENLINES }  from '../modules/terms.js';
@@ -199,7 +199,7 @@ export default function Partner() {
         const rqOptions = { method: 'GET', headers: {  'Accept': 'application/json'}, mode:'cors'};
         try {
             
-            fetch(`${process.env.REACT_APP_API_HOST}/DOWNLOAD?sessionId=${session.id}`, rqOptions)
+            fetch(`${REACT_APP_API_HOST}/DOWNLOAD?sessionId=${session.id}`, rqOptions)
             .then((response) => response.blob())
             .then((blob) => URL.createObjectURL(blob))
             .then((url) => console.log("1120 handleJSONSave URL= "+ makeJSONButton(url)))

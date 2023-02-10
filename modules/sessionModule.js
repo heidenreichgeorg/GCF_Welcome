@@ -11,6 +11,8 @@ import { PORT } from './terms.js'
 
 const debug=null;
 
+export const HTTP_OK = 200;
+
 var nets;
 
 // load JSON file from Firebase storage
