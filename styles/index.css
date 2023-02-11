@@ -25,7 +25,7 @@ input[type=range] { -webkit-appearance: none;  width: 200px; margin: 0; padding:
 .attrPair {              padding: 1px; float: left; color:inherit;min-height: 48px;               font-family: inherit; font-size: 11px; font-weight:400; text-align: center; background-color: inherit; } 
 .attrLine:nth-child(even) { background: #d0f0ff;  border: 1px dotted gray;}
 
-.key      {  height:16px;  margin: 0px; border: 0px 1px 0px 1px solid gray; float: left; background-color:transparent; font-family:  inherit; font-size: inherit; font-weight:600; color: #000; }
+.key      {  height:16px;  margin: 0px; border: 1px 1px 1px 1px gray; border-style: solid; float: left; background-color:transparent; font-family:  inherit; font-size: inherit; font-weight:600; color: #000; }
 
 .FIELD    { overflow:hidden; padding: 1px; border: none; float: left;  font-family: inherit; font-size: inherit; font-weight:inherit; color: inherit;} 
 
