@@ -251,7 +251,7 @@ export async function save2Bucket(config,session,client,year,root) {
 
 
 
-function startSessionDisplay(session,res) {
+export function startSessionDisplay(session,res) {
 
     console.log("0018 startSessionDisplay="+JSON.stringify(Object.keys(session))); 
 

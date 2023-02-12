@@ -1,17 +1,35 @@
 
+import { networkInterfaces } from 'os';
+// Next.js API route support: https://nextjs.org/docs/api-routes/introduction
+import type { NextApiRequest, NextApiResponse } from 'next'
+
+import { getRoot,init,localhost } from '../../modules/sessionModule'
+import { startSessionDisplay,save2Bucket,strSymbol,timeSymbol } from '../../modules/writeModule'
+import { compile } from '../../modules/compile'
+
+const debugUpload = false;
+
+let config:string|null;
+var nets;
+
 export default function handler(
     req: NextApiRequest,
     res: NextApiResponse<any>
   ) {
     let strTimeSymbol = timeSymbol();
-    if(debugUpload) console.log("\n\n0800 UPLOAD at "+strTimeSymbol);
+    console.log("\n\n0800 UPLOAD at "+strTimeSymbol);
+
+    config =  init(/*app,*/ process.argv); // GH20221003 do that per module
+
+    nets = networkInterfaces();
+
 
     // client sends yearclient.JSON file
     // this json has to be stored in heap
     //var signup = "NO SESSION";
 
     let remote = req.socket.remoteAddress;
-    if(debug) console.log("0810 app.post UPLOAD from "+remote);
+    console.log("0810 app.post UPLOAD from "+remote);
 
     let rawData = req.body;
     if(debugUpload) console.dir("0810 app.post UPLOAD from "+rawData);
@@ -44,7 +62,7 @@ export default function handler(
 
             // CHOOSE COMPILER based on clientFunction
             // SERVER FUNCTION COMPILE GH20220918
-            sessionData.generated = Compiler.compile(sessionData);
+            sessionData.generated = compile(sessionData);
 
 
             // INSTEAD OF LOCAL FILE STORAGE
@@ -53,7 +71,7 @@ export default function handler(
 
             // PERSISTENT FB CLOUD FILE STORAGE
             // SETS SESSION AFTER WRITE
-            save2Bucket(config,sessionData,client,year,root);
+            save2Bucket(config,sessionData,client,year,getRoot());
 
             
             // 20221202 what if config==null and no bucket shall be used?
