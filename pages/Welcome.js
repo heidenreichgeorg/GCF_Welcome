@@ -119,10 +119,10 @@ export default function Welcome() {
                 CSV/JSON in UTF-8
             </div>
             <div className="attrPair">
-                <div className="FLEX key" onDragOver={dragOverHandler} onDrop={dropHandler}> </div>                
+                <div className="FLEX box" onDragOver={dragOverHandler} onDrop={dropHandler}> </div>                
                 
             </div>
-            <div className="key" id="fileupload">Upload</div>            
+            <div className="FIELD box" id="fileupload">Upload</div>            
         </div>
          
         
