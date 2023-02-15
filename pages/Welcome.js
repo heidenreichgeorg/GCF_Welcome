@@ -1,7 +1,6 @@
 
-import { PORT } from '../modules/terms.js'
-import { HTTP_OK, HTTP_WRONG } from '../modules/sessionModule.js'
-import { timeSymbol } from '../modules/writeModule.js'
+
+import { HTTP_OK, HTTP_WRONG, timeSymbol } from '../modules/sessionModule.js'
 import { REACT_APP_API_HOST } from '../modules/sessionmanager.tsx';
 
 export default function Welcome() {

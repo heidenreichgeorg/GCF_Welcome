@@ -2,9 +2,9 @@ body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
   margin: 0;
   font-family: Bahnschrift, monospace, sans-serif; }
 
-.dosBorder{ max-width:1005px; padding: 4px; border-style: solid; border-radius: 10px; border-width: 2px; border-color: #AEADAE;  background-color: #FFF; color: #0F0F0F; }
+.dosBorder{ max-width:1030px; padding: 14px; border-style: solid; border-radius: 10px; border-width: 2px; border-color: #AEADAE;  background-color: #FFF; color: #0F0F0F; }
 .mTable   { font-family: Bahnschrift,monospace;                             height: 18px;             display:table;    page-break-after: always  }
-.ulliTab  { width:995px;  padding: 1px; border: none;  font-size: 12px; font-weight:400;  } 
+.ulliTab  { width:1020px;  padding: 1px; border: none;  font-size: 12px; font-weight:400;  } 
 
 
 input  { color:#0F0F0F; background-color:inherit; font-family :Bahnschrift; font-size: 10px;  width:80px;}
