@@ -246,3 +246,7 @@ export function timeSymbol() {
       ('0' + u.getUTCSeconds()).slice(-2) +
       (u.getUTCMilliseconds() / 1000).toFixed(3).slice(2, 5);
 };     
+
+export function currentHash() {
+    return strSymbol(timeSymbol().slice(6,10)).slice(-4);
+}

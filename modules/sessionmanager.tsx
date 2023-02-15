@@ -4,7 +4,7 @@ import { useRouter } from 'next/router'
 import { ParsedUrlQuery,stringify } from "querystring";
 import { createContext, ReactNode, useContext, useEffect, useState } from "react";
 
-import { strSymbol,timeSymbol } from './sessionModule.js'
+import { currentHash } from './sessionModule.js'
 
 type Session = { }
 
@@ -16,9 +16,6 @@ export function useSession() {
     return useContext(SessionContext)
 }
 
-export function currentHash() {
-    return strSymbol(timeSymbol().slice(6,10)).slice(-4);
-}
 
 
 export function SessionProvider({ children,  default_value, onLoading, onError }:
@@ -31,8 +28,8 @@ export function SessionProvider({ children,  default_value, onLoading, onError }
     const router = useRouter()
 
   
-    async function startTimer(max: number) {
-        for (;max>0;) {
+    async function startTimer() {
+        for (;1>0;) {
             let symTime = currentHash();
             console.log(symTime+"   Hash="+symTime);
             await delay(20000);
@@ -47,16 +44,17 @@ export function SessionProvider({ children,  default_value, onLoading, onError }
       })
     }
   
-    startTimer(100);
 
     
-
+    let symTime = currentHash();
+    console.log("0000 "+symTime+"   Hash  "+symTime);
     console.log("0001 Sessionprovider "+stringify(router.query));
     let strSearch = router.asPath.split('?')[1];
     console.log("0002 SessionProvider host="+REACT_APP_API_HOST);
     console.log("0003 SessionProvider query="+strSearch)
 
     useEffect(() => {      
+        startTimer();
         setStatus('loading')
         let browserItem = sessionStorage.getItem('session');
         if(browserItem!=null && browserItem.length>256) {
@@ -71,6 +69,7 @@ export function SessionProvider({ children,  default_value, onLoading, onError }
                 setStatus('error')
             }
         } else { 
+
             // PUT REAL IP ADDR or DNS NAME OF BACKEND INTO .env file
             //fetch(`${process.env.REACT_APP_API_HOST}/SESSION${strSearch}`,  
             fetch(`${REACT_APP_API_HOST}/SESSION?${strSearch}`,  

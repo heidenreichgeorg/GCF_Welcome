@@ -3,7 +3,7 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 
 
 
-import  { init, signIn, startSessionJSON } from '../../modules/sessionModule'
+import  { currentHash, init, signIn, startSessionJSON } from '../../modules/sessionModule'
 
 
 let config = null;
@@ -19,11 +19,13 @@ export default function handler(
 
   if(req && req.query && req.socket) {       
       
-      const { client, year } = req.query;
+      const { client, year, auth } = req.query;
       const query:JSON = <JSON><unknown> { "ext":"JSON", "client":client, "year":year  };
       console.log("    SESSION.handler "+JSON.stringify(query));
     
-      signIn(config,query,req.socket.remoteAddress,res,startSessionJSON); 
+      if(auth==currentHash())
+        signIn(config,query,req.socket.remoteAddress,res,startSessionJSON); 
+      else  res.json({ id: '666', code : "NO VALID AUTH"})
   }
   else res.json({ id: '0123', code : "NO VALID QUERY"})
 }
