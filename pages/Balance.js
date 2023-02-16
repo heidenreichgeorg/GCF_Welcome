@@ -42,10 +42,10 @@ export default function Balance({show}) {
     return (
         <Screen prevFunc={prevFunc} nextFunc={nextFunc} tabSelector={pageText} tabName={tabName}>
             {report.map((balance,n) => ( 
-                <div className="ulliTab" id={tabName+n} style= {{ 'display': aPages[n]}} >
+                <div className="ulliTab" key={"Balance0"+n} id={tabName+n} style= {{ 'display': aPages[n]}} >
                     <div className="attrLine">{[page.BalanceOpen,page.BalanceClose,page.BalanceNext][n] + ' ' + (parseInt(session.year))}</div>
                     {balance.map((row,i) => (
-                        <BalanceRow jArgs={row} id={i} />    
+                        <BalanceRow  key={"Balance1"+n} jArgs={row} id={i} />    
                     ))}
                     <FooterRow  id={"F1"}  left={page["client"]}   right={page["register"]} prevFunc={prevFunc} nextFunc={nextFunc}/>
                     <FooterRow  id={"F2"}  left={page["reference"]}  right={page["author"]} prevFunc={prevFunc} nextFunc={nextFunc}/>

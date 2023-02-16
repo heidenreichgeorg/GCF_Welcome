@@ -124,10 +124,10 @@ export default function Partner() {
 
             {Object.keys(jReport).map((_,partnerNo) => ( 
 
-                <div className="ulliTab" id={tabName+partnerNo} style= {(partnerNo==0?{ 'display': 'block'}:{ 'display': 'none'})} >
+                <div  key={"Partner0"+partnerNo}  className="ulliTab" id={tabName+partnerNo} style= {(partnerNo==0?{ 'display': 'block'}:{ 'display': 'none'})} >
                     
                     { shortReport.map((row,i)=> (
-                        <HGB275Row jArgs={row} id={"Args"+i} />
+                        <HGB275Row  key={"Partner1"+i}  jArgs={row} id={"Args"+i} />
                         )
                     )}
 
@@ -158,14 +158,14 @@ export default function Partner() {
                                         
                     { taxDetails.map((row,i) => ((i==partnerNo)?
                         
-                        <div className='attrLine'>                      
-                            {Object.keys(row).map((fieldName) => <NamedAmount p={{'name':fieldName==='name'?'':fieldName,'amnt':row[fieldName]}}/>
+                        <div className='attrLine'  key={"Partner2"+i} >                      
+                            {Object.keys(row).map((fieldName,j) => <NamedAmount  key={"PartnerA"+j}  p={{'name':fieldName==='name'?'':fieldName,'amnt':row[fieldName]}}/>
                             )}                       
                         </div>
                     :""))}    
 
-                    { filler.map((row) => (
-                        <PartnerRow p={row}/>    
+                    { filler.map((row,k) => (
+                        <PartnerRow  key={"Partner3"+k} p={row}/>    
                     ))}    
 
                     <div className="attrLine">

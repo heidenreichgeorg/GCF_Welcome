@@ -46,13 +46,13 @@ export default function Accounts() {
     return (
         <Screen prevFunc={prevFunc} nextFunc={nextFunc} tabSelector={pageText} tabName={tabName}>
             { aStands.map((report,n)=>
-                <div className="ulliTab" id={tabName+n} style= {{ 'display': aPages[n]}} >
+                <div className="ulliTab" key={"Accounts0"+n} id={tabName+n} style= {{ 'display': aPages[n]}} >
                     <div className="attrLine">{[
                         page.AcctOpen+' '+session.year,
                         page.AcctClose+' '+session.year,
                         page.AcctNext+' '+(parseInt(session.year)+1)][n]}</div>
                     {report.map((row) => 
-                        <AccountsRow am1={row.gLeft} tx1={row.nLeft} am2={row.gMidl} tx2={row.nMidl} am3={row.gRite} tx3={row.nRite} />                       
+                        <AccountsRow  key={"Accounts1"+n} am1={row.gLeft} tx1={row.nLeft} am2={row.gMidl} tx2={row.nMidl} am3={row.gRite} tx3={row.nRite} />                       
                     )}                    
                     <FooterRow left={page["client"]}  right={page["register"]} prevFunc={prevFunc} nextFunc={nextFunc}/>
                     <FooterRow left={page["reference"]} right={page["author"]} prevFunc={prevFunc} nextFunc={nextFunc}/>

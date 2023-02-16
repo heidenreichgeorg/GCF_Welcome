@@ -42,10 +42,10 @@ export default function HGB275S2Page() {
     return (
         <Screen prevFunc={prevFunc} nextFunc={nextFunc} tabSelector={aPages}  tabName={tabName}>
             {report.map((balance,n) => ( 
-                <div className="ulliTab" id={tabName+n} style= {{ 'display': aPages[n]}} >
+                <div className="ulliTab"  key={"HGB0"+n}  id={tabName+n} style= {{ 'display': aPages[n]}} >
                     <div className="attrLine">{page.GainLoss + ' ' + session.year}</div>
                     {balance.map((row,i) => (
-                        <HGB275Row jArgs={row} id={"Args"+i} />    
+                        <HGB275Row  key={"HGB1"+i}  jArgs={row} id={"Args"+i} />    
                     ))}
                     <FooterRow  id={"F1"}  left={page["client"]}   right={page["register"]} prevFunc={prevFunc} nextFunc={nextFunc}/>
                     <FooterRow  id={"F2"}  left={page["reference"]}  right={page["author"]} prevFunc={prevFunc} nextFunc={nextFunc}/>

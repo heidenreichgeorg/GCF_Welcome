@@ -97,7 +97,8 @@ export default function Operations() {
 
             {
                 report.map((row,l) => (
-                    <StatusRow am1={row.gAsset}  tx1={row.nAsset}  tt1={row.tAsset} 
+                    <StatusRow  key={"Operations0"+l} 
+                               am1={row.gAsset}  tx1={row.nAsset}  tt1={row.tAsset} 
                                am2={row.gLiab}   tx2={row.nLiab}   tt2={row.tLiab} 
                                am3={row.gGain}   tx3={row.nGain}   tt3={row.tGain}
                                am4={row.gEquity} tx4={row.nEquity} tt4={row.tEquity} /> 

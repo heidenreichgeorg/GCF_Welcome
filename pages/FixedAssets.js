@@ -58,11 +58,11 @@ export default function FixedAssets() {
                         'gain':'Ertrag'} } />
 
 
-                {Object.keys(jAssets).map(function(key) {
+                {Object.keys(jAssets).map(function(key,n) {
                     var row = jAssets[key];
                     iRest+=BigInt(row.rest);
                     return (
-                        <FixedAssetsRow p={{idnt:row.idnt,type:row.type,date:row.date,
+                        <FixedAssetsRow  key={"Fixed0"+n}  p={{idnt:row.idnt,type:row.type,date:row.date,
                             init:cents2EU(row.init),
                             nmbr:row.nmbr,
                             rest:cents2EU(row.rest),
@@ -81,9 +81,9 @@ export default function FixedAssets() {
                         'cost':' ' } }
                 />
 
-                { filler.map((row) =>
+                { filler.map((row,n) =>
                     (
-                        <FixedAssetsRow p={row} />
+                        <FixedAssetsRow  key={"Fixed2"+n} p={row} />
                     )                    
                 )}    
                 

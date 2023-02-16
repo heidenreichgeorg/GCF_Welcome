@@ -24,7 +24,7 @@ export default function Chart({jValue, legend}) {
                 <svg id="ins1_chart" width={20+14*num} height="180">
                     {valueKeys.map((key,i) =>
                     (
-                        <line x1={20+14*i} y1={140} x2={20+14*i} y2={(140-140*parseInt(jValue[key])/max)} stroke={colArray[i] }
+                        <line key={"Chart0"+i} x1={20+14*i} y1={140} x2={20+14*i} y2={(140-140*parseInt(jValue[key])/max)} stroke={colArray[i] }
                         strokeDasharray={dashArray} 
                             strokeLinecap="round" strokeWidth={strokeWidth} />
                     ))}

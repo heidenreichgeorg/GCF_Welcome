@@ -144,7 +144,7 @@ export default function Screen({ children, prevFunc, nextFunc, tabSelector, tabN
             <div className="attrLine">                     
                 <select type="radio" name={tabName}>                          
                     {tabSelector.map((row,tabNum) => (
-                        <option value={row} onClick={makeTab(tabName,tabNum)}>{row}</option>
+                        <option  key={"Screen0"+tabNum}  value={row} onClick={makeTab(tabName,tabNum)}>{row}</option>
                     ))}
                 </select>
             </div>

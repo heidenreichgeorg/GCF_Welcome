@@ -73,7 +73,7 @@ export default function Status() {
             <StatusRow am1={page.Assets} am2={page.GainLoss}  am3={page.eqliab}/>
             {
                 report.map((row,l) => (
-                    <StatusRow am1={row.gLeft} tx1={row.nLeft} am2={row.gMidl} tx2={row.nMidl} am3={row.gRite} tx3={row.nRite} d={row.dTran} n={row.nTran} l={row.lTran}/>                       
+                    <StatusRow  key={"Status"+l}  am1={row.gLeft} tx1={row.nLeft} am2={row.gMidl} tx2={row.nMidl} am3={row.gRite} tx3={row.nRite} d={row.dTran} n={row.nTran} l={row.lTran}/>                       
                 ))
             }
             <FooterRow left={page["client"]}  right={page["register"]} prevFunc={prevFunc} nextFunc={nextFunc} miscFunc={handleXLSave}/>
