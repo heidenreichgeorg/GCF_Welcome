@@ -1150,7 +1150,8 @@ function distribute(iMoney,bPartner,target) {
         for (var n in bPartner) {
             var p=bPartner[n];
             if(p) {
-                let iShare = (iMoney * BigInt(p.gain)) / BigInt(p.denom);
+                let iShare = 0n;
+                if(BigInt(p.denom)>0n) iShare = (iMoney * BigInt(p.gain)) / BigInt(p.denom);
                 shares[index1]=iShare;
                 cents[index1]=0n;
                 if(debugTax) console.log('0134 Sender.distribute #'+n+'='+index1+': '+sign+'*'+iShare+' to '+ p.varCap+ " with "+p.gain+"/"+p.denom);

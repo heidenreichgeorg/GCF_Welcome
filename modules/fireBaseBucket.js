@@ -242,8 +242,10 @@ async function bucketUpload(bpStorage,client,year,jData,startSessionCB,callRes) 
           
           uploadTask.on("state_changed", // params are: EVENT NEXT ERROR COMPLETE
           (snapshot) => { // NEXT
+              let total = 1000;
+              if(snapshot.totalBytes>0) total=snapshot.totalBytes;
               const progress =
-                Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
+                Math.round((snapshot.bytesTransferred / total) * 100);
               //setProgresspercent(progress);
               
               if(debug) console.log("Firebase fbWriteJSON "+progress+"%");
