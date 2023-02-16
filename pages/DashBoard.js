@@ -5,7 +5,8 @@ import { useEffect, useState  } from 'react';
 import Screen from './Screen'
 import { useSession } from '../modules/sessionmanager';
 import { makeStatusData }  from '../modules/App';
-import { D_FixAss }  from '../modules/terms.js';
+import { D_FixAss, D_Page }  from '../modules/terms.js';
+import FooterRow from '../components/FooterRow';
 
 import Chart from '../components/Chart'
 import Gauge from '../components/Gauge'
@@ -56,6 +57,8 @@ export default function DashBoard({value}) {
 
     function prevFunc() {console.log("CLICK PREVIOUS"); window.location.href="/Balance?client="+session.client+"&year="+session.year; }
     function nextFunc() {  console.log("CLICK NEXT");   window.location.href="/FixedAssets?client="+session.client+"&year="+session.year; }
+    
+    let page = sheet[D_Page];
 
     return (
         <Screen prevFunc={prevFunc} nextFunc={nextFunc} >
@@ -78,7 +81,9 @@ export default function DashBoard({value}) {
             <div classname="attrLine">
                 <Relation scale={ass} left={fix} right={eqt} legend={"fix/eqt"} />
             </div>
-            
+            <FooterRow  id={"F1"}  left={page["client"]}   right={page["register"]} prevFunc={prevFunc} nextFunc={nextFunc}/>
+            <FooterRow  id={"F2"}  left={page["reference"]}  right={page["author"]} prevFunc={prevFunc} nextFunc={nextFunc}/>
+
         </Screen>
         )
    

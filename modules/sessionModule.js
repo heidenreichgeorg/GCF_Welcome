@@ -250,3 +250,53 @@ export function timeSymbol() {
 export function currentHash() {
     return strSymbol(timeSymbol().slice(6,10)).slice(-4);
 }
+
+export function sendDisplay(session,res) {
+    let sessionId= session.id;
+    let client  =  session.client;
+    let year    =  session.year;
+    let clientSave = (session.ext==='JSON') ? true:false;
+
+    // 20220728
+    if(sessionId) {
+
+        let localHost = localhost();
+        
+        let url = localHost.addr + ":" + PORT + "/Status?client="+client+"&year="+year;
+
+        
+        console.dir("5010 sendDisplay() rendering url="+url);
+
+        if(res) {
+           // qr.toDataURL(url, (err, qrCodeDataUrl) => {
+           //     if (err) res.send("Error occured");
+
+                //res.header('Content-Type', 'text/html');
+            
+                // Let us return the QR code image as our response and set it to be the source used in the webpage
+           //     const html = ejs.render('<DIV class="attrRow"><img src="<%= qrCodeDataUrl %>" /></DIV>', { qrCodeDataUrl });
+                const html = "nbsp;";
+
+
+                console.dir("5020 sendDisplay() rendering QR code with #"+html.length+ "chars");
+
+                res.writeHead(HTTP_OK);
+                res.write(
+                    "<HTML>"+clientHead+"<BODY>"
+                    +html
+                    +'<DIV class="attrRow"><H1>'+year+'&nbsp;'+client+'&nbsp;</H1>'
+                    +"<A HREF="+url+">STATUS</A>"
+                    +'</DIV></BODY></HTML>'
+                );
+                res.end();
+            // )};
+        }
+
+    } else {
+        res.writeHead(HTTP_OK);
+        res.end("\n<HTML>"+clientHead+"<BODY>"+banner+"</BODY></HTML>\n");
+        console.dir("5021 sendDisplay: no sessionId");
+
+    }
+}
+
