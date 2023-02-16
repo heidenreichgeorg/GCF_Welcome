@@ -1,7 +1,11 @@
-/* global BigInt */
+export default function Operations() {
+    return <div/>
+}
+
+/* xglobal BigInt */
 
 // .refAcct;var jSVWZ  = reqBody.reason;var jSVWZ2 = reqBody.refTime;
-
+/*
 import { useEffect, useState, useRef } from 'react';
 
 import Screen from '../pages/Screen'
@@ -76,12 +80,7 @@ export default function Operations() {
         sessionStorage.setItem('session',"");
 
         console.log("BOOK O booked.");
-   /*
-   
-20230127212142120
-0610 app.post BOOK jTXN('{"add":{"COGK":"139000"},"sub":{"NKHA":"10000","MIET":"129000"},"diff":"0","date":"2023-02-02","sender":"Ferguson","refAcct":"MIET","reason":"Eifelweg22","refTime":"Februar2023","credit":{"COGK":{"index":10,"value":"139.000,00"}},"debit":{"NKHA":{"index":24,"value":"10.000,00"},"MIET":{"index":16,"value":"129.000,00"}}}')
-0617 app.post BOOK NO OLD session MUST SET req.body.sessionId
-   */
+  
     }
 
     const aNums = [0];
@@ -186,5 +185,5 @@ export default function Operations() {
     function addTXNData(shrtName,a) { txn[shrtName]=a; console.log("DATA("+a+") "+JSON.stringify(txn)); return txn; } // avoid update
 }
 
-
+*/
 

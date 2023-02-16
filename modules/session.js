@@ -8,6 +8,7 @@ import { PORT } from './terms.js'
 const debug=null;
 
 export const HTTP_OK = 200;
+export const HTTP_WRONG = 400;
 
 var nets;
 

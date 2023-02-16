@@ -1,5 +1,7 @@
-
-
+export default function HGB275S2Page() {
+    return <div/>
+}
+/*
 import { useEffect, useState  } from 'react';
 
 import {  makeHGB275S2Report } from '../modules/App'
@@ -72,3 +74,4 @@ function HGB275Row({ jArgs, id }) {
     )
 }
 
+*/

@@ -1,5 +1,9 @@
-/* global BigInt */
+export default function History() {
+    return <div/>
+}
 
+
+/*
 import { useEffect, useState } from 'react';
 
 import { D_History, D_Page, D_Schema, SCREENLINES }  from '../modules/terms.js';
@@ -298,3 +302,4 @@ function BalanceRow({text,level7,level6,level5,level4,level3,level2,level1,level
     )
 }
 
+*/

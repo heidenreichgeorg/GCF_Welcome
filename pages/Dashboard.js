@@ -1,5 +1,10 @@
-/* global BigInt */
+export default function DashBoard({value}) {
+    return <div/>
+}
 
+
+/* xglobal BigInt */
+/*
 
 import { useEffect, useState  } from 'react';
 import Screen from './Screen'
@@ -88,3 +93,4 @@ export default function DashBoard({value}) {
         )
    
 }
+*/

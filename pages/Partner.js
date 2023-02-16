@@ -1,3 +1,6 @@
+export default function Partner() {
+    return <div/>
+}
 /*
 
 HTTPS
@@ -10,8 +13,9 @@ for each account in D_Balance with XBRL=de-gaap-ci_bs.ass.currAss.receiv.other.o
     for each partner in D_Partner take gain/denom
 */
 
-/* global BigInt */
+/* xglobal BigInt */
 
+/*
 import { useEffect, useState   } from 'react';
 import Screen from '../pages/Screen'
 import FooterRow from '../components/FooterRow'
@@ -184,12 +188,7 @@ export default function Partner() {
 
         </Screen>
     )
-    /*
-    
-                    <div id="fullReport" style={{'display':'none'}} >
-                        <Report ></Report>
-                    </div>
-    */
+   
     
     function showReport(e) { console.log("SHOW"); let report=document.getElementById("fullReport"); if(report) report.style={'display':'block'};}
     //function hideReport(e) { console.log("HIDE"); let report=document.getElementById("fullReport"); if(report) report.style={'display':'none'}; }
@@ -294,3 +293,4 @@ function HGB275Row({ jArgs, id }) {
     )
 }
 
+*/
