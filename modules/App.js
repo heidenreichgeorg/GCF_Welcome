@@ -399,7 +399,7 @@ export function makeStatusData(response) {
 }
 
 
-export function makeHGB275S2Report(response) {
+export function makeHGBReport(response) {
 
     let balance = []; 
 
@@ -566,7 +566,8 @@ export function makeHGB275S2Report(response) {
         fillRight(balance,cReceiv,page.rec,19,1);
         let opCap = cAvgFix+cAvgCur+cReceiv;
         fillRight(balance,opCap,page.OpCapital,21,3);
-        let performanceBP = (10000n*netGain)/opCap;
+        let performanceBP = 1n;
+        if(opCap>0n) performanceBP = (10000n*netGain) / opCap;
         iRite=fillRight(balance,performanceBP,page.CapMargin,22,3);
         
         }

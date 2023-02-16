@@ -1,11 +1,7 @@
-export default function Operations() {
-    return <div/>
-}
 
-/* xglobal BigInt */
+/* global BigInt */
 
-// .refAcct;var jSVWZ  = reqBody.reason;var jSVWZ2 = reqBody.refTime;
-/*
+
 import { useEffect, useState, useRef } from 'react';
 
 import Screen from '../pages/Screen'
@@ -185,5 +181,5 @@ export default function Operations() {
     function addTXNData(shrtName,a) { txn[shrtName]=a; console.log("DATA("+a+") "+JSON.stringify(txn)); return txn; } // avoid update
 }
 
-*/
+
 

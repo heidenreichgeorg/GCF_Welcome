@@ -1,15 +1,10 @@
-export default function DashBoard({value}) {
-    return <div/>
-}
 
+/* global BigInt */
 
-/* xglobal BigInt */
-/*
 
 import { useEffect, useState  } from 'react';
 import Screen from './Screen'
 import { useSession } from '../modules/sessionmanager';
-import { makeStatusData }  from '../modules/App';
 import { D_FixAss, D_Page }  from '../modules/terms.js';
 import FooterRow from '../components/FooterRow';
 
@@ -17,6 +12,8 @@ import Chart from '../components/Chart'
 import Gauge from '../components/Gauge'
 import Relation from '../components/Relation'
 import Slider from '../components/Slider'
+
+import { makeStatusData }  from '../modules/App';
 
 
 export default function DashBoard({value}) {
@@ -93,4 +90,3 @@ export default function DashBoard({value}) {
         )
    
 }
-*/

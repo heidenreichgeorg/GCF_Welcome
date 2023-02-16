@@ -2,18 +2,16 @@ import { useEffect, useState } from 'react';
 import { useSession, REACT_APP_API_HOST } from '../modules/sessionmanager';
 import Screen from '../pages/Screen'
 import FooterRow from '../components/FooterRow'
-
-
 import { cents2EU }  from '../modules/money';
 import { D_Page } from '../modules/terms.js'
 
-/*
+
 
 
 import { makeStatusData }  from '../modules/App';
 
 
-*/
+
 
 
 export default function Status() {

@@ -1,6 +1,3 @@
-export default function Partner() {
-    return <div/>
-}
 /*
 
 HTTPS
@@ -15,13 +12,13 @@ for each account in D_Balance with XBRL=de-gaap-ci_bs.ass.currAss.receiv.other.o
 
 /* xglobal BigInt */
 
-/*
+
 import { useEffect, useState   } from 'react';
 import Screen from '../pages/Screen'
 import FooterRow from '../components/FooterRow'
 import { REACT_APP_API_HOST,useSession } from '../modules/sessionmanager';
 import { cents2EU } from  '../modules/money'
-import { makeHGB275S2Report } from "../modules/App.js"
+import { makeHGBReport } from "../modules/App.js"
 import { X_ASSET_CAPTAX, D_Balance, D_Partner, D_Page, SCREENLINES }  from '../modules/terms.js';
 
 export default function Partner() {
@@ -95,7 +92,7 @@ export default function Partner() {
         filler.push({});
     }
     
-    let hgbReport = makeHGB275S2Report(sheet) ;
+    let hgbReport = makeHGBReport(sheet) ;
     let shortReport = hgbReport.filter((line,l) => line.tx1 && l<15);
 
     let jPage =  {'name':'Gesamthand', 
@@ -293,4 +290,3 @@ function HGB275Row({ jArgs, id }) {
     )
 }
 
-*/

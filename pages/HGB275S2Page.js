@@ -1,20 +1,15 @@
-export default function HGB275S2Page() {
-    return <div/>
-}
-/*
-import { useEffect, useState  } from 'react';
 
-import {  makeHGB275S2Report } from '../modules/App'
+import { useEffect, useState  } from 'react';
+import { useSession } from '../modules/sessionmanager';
+import {  makeHGBReport } from '../modules/App'
 import Screen from '../pages/Screen'
 import FooterRow from '../components/FooterRow'
 import { D_Page }  from '../modules/terms.js';
-import { useSession } from '../modules/sessionmanager';
-
 
 
 export default function HGB275S2Page() {
 
-    const { session, status } = useSession()   
+const { session, status } = useSession()   
     const [ sheet,  setSheet] = useState(null)
     useEffect(() => {
         if(status !== 'success') return;
@@ -33,7 +28,7 @@ export default function HGB275S2Page() {
 
     let page = sheet[D_Page];
     
-    let report = [  makeHGB275S2Report(sheet) ];
+    let report = []; report.push(makeHGBReport(sheet));
 
 
     let aPages = [];
@@ -74,4 +69,3 @@ function HGB275Row({ jArgs, id }) {
     )
 }
 
-*/
