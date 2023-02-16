@@ -10,7 +10,7 @@ import { getParam, symbolic }  from '../modules/App';
 import { CSEP,prettyTXN }  from '../modules/writeModule';
 import { useSession } from '../modules/sessionmanager';
 
-const SCREEN_TXNS=1+parseInt(SCREENLINES/3);
+const SCREEN_TXNS=2+parseInt(SCREENLINES/3);
 
 var funcShowReceipt=null;
 var funcHideReceipt=null;

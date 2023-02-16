@@ -31,10 +31,11 @@ export function signIn(config,query,remote,res,startSessionCB) {
             console.log("0010 signIn for client "+client+"  year "+year);
 
             let id=null;
-            if(id=sy_findSessionId(client,''+year)) {
-                console.log ( "0012 signIn FOUND WARM id ="+id);
-                sendDisplay( getSession(id), res);
-            } else {
+            //if(id=sy_findSessionId(client,''+year)) 
+            {
+//                console.log ( "0012 signIn FOUND WARM id ="+id);
+//                sendDisplay( getSession(id), res);
+//            } else {
                 console.log ( "0014 signIn READ BUCKET FOR COLD id ="+id);
                 fbDownload(config,client,year,startSessionCB,res,getRoot()); // avoid double response
             }
@@ -264,7 +265,8 @@ export function sendDisplay(session,res) {
         
         let url = localHost.addr + ":" + PORT + "/Status?client="+client+"&year="+year;
 
-        
+        const clientHead = "Login";
+
         console.dir("5010 sendDisplay() rendering url="+url);
 
         if(res) {
@@ -280,6 +282,8 @@ export function sendDisplay(session,res) {
 
                 console.dir("5020 sendDisplay() rendering QR code with #"+html.length+ "chars");
 
+                res.json({client, year, sessionId});
+/*
                 res.writeHead(HTTP_OK);
                 res.write(
                     "<HTML>"+clientHead+"<BODY>"
@@ -289,6 +293,7 @@ export function sendDisplay(session,res) {
                     +'</DIV></BODY></HTML>'
                 );
                 res.end();
+*/
             // )};
         }
 

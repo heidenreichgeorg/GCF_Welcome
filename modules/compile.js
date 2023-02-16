@@ -197,12 +197,6 @@ function bigCost(idnt,nmbr,init) {
 var autoSave=36000000; // seconds, defaults to ten-hourly-save
 
 
-/*
-    app.get("/favicon.ico", (req, res)  => { 
-        res.sendFile(__dirname + "/favicon.jpg"); });
-*/
-
-
 // XBRL
 function initBalance() {
 
@@ -1379,7 +1373,7 @@ function getYear() {  return currentYear; }
 module.exports['getYear']=getYear;
 
 
-
+/*
 async function send(res,session) {
 
     if(session) {
@@ -1405,30 +1399,5 @@ async function send(res,session) {
         }
     }
     res.end(); 
-}
-
-
-/* was needed to migrate from numerically-formatted XLSX files
-function bigENMoney(strSet) {
-    var euros=0n;
-    var cents=0n;
-    var factor=1n;
-    var result=0n;
-
-    if(strSet && strSet.length>0) {
-        try {
-            var amount = strSet.split('.');
-            var plain = amount[0].replace(',', '').trim(); 
-            if(plain.startsWith('-')) { factor=-1*factor; plain=plain.slice(1); }
-            euros = BigInt(('0'+plain));
-            if(amount.length>1) {                 
-                const digits=amount[1]+"00";
-                const strDigits=digits[0]+digits[1];
-                cents=BigInt(strDigits);
-            }
-            result = factor * ( euros * 100n + cents );
-        } catch(err) { console.dir("0473 bigENMoney("+strSet+"=>"+factor+"*("+euros+","+cents+")"); }
-    }
-    return result;        
 }
 */
