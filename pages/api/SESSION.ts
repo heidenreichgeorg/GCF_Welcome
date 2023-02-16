@@ -3,7 +3,7 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 
 
 
-import  { currentHash, init, signIn, startSessionJSON } from '../../modules/sessionModule'
+import  { currentHash, init, signIn, startSessionJSON } from '../../modules/session'
 
 
 let config = null;

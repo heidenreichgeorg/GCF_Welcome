@@ -4,7 +4,7 @@ import { useRouter } from 'next/router'
 import { ParsedUrlQuery,stringify } from "querystring";
 import { createContext, ReactNode, useContext, useEffect, useState } from "react";
 
-import { currentHash } from './sessionModule.js'
+import { currentHash } from './session.js'
 
 type Session = { }
 

@@ -1,7 +1,7 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next'
 
-import  { HTTP_OK, init, signIn, strSymbol, timeSymbol  } from '../../modules/sessionModule'
+import  { HTTP_OK, init, signIn, strSymbol, timeSymbol  } from '../../modules/session'
 
 let config:string|null;
 

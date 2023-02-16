@@ -8,7 +8,7 @@ const CEND = '|';
 
 import * as  XLSX from 'xlsx'
 
-import { getRoot,Slash } from './sessionModule'
+import { getRoot,Slash } from './session'
 
 // EXCEL interface
 

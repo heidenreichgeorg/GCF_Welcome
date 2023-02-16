@@ -3,7 +3,7 @@ import { networkInterfaces } from 'os';
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next'
 
-import { getRoot,init,localhost,strSymbol,timeSymbol } from '../../modules/sessionModule'
+import { getRoot,init,localhost,strSymbol,timeSymbol } from '../../modules/session'
 import { startSessionDisplay,save2Bucket } from '../../modules/writeModule'
 import { compile } from '../../modules/compile'
 
