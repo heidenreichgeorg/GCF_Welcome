@@ -6,10 +6,10 @@ import { useEffect, useState, useRef } from 'react';
 
 import Screen from '../pages/Screen'
 import FooterRow from '../components/FooterRow'
-import { makeOperationsForm }  from '../modules/App';
+//import { makeOperationsForm }  from '../modules/App';
 import { cents2EU, bigEUMoney }  from '../modules/money';
 import { book, prepareTXN } from '../modules/writeModule';
-import { D_Page, D_Schema } from '../modules/terms.js'
+import { D_Balance, D_Page, D_Report, D_Schema, SCREENLINES, X_ASSETS, X_EQUITY, X_EQLIAB, X_INCOME, X_INCOME_REGULAR } from '../modules/terms.js'
 import { useSession } from '../modules/sessionmanager';
 
 export default function Operations() {
@@ -182,4 +182,191 @@ export default function Operations() {
 }
 
 
+
+function makeOperationsForm(response,formAdd,formSub) {
+
+    const debug=null;
+
+    const page = response[D_Page];
+    
+    let iFixed=0n;
+    let iEquity=0n;
+    let iTan=0n;
+
+    let ass="{close:0}";
+    let eql="{close:0}";
+    let gls="{close:0}";
+
+    var jReport = response[D_Report];
+    if(debug) console.log("makeOperationsForm from response D_Report"+JSON.stringify(Object.keys(jReport)));
+
+ //   var jHistory = response[D_History];
+ //   var gSchema = response[D_Schema];
+
+    var jAccounts = response[D_Balance];
+    // add three additional accounts: ASSETS, EQLIAB, GAINLOSS
+    if(jReport["xbrlAssets"].account) { 
+        ass = jReport["xbrlAssets"].account; 
+        if(debug) console.log("ASSET "+JSON.stringify(ass)); 
+        jAccounts["xbrlAssets"]=ass;
+    }
+    if(jReport["xbrlEqLiab"].account) { 
+        eql = jReport["xbrlEqLiab"].account; 
+        if(debug) console.log("EQLIB "+JSON.stringify(eql)); 
+        jAccounts["xbrlEqLiab"]=eql;
+    }
+    if(jReport["xbrlRegular"].account) { 
+        gls = jReport["xbrlRegular"].account; 
+        if(debug) console.log("GALOS "+JSON.stringify(gls)); 
+        jAccounts["xbrlRegular"]=gls;
+    }
+    if(debug) console.log("makeOperationsForm from response D_Balance"+JSON.stringify(Object.keys(jAccounts)));
+
+    if(debug) console.log(JSON.stringify(response));
+    
+    // build three columns
+    let aAsset={};
+    let aGain={};
+    let aEquity={};
+    let aLiab={};
+
+    for (let name in jAccounts)   {
+        var account=jAccounts[name];
+        if(account.xbrl.length>1) {
+            var xbrl = account.xbrl.split('\.').reverse();
+            var xbrl_pre = xbrl.pop()+ "."+ xbrl.pop();
+            if(xbrl_pre===X_ASSETS) {
+                aAsset[name]=account;
+                let iClose=BigInt(account.init)+BigInt(account.debit)+BigInt(account.credit); ;
+                if(account.xbrl.startsWith(jReport.xbrlFixed.xbrl)) { // accumulate fixed assets
+                    iFixed = iFixed + iClose;
+                    if(account.xbrl.startsWith(jReport.xbrlTanFix.xbrl)) { // accumulate tangible fixed assets
+                        iTan = iTan + iClose;
+                    }
+                }
+            }
+            if(xbrl_pre===X_INCOME) {
+                aGain[name]=account;
+            }
+            if(xbrl_pre===X_EQLIAB) {
+                // Passivkonten
+                if(account.xbrl.startsWith(jReport.xbrlEquity.xbrl)) { // accumulate equity
+                    aEquity[name]=account;
+                    iEquity = iEquity + BigInt(account.init)+BigInt(account.debit)+BigInt(account.credit); 
+                }
+                else {
+                    aLiab[name]=account;
+                }
+            }
+        }
+    }
+    
+    let maxCol = Object.keys(aAsset).length;
+    let maxCom = Object.keys(aGain).length;
+    let maxCor = Object.keys(aLiab).length;
+    let maxCoe = Object.keys(aEquity).length;
+    let maxRow= SCREENLINES-2;
+    if(maxCol>maxRow) maxRow=maxCol;
+    if(maxCom>maxRow) maxRow=maxCom;
+    if(maxCor>maxRow) maxRow=maxCor;
+    if(maxCoe>maxRow) maxRow=maxCoe;
+
+    let statusData = []; for(let i=0;i<=maxRow && i<=SCREENLINES;i++) statusData[i]={};
+    if(maxRow>SCREENLINES) maxRow=SCREENLINES; // 20221201
+    
+    let iAsset=0;
+    for (let name in aAsset)   {
+        var account=aAsset[name];
+        var yearEnd = account.yearEnd;
+        var iName = account.name;
+
+        if(debug) console.log("STATUS.JS STATUSDATA LEFT "+iAsset+" "+name+"="+yearEnd);
+
+        if(iAsset<SCREENLINES) {
+            statusData[iAsset]={"gAsset":formAdd[iName],"nAsset":iName, "tAsset":(account.xbrl!=X_ASSETS)?"A":""};
+        }
+        iAsset++;
+    }
+    for (let i=iAsset;i<maxRow && i<SCREENLINES;i++) { statusData[i]={ "gAsset":null, "nAsset": " " }; }
+
+
+    let iLiab=0;
+    for (let name in aLiab)   {
+        var account=aLiab[name];
+        var iName = account.name;
+        if(iLiab<SCREENLINES) {
+            statusData[iLiab].gLiab = formSub[iName];
+            statusData[iLiab].nLiab = iName;
+            statusData[iLiab].tLiab = !(account.xbrl==X_EQLIAB)?(account.xbrl.startsWith(X_EQUITY))?'E':'L':'';
+            iLiab++;
+        }
+        
+    }
+    for (let i=iLiab;i<maxRow && i<SCREENLINES;i++) { statusData[i].gLiab=null; statusData[i].nLiab=' '; }
+
+
+    let iGain=0;
+    for (let name in aGain)   {
+        var account=aGain[name];
+        var iName = account.name;
+        statusData[iGain].gGain = formSub[iName]; 
+        statusData[iGain].nGain = iName;
+        statusData[iGain].tGain = (account.xbrl!=X_INCOME_REGULAR)?'G':'';
+        iGain++;
+    }
+    for (let i=iGain;i<maxRow && i<SCREENLINES;i++) { statusData[i].gGain=null; statusData[i].nGain=' '; }
+
+
+    let nEquity=0;
+    for (let name in aEquity)   {
+        var account=aEquity[name];
+        var iName = account.name;
+        statusData[nEquity].gEquity = formSub[iName];
+        statusData[nEquity].nEquity = iName;
+        statusData[nEquity].tEquity = account.xbrl!=X_EQUITY?'E':'E';
+        nEquity++;
+    }
+    for (let i=nEquity;i<maxRow && i<SCREENLINES;i++) { statusData[i].gEquity=null; statusData[i].nEquity=' '; }
+
+    // four columns: assets liab gain equity
+
+/*
+    if(jHistory && gSchema.Names && gSchema.Names.length>0) {
+        var names=gSchema.Names;
+        var aLen = gSchema.assets;
+        var eLen = gSchema.eqliab;
+
+        let hLen = Object.keys(jHistory).length;
+        var bLine=hLen;
+        var iTran=maxRow;
+
+        statusData[0].lTran= "Recent Transactions";
+
+        for (let hash in jHistory)  {
+
+            if(debug) console.log("Recent TXN("+hash+") #iTran="+iTran+ "      #bLine="+bLine+"    #maxRow="+maxRow);
+
+            if(bLine<maxRow && iTran>0) {
+        
+                let jPrettyTXN = prettyTXN(jHistory,hash,null,null,names,aLen,eLen);
+                jPrettyTXN.credit.shift();
+//                jPrettyTXN.debit.shift();
+                jPrettyTXN.debit.shift();
+                let aMount=jPrettyTXN.credit.concat(jPrettyTXN.debit);
+                aMount.push("-.--"); aMount.push("-.--"); aMount.push("-.--");
+
+                let sAmount = (aMount[0]+"  "+aMount[1]+"  "+aMount[2]+"  "+aMount[3]+ " ").slice(0,iCpField);
+
+                iTran--;
+                statusData[iTran].dTran=jPrettyTXN.entry[0].slice(2);
+                statusData[iTran].nTran=jPrettyTXN.entry[1].slice(0,16);
+                statusData[iTran].lTran= sAmount;                                
+            }
+            bLine--;
+        }
+    }
+*/  
+
+   return {report:statusData, ass:ass.yearEnd, eql:eql.yearEnd, gls:gls.yearEnd, fix:(""+iFixed), equity:(""+iEquity), tan:(""+iTan)};
+}
 
