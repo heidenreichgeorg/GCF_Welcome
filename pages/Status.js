@@ -39,9 +39,15 @@ export default function Status() {
     function nextFunc() {  console.log("CLICK NEXT");   window.location.href="/Transfer?client="+client+"&year="+year; }
 
     function handleXLSave() {
+        
+        const rqHeaders = {  'Accept': 'application/octet-stream',
+                             'Access-Control-Allow-Origin':'*',
+                             'Access-Control-Allow-Headers':'Origin, X-Requested-With, Content-Type, Accept, Authorization' };
+
         console.log("1110 Status.handleXLSave sessionId = "+session.id);
-        const rqOptions = { method: 'GET', headers: {  'Accept': 'application/octet-stream'}, mode:'cors'};
-        try {            
+        
+        const rqOptions = { method: 'GET', headers: rqHeaders, mode:'cors'};
+        try {                
             fetch(`${REACT_APP_API_HOST}/EXCEL?client=${client}&year=${year}`, rqOptions)
             .then((response) => response.blob())
             .then((blob) => URL.createObjectURL(blob))

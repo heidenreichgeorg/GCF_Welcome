@@ -183,6 +183,8 @@ export async function sendFile(sig, response) {
             return;
         }
         response.writeHead(400, { "Content-Type": "text/plain" });
+        response.setHeader("Access-Control-Allow-Origin", "*");
+        response.setHeader("Access-Control-Allow-Headers","Origin, X-Requested-With, Content-Type, Accept, Authorization");
         response.end("ERROR File does not exist");
     });
 }

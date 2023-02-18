@@ -10,6 +10,8 @@ const debug=null;
 export const HTTP_OK = 200;
 export const HTTP_WRONG = 400;
 
+export const Slash = '/';
+
 var nets;
 
 // load JSON file from Firebase storage
@@ -71,14 +73,16 @@ export function startSessionJSON(session,res) {
 
     // 20221207
     if(res) {
-        console.log("0022 startSessionJSON("+client+","+year+")  res.JSON"); 
+        console.log("0022 startSessionJSON("+client+","+year+")  res.JSON");         
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers","Origin, X-Requested-With, Content-Type, Accept, Authorization");
         res.json(session);
     } else console.log("0021 startSessionJSON("+client+","+year+") NO res object"); 
 }
 
 
 var SERVEROOT= '/data/sessions/';
-const Slash = '/';
+
 export function setRoot(root) {  
     if(root.slice(-1)==='/' || root.slice(-1)==='\\') {
         SERVEROOT=root; 
@@ -282,19 +286,11 @@ export function sendDisplay(session,res) {
 
 
                 console.dir("5020 sendDisplay() rendering QR code with #"+html.length+ "chars");
-
+                
+                res.setHeader("Access-Control-Allow-Origin", "*");
+                res.setHeader("Access-Control-Allow-Headers","Origin, X-Requested-With, Content-Type, Accept, Authorization");        
                 res.json({client, year, sessionId});
-/*
-                res.writeHead(HTTP_OK);
-                res.write(
-                    "<HTML>"+clientHead+"<BODY>"
-                    +html
-                    +'<DIV class="attrRow"><H1>'+year+'&nbsp;'+client+'&nbsp;</H1>'
-                    +"<A HREF="+url+">STATUS</A>"
-                    +'</DIV></BODY></HTML>'
-                );
-                res.end();
-*/
+
             // )};
         }
 

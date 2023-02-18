@@ -76,7 +76,12 @@ function bookTransaction(session:any, res:NextApiResponse<any>) {
           let serverAddr = localhost();
           // async
           save2Bucket(config,session,client,year,getRoot())
-              .then(result => { if(res) res.json({url:serverAddr+'/LATEST', client, year, 'result':result  })
+              .then(result => { 
+                if(res) {
+                    res.setHeader("Access-Control-Allow-Origin", "*");
+                    res.setHeader("Access-Control-Allow-Headers","Origin, X-Requested-With, Content-Type, Accept, Authorization");            
+                    res.json({url:serverAddr+'/LATEST', client, year, 'result':result  })
+                }
               });
                 
 

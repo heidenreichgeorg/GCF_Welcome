@@ -31,12 +31,15 @@ export default function Balance({show}) {
     
     let page = sheet[D_Page];
     
-    let pageNames = [ 'init','yearEnd','next'];
-    let pageText =  ['Init', 'Close',  'Next'].map((name) =>( page[name] ));
+    let pageText =  ['Init',  'Close',  'Next'].map((name) =>( page[name] ));
+
+    let pageNames = [ 'init', 'yearEnd','next'];
+    
     let report = pageNames.map((name) =>( makeBalance(sheet,name) ));
-    let aPages = [];
+   
+    let aPages = ['block'];
     for(let p=1;p<report.length;p++) aPages[p]='none'; 
-    if(show && parseInt(show)>0) aPages[parseInt(show)]='block'; else aPages[0]='block';
+    if(show && parseInt(show)>0) { aPages[parseInt(show)]='block'; aPages[0]='none'; }
     
     const tabName = 'BalanceContent';
     return (
