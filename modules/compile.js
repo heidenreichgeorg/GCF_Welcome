@@ -224,6 +224,7 @@ function initBalance() {
         xbrlLloan:  {  level:3, xbrl: "de-gaap-ci_bs.eqLiab.liab.bank", de_DE:'Darlehen'},
         xbrlLshare: {  level:3, xbrl: "de-gaap-ci_bs.eqLiab.liab.shareholders", de_DE:'Gesell.Darlehen'},
         xbrlLiab:   {  level:2, xbrl: "de-gaap-ci_bs.eqLiab.liab", de_DE:'Fremdkapital'},
+        
         xbrlEqfix:  {  level:3, xbrl: "de-gaap-ci_bs.eqLiab.equity.subscribed.unlimitedLiablePartners.FK", de_DE:'Festkapital'},
         xbrlEqlim:  {  level:3, xbrl: "de-gaap-ci_bs.eqLiab.equity.subscribed.limitedLiablePartners.KK", de_DE:'Kommanditkapital'},
         xbrlEVulp:  {  level:3, xbrl: "de-gaap-ci_bs.eqLiab.equity.subscribed.unlimitedLiablePartners.VK", de_DE:'Komplementär-VK'},
@@ -240,6 +241,7 @@ function initBalance() {
         // see sendBalance(), CloseAndSave.htmlReport.xbrlIncome.closing.split(CSEP);
         //xbrlNIP:    {  level:1, xbrl: "de-gaap-ci_bs.eqLiab.equity.netIncomePartnerships", de_DE:'Bilanzgewinn'},
         // 20220123 previous row is synthetic, from KernTax for HGBRegular
+        
     };
     // subscribed.limitedLiablePartners.accumLoss
 

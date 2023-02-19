@@ -37,9 +37,10 @@ export default function Accounts() {
 
     let  standsPages = [ 'init', 'yearEnd', 'next' ];
     let aStands = standsPages.map((currentPage)=>(makeAccountsPosition(sheet,currentPage)));
-    let aPages = [];
+
+    let aPages = ['block'];
     for(let p=1;p<standsPages.length;p++) aPages[p]='none'; 
-    aPages[0]='block';
+
     let pageText =  ['Init', 'Close',  'Next'].map((name) =>( page[name] ));
 
     const tabName = 'AccountsContent';

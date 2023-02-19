@@ -10,7 +10,7 @@ import { useSession } from '../modules/sessionmanager';
 
 
 
-export default function Balance({show}) {
+export default function Balance() {
 
     const { session, status } = useSession()   
     const [ sheet,  setSheet] = useState(null)
@@ -31,24 +31,24 @@ export default function Balance({show}) {
     
     let page = sheet[D_Page];
     
-    let pageText =  ['Init',  'Close',  'Next'].map((name) =>( page[name] ));
 
-    let pageNames = [ 'init', 'yearEnd','next'];
-    
-    let report = pageNames.map((name) =>( makeBalance(sheet,name) ));
-   
+    let pageNames = [ 'init',  'yearEnd','next'];    
+    let report = pageNames.map((name) =>( makeBalance(sheet,name)  ));
+       
     let aPages = ['block'];
     for(let p=1;p<report.length;p++) aPages[p]='none'; 
-    if(show && parseInt(show)>0) { aPages[parseInt(show)]='block'; aPages[0]='none'; }
     
+    let pageText =  ['Init',  'Close',  'Next'].map((name) =>( page[name] ));
+
     const tabName = 'BalanceContent';
     return (
         <Screen prevFunc={prevFunc} nextFunc={nextFunc} tabSelector={pageText} tabName={tabName}>
-            {report.map((balance,n) => ( 
+            {report.map((balance,n) => (
                 <div className="ulliTab" key={"Balance0"+n} id={tabName+n} style= {{ 'display': aPages[n]}} >
                     <div className="attrLine">{[page.BalanceOpen,page.BalanceClose,page.BalanceNext][n] + ' ' + (parseInt(session.year))}</div>
-                    {balance.map((row,i) => (
-                        <BalanceRow  key={"Balance1"+n} jArgs={row} id={i} />    
+                    {JSON.parse(balance).map((row,i) => ( 
+                        <BalanceRow  key={"Balance"+n+"1"+i} jArgs={row} id={i} />    
+                        
                     ))}
                     <FooterRow  id={"F1"}  left={page["client"]}   right={page["register"]} prevFunc={prevFunc} nextFunc={nextFunc}/>
                     <FooterRow  id={"F2"}  left={page["reference"]}  right={page["author"]} prevFunc={prevFunc} nextFunc={nextFunc}/>
@@ -61,11 +61,11 @@ export default function Balance({show}) {
 
 function makeBalance(response,value) {
 
-    var jReport = response[D_Report];
-    console.log("makeBalance from response D_Report"+JSON.stringify(Object.keys(jReport)));
+    const sReport = JSON.stringify(response[D_Report]);
+    var jReport = JSON.parse(sReport);
+    let balance = new Array();
 
-   // var jHistory = response[D_History];
-   // var gSchema = response[D_Schema];
+    console.log("makeBalance 001 from response D_Report"+JSON.stringify(Object.keys(jReport)));
 
     var jAccounts = response[D_Balance];
 
@@ -73,20 +73,20 @@ function makeBalance(response,value) {
     // add three additional accounts: ASSETS, EQLIAB, GAINLOSS
     if(jReport["xbrlAssets"].account) { 
         ass = jReport["xbrlAssets"].account; 
-        console.log("ASSET "+JSON.stringify(ass)); 
+        //console.log("ASSET "+JSON.stringify(ass)); 
         jAccounts["xbrlAssets"]=ass;
     }
     if(jReport["xbrlEqLiab"].account) { 
         eql = jReport["xbrlEqLiab"].account; 
-        console.log("EQLIB "+JSON.stringify(eql)); 
+        //console.log("EQLIB "+JSON.stringify(eql)); 
         jAccounts["xbrlEqLiab"]=eql;
     }
     if(jReport["xbrlRegular"].account) { 
         gls = jReport["xbrlRegular"].account; 
-        console.log("GALOS "+JSON.stringify(gls)); 
+        //console.log("GALOS "+JSON.stringify(gls)); 
         jAccounts["xbrlRegular"]=gls;
     }
-    console.log("makeBalance from response D_Balance"+JSON.stringify(Object.keys(jAccounts)));
+    //console.log("makeBalance from response D_Balance"+JSON.stringify(Object.keys(jAccounts)));
 
     
     // build three columns
@@ -106,15 +106,17 @@ function makeBalance(response,value) {
     var iEqLiab=0n;
     var income=0n;
 
-    let balance = []; 
+    
  
     var iRite=3;
     var iLeft=3;
     balance.push({  });
-    balance.push({ 'tw1':jReport.xbrlAssets.de_DE, 'tx1':jReport.xbrlEqLiab.de_DE });
+    const aTag = Object.keys(jReport);
+    balance.push({ 'tw1':jReport.xbrlAssets.de_DE,/* 'am1': (""+aTag),*/ 'tx1':jReport.xbrlEqLiab.de_DE });
 
-    for (let tag in jReport)   {
-        console.log("Report "+JSON.stringify(jReport[tag]));
+    for (let tt=0;tt<aTag.length;tt++)   {
+        let tag=aTag[tt];
+        console.log("makeBalance 005 Report "+JSON.stringify(jReport[tag]));
         
         var element    =  jReport[tag];
         var level     =  element.level;
@@ -129,14 +131,14 @@ function makeBalance(response,value) {
             if(full_xbrl==='de-gaap-ci_is.netIncome.regular') { income=BigInt(dispValue); }
             if(full_xbrl==='de-gaap-ci_bs.eqLiab.income') { 
                 let bIncome=(income+iEqLiab); 
-                console.log("INCOME = "+bIncome);
+                //console.log("INCOME = "+bIncome);
                 dispValue=bIncome;
             }
 
             var xbrl = full_xbrl.split('\.');
             var side = xbrl[1];
            
-            console.log('makeBalance side='+side + "  in "+full_xbrl + "= "+dispValue);
+            //console.log('makeBalance side='+side + "  in "+full_xbrl + "= "+dispValue);
 
             if(side==='ass') {
                 if(iLeft<SCREENLINES) {
@@ -165,7 +167,7 @@ function makeBalance(response,value) {
 
         } else {
             // divider line out
-            console.log('makeBalance unknown '+JSON.stringify(account));
+            //console.log('makeBalance unknown '+JSON.stringify(account));
         }
     }
 
@@ -175,11 +177,23 @@ function makeBalance(response,value) {
         iRite++;
     }
 
-    return balance;
+    return JSON.stringify(balance);
+    /*
+    return [ 
+        { tw1:'Gebäude    ',   am3:' 7,35' },
+        { tw1:'Grundstücke',   am3:'10,00' },
+        { tw1:'Sachanlagen',   am2:'17,35',  tx1:'Stammkapital',  an2:'17,35' },
+        { tw1:'Aktien',        am3:'80,55',  },
+        { tw1:'Münzen',        am3:'17,00',  },
+        { tw1:'Finanzanlagen', am2:'97,55',  tx1:'Kredite', an2:'97,55' },
+        { tw1:'Aktiva',       am1:'114,90',  tx1:'Passiva',an1:'114,90' }
+        ]
+      */  
 }
 
 
 function BalanceRow({ jArgs, id }) {
+    if(jArgs)
     return(
         <div className={"attrLine"} >
             <div className="FIELD LNAM"> {jArgs.tw1}</div>
