@@ -139,12 +139,24 @@ export default function Screen({ children, prevFunc, nextFunc, tabSelector, tabN
     
     function makeTab(tabName,tabNum) { return (e) => { console.log("onClick("+tabName+","+tabNum+")"); select(tabName,tabNum)}}
 
+    function makeSelect(tabName,target) { 
+        var elem = document.getElementById(target.id);
+        if(elem) {
+            let index=elem.selectedIndex;
+            var value = elem.options[index].value;
+            select(tabName,index,value);
+        }
+    }
+
+    
+
     return (
         <div className="mTable">           
             <div className="attrLine">                     
-                <select type="radio" name={tabName}>                          
+                <select type="radio" id={tabName} name={tabName} onChange={(e)=>makeSelect(tabName,e.target)}> 
                     {tabSelector.map((row,tabNum) => (
-                        <option  key={"Screen0"+tabNum}  value={row} onClick={makeTab(tabName,tabNum)}>{row}</option>
+                        <option  id={"Screen0"+tabNum}  key={"Screen0"+tabNum}  value={row} >{row}</option>
+                        // onClick={makeTab(tabName,tabNum,"")}
                     ))}
                 </select>
             </div>
