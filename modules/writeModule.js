@@ -148,9 +148,12 @@ export function book(jTXN,session) {
 
     const requestOptions = {
         method: 'POST',
-        headers: {  'Accept': 'application/json',
-                    'Content-Type': 'application/json',
-                    'mode':'cors'
+        headers: {  'Accept': 'application/json'
+                    ,'Content-Type': 'application/json'
+                    ,'withCredentials':'true' // GH20230226
+                    ,'Access-Control-Allow-Origin': '*' // GH20230226
+                    ,'Access-Control-Allow-Headers':'Origin, X-Requested-With, Content-Type, Accept,withCredentials' // GH20230226
+                    ,'mode':'cors'
                   },
         body: JSON.stringify(jTXN)
     };
@@ -161,7 +164,7 @@ export function book(jTXN,session) {
     
             let urlCommand = REACT_APP_API_HOST+"/LATEST?client="+body.client+"&year="+body.year+"&ext=JSON";
             console.log("BOOK RELOAD "+urlCommand);
-            fetch(urlCommand)
+            fetch(urlCommand, requestOptions) // GH20230226
             .then(res => {console.log("BOOK REFRESH "+JSON.stringify(res.body))})
         });
 }

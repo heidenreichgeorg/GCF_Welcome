@@ -4,10 +4,12 @@ import { Inter } from '@next/font/google'
 
 const inter = Inter({ subsets: ['latin'] })
 
+//import cors from 'cors';
+
+// app.use(cors());
 
 
-
-export default function Home() {
+export function Home() {
 
 
   return (

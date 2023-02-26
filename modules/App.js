@@ -4,6 +4,16 @@ import { cents2EU }  from '../modules/money.mjs';
 import { iCpField, prettyTXN } from './writeModule'
 
 
+export function getSelect(target) { 
+    var elem = document.getElementById(target.id);
+    if(elem) {
+        let index=elem.selectedIndex;
+        return elem.options[index].value;        
+    }
+    return null;
+}
+
+
 export function getParam(strParam) {
     
     var searchParams = new URL(window.location.href).searchParams;
@@ -316,7 +326,7 @@ export function makeHGBReport(response) {
         console.log("makeReport from response D_Balance"+JSON.stringify(Object.keys(jAccounts)));
 
         
-        // build three columns
+        // build two columns
         let aLeft={};
         let aRite={};
 

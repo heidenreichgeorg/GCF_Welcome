@@ -6,7 +6,7 @@ import { useEffect, useState, useRef } from 'react';
 
 import Screen from '../pages/Screen'
 import FooterRow from '../components/FooterRow'
-//import { makeOperationsForm }  from '../modules/App';
+import { getSelect }  from '../modules/App';
 import { cents2EU, bigEUMoney }  from '../modules/money';
 import { book, prepareTXN } from '../modules/writeModule';
 import { D_Balance, D_Page, D_Report, D_Schema, SCREENLINES, X_ASSETS, X_EQUITY, X_EQLIAB, X_INCOME, X_INCOME_REGULAR } from '../modules/terms.js'
@@ -79,6 +79,19 @@ export default function Operations() {
   
     }
 
+    // build reason / refAcct list
+    var jAccounts = sheet[D_Balance];
+    let arrAcct=['INVEST','SELL','YIELD'];
+
+        for (let name in jAccounts)   {
+            var account=jAccounts[name];
+            if(account.xbrl.length>1) {
+                var xbrl = account.xbrl.split('\.').reverse();
+                var xbrl_pre = xbrl.pop()+ "."+ xbrl.pop();
+                if(xbrl.length>3 && ((xbrl_pre===X_INCOME) || (xbrl_pre===X_EQLIAB))) arrAcct.push(name);
+            }
+        }
+
     const aNums = [0];
     return (
             <Screen prevFunc={prevFunc} nextFunc={nextFunc} tabSelector={aNums} >
@@ -99,7 +112,7 @@ export default function Operations() {
                                am4={row.gEquity} tx4={row.nEquity} tt4={row.tEquity} /> 
                 ))
             }
-            <InputRow date={txn.date} sender={txn.sender} refAcct={txn.refAcct} reason={txn.reason} refTime={txn.refTime}/>    
+            <InputRow date={txn.date} sender={txn.sender} arrAcct={arrAcct} reason={txn.reason} refTime={txn.refTime}/>    
             
             <FooterRow left={page["client"]}  right={page["register"]} prevFunc={prevFunc} nextFunc={nextFunc}/>
             <FooterRow left={page["reference"]} right={page["author"]} prevFunc={prevFunc} nextFunc={nextFunc}/>
@@ -129,7 +142,7 @@ export default function Operations() {
         )
     }
  
-    function InputRow({ date,sender,refAcct,reason,refTime }) {
+    function InputRow({ date,sender,arrAcct,reason,refTime }) {
         return(
             <div className="attrRow">
                 <div className="FIELD SYMB"> &nbsp;</div>
@@ -137,7 +150,13 @@ export default function Operations() {
                 <div className="FIELD SEP">&nbsp;</div>
                 <div className="FIELD XFER"><input type="edit" id="cSender" name="cSender" defaultValue ={sender} onChange={(e)=>addTXNData('sender',e.target.value)} onDrop={ignore} /></div>
                 <div className="FIELD SEP">&nbsp;</div>
-                <div className="FIELD XFER"><input type="edit" id="cReason" name="cReason" defaultValue ={refAcct} onChange={(e)=>addTXNData('refAcct',e.target.value)} onDrop={ignore} /></div>
+                <div className="FIELD XFER">
+                    <select type="radio" id="cReason" name="cReason" onChange={(e)=>addTXNData('refAcct',getSelect(e.target))} onDrop={ignore} >
+                        {arrAcct.map((reason,i) => (
+                            <option id={"reason0"+i} value={reason}>{reason}</option>
+                        ))}
+                    </select>
+                </div>
                 <div className="FIELD SEP">&nbsp;</div>
                 <div className="FIELD XFER"><input type="edit" id="cRef1"   name="cRef1"   defaultValue ={reason}   onChange={(e)=>addTXNData('reason',e.target.value)} onDrop={ignore} /></div>
                 <div className="FIELD SEP">&nbsp;</div>
