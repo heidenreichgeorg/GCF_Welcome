@@ -83,15 +83,15 @@ export default function Operations() {
     var jAccounts = sheet[D_Balance];
     let arrAcct=['INVEST','SELL','YIELD'];
 
-        for (let name in jAccounts)   {
-            var account=jAccounts[name];
-            if(account.xbrl.length>1) {
-                var xbrl = account.xbrl.split('\.').reverse();
-                var xbrl_pre = xbrl.pop()+ "."+ xbrl.pop();
-                if(xbrl.length>3 && ((xbrl_pre===X_INCOME) || (xbrl_pre===X_EQLIAB))) arrAcct.push(name);
-            }
+    for (let name in jAccounts)   {
+        var account=jAccounts[name];
+        if(account.xbrl.length>1) {
+            var xbrl = account.xbrl.split('\.').reverse();
+            var xbrl_pre = xbrl.pop()+ "."+ xbrl.pop();
+            if(xbrl.length>3 && ((xbrl_pre===X_INCOME) || (xbrl_pre===X_EQLIAB))) arrAcct.push(name);
         }
-
+    }
+    addTXNData('refAcct',arrAcct[0]);
 
         
     // build cRef2 = refCode list with assets codes
@@ -101,6 +101,7 @@ export default function Operations() {
         var row = jAssets[key];
         arrCode.push(row.idnt);
     });
+    addTXNData('refCode',arrCode[0]);
 
 
     const aNums = [0];

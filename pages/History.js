@@ -52,7 +52,7 @@ export default function History() {
 
     let page = sheet[D_Page];
     let sHistory=makeHistory(sheet);
-    let sPages = sHistory.length / SCREEN_TXNS;    
+    let sPages = (sHistory.length+1) / SCREEN_TXNS;    
     let strToken=token();
     console.log("strToken="+JSON.stringify(strToken));
 
@@ -132,7 +132,7 @@ function SigRow({row,index,client,year}) {
     var selectAll = getParam("SELECTALL");
     if(selectAll && selectAll.length<1) selectAll=null;
     if(selectAll) { aSelText[id]=aRow;  aSelMoney[id]=mRow; aSelSaldo[id]=""+saldo; }
-// checked={(selectAll||aSelMoney[id])?"checked":""}
+
     var checked=(aSelSaldo[id]!=null);
     return (
         <div className="attrPair">
