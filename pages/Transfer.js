@@ -42,7 +42,7 @@ export default function Transfer() {
 
 
 
-    function InputRow({ date,sender,refAcct,reason,refTime }) {
+    function InputRow({ date,sender,refAcct,reason,refCode }) {
         return(
             <div className="attrLine">
                 <div className="FIELD SYMB"> &nbsp;</div>
@@ -54,7 +54,7 @@ export default function Transfer() {
                 <div className="FIELD SEP"> &nbsp;</div>
                 <div className="FIELD XFER"> <input type="edit" id="cReason" name="cReason" defaultValue ={reason} onDrop={ignore}  ref={refReason}/></div>
                 <div className="FIELD SEP"> &nbsp;</div>
-                <div className="FIELD XFER"> <input type="edit" id="cRefTime"   name="cRefTime"   defaultValue ={refTime} onDrop={ignore} ref={refRefTime}/></div>
+                <div className="FIELD XFER"> <input type="edit" id="cRefTime"   name="cRefTime"   defaultValue ={refCode} onDrop={ignore} ref={refRefTime}/></div>
             </div>)
     }
     
@@ -214,7 +214,7 @@ export default function Transfer() {
             "sender":   refSender.current.value,
             "refAcct":  refRefAcct.current.value,
             "reason":   refReason.current.value,
-            "refTime":  refRefTime.current.value,
+            "refCode":  refRefTime.current.value,
             "sessionId":session.id,
             "credit":   flow.credit,
             "debit":    flow.debit,
@@ -259,12 +259,12 @@ export default function Transfer() {
             <TransferRow/> 
             <TransferRow/> 
             <TransferRow/> 
-            <TransferRow date={report.date} sender={report.sender} refAcct={report.refAcct} reason={report.reason} refTime={report.refTime} />    
-            <TransferRow date={report.lTran[0]} sender={report.lTran[1]} refAcct={report.lTran[2]} reason={report.lTran[3]} refTime={report.lTran[4]} />    
+            <TransferRow date={report.date} sender={report.sender} refAcct={report.refAcct} reason={report.reason} refCode={report.refCode} />    
+            <TransferRow date={report.lTran[0]} sender={report.lTran[1]} refAcct={report.lTran[2]} reason={report.lTran[3]} refCode={report.lTran[4]} />    
             <TransferRow/> 
             <TransferRow/> 
             <form onSubmit={(e)=>onBook(e)} >
-                <InputRow date={report.date} sender={report.sender} refAcct={report.refAcct} reason={report.reason} refTime={report.refTime}/>    
+                <InputRow date={report.date} sender={report.sender} refAcct={report.refAcct} reason={report.reason} refCode={report.refCode}/>    
                 <TransferRow/> 
                 <TransferRow/> 
                 <AccountRow name1={report.aNames[0]} amount1={report.aAmount[0]}
@@ -300,7 +300,7 @@ function where(array,key) {
     for(let i=0;i<array.length;i++) if((array[i]+CSEP).startsWith(key)) return i;
 }
 
-function TransferRow({ date,sender,refAcct,reason,refTime }) {
+function TransferRow({ date,sender,refAcct,reason,refCode }) {
     return(
         <div className="attrLine">
             <div className="SYMB"> &nbsp;</div>
@@ -312,7 +312,7 @@ function TransferRow({ date,sender,refAcct,reason,refTime }) {
             <div className="FIELD SEP"> &nbsp;</div>
             <div className="FIELD XFER"> {reason}</div>
             <div className="FIELD SEP"> &nbsp;</div>
-            <div className="FIELD XFER"> {refTime}</div>
+            <div className="FIELD XFER"> {refCode}</div>
         </div>)
 }
 
@@ -330,7 +330,7 @@ function makeTransferData(response,iSelected) {
     var jHistory = response[D_History];
     var gSchema = response[D_Schema];
 
-    let transferData={ date:'',sender:'',refAcct:'',reason:'',refTime:'',lTran:["","","","","",""]};
+    let transferData={ date:'',sender:'',refAcct:'',reason:'',refCode:'',lTran:["","","","","",""]};
 
     if(jHistory && gSchema.Names && gSchema.Names.length>0) {
         var names=gSchema.Names;
@@ -346,7 +346,7 @@ function makeTransferData(response,iSelected) {
                 transferData.sender = txn[2];
                 transferData.refAcct = txn[3];
                 transferData.reason  =  txn[4];
-                transferData.refTime  =  txn[5];
+                transferData.refCode  =  txn[5];
                 
                 let jPrettyTXN = prettyTXN(jHistory,hash,null,null,names,aLen,eLen);
                 transferData.aNames = jPrettyTXN.aNames;                                

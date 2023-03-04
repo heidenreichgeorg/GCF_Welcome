@@ -9,7 +9,7 @@ import FooterRow from '../components/FooterRow'
 import { getSelect }  from '../modules/App';
 import { cents2EU, bigEUMoney }  from '../modules/money';
 import { book, prepareTXN } from '../modules/writeModule';
-import { D_Balance, D_Page, D_Report, D_Schema, SCREENLINES, X_ASSETS, X_EQUITY, X_EQLIAB, X_INCOME, X_INCOME_REGULAR } from '../modules/terms.js'
+import { D_Balance, D_FixAss, D_Page, D_Report, D_Schema, SCREENLINES, X_ASSETS, X_EQUITY, X_EQLIAB, X_INCOME, X_INCOME_REGULAR } from '../modules/terms.js'
 import { useSession } from '../modules/sessionmanager';
 
 export default function Operations() {
@@ -17,7 +17,7 @@ export default function Operations() {
     const [sheet, setSheet]  = useState() // returns a pair with object-location plus setter function for that location
     const [ year, setYear]   = useState()
     const [client,setClient] = useState()
-    const [txn,setTxn] = useState({'add':{},'sub':{},'diff':"0", 'date':"", 'sender':"", 'refAcct':"", 'reason':"", 'refTime':""  })
+    const [txn,setTxn] = useState({'add':{},'sub':{},'diff':"0", 'date':"", 'sender':"", 'refAcct':"", 'reason':"", 'refCode':""  })
 
     const { session, status } = useSession()
 
@@ -58,7 +58,7 @@ export default function Operations() {
         txn.credit = flow.credit;
         txn.debit = flow.debit;
         
-        // refAcct reason refTime missing
+        // refAcct reason refCode missing
 
         console.log("BOOK B "+JSON.stringify(txn));
 
@@ -79,7 +79,7 @@ export default function Operations() {
   
     }
 
-    // build reason / refAcct list
+    // build refAcct list with all GALS / EQUITY account names
     var jAccounts = sheet[D_Balance];
     let arrAcct=['INVEST','SELL','YIELD'];
 
@@ -91,6 +91,17 @@ export default function Operations() {
                 if(xbrl.length>3 && ((xbrl_pre===X_INCOME) || (xbrl_pre===X_EQLIAB))) arrAcct.push(name);
             }
         }
+
+
+        
+    // build cRef2 = refCode list with assets codes
+    var jAssets = sheet[D_FixAss];
+    let arrCode=['DEP_MONEY',"DEP_IN_KIND","FEE","WITHDRAW","ADJUST"];
+    Object.keys(jAssets).map(function(key,n) {
+        var row = jAssets[key];
+        arrCode.push(row.idnt);
+    });
+
 
     const aNums = [0];
     return (
@@ -112,7 +123,7 @@ export default function Operations() {
                                am4={row.gEquity} tx4={row.nEquity} tt4={row.tEquity} /> 
                 ))
             }
-            <InputRow date={txn.date} sender={txn.sender} arrAcct={arrAcct} reason={txn.reason} refTime={txn.refTime}/>    
+            <InputRow date={txn.date} sender={txn.sender} arrAcct={arrAcct} reason={txn.reason} refCode={txn.refCode}/>    
             
             <FooterRow left={page["client"]}  right={page["register"]} prevFunc={prevFunc} nextFunc={nextFunc}/>
             <FooterRow left={page["reference"]} right={page["author"]} prevFunc={prevFunc} nextFunc={nextFunc}/>
@@ -142,7 +153,7 @@ export default function Operations() {
         )
     }
  
-    function InputRow({ date,sender,arrAcct,reason,refTime }) {
+    function InputRow({ date,sender,arrAcct,reason,refCode }) {
         return(
             <div className="attrRow">
                 <div className="FIELD SYMB"> &nbsp;</div>
@@ -160,7 +171,13 @@ export default function Operations() {
                 <div className="FIELD SEP">&nbsp;</div>
                 <div className="FIELD XFER"><input type="edit" id="cRef1"   name="cRef1"   defaultValue ={reason}   onChange={(e)=>addTXNData('reason',e.target.value)} onDrop={ignore} /></div>
                 <div className="FIELD SEP">&nbsp;</div>
-                <div className="FIELD XFER"><input type="edit" id="cRef2"   name="cRef2"   defaultValue ={refTime}   onChange={(e)=>addTXNData('refTime',e.target.value)} onDrop={ignore} /></div>
+                <div className="FIELD XFER">
+                <select type="radio" id="cRef2" name="cRef2" onChange={(e)=>addTXNData('refCode',getSelect(e.target))} onDrop={ignore} >
+                        {arrCode.map((code,i) => (
+                            <option id={"code0"+i} value={code}>{code}</option>
+                        ))}
+                    </select>
+                </div>
             </div>)
     }
     

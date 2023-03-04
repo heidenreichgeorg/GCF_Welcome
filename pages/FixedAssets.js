@@ -51,11 +51,11 @@ export default function FixedAssets() {
             <FixedAssetsRow p={ {'idnt':'Name', 'type':'WKN/Typ', 
                         'date':page.AcquisitionDate,
                         'init':page.AcquisitionPrice, 
-                        'nmbr':'Anzahl',
-                        'rest':'Zeitwert',
-                        'current':'Anzahl',
-                        'cost':'Stückpreis',
-                        'gain':'Ertrag'} } />
+                        'nmbr':page.AssetNumber, // 'Anzahl',
+                        'rest':page.AssetRemain, //'Zeitwert',
+                        'cost':page.AssetPrice, // 'Stückpreis',
+                        'gain':page.AssetGain  // 'Ertrag'} } />
+                        }} /> 
 
 
                 {Object.keys(jAssets).map(function(key,n) {

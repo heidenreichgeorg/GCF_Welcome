@@ -95,6 +95,7 @@ let de_DE = {
     AssetNumber:"Anzahl",
     AssetRemain:"Zeitwert",
     AssetPrice: "Stückkosten",
+    AssetGain: "Ertrag",
 
     // GainLoss GuV
     Carry4Loss:  "Verlustvortrag",
@@ -1043,7 +1044,7 @@ function sendBalance(balance) {
             closeIncome['sender']='System';
             closeIncome['refAcct']=de_DE['GainLoss'];
             closeIncome['reason']=de_DE['Closing'];
-            closeIncome['refTime']=de_DE['NextYear'];
+            closeIncome['refCode']=de_DE['NextYear'];
 
             let yearEnd = gReport.xbrlRegular.account.yearEnd;
             if(debugReport) console.log("sendBalance CLOSING income "+yearEnd);
@@ -1312,7 +1313,7 @@ export function formatTXN(session,reqBody) {
     var jSender= reqBody.sender;
     var jAcct  = reqBody.refAcct;
     var jSVWZ  = reqBody.reason;
-    var jSVWZ2 = reqBody.refTime;
+    var jSVWZ2 = reqBody.refCode;
     var jCredit= reqBody.credit;
     var jDebit = reqBody.debit;
     var bookingForm=null;
