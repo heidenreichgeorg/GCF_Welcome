@@ -15,7 +15,7 @@ const HTMLSPACE=" ";
 
 export const CSEP = ';';
 export const S_COLUMN = 15;
-export const iCpField = 35;
+export const iCpField = 75;
 
 
 export function prettyTXN(jHistory,hash,lPattern,aPattern,names,aLen,eLen) {

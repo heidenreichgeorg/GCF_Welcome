@@ -84,7 +84,11 @@ export default function Status() {
             <StatusRow am1={page.Assets} am2={page.GainLoss}  am3={page.eqliab}/>
             {
                 report.map((row,l) => (
-                    <StatusRow  key={"Status"+l}  am1={row.gLeft} tx1={row.nLeft} am2={row.gMidl} tx2={row.nMidl} am3={row.gRite} tx3={row.nRite} d={row.dTran} n={row.nTran} l={row.lTran}/>                       
+                    <StatusRow  key={"Status"+l}  
+                                        am1={row.gLeft} tx1={row.nLeft} 
+                                        am2={row.gMidl} tx2={row.nMidl} 
+                                        am3={row.gRite} tx3={row.nRite} 
+                                        d={row.dTran} n={row.nTran} l={row.lTran}/>                       
                 ))
             }
             <FooterRow left={page["client"]}  right={page["register"]} prevFunc={prevFunc} nextFunc={nextFunc} miscFunc={handleXLSave}/>
@@ -107,9 +111,10 @@ function StatusRow({ am1,tx1, am2, tx2, am3, tx3, d, n, l}) {
             <div className="FIELD MOAM"> {cents2EU(am3)}</div>
             <div className="FIELD SYMB" onClick={(e)=>showAccount(tx3)}> {tx3}</div>
             <div className="FIELD SEP"> &nbsp;</div>
+            <div className="FIELD SEP"> &nbsp;</div>
             <div className="FIELD SYMB"> {d}</div>
             <div className="FIELD SNAM"> {n}</div>
-            <div className="FIELD LTXT">{l}</div>
+            <div className="FIELD">{l}</div>
         </div>
     )
 }

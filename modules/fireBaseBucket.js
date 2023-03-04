@@ -369,7 +369,6 @@ export function loadFBConfig(dir,config) {
     var fbConfig=null;
     if(config && dir) {
         
-        //let fileName = getMostRecentFile(dir,"json");
         let fileName = dir+config+".json";
         if(fileName) {
             console.log("0022 loadFBConfig from "+fileName);

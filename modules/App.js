@@ -180,9 +180,6 @@ export function makeStatusData(response) {
     for (let i=iRite;i<maxRow && i<SCREENLINES;i++) { statusData[i].gRite=null; statusData[i].nRite=' '; }
 
     // build fourth column with recent transactions
-
-   // let iHistory=Object.keys(jHistory).map((x) => (x));
-
     if(jHistory && gSchema.Names && gSchema.Names.length>0) {
         var names=gSchema.Names;
         var aLen = gSchema.assets;
@@ -192,22 +189,21 @@ export function makeStatusData(response) {
         var bLine=hLen;
         var iTran=maxRow;
 
-        statusData[0].lTran= "Recent Transactions";
+        //statusData[0].lTran= "Recent Transactions";
 
         for (let hash in jHistory)  {
 
             if(debug) console.log("Recent TXN("+hash+") #iTran="+iTran+ "      #bLine="+bLine+"    #maxRow="+maxRow);
 
-            if(bLine<maxRow && iTran>0) {
+            if(bLine<=maxRow && iTran>=0) {
         
                 let jPrettyTXN = prettyTXN(jHistory,hash,null,null,names,aLen,eLen);
                 jPrettyTXN.credit.shift();
-//                jPrettyTXN.debit.shift();
                 jPrettyTXN.debit.shift();
                 let aMount=jPrettyTXN.credit.concat(jPrettyTXN.debit);
-                aMount.push("-.--"); aMount.push("-.--"); aMount.push("-.--");
+                aMount.push("-.--"); aMount.push("-.--"); aMount.push("-.--"); aMount.push("-.--"); 
 
-                let sAmount = (aMount[0]+"  "+aMount[1]+"  "+aMount[2]+"  "+aMount[3]+ " ").slice(0,iCpField);
+                let sAmount = (aMount[0]+"  "+aMount[1]+"  "+aMount[2]+"  "+aMount[3]+ " "+aMount[4]+ " ").slice(0,iCpField);
 
                 iTran--;
                 statusData[iTran].dTran=jPrettyTXN.entry[0].slice(2);
