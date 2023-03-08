@@ -9,7 +9,7 @@ const inter = Inter({ subsets: ['latin'] })
 // app.use(cors());
 
 
-export function Home() {
+export default function Home() {
 
 
   return (
