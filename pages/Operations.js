@@ -165,7 +165,7 @@ export default function Operations() {
                 <div className="FIELD XFER">
                     <select type="radio" id="cReason" name="cReason" onChange={(e)=>addTXNData('refAcct',getSelect(e.target))} onDrop={ignore} >
                         {arrAcct.map((reason,i) => (
-                            <option id={"reason0"+i} value={reason}>{reason}</option>
+                            <option key={"reason0"+i} id={"reason0"+i} value={reason}>{reason}</option>
                         ))}
                     </select>
                 </div>
@@ -175,7 +175,7 @@ export default function Operations() {
                 <div className="FIELD XFER">
                 <select type="radio" id="cRef2" name="cRef2" onChange={(e)=>addTXNData('refCode',getSelect(e.target))} onDrop={ignore} >
                         {arrCode.map((code,i) => (
-                            <option id={"code0"+i} value={code}>{code}</option>
+                            <option key={"code0"+i} id={"code0"+i} value={code}>{code}</option>
                         ))}
                     </select>
                 </div>
