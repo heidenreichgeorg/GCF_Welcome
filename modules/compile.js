@@ -581,12 +581,14 @@ export function compile(sessionData) {
 /*          D_Partner[i] = { }
             compile
                     id:     # 0-(N-1)
-                    varCap  Name 'K2xx'
+                    fixCap  Name 'EKxx' Festkapital/KK
+                    varCap  Name 'K2xx' var Kapital
+                    resCap  Name RExx Rücklage
                     gain:   Nenner
                     denom:  Zaehler
                     iVar    #Spalte K2xx
                     iCap    #Spalte Fest/Kommanditkapital
-                    capRes  Name RExx Rücklage
+                    iCap    #Spalte Rücklage
                     name    Name (Text in Spalte mit FK oder KK)
 
             sendBalance
@@ -623,6 +625,7 @@ export function compile(sessionData) {
                         for(var col=eqliab+1;col<shares.length;col++) {
                             var acc = arrXBRL[col];
                             if(shares[col] && (acc.includes('limitedLiablePartners.KK') || acc.includes('limitedLiablePartners.FK'))) {
+                                partners[pNum].fixCap=gNames[col];
                                 partners[pNum].iCap=col;
                                 partners[pNum].name=shares[col];
                                 pNum++;
@@ -634,7 +637,8 @@ export function compile(sessionData) {
                         for(var col=eqliab+1;col<shares.length;col++) {
                             var acc = arrXBRL[col]+" ";
                             if(acc.includes('eqLiab.equity.capRes')) {
-                                partners[pNum].capRes=gNames[col];
+                                partners[pNum].resCap=gNames[col];
+                                partners[pNum].iRes=col;
                                 pNum++;
                             }
                         }
@@ -942,10 +946,10 @@ function sendBalance(balance) {
 
             if(debugReport) console.log('compile sendBalance  '+JSON.stringify(p) + "\n ==>> MODIFY K2xx "+JSON.stringify(varcap));
 
-            if(p.capRes) {
+            if(p.resCap) {
                 // consolidate RE capital reserve
-                var rescap=bAccounts[p.capRes]; // index with name
-                console.dir("compile sendBalance partner "+p.name+ " CapitalReserve("+p.capRes+")="+JSON.stringify(rescap));
+                var rescap=bAccounts[p.resCap]; // index with name
+                console.dir("compile sendBalance partner "+p.name+ " CapitalReserve("+p.resCap+")="+JSON.stringify(rescap));
 
                 rescap.income="";
                 rescap.netIncomeOTC="";

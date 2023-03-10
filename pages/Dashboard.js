@@ -5,13 +5,15 @@
 import { useEffect, useState  } from 'react';
 import Screen from './Screen'
 import { useSession } from '../modules/sessionmanager';
-import { D_FixAss, D_Page }  from '../modules/terms.js';
+import { D_FixAss,  D_Balance, D_Page, D_Partner, D_Report }  from '../modules/terms.js';
 import FooterRow from '../components/FooterRow';
 
+import BarList from '../components/BarList'
 import Chart from '../components/Chart'
 import Gauge from '../components/Gauge'
 import Relation from '../components/Relation'
 import Slider from '../components/Slider'
+
 
 import { makeStatusData }  from '../modules/App';
 
@@ -62,6 +64,33 @@ export default function DashBoard({value}) {
     
     let page = sheet[D_Page];
 
+
+    var jAccounts = sheet[D_Balance];
+//console.log(JSON.stringify(jAccounts));
+
+    let jPartners = sheet[D_Partner];
+    let nPartners = Object.keys(jPartners);
+    nPartners.forEach(index => {console.log(JSON.stringify(jPartners[index]))});
+    let accPartners = nPartners.map((partner) => ({varCap:jPartners[partner].varCap,resCap:jPartners[partner].resCap,fixCap:jPartners[partner].fixCap}));
+    let arrAccounts = accPartners.map((partner) => ([jAccounts[partner.varCap].yearEnd,jAccounts[partner.resCap].yearEnd,jAccounts[partner.fixCap].yearEnd]));
+console.log(JSON.stringify(arrAccounts));
+    let arrNumbers = arrAccounts.map((partner) => (partner.map((strNum)=>(BigInt(strNum)).toString())));
+console.log(JSON.stringify(arrNumbers));
+    let bigTotal = 0n;
+    let bigFactor = 4n;
+    arrNumbers.map((partner) => (partner.map((strNum)=>(bigTotal+=(BigInt(strNum)/100n)))));
+console.log(bigTotal.toString());
+    let arrPartners = arrNumbers.map((partner) => (partner.map((strNum)=>(parseInt((bigFactor*BigInt(strNum))/bigTotal).toString()))));
+console.log(JSON.stringify(arrPartners));
+    
+    let partners = [
+        {'value1':12,'value2':60},
+        {'value1':12,'value2':60},
+        {'value1':24,'value2':5},
+        {'value1':24,'value2':4},
+        {'value1':24,'value2':3},
+        {'value1':24,'value2':1}];
+
     return (
         <Screen prevFunc={prevFunc} nextFunc={nextFunc} >
 
@@ -82,6 +111,7 @@ export default function DashBoard({value}) {
             </div>
             <div classname="attrLine">
                 <Relation scale={ass} left={fix} right={eqt} legend={"fix/eqt"} />
+                <BarList partners={arrPartners} legend={"partners"}/>
             </div>
             <FooterRow  id={"F1"}  left={page["client"]}   right={page["register"]} prevFunc={prevFunc} nextFunc={nextFunc}/>
             <FooterRow  id={"F2"}  left={page["reference"]}  right={page["author"]} prevFunc={prevFunc} nextFunc={nextFunc}/>

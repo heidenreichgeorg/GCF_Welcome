@@ -32,7 +32,7 @@ export function SessionProvider({ children,  default_value, onLoading, onError }
         for (;1>0;) {
             let symTime = currentHash();
             console.log(symTime+"   Hash="+symTime);
-            await delay(20000);
+            await delay(80000);
         }
     }
     
