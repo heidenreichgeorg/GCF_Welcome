@@ -369,10 +369,12 @@ export function loadFBConfig(dir,config) {
     var fbConfig=null;
     if(config && dir) {
         
-        let fileName = dir+config+".json";
+        let fileName = config+".json";
+        
         if(fileName) {
             console.log("0022 loadFBConfig from "+fileName);
             fbConfig = JSON.parse(fs.readFileSync(fileName, 'utf8'));
+            //if(!fbConfig) fbConfig = JSON.parse(fs.readFileSync(config+".json", 'utf8'));
         } else {
             console.log("0023 loadFBConfig NO JSON in "+dir);
             return null;

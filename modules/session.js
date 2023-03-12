@@ -34,11 +34,7 @@ export function signIn(config,query,remote,res,startSessionCB) {
             console.log("0010 signIn for client "+client+"  year "+year);
 
             let id=null;
-            //if(id=sy_findSessionId(client,''+year)) 
             {
-//                console.log ( "0012 signIn FOUND WARM id ="+id);
-//                sendDisplay( getSession(id), res);
-//            } else {
                 console.log ( "0014 signIn READ BUCKET FOR COLD id ="+id);
                 fbDownload(config,client,year,startSessionCB,res,getRoot()); // avoid double response
             }
