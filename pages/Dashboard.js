@@ -72,7 +72,7 @@ export default function DashBoard({value}) {
     let nPartners = Object.keys(jPartners);
     nPartners.forEach(index => {console.log(JSON.stringify(jPartners[index]))});
     let accPartners = nPartners.map((partner) => ({varCap:jPartners[partner].varCap,resCap:jPartners[partner].resCap,fixCap:jPartners[partner].fixCap}));
-    let arrAccounts = accPartners.map((partner) => ([jAccounts[partner.varCap].yearEnd,jAccounts[partner.resCap].yearEnd,jAccounts[partner.fixCap].yearEnd]));
+    let arrAccounts = accPartners.map((partner) => ([jAccounts[partner.varCap].yearEnd,partner.resCap?jAccounts[partner.resCap].yearEnd:"0",jAccounts[partner.fixCap].yearEnd]));
 console.log(JSON.stringify(arrAccounts));
     let arrNumbers = arrAccounts.map((partner) => (partner.map((strNum)=>(BigInt(strNum)).toString())));
 console.log(JSON.stringify(arrNumbers));
