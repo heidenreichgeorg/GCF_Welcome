@@ -70,18 +70,18 @@ export default function DashBoard({value}) {
 
     let jPartners = sheet[D_Partner];
     let nPartners = Object.keys(jPartners);
-    nPartners.forEach(index => {console.log(JSON.stringify(jPartners[index]))});
-    let accPartners = nPartners.map((partner) => ({varCap:jPartners[partner].varCap,resCap:jPartners[partner].resCap,fixCap:jPartners[partner].fixCap}));
-    let arrAccounts = accPartners.map((partner) => ([jAccounts[partner.varCap].yearEnd,partner.resCap?jAccounts[partner.resCap].yearEnd:"0",jAccounts[partner.fixCap].yearEnd]));
-console.log(JSON.stringify(arrAccounts));
+//nPartners.forEach(index => {console.log(JSON.stringify(jPartners[index]))});
+    let accPartners = nPartners.map((partner) => ({varCap:jPartners[partner].varCap,resCap:jPartners[partner].resCap,fixCap:jPartners[partner].fixCap,income:jPartners[partner].income}));
+    let arrAccounts = accPartners.map((partner) => ([jAccounts[partner.varCap].yearEnd,partner.resCap?jAccounts[partner.resCap].yearEnd:"0",jAccounts[partner.fixCap].yearEnd,partner.income]));
+//console.log(JSON.stringify(arrAccounts));
     let arrNumbers = arrAccounts.map((partner) => (partner.map((strNum)=>(BigInt(strNum)).toString())));
-console.log(JSON.stringify(arrNumbers));
-    let bigTotal = 0n;
-    let bigFactor = 4n;
+//console.log(JSON.stringify(arrNumbers));
+    let bigTotal = 2000n;
+    let bigFactor = BigInt(arrNumbers.length);
     arrNumbers.map((partner) => (partner.map((strNum)=>(bigTotal+=(BigInt(strNum)/100n)))));
-console.log(bigTotal.toString());
+//console.log(bigTotal.toString());
     let arrPartners = arrNumbers.map((partner) => (partner.map((strNum)=>(parseInt((bigFactor*BigInt(strNum))/bigTotal).toString()))));
-console.log(JSON.stringify(arrPartners));
+//console.log(JSON.stringify(arrPartners));
     
     let partners = [
         {'value1':12,'value2':60},
