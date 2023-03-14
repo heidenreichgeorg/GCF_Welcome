@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev . root=C:\\Privat config=bookingpages",
     "build": "next build",
-    "start": "next start",
+    "start": "next start . config=bookingpages",
     "lint": "next lint"
   },
   "browser": {
