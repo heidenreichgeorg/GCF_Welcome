@@ -367,19 +367,19 @@ let fbConfig=null;
 
 export function loadFBConfig(dir,config) {
     var fbConfig=null;
-    if(config && dir) {
+    if(config) {
         
         let fileName = config+".json";
         
         if(fileName) {
             console.log("0022 loadFBConfig from "+fileName);
             fbConfig = JSON.parse(fs.readFileSync(fileName, 'utf8'));
-            //if(!fbConfig) fbConfig = JSON.parse(fs.readFileSync(config+".json", 'utf8'));
+            if(!fbConfig) console.log("0023 loadFBConfig NO CONFIG FILE "+fileName);
         } else {
-            console.log("0023 loadFBConfig NO JSON in "+dir);
+            console.log("0025 loadFBConfig NO JSON in "+dir);
             return null;
         }
-    }
+    } else console.log("0021 loadFBConfig NO CONFIG ");
     return fbConfig;
 } 
 
