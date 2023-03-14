@@ -16,6 +16,7 @@
 /build
 
 # misc
+/sec/
 .DS_Store
 *.pem
 
