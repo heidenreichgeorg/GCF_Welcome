@@ -31,7 +31,7 @@ export function signIn(config,query,remote,res,startSessionCB) {
 
             // Security sanitize input year
             let year   = parseInt(query.year); // Security sanitize input year
-            console.log("0010 signIn for client "+client+"  year "+year);
+            console.log("0012 signIn for client "+client+"  year "+year);
 
             let id=null;
             {
@@ -53,7 +53,7 @@ export function signIn(config,query,remote,res,startSessionCB) {
 
 export function startSessionJSON(session,res) {
 
-    console.log("0018 startSessionJSON="+JSON.stringify(Object.keys(session))); 
+    console.log("0038 startSessionJSON="+JSON.stringify(Object.keys(session))); 
 
     // START A NEW SESSION
     let time = timeSymbol();
@@ -65,15 +65,15 @@ export function startSessionJSON(session,res) {
 
     setSession(session);
 
-    console.log("0020 startSessionJSON("+client+","+year+") SUCCESS sessionId="+sessionId); 
+    console.log("0040 startSessionJSON("+client+","+year+") SUCCESS sessionId="+sessionId); 
 
     // 20221207
     if(res) {
-        console.log("0022 startSessionJSON("+client+","+year+")  res.JSON");         
+        console.log("0042 startSessionJSON("+client+","+year+")  res.JSON");         
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers","Origin, X-Requested-With, Content-Type, Accept, Authorization");
         res.json(session);
-    } else console.log("0021 startSessionJSON("+client+","+year+") NO res object"); 
+    } else console.log("0041 startSessionJSON("+client+","+year+") NO res object"); 
 }
 
 
@@ -93,7 +93,7 @@ export function getRoot() {  return SERVEROOT; }
 
 export function init(/*app,*/ argv) {
 
-    console.log(JSON.stringify(argv));
+    console.log("0000 ARGV= "+JSON.stringify(argv));
 
     return processArgv(argv);
 }
@@ -106,7 +106,8 @@ function processArgv(processArgv) {
         if(debug>1) console.log("0000 Starting server " + index + ': ' + val);
         let attribute=val.split('=');
         if(index>1 && attribute && attribute.length>1) {
-            if(debug>1) console.log("0002 Attribute " + index + ': ' + val);
+            //if(debug>1) 
+            console.log("0002 Attribute " + index + ': ' + val);
             if(attribute[0].toLowerCase()==='root') {
                 setRoot(attribute[1]);
                 console.log("0004 Starting server SET ROOT TO " + getRoot());

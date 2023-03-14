@@ -372,14 +372,14 @@ export function loadFBConfig(dir,config) {
         let fileName = config+".json";
         
         if(fileName) {
-            console.log("0022 loadFBConfig from "+fileName);
+            console.log("0052 loadFBConfig from "+fileName);
             fbConfig = JSON.parse(fs.readFileSync(fileName, 'utf8'));
             if(!fbConfig) console.log("0023 loadFBConfig NO CONFIG FILE "+fileName);
         } else {
-            console.log("0025 loadFBConfig NO JSON in "+dir);
+            console.log("0055 loadFBConfig NO JSON in "+dir);
             return null;
         }
-    } else console.log("0021 loadFBConfig NO CONFIG ");
+    } else console.log("0051 loadFBConfig NO CONFIG ");
     return fbConfig;
 } 
 
@@ -396,6 +396,9 @@ export function fbDownload(config,client,year,callBack,res,root) {
             console.log("0033 server.fbDownload NO FIREBASE CONFIG")
             return null;
         }
-    } else return null;
+    } else console.log("0031 server.fbDownload NO CONFIG FROM SERVER")
+    
+    return null;
+    
 }
 
