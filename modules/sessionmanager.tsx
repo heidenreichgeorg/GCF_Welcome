@@ -8,7 +8,7 @@ import { currentHash } from './session.js'
 
 type Session = { }
 
-export const REACT_APP_API_HOST="http://192.168.178.28:3000/api"
+export const REACT_APP_API_HOST="/api"
 
 const SessionContext = createContext<Session>({})
 
