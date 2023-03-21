@@ -114,7 +114,7 @@ function processArgv(processArgv) {
             }        
             else if(attribute[0].toLowerCase()==='config') {
                 config = attribute[1];
-                console.log("0006 Starting server SET FIREBASE CONFIG " + config);
+                console.log("0006 Starting server "+currentHash()+" SET FIREBASE CONFIG " + config);
             }        
             else if(attribute[0].toLowerCase()==='auto') {
                 let autoSec = parseInt(attribute[1]);

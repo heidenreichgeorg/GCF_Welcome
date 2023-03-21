@@ -27,7 +27,7 @@ export function SessionProvider({ children,  default_value, onLoading, onError }
 
     const router = useRouter()
 
-  
+ /* 
     async function startTimer() {
         for (;1>0;) {
             let symTime = currentHash();
@@ -48,13 +48,14 @@ export function SessionProvider({ children,  default_value, onLoading, onError }
     
     let symTime = currentHash();
     console.log("0000 "+symTime+"   Hash  "+symTime);
+*/    
     console.log("0001 Sessionprovider "+stringify(router.query));
     let strSearch = router.asPath.split('?')[1];
     console.log("0002 SessionProvider host="+REACT_APP_API_HOST);
     console.log("0003 SessionProvider query="+strSearch)
 
     useEffect(() => {      
-        startTimer();
+//        startTimer();
         setStatus('loading')
         let browserItem = sessionStorage.getItem('session');
         if(browserItem!=null && browserItem.length>256) {
