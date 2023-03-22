@@ -2,9 +2,9 @@ body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
   margin: 0;
   font-family: Bahnschrift, monospace, sans-serif; }
 
-.dosBorder{ max-width:1030px; padding: 14px; border-style: solid; border-radius: 10px; border-width: 2px; border-color: #AEADAE;  background-color: #FFF; color: #0F0F0F; }
+.dosBorder{  padding: 14px; border-style: none; border-radius: 10px; border-width: 2px; border-color: #AEADAE;  background-color: #FFF; color: #0F0F0F; }
 .mTable   { font-family: Bahnschrift,monospace;                             height: 18px;             display:table;    page-break-after: always  }
-.ulliTab  { width:1020px;  padding: 1px; border: none;  font-size: 12px; font-weight:400;  } 
+.ulliTab  {      padding: 1px; border: none;  font-size: 12px; font-weight:400;  } 
 
 
 input  { color:#0F0F0F; background-color:inherit; font-family :Bahnschrift; font-size: 10px;  width:80px;}
@@ -20,8 +20,8 @@ input[type="radio"]::before {content: "#"; }
 
 input[type=range] { -webkit-appearance: none;  width: 200px; margin: 0; padding: 0; display: block; height: 50px; }
 
-.attrRow  { width:1020px; padding: 1px; float: left;               min-height: 16px; height: 17px; font-family :inherit; font-size: 11px; font-weight:400; text-align: center;}
-.attrLine { width:1020px; padding: 1px; float: left;               min-height: 16px; height: 17px; font-family :inherit; font-size: 11px; font-weight:400; text-align: center;}
+.attrRow  { width:75rem; padding: 1px; float: left;               min-height: 16px; height: 17px; font-family :inherit; font-size: 11px; font-weight:400; text-align: center;}
+.attrLine { width:75rem; padding: 1px; float: left;               min-height: 16px; height: 17px; font-family :inherit; font-size: 11px; font-weight:400; text-align: center;}
 .attrPair {              padding: 1px; float: left; color:inherit;min-height: 48px;               font-family: inherit; font-size: 11px; font-weight:400; text-align: center; background-color: inherit; } 
 .attrLine:nth-child(even) { background: #f0f0f0;  border: 1px dotted gray;}
 
