@@ -374,11 +374,14 @@ export function loadFBConfig(dir,config) {
         if(fileName) {
             console.log("0052 loadFBConfig from "+fileName);
             try {
-              fbConfig = JSON.parse(fs.readFileSync(fileName, 'utf8'));
-            } catch(err) { console.dir("FAILED READING CONFIG "+fileName); }
-            if(!fbConfig) console.log("0023 loadFBConfig NO CONFIG FILE "+fileName);
+              let configStr = fs.readFileSync(fileName, 'utf8');
+              try {
+                fbConfig = JSON.parse(configStr);
+            } catch(err) { console.dir("0055 FAILED PARSING CONFIG "+fileName); }
+          } catch(err) { console.dir("0057 FAILED READING CONFIG "+fileName); }
+          if(!fbConfig) console.log("0059 loadFBConfig NO/INVALID CONFIG FILE "+fileName);
         } else {
-            console.log("0055 loadFBConfig NO JSON in "+dir);
+            console.log("0053 loadFBConfig NO JSON in "+dir);
             return null;
         }
     } else console.log("0051 loadFBConfig NO CONFIG ");
