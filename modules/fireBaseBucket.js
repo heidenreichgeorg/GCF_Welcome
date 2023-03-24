@@ -369,7 +369,12 @@ export function loadFBConfig(dir,config) {
     var fbConfig=null;
     if(config) {
         
-        let fileName = "./sec/"+config+".json";
+        let fileName = "/usr/sec/"+config+".json";
+        // mount volume in docker-compose.yml
+        //     volumes:      
+        //      - sec:/usr/sec 
+        //   volumes:      
+        //    sec:
         
         if(fileName) {
             console.log("0052 loadFBConfig from "+fileName);
@@ -379,7 +384,7 @@ export function loadFBConfig(dir,config) {
                 fbConfig = JSON.parse(configStr);
             } catch(err) { console.dir("0055 FAILED PARSING CONFIG "+fileName); }
           } catch(err) { console.dir("0057 FAILED READING CONFIG "+fileName); }
-          if(!fbConfig) console.log("0059 loadFBConfig NO/INVALID CONFIG FILE "+fileName);
+          if(!fbConfig) console.log("0059 loadFBConfig from "+process.cwd()+" NO/INVALID CONFIG FILE "+fileName);
         } else {
             console.log("0053 loadFBConfig NO JSON in "+dir);
             return null;
