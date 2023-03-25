@@ -11,6 +11,6 @@ services:
     ports:
       - 3000:3000
     volumes:
-      - ./sec:/usr/sec:ro
+      - ./sec:/usr/src/app/sec:ro
 volumes:
   sec:
