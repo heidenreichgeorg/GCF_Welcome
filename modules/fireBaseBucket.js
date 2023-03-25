@@ -378,17 +378,19 @@ export function loadFBConfig(dir,config) {
         //    sec:
         
         if(fileName) {
-            console.log("0052 loadFBConfig from "+fileName);
+            console.log("0050 loadFBConfig from "+fileName);
             try {
               let configStr = fs.readFileSync(fileName, 'utf8');
-              //console.log("0054 READ SEC FILE WITH "+configStr.length()+" CHARS");
-              try {
-                fbConfig = JSON.parse(configStr);
-              } catch(err) { console.dir("0055 FAILED PARSING CONFIG "+fileName); }
-            } catch(err) { console.dir("0057 FAILED READING CONFIG "+fileName); }
-           if(!fbConfig) console.log("0059 loadFBConfig from "+process.cwd()+" NO/INVALID CONFIG FILE "+fileName);
+              if(configStr) {
+                //console.log("0052 READ SEC FILE WITH "+configStr.length+" CHARS");              
+                try {
+                  fbConfig = JSON.parse(configStr);
+                } catch(err) { console.dir("0055 FAILED PARSING CONFIG "+fileName); }
+              } else console.log("0057 READ SEC FILE  - EMPTY");
+          } catch(err) { console.dir("0055 FAILED READING CONFIG "+fileName); }
+           if(!fbConfig) console.log("0059 loadFBConfig CWD="+process.cwd()+" ROOT="+getRoot()+" NO/INVALID CONFIG FILE "+fileName);
         } else {
-            console.log("0053 loadFBConfig NO JSON in "+dir);
+            console.log("0053 loadFBConfig NO DIR "+getRoot());
             return null;
         }
     } else console.log("0051 loadFBConfig NO CONFIG ");
