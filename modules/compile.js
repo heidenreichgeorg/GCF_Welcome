@@ -254,6 +254,7 @@ function initBalance() {
 export function compile(sessionData) {
 
     let addrT=sessionData.addrT;
+
     let logT=sessionData.logT;
     let aoaCells=sessionData.sheetCells;
     let strTimeSymbol=sessionData.strTimeSymbol;

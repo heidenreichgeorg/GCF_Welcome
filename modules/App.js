@@ -13,6 +13,15 @@ export function getSelect(target) {
     return null;
 }
 
+export function getValue(targetName) { 
+    var elem = document.getElementById(targetName);
+    if(elem) {
+       
+        return elem.value;        
+    }
+    return targetName;
+}
+
 
 export function getParam(strParam) {
     
