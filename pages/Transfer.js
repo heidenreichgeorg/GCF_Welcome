@@ -4,7 +4,7 @@ import FooterRow from '../components/FooterRow'
 import Screen from '../pages/Screen'
 import { addTXNData, getSelect, getValue, InputRow }  from '../modules/App';
 import { book, prettyTXN, prepareTXN }  from '../modules/writeModule';
-import {CSEP, D_Adressen, D_Balance, D_FixAss, D_Page, D_History, D_Schema,  J_ACCT, X_INCOME, X_EQLIAB } from '../modules/terms.js'
+import {CSEP, D_Adressen, D_Balance, D_FixAss, D_Page, D_History, D_Schema,  X_ASSETS, X_INCOME, X_EQLIAB } from '../modules/terms.js'
 import { useSession } from '../modules/sessionmanager';
 
 
@@ -32,6 +32,12 @@ export default function Transfer() {
         e.preventDefault();
         creditor.sender = sender;
         console.log("PRE-BOOK "+sender+" AS CRED "+JSON.stringify(creditor));
+
+        txn.sender = sender;
+        txn.refAcct = creditor.acct0;
+
+        // renders complete page, because txn is a controlled variable
+        setTxn(JSON.parse(JSON.stringify(txn)))
     }    
     
 
@@ -56,8 +62,19 @@ export default function Transfer() {
     
 
     var jAccounts = sheet[D_Balance];
-    let arrAcct=[];
 
+    let arrAsst=[];
+    for (let name in jAccounts)   {
+        var account=jAccounts[name];
+        if(account.xbrl.length>1) {
+            var xbrl = account.xbrl.split('\.').reverse();
+            var xbrl_pre = xbrl.pop()+ "."+ xbrl.pop();
+            if(xbrl.length>2 && xbrl_pre===X_ASSETS) arrAsst.push(name);
+        }
+    }
+    
+
+    let arrAcct=[];
     for (let name in jAccounts)   {
         var account=jAccounts[name];
         if(account.xbrl.length>1) {
@@ -67,7 +84,6 @@ export default function Transfer() {
         }
     }
     addTXNData(txn,'refAcct',arrAcct[0]);
-
 
     // build cRef2 = refCode list with assets codes
     var jAssets = sheet[D_FixAss];
@@ -88,7 +104,6 @@ export default function Transfer() {
                 {'given':'Stadt','surname':'Erlangen','address':'Rathausplatz 1','zip':'91052','city':'Erlangen','country':'DE'},
                 {'given':'Entwässerungsbetrieb','surname':'Stadt Erlangen','address':'Schuhstraße 30','zip':'91052','city':'Erlangen','country':'DE'},
                 {'given':'Ind.u.Handelskammer','surname':'Nürnberg','address':'Hauptmarkt 25-27','zip':'90403','city':'Nürnberg','country':'DE'}]
-    let select = creditorsT[0];
 
     console.log(JSON.stringify(creditorsT));
 
@@ -127,18 +142,18 @@ export default function Transfer() {
                             ))}
                         </select>
                 </div>
-                </div><div className="attrLine">
+                <div className="FIELD MOAM"></div>
                 <div className="FIELD MOAM"><input id="iAmount2"></input></div>
                 <div className="FIELD XFER">
                         <select type="radio" id="cReason2" name="cReason2" onChange={(e)=>addPreData('acct2',getSelect(e.target),'iAmount2',getValue('iAmount2'))} onDrop={ignore} >
-                            {arrAcct.map((reason,i) => (
+                            {arrAsst.map((reason,i) => (
                                 <option key={"reason2"+i} id={"reason2"+i} value={reason}>{reason}</option>
                             ))}
                         </select>
                 </div>
             </div>
             <CreditorRow/>             
-            <InputRow date={txn.date} sender={txn.sender} arrAcct={arrAcct} reason={txn.reason} arrCode={arrCode}/>    
+            <InputRow arrAcct={arrAcct} arrCode={arrCode} txn={txn}/>    
             <CreditorRow/> 
             <CreditorRow/>
             <FooterRow left={page["client"]}  right={page["register"]} prevFunc={prevFunc} nextFunc={nextFunc}/>
