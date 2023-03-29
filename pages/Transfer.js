@@ -2,9 +2,9 @@ import { useEffect, useState, useRef  } from 'react';
 
 import FooterRow from '../components/FooterRow'
 import Screen from '../pages/Screen'
-import { getSelect, getValue }  from '../modules/App';
+import { addTXNData, getSelect, getValue, InputRow }  from '../modules/App';
 import { book, prettyTXN, prepareTXN }  from '../modules/writeModule';
-import {CSEP, D_Adressen, D_Balance, D_Page, D_History, D_Schema,  J_ACCT, X_INCOME, X_EQLIAB } from '../modules/terms.js'
+import {CSEP, D_Adressen, D_Balance, D_FixAss, D_Page, D_History, D_Schema,  J_ACCT, X_INCOME, X_EQLIAB } from '../modules/terms.js'
 import { useSession } from '../modules/sessionmanager';
 
 
@@ -13,6 +13,7 @@ export default function Transfer() {
     const { session, status } = useSession()   
     const [ sheet,  setSheet] = useState(null)
     const [ creditor, setCreditor ] = useState({'sender':'','acct0':'','acct1':'','acct2':'','iAmount0':'','iAmount1':'','iAmount2':''});
+    const [txn,setTxn] = useState({'add':{},'sub':{},'diff':"0", 'date':"", 'sender':"", 'refAcct':"", 'reason':"", 'refCode':""  })
 
     useEffect(() => {
         if(status !== 'success') return;
@@ -65,14 +66,31 @@ export default function Transfer() {
             if(xbrl.length>3 && ((xbrl_pre===X_INCOME) || (xbrl_pre===X_EQLIAB))) arrAcct.push(name);
         }
     }
+    addTXNData(txn,'refAcct',arrAcct[0]);
 
-    let addrT = sheet[D_Adressen];
-    if(!addrT || addrT.length<1) 
-        addrT = [{'given':'given','surname':'surname','address':'address','zip':'zip','city':'city','country':'DE'}];
-    let report = addrT[0];
-    let select = report;
 
-    console.log(JSON.stringify(addrT));
+    // build cRef2 = refCode list with assets codes
+    var jAssets = sheet[D_FixAss];
+    let arrCode=["FEE","WITHDRAW","ADJUST",'DEP_MONEY',"DEP_IN_KIND"];
+    Object.keys(jAssets).map(function(key,n) {
+        var row = jAssets[key];
+        arrCode.push(row.idnt);
+    });
+    addTXNData(txn,'refCode',arrCode[0]);
+
+
+    let creditorsT = sheet[D_Adressen];
+    if(!creditorsT || creditorsT.length<1) 
+        creditorsT =[{'given':'Bundesanzeiger','surname':'Verlag','address':'Postfach 100534','zip':'50445','city':'Köln','country':'DE'},
+                {'given':'Bayerische','surname':'Versicherungskammer','address':'Postfach','zip':'80430','city':'München','country':'DE'},
+                {'given':'CosmosDirekt','surname':'Versicherung AG','address':'Halbergstr 50-60','zip':'66121','city':'Saarbrücken','country':'DE'},
+                {'given':'Reichel','surname':'Schornsteinfeger','address':'Bamberger Str. 10','zip':'96172','city':'Mühlhausen','country':'DE'},
+                {'given':'Stadt','surname':'Erlangen','address':'Rathausplatz 1','zip':'91052','city':'Erlangen','country':'DE'},
+                {'given':'Entwässerungsbetrieb','surname':'Stadt Erlangen','address':'Schuhstraße 30','zip':'91052','city':'Erlangen','country':'DE'},
+                {'given':'Ind.u.Handelskammer','surname':'Nürnberg','address':'Hauptmarkt 25-27','zip':'90403','city':'Nürnberg','country':'DE'}]
+    let select = creditorsT[0];
+
+    console.log(JSON.stringify(creditorsT));
 
     const tabName = 'TXNContent';
     return (
@@ -80,13 +98,15 @@ export default function Transfer() {
             <CreditorRow/> 
             <CreditorRow/> 
             <CreditorRow/> 
-            <CreditorRow given={report.given} surname={report.surname} 
-                        address={report.address} 
-                        zip={report.zip} 
-                        city={report.city} 
-                        country={report.country}
-                        sender = {report.given+" "+report.surname} 
-                        onPreBook={onPreBook}/>    
+            { creditorsT.map((report) => 
+                (<CreditorRow given={report.given} surname={report.surname} 
+                            address={report.address} 
+                            zip={report.zip} 
+                            city={report.city} 
+                            country={report.country}
+                            sender = {report.given+" "+report.surname} 
+                            onPreBook={onPreBook}/>)
+            )}
             <CreditorRow/> 
             <CreditorRow/> 
             <div className="attrLine">
@@ -118,8 +138,7 @@ export default function Transfer() {
                 </div>
             </div>
             <CreditorRow/>             
-            <CreditorRow given={select.given} surname={select.surname} address={select.address} zip={select.zip} city={select.city} country={select.country} />    
-            
+            <InputRow date={txn.date} sender={txn.sender} arrAcct={arrAcct} reason={txn.reason} arrCode={arrCode}/>    
             <CreditorRow/> 
             <CreditorRow/>
             <FooterRow left={page["client"]}  right={page["register"]} prevFunc={prevFunc} nextFunc={nextFunc}/>
@@ -181,6 +200,9 @@ function makeTransferData(response,iSelected) {
 function CreditorRow({ given,surname,address,zip,city,country,sender,onPreBook }) {
     return(
         <div className="attrLine">
+            {   (sender && sender.length>2) ?
+                (<div className="FIELD MOAM"><input type="submit" className="key" value="PRE-BOOK" onClick={(e)=>onPreBook(e,sender)}/></div>
+                ):( <div>&nbsp;</div> )}   
             <div className="FIELD SEP"> &nbsp;</div>
             <div className="FIELD XFER"> {given}</div>
             <div className="FIELD SEP"> &nbsp;</div>
@@ -193,8 +215,5 @@ function CreditorRow({ given,surname,address,zip,city,country,sender,onPreBook }
             <div className="FIELD XFER"> {city}</div>
             <div className="FIELD SEP"> &nbsp;</div>
             <div className="FIELD XFER"> {country}</div>
-            {   (sender && sender.length>2) ?
-                (<div className="FIELD MOAM"><input type="submit" className="key" value="PRE-BOOK" onClick={(e)=>onPreBook(e,sender)}/></div>
-                ):( <div>&nbsp;</div> )}   
         </div>)
 }

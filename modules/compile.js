@@ -253,7 +253,7 @@ function initBalance() {
 
 export function compile(sessionData) {
 
-    let addrT=sessionData.addrT;
+    let creditorsT=sessionData.creditorsT;
 
     let logT=sessionData.logT;
     let aoaCells=sessionData.sheetCells;
@@ -263,7 +263,7 @@ export function compile(sessionData) {
     
     result[D_Muster] = logT;
  
-    result[D_Adressen] = addrT;
+    result[D_Adressen] = creditorsT;
 
     // digest aoaCells and write into balance object
     var firstLine=1;

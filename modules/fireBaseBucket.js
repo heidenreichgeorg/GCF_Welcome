@@ -64,7 +64,7 @@ UNAUTHORIZED
 Firebase Storage: User does not have permission to access 'HGKG/2022/main.json'. (storage/unauthorized)"
 */
 
-const sessionKeys = ["client","year","remote","time","sheetCells","sheetName","id","addrT","sheetFile","sessionId","generated","ext","clientFunction","strTimeSymbol","fireBase"]
+const sessionKeys = ["client","year","remote","time","sheetCells","sheetName","id","creditorsT","sheetFile","sessionId","generated","ext","clientFunction","strTimeSymbol","fireBase"]
 
 let bpApp = null;
 

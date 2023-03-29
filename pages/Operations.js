@@ -6,7 +6,7 @@ import { useEffect, useState, useRef } from 'react';
 
 import Screen from '../pages/Screen'
 import FooterRow from '../components/FooterRow'
-import { getSelect }  from '../modules/App';
+import { addTXNData, InputRow }  from '../modules/App';
 import { cents2EU, bigEUMoney }  from '../modules/money';
 import { book, prepareTXN } from '../modules/writeModule';
 import { D_Balance, D_FixAss, D_Page, D_Report, D_Schema, SCREENLINES, X_ASSETS, X_EQUITY, X_EQLIAB, X_INCOME, X_INCOME_REGULAR } from '../modules/terms.js'
@@ -91,7 +91,7 @@ export default function Operations() {
             if(xbrl.length>3 && ((xbrl_pre===X_INCOME) || (xbrl_pre===X_EQLIAB))) arrAcct.push(name);
         }
     }
-    addTXNData('refAcct',arrAcct[0]);
+    addTXNData(txn,'refAcct',arrAcct[0]);
 
         
     // build cRef2 = refCode list with assets codes
@@ -101,7 +101,7 @@ export default function Operations() {
         var row = jAssets[key];
         arrCode.push(row.idnt);
     });
-    addTXNData('refCode',arrCode[0]);
+    addTXNData(txn,'refCode',arrCode[0]);
 
 
     const aNums = [0];
@@ -124,7 +124,7 @@ export default function Operations() {
                                am4={row.gEquity} tx4={row.nEquity} tt4={row.tEquity} /> 
                 ))
             }
-            <InputRow date={txn.date} sender={txn.sender} arrAcct={arrAcct} reason={txn.reason} refCode={txn.refCode}/>    
+            <InputRow date={txn.date} sender={txn.sender} arrAcct={arrAcct} reason={txn.reason} arrCode={arrCode}/>    
             
             <FooterRow left={page["client"]}  right={page["register"]} prevFunc={prevFunc} nextFunc={nextFunc}/>
             <FooterRow left={page["reference"]} right={page["author"]} prevFunc={prevFunc} nextFunc={nextFunc}/>
@@ -154,33 +154,6 @@ export default function Operations() {
         )
     }
  
-    function InputRow({ date,sender,arrAcct,reason,refCode }) {
-        return(
-            <div className="attrRow">
-                <div className="FIELD SYMB"> &nbsp;</div>
-                <div className="FIELD XFER"><input type="date" id="cDate"   name="cDate"   defaultValue ={date}   onChange={(e)=>addTXNData('date',e.target.value)} onDrop={ignore} /></div>
-                <div className="FIELD SEP">&nbsp;</div>
-                <div className="FIELD XFER"><input type="edit" id="cSender" name="cSender" defaultValue ={sender} onChange={(e)=>addTXNData('sender',e.target.value)} onDrop={ignore} /></div>
-                <div className="FIELD SEP">&nbsp;</div>
-                <div className="FIELD XFER">
-                    <select type="radio" id="cReason" name="cReason" onChange={(e)=>addTXNData('refAcct',getSelect(e.target))} onDrop={ignore} >
-                        {arrAcct.map((reason,i) => (
-                            <option key={"reason0"+i} id={"reason0"+i} value={reason}>{reason}</option>
-                        ))}
-                    </select>
-                </div>
-                <div className="FIELD SEP">&nbsp;</div>
-                <div className="FIELD XFER"><input type="edit" id="cRef1"   name="cRef1"   defaultValue ={reason}   onChange={(e)=>addTXNData('reason',e.target.value)} onDrop={ignore} /></div>
-                <div className="FIELD SEP">&nbsp;</div>
-                <div className="FIELD XFER">
-                <select type="radio" id="cRef2" name="cRef2" onChange={(e)=>addTXNData('refCode',getSelect(e.target))} onDrop={ignore} >
-                        {arrCode.map((code,i) => (
-                            <option key={"code0"+i} id={"code0"+i} value={code}>{code}</option>
-                        ))}
-                    </select>
-                </div>
-            </div>)
-    }
     
     
     function setDiff(txn) {
@@ -215,7 +188,7 @@ export default function Operations() {
         console.log("SET("+a+") "+JSON.stringify(txn)); 
     }    
 
-    function addTXNData(shrtName,a) { txn[shrtName]=a; console.log("DATA("+a+") "+JSON.stringify(txn)); return txn; } // avoid update
+    
 }
 
 
@@ -367,42 +340,6 @@ function makeOperationsForm(response,formAdd,formSub) {
 
     // four columns: assets liab gain equity
 
-/*
-    if(jHistory && gSchema.Names && gSchema.Names.length>0) {
-        var names=gSchema.Names;
-        var aLen = gSchema.assets;
-        var eLen = gSchema.eqliab;
-
-        let hLen = Object.keys(jHistory).length;
-        var bLine=hLen;
-        var iTran=maxRow;
-
-        statusData[0].lTran= "Recent Transactions";
-
-        for (let hash in jHistory)  {
-
-            if(debug) console.log("Recent TXN("+hash+") #iTran="+iTran+ "      #bLine="+bLine+"    #maxRow="+maxRow);
-
-            if(bLine<maxRow && iTran>0) {
-        
-                let jPrettyTXN = prettyTXN(jHistory,hash,null,null,names,aLen,eLen);
-                jPrettyTXN.credit.shift();
-//                jPrettyTXN.debit.shift();
-                jPrettyTXN.debit.shift();
-                let aMount=jPrettyTXN.credit.concat(jPrettyTXN.debit);
-                aMount.push("-.--"); aMount.push("-.--"); aMount.push("-.--");
-
-                let sAmount = (aMount[0]+"  "+aMount[1]+"  "+aMount[2]+"  "+aMount[3]+ " ").slice(0,iCpField);
-
-                iTran--;
-                statusData[iTran].dTran=jPrettyTXN.entry[0].slice(2);
-                statusData[iTran].nTran=jPrettyTXN.entry[1].slice(0,16);
-                statusData[iTran].lTran= sAmount;                                
-            }
-            bLine--;
-        }
-    }
-*/  
 
    return {report:statusData, ass:ass.yearEnd, eql:eql.yearEnd, gls:gls.yearEnd, fix:(""+iFixed), equity:(""+iEquity), tan:(""+iTan)};
 }

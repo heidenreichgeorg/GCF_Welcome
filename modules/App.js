@@ -437,3 +437,35 @@ function fillRight(balance,cValue,iName,iRite,level) {
     }
     return iRite;
 }
+
+function ignore(e) { e.preventDefault(); }
+
+export function InputRow({ date,sender,arrAcct,reason,arrCode, txn }) {
+    return(
+        <div className="attrRow">
+            <div className="FIELD SYMB"> &nbsp;</div>
+            <div className="FIELD XFER"><input type="date" id="cDate"   name="cDate"   defaultValue ={date}   onChange={(e)=>addTXNData(txn,'date',e.target.value)} onDrop={ignore} /></div>
+            <div className="FIELD SEP">&nbsp;</div>
+            <div className="FIELD XFER"><input type="edit" id="cSender" name="cSender" defaultValue ={sender} onChange={(e)=>addTXNData(txn,'sender',e.target.value)} onDrop={ignore} /></div>
+            <div className="FIELD SEP">&nbsp;</div>
+            <div className="FIELD XFER">
+                <select type="radio" id="cReason" name="cReason" onChange={(e)=>addTXNData(txn,'refAcct',getSelect(e.target))} onDrop={ignore} >
+                    {arrAcct.map((reason,i) => (
+                        <option key={"reason0"+i} id={"reason0"+i} value={reason}>{reason}</option>
+                    ))}
+                </select>
+            </div>
+            <div className="FIELD SEP">&nbsp;</div>
+            <div className="FIELD XFER"><input type="edit" id="cRef1"   name="cRef1"   defaultValue ={reason}   onChange={(e)=>addTXNData(txn,'reason',e.target.value)} onDrop={ignore} /></div>
+            <div className="FIELD SEP">&nbsp;</div>
+            <div className="FIELD XFER">
+            <select type="radio" id="cRef2" name="cRef2" onChange={(e)=>addTXNData(txn,'refCode',getSelect(e.target))} onDrop={ignore} >
+                    {arrCode.map((code,i) => (
+                        <option key={"code0"+i} id={"code0"+i} value={code}>{code}</option>
+                    ))}
+                </select>
+            </div>
+        </div>)
+}
+
+export function addTXNData(txn,shrtName,a) { txn[shrtName]=a; console.log("App.addTXNData TXN("+a+") "+JSON.stringify(txn)); return txn; } // avoid update
