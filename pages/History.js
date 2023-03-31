@@ -135,7 +135,7 @@ function SigRow({row,index,client,year}) {
 
     var checked=(aSelSaldo[id]!=null);
     return (
-        <div className="attrPair">
+        <div className="BIGCELL">
             <div className="attrLine" id={id}>
                 <div className="FIELD SYMB"><label><input TYPE="CHECKBOX" onChange={(event) => handleChange(event.target,aRow,mRow)} defaultChecked={checked} />
                                         </label></div>
@@ -277,7 +277,7 @@ function TXNReceipt(sym,sum) {
 
     return(
         <div className="ulliTab" id="PageContentReceipt">
-            <div className="attrPair">
+            <div className="BIGCELL">
                 <BalanceRow text={aSelText[sym].join(' ')} level7={level7} level6={level6} level5={level5} level4={level4} level3={level3} level2={level2} level1={level1} level0={level0}/>
             </div>
         </div>

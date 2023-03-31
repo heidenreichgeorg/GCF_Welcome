@@ -124,7 +124,7 @@ export default function Operations() {
                                am4={row.gEquity} tx4={row.nEquity} tt4={row.tEquity} /> 
                 ))
             }
-            <InputRow date={txn.date} sender={txn.sender} arrAcct={arrAcct} reason={txn.reason} arrCode={arrCode}/>    
+            <InputRow arrAcct={arrAcct} arrCode={arrCode} txn={txn}/>    
             
             <FooterRow left={page["client"]}  right={page["register"]} prevFunc={prevFunc} nextFunc={nextFunc}/>
             <FooterRow left={page["reference"]} right={page["author"]} prevFunc={prevFunc} nextFunc={nextFunc}/>

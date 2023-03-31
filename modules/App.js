@@ -4,14 +4,30 @@ import { cents2EU }  from '../modules/money.mjs';
 import { iCpField, prettyTXN } from './writeModule'
 
 
-export function getSelect(target) { 
-    var elem = document.getElementById(target.id);
+export function getSelect(targetId) { 
+    var elem = document.getElementById(targetId);
     if(elem) {
         let index=elem.selectedIndex;
         return elem.options[index].value;        
     }
     return null;
 }
+
+export function setSelect(targetId,value) { 
+    var elem = document.getElementById(targetId);
+    if(elem) {
+        console.log("SET SELECT "+targetId+" WITH "+value);
+        let arrElem=elem.options;
+        for(let i=0;i<arrElem.length;i++) {
+            if(arrElem[i].value==value) {
+                elem.selectedIndex=i;
+                console.log("SET SELECT OPTION "+i);
+            }
+        }
+    }
+    return null;
+}
+
 
 export function getValue(targetName) { 
     var elem = document.getElementById(targetName);
@@ -450,10 +466,10 @@ export function InputRow({ arrAcct, arrCode, txn }) {
             <div className="FIELD SYMB"> &nbsp;</div>
             <div className="FIELD XFER"><input type="date" id="cDate"   name="cDate"   defaultValue ={date}   onChange={(e)=>addTXNData(txn,'date',e.target.value)} onDrop={ignore} /></div>
             <div className="FIELD SEP">&nbsp;</div>
-            <div className="attrPair LNAM"><input class="LNAM" type="edit" id="cSender" name="cSender" defaultValue ={sender} onChange={(e)=>addTXNData(txn,'sender',e.target.value)} onDrop={ignore} /></div>
+            <div className="BIGCELL LNAM"><input className="LNAM" type="edit" id="cSender" name="cSender" defaultValue ={sender} onChange={(e)=>addTXNData(txn,'sender',e.target.value)} onDrop={ignore} /></div>
             <div className="FIELD SEP">&nbsp;</div>
             <div className="FIELD XFER">
-                <select type="radio" id="cReason" name="cReason" onChange={(e)=>addTXNData(txn,'refAcct',getSelect(e.target))} onDrop={ignore} >
+                <select type="radio" id="cReason" name="cReason" onChange={(e)=>addTXNData(txn,'refAcct',getSelect(e.target.id))} onDrop={ignore} >
                     {arrAcct.map((reason,i) => (
                         <option key={"reason0"+i} id={"reason0"+i} value={reason}>{reason}</option>
                     ))}
@@ -463,7 +479,7 @@ export function InputRow({ arrAcct, arrCode, txn }) {
             <div className="FIELD XFER"><input type="edit" id="cRef1"   name="cRef1"   defaultValue ={reason}   onChange={(e)=>addTXNData(txn,'reason',e.target.value)} onDrop={ignore} /></div>
             <div className="FIELD SEP">&nbsp;</div>
             <div className="FIELD XFER">
-            <select type="radio" id="cRef2" name="cRef2" onChange={(e)=>addTXNData(txn,'refCode',getSelect(e.target))} onDrop={ignore} >
+            <select type="radio" id="cRef2" name="cRef2" onChange={(e)=>addTXNData(txn,'refCode',getSelect(e.target.id))} onDrop={ignore} >
                     {arrCode.map((code,i) => (
                         <option key={"code0"+i} id={"code0"+i} value={code}>{code}</option>
                     ))}

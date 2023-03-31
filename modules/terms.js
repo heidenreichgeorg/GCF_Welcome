@@ -14,6 +14,7 @@ export const  D_Adressen="Adressen";
 
 export const  X_ASSETS = 'de-gaap-ci_bs.ass';
 export const  X_EQLIAB = 'de-gaap-ci_bs.eqLiab';
+export const  X_LIABILITY = 'de-gaap-ci_bs.eqLiab.liab';
 export const  X_EQUITY = 'de-gaap-ci_bs.eqLiab.equity';
 export const  X_INCOME = 'de-gaap-ci_is.netIncome';
 export const  X_INCOME_REGULAR = 'de-gaap-ci_is.netIncome.regular';

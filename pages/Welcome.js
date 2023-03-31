@@ -117,7 +117,7 @@ export default function Welcome() {
                 Sign Up
                 CSV/JSON in UTF-8
             </div>
-            <div className="attrPair">
+            <div className="BIGCELL">
                 <div className="FLEX box" onDragOver={dragOverHandler} onDrop={dropHandler}> </div>                
                 
             </div>

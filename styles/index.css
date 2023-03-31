@@ -22,13 +22,13 @@ input[type=range] { -webkit-appearance: none;  width: 200px; margin: 0; padding:
 
 .attrRow  { width:75rem; padding: 1px; float: left;               min-height: 16px; height: 17px; font-family :inherit; font-size: 11px; font-weight:400; text-align: center;}
 .attrLine { width:75rem; padding: 1px; float: left;               min-height: 16px; height: 17px; font-family :inherit; font-size: 11px; font-weight:400; text-align: center;}
-.attrPair {              padding: 1px; float: left; color:inherit;min-height: 48px;               font-family: inherit; font-size: 11px; font-weight:400; text-align: center; background-color: inherit; } 
 .attrLine:nth-child(even) { background: #f0f0f0;  border: 1px dotted gray;}
 
 .key      {  height:16px;  margin: 0px; border-color: rgb(167, 152, 152); border-style: solid; float: left; background-color:transparent; font-family:  inherit; font-size: inherit; font-weight:600; color: #000; }
 .box      {  height:40px;  margin: 0px; border-color: gray;               border-style: solid; float: left; background-color:transparent; font-family:  inherit; font-size: inherit; font-weight:600; color: #000; }
 
-.FIELD    { overflow:hidden; padding: 1px; border: none; float: left;  font-family: inherit; font-size: inherit; font-weight:inherit; color: inherit;} 
+.BIGCELL {                   padding: 1px;               float: left; color:inherit;min-height: 48px; font-family: inherit; font-size: 11px; font-weight:400; text-align: center; background-color: inherit; } 
+.FIELD    { overflow:hidden; padding: 1px; border: none; float: left;                                 font-family: inherit; font-size: inherit; font-weight:inherit; color: inherit;} 
 
 .SEP      { width: 1rem; text-align: center;  }		
 .TAG      { width: 2rem; text-align: left;  }		
