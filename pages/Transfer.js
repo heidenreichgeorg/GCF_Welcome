@@ -145,6 +145,7 @@ export default function Transfer() {
     if(!creditorsT || creditorsT.length<1) 
         creditorsT =[{'given':'Bundesanzeiger','surname':'Verlag','address':'Postfach 100534','zip':'50445','city':'Köln','country':'DE'},
                 {'given':'Bayerische','surname':'Versicherungskammer','address':'Postfach','zip':'80430','city':'München','country':'DE'},
+                {'given':'BNP Paribas','surname':'S.A.','address':'Bahnhofstraße 55','zip':'90402','city':'Nürnberg','country':'DE'},
                 {'given':'CosmosDirekt','surname':'Versicherung AG','address':'Halbergstr 50-60','zip':'66121','city':'Saarbrücken','country':'DE'},
                 {'given':'Reichel','surname':'Schornsteinfeger','address':'Bamberger Str. 10','zip':'96172','city':'Mühlhausen','country':'DE'},
                 {'given':'Stadt','surname':'Erlangen','address':'Rathausplatz 1','zip':'91052','city':'Erlangen','country':'DE'},
