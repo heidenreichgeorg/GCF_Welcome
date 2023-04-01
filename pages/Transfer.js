@@ -4,7 +4,7 @@ import FooterRow from '../components/FooterRow'
 import Screen from '../pages/Screen'
 import { addTXNData, getSelect, getValue, InputRow, setSelect }  from '../modules/App';
 import { book, prettyTXN, prepareTXN }  from '../modules/writeModule';
-import {CSEP, D_Adressen, D_Balance, D_FixAss, D_Page, D_History, D_Schema,  X_ASSETS, X_EQLIAB, X_INCOME, X_LIABILITY } from '../modules/terms.js'
+import {CSEP, D_Adressen, D_Balance, D_FixAss, D_Page, D_History, D_Schema,  X_ASS_CASH, X_EQLIAB, X_INCOME, X_LIABILITY } from '../modules/terms.js'
 import { useSession } from '../modules/sessionmanager';
 import { cents2EU, bigEUMoney }  from '../modules/money';
 
@@ -125,7 +125,7 @@ export default function Transfer() {
             if(xbrl.length>2) { 
                 if(xbrl_pre.startsWith(X_INCOME) || xbrl_pre.startsWith(X_EQLIAB)) arrAcct.push(name);
                 if(xbrl_pre.startsWith(X_LIABILITY)) arrLiab.push(name);
-                if(xbrl_pre.startsWith(X_ASSETS)) arrAsst.push(name);
+                if(xbrl_pre.startsWith(X_ASS_CASH)) arrAsst.push(name);
             }
         }
     }
@@ -142,20 +142,36 @@ export default function Transfer() {
 
 
     let creditorsT = sheet[D_Adressen];
-    if(!creditorsT || creditorsT.length<1) 
-        creditorsT =[{'given':'Bundesanzeiger','surname':'Verlag','address':'Postfach 100534','zip':'50445','city':'Köln','country':'DE'},
-                {'given':'Bayerische','surname':'Versicherungskammer','address':'Postfach','zip':'80430','city':'München','country':'DE'},
-                {'given':'BNP Paribas','surname':'S.A.','address':'Bahnhofstraße 55','zip':'90402','city':'Nürnberg','country':'DE'},
-                {'given':'CosmosDirekt','surname':'Versicherung AG','address':'Halbergstr 50-60','zip':'66121','city':'Saarbrücken','country':'DE'},
-                {'given':'Reichel','surname':'Schornsteinfeger','address':'Bamberger Str. 10','zip':'96172','city':'Mühlhausen','country':'DE'},
-                {'given':'Stadt','surname':'Erlangen','address':'Rathausplatz 1','zip':'91052','city':'Erlangen','country':'DE'},
-                {'given':'Entwässerungsbetrieb','surname':'Stadt Erlangen','address':'Schuhstraße 30','zip':'91052','city':'Erlangen','country':'DE'},
-                {'given':'Ind.u.Handelskammer','surname':'Nürnberg','address':'Hauptmarkt 25-27','zip':'90403','city':'Nürnberg','country':'DE'}]
+    if(!creditorsT || creditorsT.length<1) {
+        creditorsT =[
+            {'given':'Bayerische','surname':'Versicherungskammer','address':'Postfach','zip':'80430','city':'München','country':'DE'},
+            {'given':'BNP Paribas','surname':'S.A.','address':'Bahnhofstraße 55','zip':'90402','city':'Nürnberg','country':'DE'},
+            {'given':'Bundesanzeiger','surname':'Verlag','address':'Postfach 100534','zip':'50445','city':'Köln','country':'DE'},
+            {'given':'CosmosDirekt','surname':'Versicherung AG','address':'Halbergstr 50-60','zip':'66121','city':'Saarbrücken','country':'DE'},
+            {'given':'Entwässerungsbetrieb Erlangen','surname':'Stadt','address':'Schuhstraße 30','zip':'91052','city':'Erlangen','country':'DE'},
+            {'given':'Erlangen','surname':'Stadt','address':'Rathausplatz 1','zip':'91052','city':'Erlangen','country':'DE'},
+            {'given':'Nürnberg','surname':'Ind.u.Handelskammer','address':'Hauptmarkt 25-27','zip':'90403','city':'Nürnberg','country':'DE'},
+            {'given':'Reichel','surname':'Schornsteinfeger','address':'Bamberger Str. 10','zip':'96172','city':'Mühlhausen','country':'DE'}];
 
+            session.creditorsT=creditorsT;
+        }
     console.log("REFRESH PAGE "+JSON.stringify(creditor));
     console.log("REFRESH TXN "+JSON.stringify(txn));
 
+        // Buchungssatz
+    let arrICred = Object.keys(txn.credit).map((accVal) => (bigEUMoney(txn.credit[accVal].value)))
+    let arrIDebt = Object.keys(txn.debit).map((accVal)  => (bigEUMoney(txn.debit[accVal].value)))
+    let arrCred = [];
+    let arrDebt = [];
+    Object.keys(txn.credit).map((accVal,i) => 
+        (arrICred[i]<0n ? 
+            arrDebt.push(accVal+":"+cents2EU(arrICred[i]*-1n)) :
+            arrCred.push(accVal+":"+cents2EU(arrICred[i]*-1n))))
 
+     Object.keys(txn.debit).map((accVal,i)  => 
+        (arrIDebt[i]<0n ? 
+            arrCred.push(accVal+":"+cents2EU(arrIDebt[i]*-1n)) :
+            arrDebt.push(accVal+":"+cents2EU(arrIDebt[i]*-1n))))
 
 
     const tabName = 'TXNContent';
@@ -166,17 +182,17 @@ export default function Transfer() {
             <div className="attrLine">
             <div className="FIELD XFER"></div>
             <div className="FIELD MOAM"><input id="iAmount0"></input></div>
-                <div className="FIELD XFER">
-                        <select type="radio" key="cReason0" id="acct0" name="cReason0" onDrop={ignore} >
-                            {arrAcct.map((reason,i) => (
-                                <option key={"reason0"+i} id={"reason0"+i} value={reason}>{reason}</option>
+            <div className="FIELD XFER">
+                        <select type="radio" key="acct0" id="acct0" name="acct0" onDrop={ignore} >
+                            {arrAsst.map((reason,i) => (
+                                <option key={"reason2"+i} id={"reason2"+i} value={reason}>{reason}</option>
                             ))}
                         </select>
                 </div>
             <div className="SEP"></div>
                 <div className="FIELD MOAM"><input id="iAmount1"></input></div>
                 <div className="FIELD XFER">
-                        <select type="radio" key="cReason1" id="acct1" name="cReason1" onDrop={ignore} >
+                        <select type="radio" key="acct1" id="acct1" name="acct1" onDrop={ignore} >
                             {arrLiab.map((reason,i) => (
                                 <option key={"reason1"+i} id={"reason1"+i} value={reason}>{reason}</option>
                             ))}
@@ -185,9 +201,9 @@ export default function Transfer() {
                 <div className="FIELD MOAM"></div>
                 <div className="FIELD MOAM"><input id="iAmount2"></input></div>
                 <div className="FIELD XFER">
-                        <select type="radio" key="cReason2" id="acct2" name="cReason2" onDrop={ignore} >
-                            {arrAsst.map((reason,i) => (
-                                <option key={"reason2"+i} id={"reason2"+i} value={reason}>{reason}</option>
+                        <select type="radio" key="acct2" id="acct2" name="acct2" onDrop={ignore} >
+                            {arrAcct.map((reason,i) => (
+                                <option key={"reason0"+i} id={"reason0"+i} value={reason}>{reason}</option>
                             ))}
                         </select>
                 </div>
@@ -212,8 +228,12 @@ export default function Transfer() {
             <InputRow arrAcct={arrAcct} arrCode={arrCode} txn={txn}/>  
             <CreditorRow/>
             <div className="attrLine">
-            <div className="FIELD SEP"></div><div className="FIELD SEP"></div><div className="FIELD SEP"></div>
+                <div className="FIELD SEP"></div><div className="FIELD SEP"></div><div className="FIELD SEP"></div>
                 <div className="FIELD MOAM"><input type="submit" className="key" value="BOOK" onClick={(e)=>onBook(e)}/></div>
+                <div className="FIELD SEP"></div>
+                <div className="FIELD SNAM">{arrCred.join()}</div>
+                <div className="FIELD SEP">AN</div>
+                <div className="FIELD SNAM">{arrDebt.join()}</div>
             </div>
             <CreditorRow/> 
             <CreditorRow/>
