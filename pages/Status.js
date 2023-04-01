@@ -47,7 +47,7 @@ export default function Status() {
     if(!sheet) return (
         
             <div className = "attrLine">
-                <div className="FIELD XFER">'Authenticate:...'</div>
+                <div className="FIELD XFER">Authenticate:...</div>
                 <div className="FIELD MOAM"><input key="auth" id="auth" type="edit"></input></div>
                 <div className="FIELD MOAM"><div key="go" className="KEY" onClick={login}>AUTH</div>
                 </div>
