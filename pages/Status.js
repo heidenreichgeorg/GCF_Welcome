@@ -4,6 +4,7 @@ import Screen from '../pages/Screen'
 import FooterRow from '../components/FooterRow'
 import { cents2EU }  from '../modules/money';
 import { D_Page } from '../modules/terms.js'
+import { book }  from '../modules/writeModule';
 
 
 
@@ -57,6 +58,11 @@ export default function Status() {
         console.log("1140 Status.handleXLSave EXIT");
     }
 
+
+    function handleReview() {        
+        book({'client':session.client,'year':session.year},session)
+    }
+
     function makeXLSButton(url,client,year) { 
         console.log("1196 makeXLSButton XLSX "+url);
         if(client) {
@@ -88,7 +94,8 @@ export default function Status() {
                                         am1={row.gLeft} tx1={row.nLeft} 
                                         am2={row.gMidl} tx2={row.nMidl} 
                                         am3={row.gRite} tx3={row.nRite} 
-                                        d={row.dTran} n={row.nTran} l={row.lTran}/>                       
+                                        d={row.dTran} n={row.nTran} l={row.lTran}
+                                        click={(l==0)?handleReview:null}/>                       
                 ))
             }
             <FooterRow left={page["client"]}  right={page["register"]} prevFunc={prevFunc} nextFunc={nextFunc} miscFunc={handleXLSave}/>
@@ -99,7 +106,7 @@ export default function Status() {
 
 function showAccount(shrtName) { console.log("SHOW ACCOUNT "+shrtName); window.open("/History?client=HGKG&year=2023&APATTERN="+shrtName+"&SELECTALL=1"); }
 
-function StatusRow({ am1,tx1, am2, tx2, am3, tx3, d, n, l}) {
+function StatusRow({ am1,tx1, am2, tx2, am3, tx3, d, n, l, click}) {
     return(
         <div className="attrLine">
             <div className="FIELD MOAM"> {cents2EU(am1)}</div>
@@ -115,6 +122,9 @@ function StatusRow({ am1,tx1, am2, tx2, am3, tx3, d, n, l}) {
             <div className="FIELD SYMB"> {d}</div>
             <div className="FIELD SNAM"> {n}</div>
             <div className="FIELD">{l}</div>
+            {click==null ? (<div className="FIELD SEP"> &nbsp;</div>) : (
+            <div className="key"  onClick={(() => click())}>&nbsp;X&nbsp;</div>
+            ) }
         </div>
     )
 }

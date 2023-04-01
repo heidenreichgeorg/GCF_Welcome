@@ -170,9 +170,9 @@ export function book(jTXN,session) {
 }
 
 
-export async function sendFile(sig, response) {  
+export async function sendFile(sig, response) {  // was fs.exists() GH20230401
     // Check if file specified by the filePath exists
-    fs.exists(sig.serverFile, function (exists) {
+    fs.access(sig.serverFile, function (exists) {
         if (exists) {
             // Content-type is very interesting part that guarantee that
             // Web browser will handle response in an appropriate manner.

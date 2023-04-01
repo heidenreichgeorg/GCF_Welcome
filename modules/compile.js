@@ -1311,66 +1311,72 @@ function bigAsset(row,iAssets) {
 
 export function formatTXN(session,reqBody) {
 
-    if(debug) console.log("compile.js formatTXN("+session.id+") book "+JSON.stringify(reqBody));
-
-    var jFlag  = reqBody.flag; if(!jFlag) jFlag=0;
-    var jDate  = reqBody.date;
-    var jSender= reqBody.sender;
-    var jAcct  = reqBody.refAcct;
-    var jSVWZ  = reqBody.reason;
-    var jSVWZ2 = reqBody.refCode;
-    var jCredit= reqBody.credit;
-    var jDebit = reqBody.debit;
     var bookingForm=null;
-
-
-    let sessionId=session.id;
-    //let session = Server.getSession(sessionId);
     
-    if(session) {
-        if(debug) console.dir("compile.js formatTXN("+sessionId+") book "+JSON.stringify(reqBody));
+    console.log("0066 compile.js formatTXN("+session.id+") book "+JSON.stringify(reqBody));
 
-        var balance = session.generated;
+    if(Object.keys(reqBody).length>2) {
+        if(debug) console.log("compile.js formatTXN("+session.id+") book "+JSON.stringify(reqBody));
 
-        if(balance && balance[D_Schema]) {
+        var jFlag  = reqBody.flag; if(!jFlag) jFlag=0;
+        var jDate  = reqBody.date;
+        var jSender= reqBody.sender;
+        var jAcct  = reqBody.refAcct;
+        var jSVWZ  = reqBody.reason;
+        var jSVWZ2 = reqBody.refCode;
+        var jCredit= reqBody.credit;
+        var jDebit = reqBody.debit;
 
-            let year = balance[D_Schema].reportYear;
-    
-            if(isSameFY(year) || jFlag) {
 
-                if(debug>0) console.log("compile.js formatTXN() "+JSON.stringify(jCredit)+"/ "+JSON.stringify(jDebit));
+        let sessionId=session.id;
+        //let session = Server.getSession(sessionId);
+        
+        if(session) {
+            if(debug) console.dir("compile.js formatTXN("+sessionId+") book "+JSON.stringify(reqBody));
+
+            var balance = session.generated;
+
+            if(balance && balance[D_Schema]) {
+
+                let year = balance[D_Schema].reportYear;
+        
+                if(isSameFY(year) || jFlag) {
+
+                    if(debug>0) console.log("compile.js formatTXN() "+JSON.stringify(jCredit)+"/ "+JSON.stringify(jDebit));
 
 
-                var total = balance[D_Schema].total;
-                var aLen = parseInt(balance[D_Schema].assets);
+                    var total = balance[D_Schema].total;
+                    var aLen = parseInt(balance[D_Schema].assets);
 
-                bookingForm = (CSEP.repeat(total)).split(CSEP);
+                    bookingForm = (CSEP.repeat(total)).split(CSEP);
 
-                bookingForm[0]= 1-jFlag;
-                bookingForm[1]=jDate;
-                bookingForm[2]=jSender;
-                bookingForm[3]=jAcct;
-                bookingForm[4]=jSVWZ;
-                bookingForm[5]=jSVWZ2;
-                
-                // jCredit,jDebit { index:45, value:66266262 }
+                    bookingForm[0]= 1-jFlag;
+                    bookingForm[1]=jDate;
+                    bookingForm[2]=jSender;
+                    bookingForm[3]=jAcct;
+                    bookingForm[4]=jSVWZ;
+                    bookingForm[5]=jSVWZ2;
+                    
+                    // jCredit,jDebit { index:45, value:66266262 }
 
-                for(let money in jCredit) {
-                    var i=jCredit[money].index;
-                    bookingForm[i] = jCredit[money].value;
+                    for(let money in jCredit) {
+                        var i=jCredit[money].index;
+                        bookingForm[i] = jCredit[money].value;
+                    }
+
+                    for(let money in jDebit) {
+                        var i=jDebit[money].index;
+                        bookingForm[i] = jDebit[money].value;
+                    }
+                } else { console.dir("compile.js formatTXN() rejects other fiscal year:"+year);
+                    return null;
                 }
+            } else console.log("compile.js formatTXN("+sessionId+") no BALANCE table ");
 
-                for(let money in jDebit) {
-                    var i=jDebit[money].index;
-                    bookingForm[i] = jDebit[money].value;
-                }
-            } else { console.dir("compile.js formatTXN() rejects other fiscal year:"+year);
-                return null;
-            }
-        } else console.log("compile.js formatTXN("+sessionId+") no BALANCE table ");
+        } else console.log("compile.js formatTXN("+sessionId+") no SESSION ");
+        // receiver will append this to sheetCells
+    } else console.log("compile.js formatTXN() no TXN ");
 
-    } else console.log("compile.js formatTXN("+sessionId+") no SESSION ");
-    // receiver will append this to sheetCells
     return bookingForm;
 
 }

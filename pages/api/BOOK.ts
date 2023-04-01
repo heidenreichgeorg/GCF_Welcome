@@ -24,27 +24,44 @@ export default function handler(
   req: NextApiRequest,
   res: NextApiResponse<any>
 ) {
-  //res.set('Access-Control-Allow-Origin', '*');
-  console.log("BOOK.handler query="+JSON.stringify(req.query));
+  if(req) {
+    //res.set('Access-Control-Allow-Origin', '*');
 
-  config =  init(/*app,*/ process.argv); // GH20221003 do that per module
+    if(req.query) {       
+      console.log("0060 BOOK.handler query="+JSON.stringify(req.query));
 
-  console.log("BOOK.handler config="+config);
+      config =  init(/*app,*/ process.argv); // GH20221003 do that per module
 
-  if(req && req.query && req.socket) {       
+      console.log("0062 BOOK.handler config="+config);
 
+      if(req.body) {       
+        reqBody = req.body;
+        client =  req.body.client;
+        year = req.body.year;
+        const query:JSON = <JSON><unknown> { "ext":"JSON", "client":client, "year":year  };
+        console.log("0064 BOOK.handler "+JSON.stringify(query));
+        sessionTime=timeSymbol();
+        nextSessionId= strSymbol(sessionTime+client+year+sessionTime);
 
-    reqBody = req.body;
-    client =  req.body.client;
-    year = req.body.year;
-    const query:JSON = <JSON><unknown> { "ext":"JSON", "client":client, "year":year  };
-    console.log("    BOOK.handler "+JSON.stringify(query));
-    sessionTime=timeSymbol();
-    nextSessionId= strSymbol(sessionTime+client+year+sessionTime);
+        signIn(config,query,req.socket.remoteAddress,res,bookTransaction); 
 
-      signIn(config,query,req.socket.remoteAddress,res,bookTransaction); 
+        
+      }
+      else {
+        console.log("0065 BOOK.handler  NO VALID req.body");
+        res.json({ id: '0123', code : "NO VALID req.body"});
+      }
+    }
+    else {
+      console.log("0063 BOOK.handler  NO VALID req.query");
+      res.json({ id: '0123', code : "NO VALID req.query"});
+    }
+  
   }
-  else res.json({ id: '0123', code : "NO VALID QUERY"})
+  else {
+    console.log("0061 BOOK.handler  NO VALID req");
+    res.json({ id: '0123', code : "NO VALID req"});
+  }
 }
 
 
@@ -98,6 +115,7 @@ function bookTransaction(session:any, res:NextApiResponse<any>) {
 }
 
 
+
 const debug=true;
 const debugWrite=true;
 
@@ -113,7 +131,11 @@ function bookSheet(session:any,tBuffer:string[]|null,sessionTime:String,nextSess
               var numLines = session.sheetCells.length;
               if(debugWrite) console.dir("1450 sheets.bookSheet ENTER "+JSON.stringify(tBuffer)+" into "+session.sheetName+ " for ("+client+","+year+") with "+numLines+" lines in sheet ");
               
-              if(tBuffer) {
+              // GH20230401
+              if(!tBuffer || tBuffer.length==0) {
+                if(debugWrite) console.dir("1451 sheets.bookSheet SAVE NO booking statement tBuffer ("+client+","+year+") #"+numLines);
+                session.sheetCells.pop();
+              } else {
                   // add hash
                   if(parseInt(tBuffer[0])>0) tBuffer[0]=(""+symbolic(tBuffer.join(''))); 
 
@@ -134,7 +156,7 @@ function bookSheet(session:any,tBuffer:string[]|null,sessionTime:String,nextSess
                   if(debugWrite) console.dir("1456 sheets.bookSheet SET SESSION  "+session.id + " "+session.client + " "+session.year + " --> "+JSON.stringify(Object.keys(session)));
                   
               }
-              else if(debugWrite) console.dir("1451 sheets.bookSheet SAVE NO booking statement tBuffer ("+client+","+year+") #"+numLines);
+              
           }
           else if(debugWrite) console.dir("1453 sheets.bookSheet SAVE NO DATA ("+client+","+year+")") ;
       }
