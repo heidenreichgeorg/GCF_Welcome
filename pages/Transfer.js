@@ -216,7 +216,8 @@ export default function Transfer() {
                             city={report.city} 
                             country={report.country}
                             sender = {report.given+" "+report.surname} 
-                            onPreBook={onPreBook}/>)
+                            onPreBook={onPreBook}
+                            key={i} />)
             )}
             <CreditorRow/> 
             <CreditorRow/>
@@ -293,9 +294,9 @@ function makeTransferData(response,iSelected) {
 }
 
 
-function CreditorRow({ given,surname,address,zip,city,country,sender,onPreBook }) {
+function CreditorRow({ given,surname,address,zip,city,country,sender,onPreBook,key }) {
     return(
-        <div className="attrLine" key={"Creditor"+i}>
+        <div className="attrLine" key={"Creditor"+key}>
             {   (sender && sender.length>2) ?
                 (<div className="FIELD MOAM" key={"pre"+sender}><input type="submit" className="key" value="PRE-BOOK" onClick={(e)=>onPreBook(e,sender)}/></div>
                 ):( <div>&nbsp;</div> )}   
