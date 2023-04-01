@@ -185,7 +185,7 @@ export default function Transfer() {
             <div className="FIELD XFER">
                         <select type="radio" key="acct0" id="acct0" name="acct0" onDrop={ignore} >
                             {arrAsst.map((reason,i) => (
-                                <option key={"reason2"+i} id={"reason2"+i} value={reason}>{reason}</option>
+                                <option key={"reason0"+i} id={"reason0"+i} value={reason}>{reason}</option>
                             ))}
                         </select>
                 </div>
@@ -203,13 +203,13 @@ export default function Transfer() {
                 <div className="FIELD XFER">
                         <select type="radio" key="acct2" id="acct2" name="acct2" onDrop={ignore} >
                             {arrAcct.map((reason,i) => (
-                                <option key={"reason0"+i} id={"reason0"+i} value={reason}>{reason}</option>
+                                <option key={"reason2"+i} id={"reason2"+i} value={reason}>{reason}</option>
                             ))}
                         </select>
                 </div>
             </div>
             <CreditorRow/>             
-            { creditorsT.map((report) => 
+            { creditorsT.map((report,i) => 
                 (<CreditorRow given={report.given} surname={report.surname} 
                             address={report.address} 
                             zip={report.zip} 
@@ -231,9 +231,9 @@ export default function Transfer() {
                 <div className="FIELD SEP"></div><div className="FIELD SEP"></div><div className="FIELD SEP"></div>
                 <div className="FIELD MOAM"><input type="submit" className="key" value="BOOK" onClick={(e)=>onBook(e)}/></div>
                 <div className="FIELD SEP"></div>
-                <div className="FIELD SNAM">{arrCred.join()}</div>
+                <div className="FIELD SNAM" key="aCredit">{arrCred.join()}</div>
                 <div className="FIELD SEP">AN</div>
-                <div className="FIELD SNAM">{arrDebt.join()}</div>
+                <div className="FIELD SNAM" key="aDebit">{arrDebt.join()}</div>
             </div>
             <CreditorRow/> 
             <CreditorRow/>
@@ -295,9 +295,9 @@ function makeTransferData(response,iSelected) {
 
 function CreditorRow({ given,surname,address,zip,city,country,sender,onPreBook }) {
     return(
-        <div className="attrLine">
+        <div className="attrLine" key={"Creditor"+i}>
             {   (sender && sender.length>2) ?
-                (<div className="FIELD MOAM"><input type="submit" className="key" value="PRE-BOOK" onClick={(e)=>onPreBook(e,sender)}/></div>
+                (<div className="FIELD MOAM" key={"pre"+sender}><input type="submit" className="key" value="PRE-BOOK" onClick={(e)=>onPreBook(e,sender)}/></div>
                 ):( <div>&nbsp;</div> )}   
             <div className="FIELD SEP"> &nbsp;</div>
             <div className="FIELD XFER"> {given}</div>
