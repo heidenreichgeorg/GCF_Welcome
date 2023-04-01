@@ -418,8 +418,11 @@ function makeXLTabs(sheetCells,jAssets,jHistory,jSchema,jPartner,jBalance,jXBRL,
                 excelAddrT.push(arrLine);
                 numAddrs++;
             }                       
-        } else console.dir("1433 sheets.makeXLTabs NO ADDR tab");
-    } catch(err) {console.dir("1431 sheets.makeXLTabs ADDR tab: "+err);}
+        } else {
+            excelAddrT.push("WRITING CREDITORS: NO CREDITORS tab");
+            console.dir("1433 sheets.makeXLTabs NO CREDITORS tab");
+        }
+    } catch(err) {console.dir("1431 sheets.makeXLTabs CREDITORS tab: "+err);}
 
 
 
