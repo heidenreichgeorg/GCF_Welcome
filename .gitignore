@@ -17,6 +17,7 @@
 
 # misc
 /sec/
+/entity/
 .DS_Store
 *.pem
 

@@ -3,9 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev . root=C:/workspace/GCF_Welcome/sec/ config=bookingpages",
+    "dev": "next dev . root=C:/workspace/GCF_Welcome/entity/ config=bookingpages",
     "build": "next build",
-    "start": "next start . root=./sec config=bookingpages",
+    "start": "next start . root=./entity config=bookingpages",
     "lint": "next lint"
   },
   "browser": {

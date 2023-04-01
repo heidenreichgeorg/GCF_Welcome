@@ -1,13 +1,13 @@
 #package.json
   "scripts": {
-    "dev":     "next dev . root=C:/workspace/GCF_Welcome/sec/ config=bookingpages",
-    "start": "next start . root=./sec config=bookingpages",
+    "dev":     "next dev . root=C:/workspace/GCF_Welcome/entity/ config=bookingpages",
+    "start": "next start . root=./entity config=bookingpages",
 
 #docker-compose-yml
     ports:
       - 3000:3000
     volumes:
-      - ./sec:/usr/src/app/sec:ro
+      - ./entity:/usr/src/app/entity:rw
 
 npm run dev
 
@@ -45,10 +45,10 @@ cd booking
 
 docker-compose up
 
-# /usr/src/app  ln -s /home/georg/booking/sec sec
+# /usr/src/app  ln -s /home/georg/booking/entity entity
 
 # volumes: 
-#    ./sec:/usr/src/app/sec
+#    ./entity:/usr/src/app/entity
 
 ##docker run --rm -it --network host --name fin1 bookingkg/finreport
 
