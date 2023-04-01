@@ -20,7 +20,6 @@ export default function Status() {
     const [sheet, setSheet]  = useState()
     const [ year, setYear]   = useState()
     const [client,setClient] = useState()
-
     const { session, status } = useSession()
 
     useEffect(() => {
@@ -34,7 +33,27 @@ export default function Status() {
         }
     }, [status])
 
-    if(!sheet) return 'Loading Status...';
+    function login() {
+        let params = new URLSearchParams(window.location.search);
+        console.log("PARAMS "+JSON.stringify(params));
+        let cAuth=document.getElementById('auth');
+        if(cAuth) {
+            let url = "/Status?client="+params.get("client")+"&year="+params.get("year")+"&auth="+cAuth.value;
+            console.log("OPEN "+url);
+            window.open(url);
+        }
+    }
+
+    if(!sheet) return (
+        
+            <div className = "attrLine">
+                <div className="FIELD XFER">'Authenticate:...'</div>
+                <div className="FIELD MOAM"><input key="auth" id="auth" type="edit"></input></div>
+                <div className="FIELD MOAM"><div key="go" className="KEY" onClick={login}>AUTH</div>
+                </div>
+            </div>
+        
+    );
     
     function prevFunc() {console.log("CLICK PREVIOUS"); window.location.href="/Partner?client="+client+"&year="+year; } 
     function nextFunc() {  console.log("CLICK NEXT");   window.location.href="/Transfer?client="+client+"&year="+year; }
