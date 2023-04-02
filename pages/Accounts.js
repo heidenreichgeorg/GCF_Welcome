@@ -47,7 +47,7 @@ export default function Accounts() {
     return (
         <Screen prevFunc={prevFunc} nextFunc={nextFunc} tabSelector={pageText} tabName={tabName}>
             { aStands.map((report,n)=>
-                <div className="ulliTab" key={"Accounts0"+n} id={tabName+n} style= {{ 'display': aPages[n]}} >
+                <div className="SWITCH" key={"Accounts0"+n} id={tabName+n} style= {{ 'display': aPages[n]}} >
                     <div className="attrLine">{[
                         page.AcctOpen+' '+session.year,
                         page.AcctClose+' '+session.year,

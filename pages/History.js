@@ -66,7 +66,7 @@ export default function History() {
     let sum ={ value:" 12,34"};
     let aPattern = getParam("APATTERN");
 
-    function makeLabel(index) { return session.client+session.year+aPattern+index}
+    function makeLabel(index) { return (aPattern && aPattern.length>0) ?session.client+session.year+aPattern+index : ""}
 
     const tabName = 'HistoryContent';
     return (
@@ -84,7 +84,7 @@ export default function History() {
             { !isOpen && (<SearchForm token={strToken} ></SearchForm>) }
             
             {aPages.map((m,n) => ( 
-                <div className="ulliTab"  key={"History0"+n}  id={tabName+n} style= {{ 'display': m }} >
+                <div className="SWITCH"  key={"History0"+n}  id={tabName+n} style= {{ 'display': m }} >
                     { !isOpen && (sHistory.slice(n*SCREEN_TXNS,(n+1)*SCREEN_TXNS).map((row,k) => (  
                         <SigRow  key={"History2"+k} row={row} index={n} client={session.client}  year={session.year}/>  
                     )))}
@@ -285,7 +285,7 @@ function TXNReceipt(sym,sum,id) {
     }
 
     return(
-        <div className="ulliTab" id="PageContentReceipt">
+        <div className="SWITCH" id="PageContentReceipt">
             <div className="BIGCELL">
                 <BalanceRow text={aSelText[sym].join(' ')} level7={level7} level6={level6} level5={level5} level4={level4} level3={level3} level2={level2} level1={level1} level0={level0}/>
                 {id}

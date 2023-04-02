@@ -142,7 +142,7 @@ function StatusRow({ am1,tx1, am2, tx2, am3, tx3, d, n, l, click}) {
             <div className="FIELD SNAM"> {n}</div>
             <div className="FIELD">{l}</div>
             {click==null ? (<div className="FIELD SEP"> &nbsp;</div>) : (
-            <div className="key"  onClick={(() => click())}>&nbsp;X&nbsp;</div>
+            <div className="FIELD"  onClick={(() => click())}>&nbsp;.&nbsp;</div>
             ) }
         </div>
     )

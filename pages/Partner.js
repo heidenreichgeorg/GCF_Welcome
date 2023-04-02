@@ -125,7 +125,7 @@ export default function Partner() {
 
             {Object.keys(jReport).map((_,partnerNo) => ( 
 
-                <div  key={"Partner0"+partnerNo}  className="ulliTab" id={tabName+partnerNo} style= {(partnerNo==0?{ 'display': 'block'}:{ 'display': 'none'})} >
+                <div  key={"Partner0"+partnerNo}  className="SWITCH" id={tabName+partnerNo} style= {(partnerNo==0?{ 'display': 'block'}:{ 'display': 'none'})} >
                     
                     { shortReport.map((row,i)=> (
                         <HGB275Row  key={"Partner1"+i}  jArgs={row} id={"Args"+i} />

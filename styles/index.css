@@ -4,7 +4,6 @@ body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
 
 .dosBorder{  padding: 14px; border-style: none; border-radius: 10px; border-width: 2px; border-color: #AEADAE;  background-color: #FFF; color: #0F0F0F; }
 .mTable   { font-family: Bahnschrift,monospace;                             height: 18px;             display:table;    page-break-after: always  }
-.ulliTab  {      padding: 1px; border: none; font-size: 12px; font-weight:400;  } 
 
 
 input  { color:#0F0F0F; background-color:inherit; font-family :Bahnschrift; font-size: 10px;  width:80px;}
@@ -27,6 +26,7 @@ input[type=range] { -webkit-appearance: none;  width: 200px; margin: 0; padding:
 .key      {  height:16px;  margin: 0px; border-color: rgb(167, 152, 152); border-style: solid; float: left; background-color:transparent; font-family:  inherit; font-size: inherit; font-weight:600; color: #000; }
 .box      {  height:40px;  margin: 0px; border-color: gray;               border-style: solid; float: left; background-color:transparent; font-family:  inherit; font-size: inherit; font-weight:600; color: #000; }
 
+.SWITCH  {                   padding: 1px; border: none; font-size: 12px; font-weight:400;  } 
 .BIGCELL {                   padding: 1px;               float: left; color:inherit;min-height: 48px; font-family: inherit; font-size: 11px; font-weight:400; text-align: center; background-color: inherit; } 
 .FIELD    { overflow:hidden; padding: 1px; border: none; float: left;                                 font-family: inherit; font-size: inherit; font-weight:inherit; color: inherit;} 
 
