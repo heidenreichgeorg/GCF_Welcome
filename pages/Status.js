@@ -106,7 +106,7 @@ export default function Status() {
     const aNums = [0];
     return (
         <Screen prevFunc={prevFunc} nextFunc={nextFunc} tabSelector={aNums} >
-            <StatusRow am1={page.Assets} am2={page.GainLoss}  am3={page.eqliab}/>
+            <StatusRow am1={page.Assets} am2={page.Gain}  am3={page.eqliab}/>
             {
                 report.map((row,l) => (
                     <StatusRow  key={"Status"+l}  

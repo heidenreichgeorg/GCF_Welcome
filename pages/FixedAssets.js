@@ -47,7 +47,7 @@ export default function FixedAssets() {
     return (
         <Screen prevFunc={prevFunc} nextFunc={nextFunc} tabSelector={aPages} >
             
-            <div className="SWITCH" id={"faPageContent1"} style= {{ 'display': 'block' }} >
+            <div className="FIELD" id={"faPageContent1"} style= {{ 'display': 'block' }} >
             <FixedAssetsRow p={ {'idnt':'Name', 'type':'WKN/Typ', 
                         'date':page.AcquisitionDate,
                         'init':page.AcquisitionPrice, 

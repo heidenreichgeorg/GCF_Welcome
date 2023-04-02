@@ -44,7 +44,7 @@ export default function Balance() {
     return (
         <Screen prevFunc={prevFunc} nextFunc={nextFunc} tabSelector={pageText} tabName={tabName}>
             {report.map((balance,n) => (
-                <div className="SWITCH" key={"Balance0"+n} id={tabName+n} style= {{ 'display': aPages[n]}} >
+                <div className="FIELD" key={"Balance0"+n} id={tabName+n} style= {{ 'display': aPages[n]}} >
                     <div className="attrLine">{[page.BalanceOpen,page.BalanceClose,page.BalanceNext][n] + ' ' + (parseInt(session.year))}</div>
                     {JSON.parse(balance).map((row,i) => ( 
                         <BalanceRow  key={"Balance"+n+"1"+i} jArgs={row} id={i} />    

@@ -83,6 +83,7 @@ let de_DE = {
     BalanceClose:"Bilanz mit Gewinn",
     BalanceNext:"Bilanz Folgejahr",
     GainLoss:"Gewinn/ Verlust",
+    Gain:"Gewinn",
     History:"Buchungen",
     Patterns:"Vorlagen",
     Status:"Status",
@@ -338,7 +339,7 @@ export function compile(sessionData) {
                     }
                     else if(key && key==='K') {
                         // N1.author N2.residence  I1.iban I2.register I3.taxnumber  K1.reportYear K2.client
-                        result[D_Schema].reportYear= row[2];
+                        result[D_Schema].reportYear= sessionData.year; //row[2]; GH20230402
                         result[D_Schema].client    = row[3];
                     }
                     else if(key && key==='A') {
