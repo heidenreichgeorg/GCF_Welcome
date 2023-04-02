@@ -4,7 +4,7 @@ body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
 
 .dosBorder{  padding: 14px; border-style: none; border-radius: 10px; border-width: 2px; border-color: #AEADAE;  background-color: #FFF; color: #0F0F0F; }
 .mTable   { font-family: Bahnschrift,monospace;                             height: 18px;             display:table;    page-break-after: always  }
-.ulliTab  {      padding: 1px; border: none;  font-size: 12px; font-weight:400;  } 
+.ulliTab  {      padding: 1px; border: none; font-size: 12px; font-weight:400;  } 
 
 
 input  { color:#0F0F0F; background-color:inherit; font-family :Bahnschrift; font-size: 10px;  width:80px;}

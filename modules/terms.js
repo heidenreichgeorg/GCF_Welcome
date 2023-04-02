@@ -10,7 +10,7 @@ export const  D_Schema  = "Schema";
 export const  D_Muster = "Muster";
 export const  D_SteuerID = "SteuerID";
 export const  D_Adressen="Adressen";
-
+export const  D_Receipts="Belege"
 
 export const  X_ASSETS = 'de-gaap-ci_bs.ass';
 export const  X_ASS_CASH ='de-gaap-ci_bs.ass.currAss.cashEquiv';

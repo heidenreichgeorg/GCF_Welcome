@@ -3,15 +3,18 @@
 
 import { useEffect, useState } from 'react';
 
-import { D_History, D_Page, D_Schema, SCREENLINES }  from '../modules/terms.js';
+import { D_History, D_Page, D_Receipts, D_Schema, SCREENLINES }  from '../modules/terms.js';
 import Screen from '../pages/Screen'
 import FooterRow from '../components/FooterRow'
 import { cents2EU }  from '../modules/money';
 import { getParam, symbolic }  from '../modules/App';
 import { CSEP,prettyTXN }  from '../modules/writeModule';
 import { useSession } from '../modules/sessionmanager';
+import { bigEUMoney } from '../modules/money.mjs';
 
 const SCREEN_TXNS=2+parseInt(SCREENLINES/3);
+
+const VOID ="-,--";
 
 var funcShowReceipt=null;
 var funcHideReceipt=null;
@@ -61,6 +64,9 @@ export default function History() {
     aPages[0]='block';
    
     let sum ={ value:" 12,34"};
+    let aPattern = getParam("APATTERN");
+
+    function makeLabel(index) { return session.client+session.year+aPattern+index}
 
     const tabName = 'HistoryContent';
     return (
@@ -68,8 +74,10 @@ export default function History() {
 
             {isOpen && (
                 <div>                    
-                    <button onClick={() => funcHideReceipt()}>Belege</button>
-                    { Object.keys(aSelText).map((sym) => ( aSelText[sym] ? TXNReceipt(sym,sum) : "" )) }
+                    <button onClick={() => funcHideReceipt()}>{D_Receipts}</button>
+                    { Object.keys(aSelText).map((sym,i) => ( aSelText[sym] ? 
+                                                            TXNReceipt(sym,sum,makeLabel(i)) :
+                                                             "" )) }
                 </div>
             )}
 
@@ -124,7 +132,7 @@ function SigRow({row,index,client,year}) {
     } catch(err) {}
 
     let saldo="";
-    if(isNaN(row.saldo)) saldo="-,--";
+    if(isNaN(row.saldo)) saldo=VOID;
     else saldo = cents2EU(row.saldo); // cents2EU
 
     let id= ((aRow[0].substring(4).replace(/\D/g, ""))+symbolic(aRow.join('')+mRow.join('')));
@@ -141,11 +149,11 @@ function SigRow({row,index,client,year}) {
                                         </label></div>
                 <div className="FIELD TAX">{aRow[0]}</div>
                 <div className="FIELD SEP">&nbsp;</div>
-                <div className="FIELD LNAM">{aRow[1]}</div>
-                <div className="FIELD LNAM">{aRow[2]}</div>
-                <div className="FIELD LNAM">{aRow[3]}</div>
-                <div className="FIELD LNAM">{aRow[4]}</div>
-                <div className="FIELD LNAM">{aRow[5]}</div>
+                <div className="FIELD IDNT">{aRow[1]}</div>
+                <div className="FIELD IDNT">{aRow[2]}</div>
+                <div className="FIELD IDNT">{aRow[3]}</div>
+                <div className="FIELD IDNT">{aRow[4]}</div>
+                <div className="FIELD IDNT">{aRow[5]}</div>
             </div>
             <div className="attrLine">
                 <div className="FIELD SEP">&nbsp;</div>
@@ -245,7 +253,7 @@ function SearchForm(token) {
     )
 }
 
-function TXNReceipt(sym,sum) {
+function TXNReceipt(sym,sum,id) {
     let amounts = aSelMoney[sym];
     let level7="";
     let level6="";
@@ -256,6 +264,7 @@ function TXNReceipt(sym,sum) {
     let level1="";
     let level0="";
     level0=aSelSaldo[sym]; 
+    if(level0==VOID) id="";
     if(amounts) { 
         if(amounts.length>0) { level7=amounts[0];
             if(amounts.length>1) { level6=amounts[1];
@@ -279,11 +288,12 @@ function TXNReceipt(sym,sum) {
         <div className="ulliTab" id="PageContentReceipt">
             <div className="BIGCELL">
                 <BalanceRow text={aSelText[sym].join(' ')} level7={level7} level6={level6} level5={level5} level4={level4} level3={level3} level2={level2} level1={level1} level0={level0}/>
+                {id}
             </div>
         </div>
 )}      
 
-function BalanceRow({text,level7,level6,level5,level4,level3,level2,level1,level0}) { 
+function BalanceRow({text,level7,level6,level5,level4,level3,level2,level1,level0,id}) { 
     return (
         <div className="attrLine">
             <div className="FIELD L280">{text}</div>
@@ -295,6 +305,7 @@ function BalanceRow({text,level7,level6,level5,level4,level3,level2,level1,level
             <div className="FIELD MOAM">{level2}</div>
             <div className="FIELD MOAM">{level1}</div>
             <div className="FIELD MOAM">{level0}</div>
+            <div className="FIELD MOAM">{id}</div>
         </div>
     )
 }
