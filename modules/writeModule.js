@@ -102,6 +102,7 @@ export function prettyTXN(jHistory,hash,lPattern,aPattern,names,aLen,eLen) {
         }
     }
 
+    result.raw=parts;
     result.txnAcct=txnAcct;
     result.entry=entry;
     result.delta=delta;

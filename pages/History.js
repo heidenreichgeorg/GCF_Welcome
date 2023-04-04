@@ -1,6 +1,4 @@
 
-
-
 import { useEffect, useState } from 'react';
 
 import { D_History, D_Page, D_Receipts, D_Schema, J_ACCT, SCREENLINES }  from '../modules/terms.js';
@@ -19,7 +17,6 @@ const VOID ="-,--";
 var funcShowReceipt=null;
 var funcHideReceipt=null;
 var aSelText = {};
-var aSelMoney = {};
 var aJMoney = {};
 var aSelSaldo = {};
 
@@ -30,25 +27,41 @@ export default function History() {
     const { session, status } = useSession()   
     const [ sheet,  setSheet] = useState(null)
     const [isOpen, setIsOpen] = useState(false);
- 
+    const [jHeads, setJHeads] = useState({});
+
+    function removeCol(name) { console.log("REMOVE "+name); jHeads[name]='0'; setJHeads(JSON.parse(JSON.stringify(jHeads)));  }
+
     funcShowReceipt = (() => setIsOpen(true));
     funcHideReceipt = (() => setIsOpen(false));
 
     useEffect(() => {
     // run each rendering and re-rendering
         aSelText = {};
-        aSelMoney = {};
         aJMoney = {};
         if(status !== 'success') return;
             let state = null;
             try { state=JSON.parse(sessionStorage.getItem('session')); } catch(err) {}
             if(state && Object.keys(state).length>5) {
                 setSheet(state.generated);
+
+                if(state.generated) {
+                    let jColumnHeads={}; 
+                    let names=state.generated[D_Schema].Names;
+                    names.slice(6).forEach(acct => { if(acct.length>2) jColumnHeads[acct]='1'; });
+                    setJHeads(jColumnHeads);            
+                    console.log("INIT PAGE "+JSON.stringify(jColumnHeads))
+                }
             }
     }, [status])
 
+
     if(!sheet) return null; //'Loading...';
 
+    /*
+    useEffect(() => {
+        
+    }, [])
+*/
     const pageGlobal = sheet[D_Page];
 
     function token() { return { client:session.client, year:session.year }}
@@ -59,6 +72,7 @@ export default function History() {
     function nextFunc() {  console.log("CLICK NEXT");   window.location.href="/Operations?client="+session.client+"&year="+session.year; }
 
     let page = sheet[D_Page];
+    let names = sheet[D_Schema].Names;
     let sHistory=makeHistory(sheet);
     let sPages = (sHistory.length+1) / SCREEN_TXNS;    
     let strToken=token();
@@ -70,19 +84,24 @@ export default function History() {
        
     let aPattern = getParam("APATTERN");
 
-    let jColumnHeads={};
-    let jMoney={};
+    let jColumnHeads=jHeads; // state variable, do not touch
+    let jSum={};
+    Object.keys(jHeads).forEach(acct=>{jSum[acct]="0,00";});  
+
     if(isOpen) {
-        Object.keys(aSelMoney).forEach(sym => 
-            {if(aSelMoney[sym])  (aSelMoney[sym].forEach(acctAmount => { 
-                if(acctAmount.length>5) {   let pair=acctAmount.split(':'); 
-                                            if(bigEUMoney(pair[1])!=0n) { 
-                                                jColumnHeads[pair[0]]=pair[0];
-                                                jMoney[pair[0]]="0,00";
-                 } } }))
+        Object.keys(aSelText).forEach(sym => 
+            {if(aJMoney[sym])  (names.forEach(acct => { 
+                if(acct.length>2 && jColumnHeads[acct]=='1') {   
+                                            let value=aJMoney[sym][acct]; 
+                                            if(bigEUMoney(value)!=0n) { 
+                                                //jSum[acct]="0,00";  
+                                                try { jColumnHeads[acct]=acct; } catch(e) {}
+                                            }
+                  } }))
             })
     }
-    console.log("UNIFY jMoney "+JSON.stringify(jMoney));
+    console.log("INIT jColumnHeads "+JSON.stringify(jColumnHeads));
+    console.log("UNIFY jSum "+JSON.stringify(jSum));
 
     function makeLabel(index) { return (aPattern && aPattern.length>0) ?session.client+session.year+aPattern+index : ""}
 
@@ -95,16 +114,17 @@ export default function History() {
                 (
                 <div>                     
                     <button onClick={() => funcHideReceipt()}>{D_Receipts}</button>
-                    <TXNReceiptHeader text="" jAmounts={jColumnHeads} jColumnHeads={jColumnHeads} id="" />                   
+                    <TXNReceiptHeader text="" jAmounts={jColumnHeads} jColumnHeads={jColumnHeads} id="" removeCol={removeCol}/>                   
                     { Object.keys(aSelText).map((sym,i) => ( (aSelText[sym] && i>2) ? 
                                                             TXNReceipt(
                                                                 aSelText[sym].join(' '),
                                                                 aJMoney[sym],
                                                                 jColumnHeads,
-                                                                jMoney,
+                                                                jSum,
                                                                 (aSelSaldo[sym]==VOID)?"":makeLabel(i)) :
-                                                                    "" )) }
-                    <TXNReceiptHeader text="" jAmounts={jMoney} jColumnHeads={jColumnHeads} id="" />                                                                                       
+                                                                    ""
+                                                                    )) }
+                    <TXNReceiptHeader text="" jAmounts={jSum} jColumnHeads={jColumnHeads} id="" removeCol={removeCol}/>                                                                                       
                 </div>
             )}
 
@@ -113,7 +133,7 @@ export default function History() {
             {aPages.map((m,n) => ( 
                 <div className="FIELD"  key={"History0"+n}  id={tabName+n} style= {{ 'display': m }} >
                     { !isOpen && (sHistory.slice(n*SCREEN_TXNS,(n+1)*SCREEN_TXNS).map((row,k) => (  
-                        <SigRow  key={"History2"+k} row={row} index={n} client={session.client}  year={session.year}/>  
+                        <SigRow  key={"History2"+k} row={row} index={n} client={session.client}  year={session.year} />  
                     )))}
                     <div className="attrline">&nbsp;</div>
                     <FooterRow left={page["client"]}  right={page["register"]} prevFunc={prevFunc} nextFunc={nextFunc}/>
@@ -126,73 +146,64 @@ export default function History() {
 }
 
 
-function handleChange(target,aRow,mRow) {
-    
-    let id= ((aRow[0].substring(4).replace(/\D/g, ""))+symbolic(aRow.join('')+mRow.join('')));
+function handleChange(target,aRow,tRow,id) {
+        
     console.log("click "+id+"="+JSON.stringify(aRow));
     
     if(aSelText) {    
         if(aSelText && aSelText[id] && aSelText[id].length>0) {
             console.log("DESELECT "+id);
             aSelText[id]=null;
-            aSelMoney[id]=null;
             aSelSaldo[id]=null;
             target.value='';
             aJMoney[id]={};
         } else  {
             console.log("SELECT "+id);
             aSelText[id]=aRow;
-            aSelMoney[id]=mRow;
             aSelSaldo[id]="0";
-            console.log("handleChange "+JSON.stringify(mRow))
-            let jLine={};
-            mRow.forEach(acctAmount => { 
-                if(acctAmount.length>5) {   let pair=acctAmount.split(':'); 
-                                            if(bigEUMoney(pair[1])!=0n) { 
-                                                jLine[pair[0]]=pair[1];                                                
-                 } } })
-            aJMoney[id]=jLine;
+            aJMoney[id]=tRow;
+            console.log("handleChange "+JSON.stringify(tRow))
         }
     }
 }
 
 function SigRow({row,index,client,year}) {
+
     let aRow = [0n,0n,0n,0n,0n,0n]
-    try { let saRow = row.sig;
+    try { let saRow = row.entry;
         aRow = saRow.split(CSEP);
-     } catch(err) {  aRow=[""+index+client+year,""+year+index+client] }
-    
-    let mRow =  [0n,0n,0n,0n,0n,0n]
-    try { let moneyRow = row.money;
-        mRow = moneyRow.split(CSEP); // only name-value pairs
+    } catch(err) {  aRow=[""+index+client+year,""+year+index+client] }    
+
+    let tRow =  {};
+    try { let moneyRow = row.jMoney;
+        tRow = moneyRow; //  name-value pairs with sign
     } catch(err) {}
 
     let saldo="";
     if(isNaN(row.saldo)) saldo=VOID;
     else saldo = cents2EU(row.saldo); // cents2EU
 
-    let id= ((aRow[0].substring(4).replace(/\D/g, ""))+symbolic(aRow.join('')+mRow.join('')));
+    let id= ((aRow[0].substring(4).replace(/\D/g, ""))+symbolic(aRow.join('')+JSON.stringify(tRow)));
 
     var selectAll = getParam("SELECTALL");
     if(selectAll && selectAll.length<1) selectAll=null;
     if(selectAll) { 
         aSelText[id]=aRow;  
-        aSelMoney[id]=mRow; 
-        aSelSaldo[id]=""+saldo;  
-        let jLine={};
-        mRow.forEach(acctAmount => { 
-            if(acctAmount.length>5) {   let pair=acctAmount.split(':'); 
-                                        if(bigEUMoney(pair[1])!=0n) { 
-                                            jLine[pair[0]]=pair[1];                                                
-             } } })
-        aJMoney[id]=jLine;
+        aJMoney[id]=tRow;
+        aSelSaldo[id]=""+saldo;         
     }
 
     var checked=(aSelSaldo[id]!=null);
+
+    let mRow=[];
+    //mRow=Object.keys(tRow).map((a)=>(a&&tRow[a]?a+":"+tRow[a]:""));
+    //console.log("SigRow j="+JSON.stringify(Object.keys(tRow)));
+    //Object.keys(tRow)
+
     return (
         <div className="BIGCELL">
             <div className="attrLine" id={id}>
-                <div className="FIELD SYMB"><label><input TYPE="CHECKBOX" onChange={(event) => handleChange(event.target,aRow,mRow)} defaultChecked={checked} />
+                <div className="FIELD SYMB"><label><input TYPE="CHECKBOX" onChange={(event) => handleChange(event.target,aRow,tRow,id)} defaultChecked={checked} />
                                         </label></div>
                 <div className="FIELD TAX">{aRow[0]}</div>
                 <div className="FIELD TAX">&nbsp;{index}</div>
@@ -223,17 +234,15 @@ function makeHistory(sheet) {
     console.log("makeHistory sheet="+Object.keys(sheet));
  
     const arrHistory = [];                
-    //const response = JSON.parse(strText);
     const jHistory  = sheet[D_History];
     let aLen = parseInt(sheet[D_Schema].assets);
     let eLen = parseInt(sheet[D_Schema].eqliab);
     const gSchema = sheet[D_Schema];
     const pageGlobal = sheet[D_Page];
 
-
-     if(pageGlobal) {
+    if(pageGlobal) {
         
-        arrHistory.push({sig:CSEP+CSEP+pageGlobal["History"]+CSEP+pageGlobal["header"]+CSEP+CSEP,money:CSEP+CSEP+CSEP+CSEP+CSEP});
+        arrHistory.push({entry:CSEP+CSEP+pageGlobal["History"]+CSEP+pageGlobal["header"]+CSEP+CSEP});
         
         // 20220701
         var lPattern = getParam("LPATTERN");
@@ -241,7 +250,6 @@ function makeHistory(sheet) {
 
         var aPattern = getParam("APATTERN");
         if(aPattern && aPattern.length<2) aPattern=null;
-
 
         if(gSchema.Names && gSchema.Names.length>0) {
             var names=gSchema.Names;
@@ -253,33 +261,26 @@ function makeHistory(sheet) {
 
                 // GH 20220703
                 if(jPrettyTXN.txnAcct) {
-                    let txn = jHistory[hash];
+                    let txn = jPrettyTXN.raw;
                    
-                    // GH20221228 see ['','AN'] in App.js turened to ['AN'] 
-                    let data = (
-                        jPrettyTXN.entry.join(CSEP)
-                        +CSEP+jPrettyTXN.credit.join(CSEP)
-                        +CSEP+jPrettyTXN.debit.join(CSEP)+CSEP+CSEP+CSEP
-                        ).split(CSEP);
-                   
-                    var i=0;
-                    var sigLine=[];
-                    for (i=0;i< J_ACCT;i++) { sigLine.push(data[i]); }  
-                    
-                    var moneyLine=[];
-                    for (i=J_ACCT;i<14;i++) { moneyLine.push(data[i]); }  
+                    // GH20221228 see ['','AN'] in App.js turned to ['AN'] 
+                        //jPrettyTXN.credit.join(CSEP)
+                        //jPrettyTXN.debit.join(CSEP)+CSEP+CSEP+CSEP
+                                           
+                    var i=0;                    
+                    var lMoney = {};
+                    for (i=J_ACCT;i<txn.length;i++) { if(i!=aLen && i!=eLen && txn[i] && txn[i].length>1) lMoney[names[i]]=txn[i]; }  
 
-                    var jMoney = {};
-                    for (i=J_ACCT;i<txn.length;i++) { if(txn[i] && txn[i].length>2) jMoney[names[i]]=txn[i]; }  
+                    console.log("txn="+JSON.stringify(lMoney));
 
                     iSaldo += BigInt(jPrettyTXN.strSaldo);
                     
-                    arrHistory.push({'sig':sigLine.join(CSEP),'money':moneyLine.join(CSEP), 'jMoney':jMoney,  'saldo':""+(iSaldo) });                    
+                    arrHistory.push({'entry':jPrettyTXN.entry.join(CSEP), 'jMoney':lMoney,  'saldo':""+(iSaldo) });                    
                                  
                 }
             }
 
-            for (let i=1;i<SCREEN_TXNS;i++) arrHistory.push({sig:CSEP+CSEP+CSEP+CSEP+CSEP,money:CSEP+CSEP+CSEP+CSEP+CSEP+CSEP});
+            for (let i=1;i<SCREEN_TXNS;i++) arrHistory.push({entry:CSEP+CSEP+CSEP+CSEP+CSEP});
         }
     }
     return arrHistory;
@@ -302,22 +303,22 @@ function SearchForm(token) {
     )
 }
 
-function TXNReceipt(text,jAmounts,jColumnHeads,jMoney,id) {
+function TXNReceipt(text,jAmounts,jColumnHeads,jSum,id,removeCol) {
     
     Object.keys(jAmounts).forEach(acct=>{
         let value = jAmounts[acct];        
-        if(value && value.length>2) {   
-        //    console.log("TXNReceipt add "+JSON.stringify(pair));        
-            if(jMoney[acct]) jMoney[acct] = cents2EU(bigEUMoney(jMoney[acct]) + bigEUMoney(value));
+        if(jSum && value && value.length>2) {   
+            console.log("TXNReceipt "+acct+" add "+value);        
+            if(jSum[acct]) jSum[acct] = cents2EU(bigEUMoney(jSum[acct]) + bigEUMoney(value));
         }
     })
-    console.log("TXNReceipt jMoney "+JSON.stringify(jMoney));
+    if(jSum) console.log("TXNReceipt jSum "+JSON.stringify(jSum));
 
     return(
         <div className="FIELD" id={"PageContentReceipt"+id}>
             <div className="BIGCELL">
                 <div className="FIELD">{text} {id}</div>
-                <BalanceRow jHeads={jColumnHeads} jValues={jAmounts}/>
+                <BalanceRow jValues={jAmounts} jColumnHeads={jColumnHeads} removeCol={removeCol}/>
             </div>
         </div>
 )}      
@@ -325,24 +326,28 @@ function TXNReceipt(text,jAmounts,jColumnHeads,jMoney,id) {
 function TXNReceiptHeader(args) {
     console.log("HEAD "+JSON.stringify(args));
     //return (<div>TXNReceipt</div>);
-    return TXNReceipt(args.text,args.jAmounts,args.jColumnHeads,args.id);
+    return TXNReceipt(args.text,args.jAmounts,args.jColumnHeads,null,args.id,args.removeCol);
 }
 
+
 function BalanceRow(args) { 
-    let amounts = Object.keys(args.jHeads).map((c)=>(args.jValues[c]?args.jValues[c]:"-,--"));
+    let amounts =[]; let cols=[];
+    Object.keys(args.jColumnHeads).forEach(c=>
+        {if(args.jColumnHeads[c] && args.jColumnHeads[c].length>1) { cols.push(c); amounts.push(args.jValues[c]?args.jValues[c]:"-,--")}});
     return (
         <div className="attrLine">
-            <div className="FIELD MOAM">{amounts[0]}</div>
-            <div className="FIELD MOAM">{amounts[1]}</div>
-            <div className="FIELD MOAM">{amounts[2]}</div>
-            <div className="FIELD MOAM">{amounts[3]}</div>
-            <div className="FIELD MOAM">{amounts[4]}</div>
-            <div className="FIELD MOAM">{amounts[5]}</div>
-            <div className="FIELD MOAM">{amounts[6]}</div>
-            <div className="FIELD MOAM">{amounts[7]}</div>
-            <div className="FIELD MOAM">{amounts[8]}</div>
-            <div className="FIELD MOAM">{amounts[9]}</div>
-            <div className="FIELD MOAM">{amounts[10]}</div>
+            <div className="FIELD MOAM" onClick={()=>{args.removeCol(cols[ 0])}}>{amounts[ 0]}</div>
+            <div className="FIELD MOAM" onClick={()=>{args.removeCol(cols[ 1])}}>{amounts[ 1]}</div>
+            <div className="FIELD MOAM" onClick={()=>{args.removeCol(cols[ 2])}}>{amounts[ 2]}</div>
+            <div className="FIELD MOAM" onClick={()=>{args.removeCol(cols[ 3])}}>{amounts[ 3]}</div>
+            <div className="FIELD MOAM" onClick={()=>{args.removeCol(cols[ 4])}}>{amounts[ 4]}</div>
+            <div className="FIELD MOAM" onClick={()=>{args.removeCol(cols[ 5])}}>{amounts[ 5]}</div>
+            <div className="FIELD MOAM" onClick={()=>{args.removeCol(cols[ 6])}}>{amounts[ 6]}</div>
+            <div className="FIELD MOAM" onClick={()=>{args.removeCol(cols[ 7])}}>{amounts[ 7]}</div>
+            <div className="FIELD MOAM" onClick={()=>{args.removeCol(cols[ 8])}}>{amounts[ 8]}</div>
+            <div className="FIELD MOAM" onClick={()=>{args.removeCol(cols[ 9])}}>{amounts[ 9]}</div>
+            <div className="FIELD MOAM" onClick={()=>{args.removeCol(cols[10])}}>{amounts[10]}</div>
+            <div className="FIELD MOAM" onClick={()=>{args.removeCol(cols[11])}}>{amounts[11]}</div>
         </div>
     )
     

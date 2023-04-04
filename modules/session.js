@@ -53,7 +53,7 @@ export function signIn(config,query,remote,res,startSessionCB) {
 
 export function startSessionJSON(session,res) {
 
-    console.log("0038 startSessionJSON="+JSON.stringify(Object.keys(session))); 
+    if(debug) console.log("0038 startSessionJSON="+JSON.stringify(Object.keys(session))); 
 
     // START A NEW SESSION
     let time = timeSymbol();
