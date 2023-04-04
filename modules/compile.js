@@ -1,13 +1,13 @@
 
 
 
-const debug=2;
-const debugTax=1;
-const debugYield=1;
-const debugRegular=1;
+const debug=null;
+const debugTax=null;
+const debugYield=null;
+const debugRegular=null;
 
 // SETTING THIS WILL VIOLATE PRIVACY AT THE ADMIN CONSOLE !!! 
-const debugReport=1;
+const debugReport=null;
 
 
 

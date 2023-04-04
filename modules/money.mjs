@@ -10,7 +10,7 @@ function bigMoney(strAdd,factor,money) {
         var amount = strAdd.split(',');
         var plain = amount[0].replace('.', '').trim(); 
         if(plain.startsWith('-')) { factor=-1n * factor; plain=plain.slice(1); }
-        euros = BigInt(('0'+plain));
+        try { euros = BigInt(('0'+plain)); } catch(err) {}
         if(amount.length>1) { // GH 20201117
             const digits=amount[1]+"00";
             const strDigits=digits[0]+digits[1];

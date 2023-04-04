@@ -22,6 +22,7 @@ var aSelText = {};
 var aSelMoney = {};
 var aSelSaldo = {};
 
+// SCHEMA { acct:strValue }
 
 export default function History() {
 
@@ -46,6 +47,8 @@ export default function History() {
 
     if(!sheet) return null; //'Loading...';
 
+    const pageGlobal = sheet[D_Page];
+
     function token() { return { client:session.client, year:session.year }}
 
     console.log("session.server="+JSON.stringify(session.server));
@@ -62,22 +65,52 @@ export default function History() {
     let aPages = [];
     for(let p=1;p<sPages-1;p++) aPages[p]='none'; 
     aPages[0]='block';
-   
-    let sum ={ value:" 12,34"};
+       
     let aPattern = getParam("APATTERN");
 
+    let jColumnHeads={};
+    let jMoney={};
+    let arrHeads=[];
+    if(isOpen) {
+        Object.keys(aSelMoney).forEach(sym => 
+            {if(aSelMoney[sym])  (aSelMoney[sym].forEach(acctAmount => { 
+                if(acctAmount.length>5) {   let pair=acctAmount.split(':'); 
+                                            if(bigEUMoney(pair[1])!=0n) { 
+                                                jColumnHeads[pair[0]]=pair[0];
+                                                jMoney[pair[0]]=0n;
+                 } } }))
+            })
+
+        arrHeads=Object.keys(jColumnHeads).map((a)=>(a+":"+a));
+    }
+    
+
+    console.log("UNIFY arrHeads "+JSON.stringify(arrHeads));
+
     function makeLabel(index) { return (aPattern && aPattern.length>0) ?session.client+session.year+aPattern+index : ""}
+
+    
 
     const tabName = 'HistoryContent';
     return (
         <Screen prevFunc={prevFunc} nextFunc={nextFunc} tabSelector={isOpen ? [] : aPages.map((_,n)=>(1+n)) } tabName={tabName}>
 
-            {isOpen && (
-                <div>                    
+
+
+            {isOpen &&             
+                (
+                <div>                     
                     <button onClick={() => funcHideReceipt()}>{D_Receipts}</button>
-                    { Object.keys(aSelText).map((sym,i) => ( aSelText[sym] ? 
-                                                            TXNReceipt(sym,sum,makeLabel(i)) :
-                                                             "" )) }
+                    <TXNReceiptHeader text="" arrHeads={arrHeads} jColumnHeads={jColumnHeads} id="" />                   
+                    { Object.keys(aSelText).map((sym,i) => ( (aSelText[sym] && i>2) ? 
+                                                            TXNReceipt(
+                                                                aSelText[sym].join(' '),
+                                                                aSelMoney[sym],
+                                                                jColumnHeads,
+                                                                jMoney,
+                                                                (aSelSaldo[sym]==VOID)?"":makeLabel(i)) :
+                                                                    "" )) }
+                    <TXNReceiptHeader text="" arrHeads={Object.keys(jMoney).map((acct)=>(acct+":"+cents2EU(jMoney[acct])))} jColumnHeads={jColumnHeads} id="" />                   
                 </div>
             )}
 
@@ -127,8 +160,8 @@ function SigRow({row,index,client,year}) {
      } catch(err) {  aRow=[""+index+client+year,""+year+index+client] }
     
     let mRow =  [0n,0n,0n,0n,0n,0n]
-    try { let smRow = row.money;
-        mRow = smRow.split(CSEP);
+    try { let moneyRow = row.money;
+        mRow = moneyRow.split(CSEP); // only name-value pairs
     } catch(err) {}
 
     let saldo="";
@@ -148,7 +181,7 @@ function SigRow({row,index,client,year}) {
                 <div className="FIELD SYMB"><label><input TYPE="CHECKBOX" onChange={(event) => handleChange(event.target,aRow,mRow)} defaultChecked={checked} />
                                         </label></div>
                 <div className="FIELD TAX">{aRow[0]}</div>
-                <div className="FIELD SEP">&nbsp;</div>
+                <div className="FIELD TAX">&nbsp;{index}</div>
                 <div className="FIELD IDNT">{aRow[1]}</div>
                 <div className="FIELD IDNT">{aRow[2]}</div>
                 <div className="FIELD IDNT">{aRow[3]}</div>
@@ -253,59 +286,51 @@ function SearchForm(token) {
     )
 }
 
-function TXNReceipt(sym,sum,id) {
-    let amounts = aSelMoney[sym];
-    let level7="";
-    let level6="";
-    let level5="";
-    let level4="";
-    let level3="";
-    let level2="";
-    let level1="";
-    let level0="";
-    level0=aSelSaldo[sym]; 
-    if(level0==VOID) id="";
-    if(amounts) { 
-        if(amounts.length>0) { level7=amounts[0];
-            if(amounts.length>1) { level6=amounts[1];
-                if(amounts.length>2) { level5=amounts[2];
-                    if(amounts.length>3) { level4=amounts[3];
-                        if(amounts.length>4) { level3=amounts[4];
-                            if(amounts.length>5) { level2=amounts[5];
-                                if(amounts.length>6) { level1=amounts[6];
-                                    
-                                    
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+function TXNReceipt(text,arrHeads,jColumnHeads,jMoney,id) {
+    let jAmounts = {};
+    console.log("TXNReceipt1 "+JSON.stringify(jColumnHeads));
+    arrHeads.forEach(acctAmount=>{
+        let pair = acctAmount.split(':');        
+        if(pair.length>1 && pair[0] && pair[1] && pair[1].length>2) {
+            let acct = pair[0];
+            jAmounts[acct]=pair[1];             
+            if(jMoney) jMoney[acct] = jMoney[acct] + bigEUMoney(pair[1]);
         }
-    }
+    })
+    let amounts = Object.keys(jColumnHeads).map((acct) => jAmounts[acct]?jAmounts[acct]:"-"); 
+
+    console.log("TXNReceipt2 "+JSON.stringify(amounts));
 
     return(
-        <div className="FIELD" id="PageContentReceipt">
+        <div className="FIELD" id={"PageContentReceipt"+id}>
             <div className="BIGCELL">
-                <BalanceRow text={aSelText[sym].join(' ')} level7={level7} level6={level6} level5={level5} level4={level4} level3={level3} level2={level2} level1={level1} level0={level0}/>
-                {id}
+                <div className="FIELD">{text} {id}</div>
+                <BalanceRow amounts={amounts}/>
             </div>
         </div>
 )}      
 
-function BalanceRow({text,level7,level6,level5,level4,level3,level2,level1,level0,id}) { 
+function TXNReceiptHeader(args) {
+    console.log("HEAD "+JSON.stringify(args));
+    
+    return TXNReceipt(args.text,args.arrHeads,args.jColumnHeads,args.id);
+}
+
+function BalanceRow(amounts) { 
+    console.log("BalanceRow "+JSON.stringify(amounts));
     return (
         <div className="attrLine">
-            <div className="FIELD L280">{text}</div>
-            <div className="FIELD MOAM">{level7}</div>
-            <div className="FIELD MOAM">{level6}</div>
-            <div className="FIELD MOAM">{level5}</div>
-            <div className="FIELD MOAM">{level4}</div>
-            <div className="FIELD MOAM">{level3}</div>
-            <div className="FIELD MOAM">{level2}</div>
-            <div className="FIELD MOAM">{level1}</div>
-            <div className="FIELD MOAM">{level0}</div>
-            <div className="FIELD MOAM">{id}</div>
+            <div className="FIELD MOAM">{amounts.amounts[0]}</div>
+            <div className="FIELD MOAM">{amounts.amounts[1]}</div>
+            <div className="FIELD MOAM">{amounts.amounts[2]}</div>
+            <div className="FIELD MOAM">{amounts.amounts[3]}</div>
+            <div className="FIELD MOAM">{amounts.amounts[4]}</div>
+            <div className="FIELD MOAM">{amounts.amounts[5]}</div>
+            <div className="FIELD MOAM">{amounts.amounts[6]}</div>
+            <div className="FIELD MOAM">{amounts.amounts[7]}</div>
+            <div className="FIELD MOAM">{amounts.amounts[8]}</div>
+            <div className="FIELD MOAM">{amounts.amounts[9]}</div>
+            <div className="FIELD MOAM">{amounts.amounts[10]}</div>
         </div>
     )
 }
