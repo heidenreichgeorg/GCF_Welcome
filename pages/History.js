@@ -3,7 +3,7 @@
 
 import { useEffect, useState } from 'react';
 
-import { D_History, D_Page, D_Receipts, D_Schema, SCREENLINES }  from '../modules/terms.js';
+import { D_History, D_Page, D_Receipts, D_Schema, J_ACCT, SCREENLINES }  from '../modules/terms.js';
 import Screen from '../pages/Screen'
 import FooterRow from '../components/FooterRow'
 import { cents2EU }  from '../modules/money';
@@ -20,6 +20,7 @@ var funcShowReceipt=null;
 var funcHideReceipt=null;
 var aSelText = {};
 var aSelMoney = {};
+var aJMoney = {};
 var aSelSaldo = {};
 
 // SCHEMA { acct:strValue }
@@ -37,6 +38,7 @@ export default function History() {
     // run each rendering and re-rendering
         aSelText = {};
         aSelMoney = {};
+        aJMoney = {};
         if(status !== 'success') return;
             let state = null;
             try { state=JSON.parse(sessionStorage.getItem('session')); } catch(err) {}
@@ -70,47 +72,39 @@ export default function History() {
 
     let jColumnHeads={};
     let jMoney={};
-    let arrHeads=[];
     if(isOpen) {
         Object.keys(aSelMoney).forEach(sym => 
             {if(aSelMoney[sym])  (aSelMoney[sym].forEach(acctAmount => { 
                 if(acctAmount.length>5) {   let pair=acctAmount.split(':'); 
                                             if(bigEUMoney(pair[1])!=0n) { 
                                                 jColumnHeads[pair[0]]=pair[0];
-                                                jMoney[pair[0]]=0n;
+                                                jMoney[pair[0]]="0,00";
                  } } }))
             })
-
-        arrHeads=Object.keys(jColumnHeads).map((a)=>(a+":"+a));
     }
-    
-
-    console.log("UNIFY arrHeads "+JSON.stringify(arrHeads));
+    console.log("UNIFY jMoney "+JSON.stringify(jMoney));
 
     function makeLabel(index) { return (aPattern && aPattern.length>0) ?session.client+session.year+aPattern+index : ""}
 
-    
-
     const tabName = 'HistoryContent';
+        
     return (
         <Screen prevFunc={prevFunc} nextFunc={nextFunc} tabSelector={isOpen ? [] : aPages.map((_,n)=>(1+n)) } tabName={tabName}>
-
-
 
             {isOpen &&             
                 (
                 <div>                     
                     <button onClick={() => funcHideReceipt()}>{D_Receipts}</button>
-                    <TXNReceiptHeader text="" arrHeads={arrHeads} jColumnHeads={jColumnHeads} id="" />                   
+                    <TXNReceiptHeader text="" jAmounts={jColumnHeads} jColumnHeads={jColumnHeads} id="" />                   
                     { Object.keys(aSelText).map((sym,i) => ( (aSelText[sym] && i>2) ? 
                                                             TXNReceipt(
                                                                 aSelText[sym].join(' '),
-                                                                aSelMoney[sym],
+                                                                aJMoney[sym],
                                                                 jColumnHeads,
                                                                 jMoney,
                                                                 (aSelSaldo[sym]==VOID)?"":makeLabel(i)) :
                                                                     "" )) }
-                    <TXNReceiptHeader text="" arrHeads={Object.keys(jMoney).map((acct)=>(acct+":"+cents2EU(jMoney[acct])))} jColumnHeads={jColumnHeads} id="" />                   
+                    <TXNReceiptHeader text="" jAmounts={jMoney} jColumnHeads={jColumnHeads} id="" />                                                                                       
                 </div>
             )}
 
@@ -144,11 +138,20 @@ function handleChange(target,aRow,mRow) {
             aSelMoney[id]=null;
             aSelSaldo[id]=null;
             target.value='';
+            aJMoney[id]={};
         } else  {
             console.log("SELECT "+id);
             aSelText[id]=aRow;
             aSelMoney[id]=mRow;
             aSelSaldo[id]="0";
+            console.log("handleChange "+JSON.stringify(mRow))
+            let jLine={};
+            mRow.forEach(acctAmount => { 
+                if(acctAmount.length>5) {   let pair=acctAmount.split(':'); 
+                                            if(bigEUMoney(pair[1])!=0n) { 
+                                                jLine[pair[0]]=pair[1];                                                
+                 } } })
+            aJMoney[id]=jLine;
         }
     }
 }
@@ -172,7 +175,18 @@ function SigRow({row,index,client,year}) {
 
     var selectAll = getParam("SELECTALL");
     if(selectAll && selectAll.length<1) selectAll=null;
-    if(selectAll) { aSelText[id]=aRow;  aSelMoney[id]=mRow; aSelSaldo[id]=""+saldo; }
+    if(selectAll) { 
+        aSelText[id]=aRow;  
+        aSelMoney[id]=mRow; 
+        aSelSaldo[id]=""+saldo;  
+        let jLine={};
+        mRow.forEach(acctAmount => { 
+            if(acctAmount.length>5) {   let pair=acctAmount.split(':'); 
+                                        if(bigEUMoney(pair[1])!=0n) { 
+                                            jLine[pair[0]]=pair[1];                                                
+             } } })
+        aJMoney[id]=jLine;
+    }
 
     var checked=(aSelSaldo[id]!=null);
     return (
@@ -208,7 +222,6 @@ function makeHistory(sheet) {
 
     console.log("makeHistory sheet="+Object.keys(sheet));
  
-
     const arrHistory = [];                
     //const response = JSON.parse(strText);
     const jHistory  = sheet[D_History];
@@ -240,6 +253,7 @@ function makeHistory(sheet) {
 
                 // GH 20220703
                 if(jPrettyTXN.txnAcct) {
+                    let txn = jHistory[hash];
                    
                     // GH20221228 see ['','AN'] in App.js turened to ['AN'] 
                     let data = (
@@ -250,18 +264,20 @@ function makeHistory(sheet) {
                    
                     var i=0;
                     var sigLine=[];
-                    for (i=0;i< 6;i++) { sigLine.push(data[i]); }  
+                    for (i=0;i< J_ACCT;i++) { sigLine.push(data[i]); }  
                     
                     var moneyLine=[];
-                    for (i=6;i<14;i++) { moneyLine.push(data[i]); }  
+                    for (i=J_ACCT;i<14;i++) { moneyLine.push(data[i]); }  
+
+                    var jMoney = {};
+                    for (i=J_ACCT;i<txn.length;i++) { if(txn[i] && txn[i].length>2) jMoney[names[i]]=txn[i]; }  
 
                     iSaldo += BigInt(jPrettyTXN.strSaldo);
                     
-                    arrHistory.push({'sig':sigLine.join(CSEP),'money':moneyLine.join(CSEP), 'saldo':""+(iSaldo) });
+                    arrHistory.push({'sig':sigLine.join(CSEP),'money':moneyLine.join(CSEP), 'jMoney':jMoney,  'saldo':""+(iSaldo) });                    
                                  
                 }
             }
-//            let rHistory=arrHistory.reverse();
 
             for (let i=1;i<SCREEN_TXNS;i++) arrHistory.push({sig:CSEP+CSEP+CSEP+CSEP+CSEP,money:CSEP+CSEP+CSEP+CSEP+CSEP+CSEP});
         }
@@ -286,52 +302,49 @@ function SearchForm(token) {
     )
 }
 
-function TXNReceipt(text,arrHeads,jColumnHeads,jMoney,id) {
-    let jAmounts = {};
-    console.log("TXNReceipt1 "+JSON.stringify(jColumnHeads));
-    arrHeads.forEach(acctAmount=>{
-        let pair = acctAmount.split(':');        
-        if(pair.length>1 && pair[0] && pair[1] && pair[1].length>2) {
-            let acct = pair[0];
-            jAmounts[acct]=pair[1];             
-            if(jMoney) jMoney[acct] = jMoney[acct] + bigEUMoney(pair[1]);
+function TXNReceipt(text,jAmounts,jColumnHeads,jMoney,id) {
+    
+    Object.keys(jAmounts).forEach(acct=>{
+        let value = jAmounts[acct];        
+        if(value && value.length>2) {   
+        //    console.log("TXNReceipt add "+JSON.stringify(pair));        
+            if(jMoney[acct]) jMoney[acct] = cents2EU(bigEUMoney(jMoney[acct]) + bigEUMoney(value));
         }
     })
-    let amounts = Object.keys(jColumnHeads).map((acct) => jAmounts[acct]?jAmounts[acct]:"-"); 
-
-    console.log("TXNReceipt2 "+JSON.stringify(amounts));
+    console.log("TXNReceipt jMoney "+JSON.stringify(jMoney));
 
     return(
         <div className="FIELD" id={"PageContentReceipt"+id}>
             <div className="BIGCELL">
                 <div className="FIELD">{text} {id}</div>
-                <BalanceRow amounts={amounts}/>
+                <BalanceRow jHeads={jColumnHeads} jValues={jAmounts}/>
             </div>
         </div>
 )}      
 
 function TXNReceiptHeader(args) {
     console.log("HEAD "+JSON.stringify(args));
-    
-    return TXNReceipt(args.text,args.arrHeads,args.jColumnHeads,args.id);
+    //return (<div>TXNReceipt</div>);
+    return TXNReceipt(args.text,args.jAmounts,args.jColumnHeads,args.id);
 }
 
-function BalanceRow(amounts) { 
-    console.log("BalanceRow "+JSON.stringify(amounts));
+function BalanceRow(args) { 
+    let amounts = Object.keys(args.jHeads).map((c)=>(args.jValues[c]?args.jValues[c]:"-,--"));
     return (
         <div className="attrLine">
-            <div className="FIELD MOAM">{amounts.amounts[0]}</div>
-            <div className="FIELD MOAM">{amounts.amounts[1]}</div>
-            <div className="FIELD MOAM">{amounts.amounts[2]}</div>
-            <div className="FIELD MOAM">{amounts.amounts[3]}</div>
-            <div className="FIELD MOAM">{amounts.amounts[4]}</div>
-            <div className="FIELD MOAM">{amounts.amounts[5]}</div>
-            <div className="FIELD MOAM">{amounts.amounts[6]}</div>
-            <div className="FIELD MOAM">{amounts.amounts[7]}</div>
-            <div className="FIELD MOAM">{amounts.amounts[8]}</div>
-            <div className="FIELD MOAM">{amounts.amounts[9]}</div>
-            <div className="FIELD MOAM">{amounts.amounts[10]}</div>
+            <div className="FIELD MOAM">{amounts[0]}</div>
+            <div className="FIELD MOAM">{amounts[1]}</div>
+            <div className="FIELD MOAM">{amounts[2]}</div>
+            <div className="FIELD MOAM">{amounts[3]}</div>
+            <div className="FIELD MOAM">{amounts[4]}</div>
+            <div className="FIELD MOAM">{amounts[5]}</div>
+            <div className="FIELD MOAM">{amounts[6]}</div>
+            <div className="FIELD MOAM">{amounts[7]}</div>
+            <div className="FIELD MOAM">{amounts[8]}</div>
+            <div className="FIELD MOAM">{amounts[9]}</div>
+            <div className="FIELD MOAM">{amounts[10]}</div>
         </div>
     )
+    
 }
 
