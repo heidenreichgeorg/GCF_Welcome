@@ -329,25 +329,18 @@ function TXNReceiptHeader(args) {
     return TXNReceipt(args.text,args.jAmounts,args.jColumnHeads,null,args.id,args.removeCol);
 }
 
+function nop() {}
 
 function BalanceRow(args) { 
-    let amounts =[]; let cols=[];
+    let amounts =[]; let cols=[];  let count=0;
+    let off = args.removeCol ? args.removeCol : nop;
     Object.keys(args.jColumnHeads).forEach(c=>
-        {if(args.jColumnHeads[c] && args.jColumnHeads[c].length>1) { cols.push(c); amounts.push(args.jValues[c]?args.jValues[c]:"-,--")}});
+        {if(args.jColumnHeads[c] && args.jColumnHeads[c].length>1 && count++<12 ) { cols.push(c); amounts.push(args.jValues[c]?args.jValues[c]:"-,--")}});
     return (
         <div className="attrLine">
-            <div className="FIELD MOAM" onClick={()=>{args.removeCol(cols[ 0])}}>{amounts[ 0]}</div>
-            <div className="FIELD MOAM" onClick={()=>{args.removeCol(cols[ 1])}}>{amounts[ 1]}</div>
-            <div className="FIELD MOAM" onClick={()=>{args.removeCol(cols[ 2])}}>{amounts[ 2]}</div>
-            <div className="FIELD MOAM" onClick={()=>{args.removeCol(cols[ 3])}}>{amounts[ 3]}</div>
-            <div className="FIELD MOAM" onClick={()=>{args.removeCol(cols[ 4])}}>{amounts[ 4]}</div>
-            <div className="FIELD MOAM" onClick={()=>{args.removeCol(cols[ 5])}}>{amounts[ 5]}</div>
-            <div className="FIELD MOAM" onClick={()=>{args.removeCol(cols[ 6])}}>{amounts[ 6]}</div>
-            <div className="FIELD MOAM" onClick={()=>{args.removeCol(cols[ 7])}}>{amounts[ 7]}</div>
-            <div className="FIELD MOAM" onClick={()=>{args.removeCol(cols[ 8])}}>{amounts[ 8]}</div>
-            <div className="FIELD MOAM" onClick={()=>{args.removeCol(cols[ 9])}}>{amounts[ 9]}</div>
-            <div className="FIELD MOAM" onClick={()=>{args.removeCol(cols[10])}}>{amounts[10]}</div>
-            <div className="FIELD MOAM" onClick={()=>{args.removeCol(cols[11])}}>{amounts[11]}</div>
+            { amounts.map((value,i)=>(
+                <div className="FIELD MOAM" onClick={()=>{off(cols[i])}}>{value}</div>
+            )) }
         </div>
     )
     
