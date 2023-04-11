@@ -339,7 +339,7 @@ function BalanceRow(args) {
     return (
         <div className="attrLine">
             { amounts.map((value,i)=>(
-                <div className="FIELD MOAM" onClick={()=>{off(cols[i])}}>{value}</div>
+                <div className="FIELD MOAM" key={'sel'+i} onClick={()=>{off(cols[i])}}>{value}</div>
             )) }
         </div>
     )
