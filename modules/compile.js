@@ -100,6 +100,7 @@ let de_DE = {
 
     // GainLoss GuV
     Carry4Loss:  "Verlustvortrag",
+    Expenses:    "Ausgaben",
     NextYear:    "Folgejahr",
     VariableCap: "Variables Kapital",
     CapGainTax:  "KapErtragSt",

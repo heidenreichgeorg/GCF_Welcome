@@ -27,6 +27,14 @@ export default function Transfer() {
     function ignore(e) { e.preventDefault(); }
 
 
+    function addPreData(shrtName,acctRef) { 
+        let name = getSelect(shrtName);
+        let amount=getValue(acctRef);
+        creditor[shrtName]=name; 
+        creditor[acctRef]=amount; 
+        console.log("addPreData ACCOUNT("+name+"):= VALUE("+amount+") "+JSON.stringify(creditor)); 
+        return creditor; } // avoid update
+
     
     function onPreBook(e,sender) {
         e.preventDefault();
@@ -41,19 +49,34 @@ export default function Transfer() {
 
         console.log("onPreBook "+sender+" WITH "+txn.refAcct+" AS CRED "+JSON.stringify(creditor));
     
-        let controlRefAcct = document.getElementById("cReason");
-        if(controlRefAcct) {
-            console.log("SET SELECT "+cReason+" WITH "+txn.refAcct);
-            setSelect(controlRefAcct.id,txn.refAcct);
-        } //else console.log("NO SELECT "+cReason+" FOR "+txn.refAcct);
+        let controlRefAcct1 = document.getElementById("acct1");
+        let controlRefAcct2 = document.getElementById("acct2");
 
         let flow = { 'credit':{}, 'debit':{} };
-        let am0 = creditor.iAmount0;
-        let am1 = creditor.iAmount1;
-        let am2 = creditor.iAmount2;
-        if(am0 && am0.length>0) flow=prepareTXN(sheet[D_Schema],flow,creditor.acct0,cents2EU(am0));
-        if(am1 && am1.length>0) flow=prepareTXN(sheet[D_Schema],flow,creditor.acct1,cents2EU(am1));
-        if(am2 && am2.length>0) flow=prepareTXN(sheet[D_Schema],flow,creditor.acct2,cents2EU(am2));
+        
+        let iam0 = bigEUMoney(creditor.iAmount0);
+        if(iam0 && iam0!=0n) flow=prepareTXN(sheet[D_Schema],flow,creditor.acct0,cents2EU(iam0));
+        
+        let iam1 = bigEUMoney(creditor.iAmount1);
+        if(iam1 && iam1!=0n) {
+            flow=prepareTXN(sheet[D_Schema],flow,creditor.acct1,cents2EU(iam1));
+            if(controlRefAcct1) {
+                console.log("SET SELECT1 "+controlRefAcct1.id+" WITH "+creditor.acct1);
+                setSelect("cReason",creditor.acct1);
+            } 
+        }
+
+        let iam2 = bigEUMoney(creditor.iAmount2);
+        if(iam2 && iam2!=0n) {
+            flow=prepareTXN(sheet[D_Schema],flow,creditor.acct2,cents2EU(iam2));
+            if(controlRefAcct2) {
+                console.log("SET SELECT2 "+controlRefAcct2.id+" WITH "+creditor.acct2);
+                setSelect("cReason",creditor.acct2);
+            }
+        }
+
+
+
 
         txn.credit = flow.credit;
         txn.debit=flow.debit;
@@ -100,14 +123,6 @@ export default function Transfer() {
     let aLen = where(names,"ASSETS");
     let eLen = where(names,"EQLIAB");
     
-    function addPreData(shrtName,acctRef) { 
-        let name = getSelect(shrtName);
-        let amount=getValue(acctRef);
-        creditor[shrtName]=name; 
-        creditor[acctRef]=amount; 
-        console.log("addPreData ACCOUNT("+name+"):= VALUE("+amount+") "+JSON.stringify(creditor)); 
-        return creditor; } // avoid update
-
     const aNums = [0];
     
 
@@ -121,7 +136,7 @@ export default function Transfer() {
         if(account.xbrl.length>1) {
             var xbrl = account.xbrl.split('\.').reverse();
             var xbrl_pre = account.xbrl;//xbrl.pop()+ "."+ xbrl.pop()+ "."+ xbrl.pop()+ "."+ xbrl.pop();
-            console.log("Pattern "+xbrl_pre);
+            //console.log("Pattern "+xbrl_pre);
             if(xbrl.length>2) { 
                 if(xbrl_pre.startsWith(X_INCOME) || xbrl_pre.startsWith(X_EQLIAB)) arrAcct.push(name);
                 if(xbrl_pre.startsWith(X_LIABILITY)) arrLiab.push(name);
@@ -178,7 +193,9 @@ export default function Transfer() {
     return (
         <Screen prevFunc={prevFunc} nextFunc={nextFunc} tabSelector={aNums} tabName={tabName}>
             <CreditorRow/> 
-            <CreditorRow/> 
+            <div className="attrLine">
+                <div className="FIELD XFER">{page.Expenses}</div>
+            </div>
             <div className="attrLine">
             <div className="FIELD XFER"></div>
             <div className="FIELD MOAM"><input id="iAmount0"></input></div>
@@ -232,9 +249,9 @@ export default function Transfer() {
                 <div className="FIELD SEP"></div><div className="FIELD SEP"></div><div className="FIELD SEP"></div>
                 <div className="FIELD MOAM"><input type="submit" className="key" value="BOOK" onClick={(e)=>onBook(e)}/></div>
                 <div className="FIELD SEP"></div>
-                <div className="FIELD SNAM" key="aCredit">{arrCred.join()}</div>
+                <div className="FIELD LNAM" key="aCredit">{arrCred.join()}</div>
                 <div className="FIELD SEP">AN</div>
-                <div className="FIELD SNAM" key="aDebit">{arrDebt.join()}</div>
+                <div className="FIELD LNAM" key="aDebit">{arrDebt.join()}</div>
             </div>
             <CreditorRow/> 
             <CreditorRow/>
@@ -298,7 +315,7 @@ function CreditorRow({ given,surname,address,zip,city,country,sender,onPreBook,k
     return(
         <div className="attrLine" key={"Creditor"+key}>
             {   (sender && sender.length>2) ?
-                (<div className="FIELD MOAM" key={"pre"+sender}><input type="submit" className="key" value="PRE-BOOK" onClick={(e)=>onPreBook(e,sender)}/></div>
+                (<div className="FIELD MOAM" id={"pre"+sender}><input type="submit" className="key" value="PRE-BOOK" onClick={(e)=>onPreBook(e,sender)}/></div>
                 ):( <div>&nbsp;</div> )}   
             <div className="FIELD SEP"> &nbsp;</div>
             <div className="FIELD XFER"> {given}</div>

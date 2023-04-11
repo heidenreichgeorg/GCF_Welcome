@@ -16,12 +16,12 @@ export function getSelect(targetId) {
 export function setSelect(targetId,value) { 
     var elem = document.getElementById(targetId);
     if(elem) {
-        console.log("SET SELECT "+targetId+" WITH "+value);
+        console.log("App.setSelect "+targetId+" WITH "+value);
         let arrElem=elem.options;
         for(let i=0;i<arrElem.length;i++) {
             if(arrElem[i].value==value) {
                 elem.selectedIndex=i;
-                console.log("SET SELECT OPTION "+i);
+                console.log("App.setSelect OPTION "+i);
             }
         }
     }
