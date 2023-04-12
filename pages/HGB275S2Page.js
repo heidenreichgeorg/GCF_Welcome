@@ -1,6 +1,6 @@
 
 import { useEffect, useState  } from 'react';
-import { useSession } from '../modules/sessionmanager';
+import { SX_SESSION,useSession } from '../modules/sessionmanager';
 import {  makeHGBReport } from '../modules/App'
 import Screen from '../pages/Screen'
 import FooterRow from '../components/FooterRow'

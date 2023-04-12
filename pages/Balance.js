@@ -6,7 +6,7 @@ import { cents2EU } from '../modules/money.mjs'
 import Screen from '../pages/Screen'
 import FooterRow from '../components/FooterRow'
 import { D_Balance, D_Page, D_Report, D_Schema, X_ASSETS, X_EQLIAB, SCREENLINES }  from '../modules/terms.js';
-import { useSession } from '../modules/sessionmanager';
+import { SX_SESSION,useSession } from '../modules/sessionmanager';
 
 
 

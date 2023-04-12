@@ -107,19 +107,19 @@ function processArgv(processArgv) {
         let attribute=val.split('=');
         if(index>1 && attribute && attribute.length>1) {
             //if(debug>1) 
-            console.log("0002 Attribute " + index + ': ' + val);
+            console.log("0006 Attribute " + index + ': ' + val);
             if(attribute[0].toLowerCase()==='root') {
                 setRoot(attribute[1]);
-                console.log("0004 Starting server SET ROOT TO " + getRoot());
+                console.log("0008A Starting server SET ROOT TO " + getRoot());
             }        
             else if(attribute[0].toLowerCase()==='config') {
                 config = attribute[1];
-                console.log("0006 Starting server "+currentHash()+" SET FIREBASE CONFIG " + config);
+                console.log("0008B Starting server "+currentHash()+" SET FIREBASE CONFIG " + config);
             }        
             else if(attribute[0].toLowerCase()==='auto') {
                 let autoSec = parseInt(attribute[1]);
                 autoSave = autoSec * 1000;
-                console.log("0008 Starting server SET autoSave " + autoSec+ " [sec.]");
+                console.log("0008C Starting server SET autoSave " + autoSec+ " [sec.]");
             }        
         }
     });
@@ -158,27 +158,6 @@ export function getSession(id) {
     }
 
     return result; 
-}
-
-
-
-function sy_findSessionId(client,year) {
-    var result=null;
-    console.log("\n0802  FIND => ( client="+client+"  year="+year+")");
-    let arrSession= [ allSession ]; // 20221127
-    arrSession.forEach(session => {
-        if(session) {
-            console.log("0804  CHECK => (SESSION  client="+session.client+"  year="+session.year+")");
-            if(session.year===year && session.client===client) {
-                result=session;
-                let fb=session.fireBase?session.fireBase:" no entry";
-                console.log("0806  FOUND => (SESSION  "+showRecent(session)+" client="+session.client+","+session.year+")");
-            }
-        }
-        else    console.log("0805  FOUND EMPTY SESSION   (client="+client+",year="+year+")");
-    });
-    if(result) return result.id;
-    else return null;
 }
 
 

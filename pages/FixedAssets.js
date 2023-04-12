@@ -3,7 +3,7 @@
 import { useEffect, useState, useRef  } from 'react';
 import Screen from '../pages/Screen'
 import FooterRow from '../components/FooterRow'
-import { useSession } from '../modules/sessionmanager';
+import { SX_SESSION,useSession } from '../modules/sessionmanager';
 import { cents2EU } from '../modules/money';
 import { D_FixAss, D_Report, D_Page, SCREENLINES }  from '../modules/terms.js';
 

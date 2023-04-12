@@ -315,7 +315,7 @@ module.exports['bucketUpload']=bucketUpload;
 
 
 
-
+/*
 
     
 function fireWrite(session) {
@@ -335,7 +335,7 @@ function fireWrite(session) {
 async function markActive(client) {
   const datastore = new Datastore();
   const query = datastore
-    .createQuery('session')
+    .createQuery("session")
     .filter('client', '=', client);
 
   datastore
@@ -365,6 +365,8 @@ async function markActive(client) {
 
 
 let fbConfig=null;
+*/
+
 
 export function loadFBConfig(dir,config) {
     var fbConfig=null;

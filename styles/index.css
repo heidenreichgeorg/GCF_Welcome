@@ -43,8 +43,8 @@ input[type=range] { -webkit-appearance: none;  width: 200px; margin: 0; padding:
 .IDNT     { width: 8rem; text-align: right; }
 .LNAM     { width: 9rem; text-align: left;}
 .XFER     { width: 9rem; text-align: left;  }
-.LTXT     { width:14rem; text-align: left;}
 .L280     { width:12rem; text-align: left;} 
+.LTXT     { width:14rem; text-align: left;}
 .FLEX     { width:49rem; text-align: left;} 
 
 

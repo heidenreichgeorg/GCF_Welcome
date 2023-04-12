@@ -6,7 +6,7 @@ import FooterRow from '../components/FooterRow'
 import { cents2EU}  from '../modules/money';
 
 import { D_Balance, D_Page, D_Report, X_ASSETS, X_INCOME, X_EQLIAB, SCREENLINES } from '../modules/terms.js'
-import { useSession } from '../modules/sessionmanager';
+import { SX_SESSION,useSession } from '../modules/sessionmanager';
 
 export default function Accounts() {
     

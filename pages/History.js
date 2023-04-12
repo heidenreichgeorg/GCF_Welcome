@@ -1,13 +1,13 @@
 
 import { useEffect, useState } from 'react';
 
-import { D_History, D_Page, D_Receipts, D_Schema, J_ACCT, SCREENLINES }  from '../modules/terms.js';
+import { D_CarryOver, D_History, D_Page, D_Receipts, D_Schema, J_ACCT, SCREENLINES }  from '../modules/terms.js';
 import Screen from '../pages/Screen'
 import FooterRow from '../components/FooterRow'
 import { cents2EU }  from '../modules/money';
 import { getParam, symbolic }  from '../modules/App';
 import { CSEP,prettyTXN }  from '../modules/writeModule';
-import { useSession } from '../modules/sessionmanager';
+import { getCarryOver,storeCarryOver, useSession } from '../modules/sessionmanager';
 import { bigEUMoney } from '../modules/money.mjs';
 
 const SCREEN_TXNS=2+parseInt(SCREENLINES/3);
@@ -15,11 +15,12 @@ const SCREEN_TXNS=2+parseInt(SCREENLINES/3);
 const VOID ="-,--";
 
 var funcShowReceipt=null;
+var funcKeepReceipt=null;
 var funcHideReceipt=null;
 var aSelText = {};
 var aJMoney = {};
 var aSelSaldo = {};
-
+var jPageSum={};
 // SCHEMA { acct:strValue }
 
 export default function History() {
@@ -31,8 +32,9 @@ export default function History() {
 
     function removeCol(name) { console.log("REMOVE "+name); jHeads[name]='0'; setJHeads(JSON.parse(JSON.stringify(jHeads)));  }
 
+    funcKeepReceipt = (() => { console.log("KEEP jSUM="+JSON.stringify(jSum)); storeCarryOver(jSum)  } );  // keep jSum
+    funcHideReceipt = (() => setIsOpen(false)); 
     funcShowReceipt = (() => setIsOpen(true));
-    funcHideReceipt = (() => setIsOpen(false));
 
     useEffect(() => {
     // run each rendering and re-rendering
@@ -43,25 +45,38 @@ export default function History() {
             try { state=JSON.parse(sessionStorage.getItem('session')); } catch(err) {}
             if(state && Object.keys(state).length>5) {
                 setSheet(state.generated);
-
+                console.log("INIT PAGE#1 ")
                 if(state.generated) {
+                    
                     let jColumnHeads={}; 
                     let names=state.generated[D_Schema].Names;
                     names.slice(6).forEach(acct => { if(acct.length>2) jColumnHeads[acct]='1'; });
-                    setJHeads(jColumnHeads);            
-                    console.log("INIT PAGE "+JSON.stringify(jColumnHeads))
+                    setJHeads(jColumnHeads);   
+                    console.log("INIT PAGE#2 "+JSON.stringify(jColumnHeads))
+
+                    resetJSum(jColumnHeads);         
+                    console.log("INIT PAGE#4 "+JSON.stringify(jPageSum))
                 }
             }
     }, [status])
 
 
+    function resetJSum(jColumnHeads) { 
+        let jCarryOver=getCarryOver();
+        console.log("INIT PAGE#3 "+JSON.stringify(jCarryOver))
+        if(jCarryOver && Object.keys(jCarryOver).length>0) {
+            jPageSum=jCarryOver;
+            console.log("INIT PAGE#3A "+JSON.stringify(jPageSum))
+        } else  { 
+            jPageSum={}; 
+            Object.keys(jColumnHeads).forEach(acct=>{jPageSum[acct]="0,00";}); 
+            console.log("INIT PAGE#3B "+JSON.stringify(jPageSum))
+        }
+    }
+
+
     if(!sheet) return null; //'Loading...';
 
-    /*
-    useEffect(() => {
-        
-    }, [])
-*/
     const pageGlobal = sheet[D_Page];
 
     function token() { return { client:session.client, year:session.year }}
@@ -73,7 +88,9 @@ export default function History() {
 
     let page = sheet[D_Page];
     let names = sheet[D_Schema].Names;
-    let sHistory=makeHistory(sheet);
+
+    let sHistory=makeHistory(sheet); // accumulates jSum
+
     let sPages = (sHistory.length+1) / SCREEN_TXNS;    
     let strToken=token();
     console.log("strToken="+JSON.stringify(strToken));
@@ -85,8 +102,6 @@ export default function History() {
     let aPattern = getParam("APATTERN");
 
     let jColumnHeads=jHeads; // state variable, do not touch
-    let jSum={};
-    Object.keys(jHeads).forEach(acct=>{jSum[acct]="0,00";});  
 
     if(isOpen) {
         Object.keys(aSelText).forEach(sym => 
@@ -94,13 +109,14 @@ export default function History() {
                 if(acct.length>2 && jColumnHeads[acct]=='1') {   
                                             let value=aJMoney[sym][acct]; 
                                             if(bigEUMoney(value)!=0n) { 
-                                                //jSum[acct]="0,00";  
                                                 try { jColumnHeads[acct]=acct; } catch(e) {}
                                             }
                   } }))
             })
     }
     console.log("INIT jColumnHeads "+JSON.stringify(jColumnHeads));
+
+    let jSum=JSON.parse(JSON.stringify(jPageSum));
     console.log("UNIFY jSum "+JSON.stringify(jSum));
 
     function makeLabel(index) { return (aPattern && aPattern.length>0) ?session.client+session.year+aPattern+index : ""}
@@ -113,9 +129,11 @@ export default function History() {
             {isOpen &&             
                 (
                 <div>                     
+                    <button onClick={() => funcKeepReceipt()}>{D_CarryOver}</button>
                     <button onClick={() => funcHideReceipt()}>{D_Receipts}</button>
                     <TXNReceiptHeader text="" jAmounts={jColumnHeads} jColumnHeads={jColumnHeads} id="" removeCol={removeCol}/>                   
-                    { Object.keys(aSelText).map((sym,i) => ( (aSelText[sym] && i>2) ? 
+                    { console.log("aSelText# = "+Object.keys(aSelText).length) ||
+                    Object.keys(aSelText).map((sym,i) => ( (aSelText[sym] && i>1) ? 
                                                             TXNReceipt(
                                                                 aSelText[sym].join(' '),
                                                                 aJMoney[sym],
@@ -196,21 +214,18 @@ function SigRow({row,index,client,year}) {
     var checked=(aSelSaldo[id]!=null);
 
     let mRow=[];
-    //mRow=Object.keys(tRow).map((a)=>(a&&tRow[a]?a+":"+tRow[a]:""));
-    //console.log("SigRow j="+JSON.stringify(Object.keys(tRow)));
-    //Object.keys(tRow)
 
     return (
         <div className="BIGCELL">
             <div className="attrLine" id={id}>
-                <div className="FIELD SYMB"><label><input TYPE="CHECKBOX" onChange={(event) => handleChange(event.target,aRow,tRow,id)} defaultChecked={checked} />
+                <div className="FIELD SYMB"><label><input type="CHECKBOX" onChange={(event) => handleChange(event.target,aRow,tRow,id)} defaultChecked={checked} />
                                         </label></div>
                 <div className="FIELD TAX">{aRow[0]}</div>
                 <div className="FIELD TAX">&nbsp;{index}</div>
-                <div className="FIELD IDNT">{aRow[1]}</div>
+                <div className="FIELD L280">{aRow[1]}</div>
                 <div className="FIELD IDNT">{aRow[2]}</div>
                 <div className="FIELD IDNT">{aRow[3]}</div>
-                <div className="FIELD IDNT">{aRow[4]}</div>
+                <div className="FIELD LNAM">{aRow[4]}</div>
                 <div className="FIELD IDNT">{aRow[5]}</div>
             </div>
             <div className="attrLine">
@@ -296,7 +311,7 @@ function SearchForm(token) {
                 <div className="FIELD LTXT">Acct:<input type='edit' name='APATTERN'/></div>                
                 <input type='hidden' name='client' defaultValue={token.client}/>
                 <input type='hidden' name='year' defaultValue={token.year}/>
-                <div className="FIELD MOAM"><button autoFocus className='SYMB key'>Search</button></div>
+                <div className="FIELD MOAM"><button autoFocus className='SYMB key'>Search</button></div>                
                 <div className="FIELD MOAM"><input type='button' name='SELECT' value='SELECT' onClick={(event) => (funcShowReceipt())}/></div>                
             </form>
         </div>
@@ -315,7 +330,7 @@ function TXNReceipt(text,jAmounts,jColumnHeads,jSum,id,removeCol) {
     if(jSum) console.log("TXNReceipt jSum "+JSON.stringify(jSum));
 
     return(
-        <div className="FIELD" id={"PageContentReceipt"+id}>
+        <div className="FIELD" id={"PageContentReceipt"+id} key={"PageContentReceipt"+id}>
             <div className="BIGCELL">
                 <div className="FIELD">{text} {id}</div>
                 <BalanceRow jValues={jAmounts} jColumnHeads={jColumnHeads} removeCol={removeCol}/>
