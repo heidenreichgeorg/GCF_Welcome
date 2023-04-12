@@ -3,7 +3,7 @@
 import { useEffect, useState, useRef  } from 'react';
 import Screen from '../pages/Screen'
 import FooterRow from '../components/FooterRow'
-import { SX_SESSION,useSession } from '../modules/sessionmanager';
+import { getSession,useSession } from '../modules/sessionmanager';
 import { cents2EU } from '../modules/money';
 import { D_FixAss, D_Report, D_Page, SCREENLINES }  from '../modules/terms.js';
 
@@ -14,8 +14,7 @@ export default function FixedAssets() {
  
     useEffect(() => {
         if(status !== 'success') return;
-        let state = null;
-        try { state=JSON.parse(sessionStorage.getItem('session')); } catch(err) {}
+        let state=getSession();
         if(state && Object.keys(state).length>5) {
             setSheet(state.generated);
         }

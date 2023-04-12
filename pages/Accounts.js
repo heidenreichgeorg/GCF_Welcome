@@ -6,7 +6,7 @@ import FooterRow from '../components/FooterRow'
 import { cents2EU}  from '../modules/money';
 
 import { D_Balance, D_Page, D_Report, X_ASSETS, X_INCOME, X_EQLIAB, SCREENLINES } from '../modules/terms.js'
-import { SX_SESSION,useSession } from '../modules/sessionmanager';
+import { getSession,useSession } from '../modules/sessionmanager';
 
 export default function Accounts() {
     
@@ -20,8 +20,7 @@ export default function Accounts() {
         if(status !== 'success') return;
         setYear(session.year);
         setClient(session.client);
-        let state = null;
-        try { state=JSON.parse(sessionStorage.getItem('session')); } catch(err) {}
+        let state=getSession();
         if(state && Object.keys(state).length>5) {
             setSheet(state.generated);
         }

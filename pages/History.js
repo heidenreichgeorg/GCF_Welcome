@@ -7,7 +7,7 @@ import FooterRow from '../components/FooterRow'
 import { cents2EU }  from '../modules/money';
 import { getParam, symbolic }  from '../modules/App';
 import { CSEP,prettyTXN }  from '../modules/writeModule';
-import { getCarryOver,storeCarryOver, useSession } from '../modules/sessionmanager';
+import { getSession,getCarryOver,storeCarryOver, useSession } from '../modules/sessionmanager';
 import { bigEUMoney } from '../modules/money.mjs';
 
 const SCREEN_TXNS=2+parseInt(SCREENLINES/3);
@@ -41,22 +41,21 @@ export default function History() {
         aSelText = {};
         aJMoney = {};
         if(status !== 'success') return;
-            let state = null;
-            try { state=JSON.parse(sessionStorage.getItem('session')); } catch(err) {}
-            if(state && Object.keys(state).length>5) {
-                setSheet(state.generated);
-                console.log("INIT PAGE#1 ")
-                if(state.generated) {
-                    
-                    let jColumnHeads={}; 
-                    let names=state.generated[D_Schema].Names;
-                    names.slice(6).forEach(acct => { if(acct.length>2) jColumnHeads[acct]='1'; });
-                    setJHeads(jColumnHeads);   
-                    console.log("INIT PAGE#2 "+JSON.stringify(jColumnHeads))
+        let state=getSession();
+        if(state && Object.keys(state).length>5) {
+            setSheet(state.generated);
+            console.log("INIT PAGE#1 ")
+            if(state.generated) {
+                
+                let jColumnHeads={}; 
+                let names=state.generated[D_Schema].Names;
+                names.slice(6).forEach(acct => { if(acct.length>2) jColumnHeads[acct]='1'; });
+                setJHeads(jColumnHeads);   
+                console.log("INIT PAGE#2 "+JSON.stringify(jColumnHeads))
 
-                    resetJSum(jColumnHeads);         
-                    console.log("INIT PAGE#4 "+JSON.stringify(jPageSum))
-                }
+                resetJSum(jColumnHeads);         
+                console.log("INIT PAGE#4 "+JSON.stringify(jPageSum))
+            }
             }
     }, [status])
 

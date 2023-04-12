@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { SX_SESSION, useSession, REACT_APP_API_HOST } from '../modules/sessionmanager';
+import { getSession, useSession, REACT_APP_API_HOST } from '../modules/sessionmanager';
 import Screen from '../pages/Screen'
 import FooterRow from '../components/FooterRow'
 import { cents2EU }  from '../modules/money';
@@ -26,8 +26,7 @@ export default function Status() {
         if(status !== 'success') return;
         setYear(session.year);
         setClient(session.client);
-        let state = null;
-        try { state=JSON.parse(sessionStorage.getItem('session')); } catch(err) {}
+        let state=getSession();
         if(state && Object.keys(state).length>5) {
             setSheet(state.generated);
         }

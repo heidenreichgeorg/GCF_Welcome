@@ -1,6 +1,6 @@
 
 import { useEffect, useState  } from 'react';
-import { SX_SESSION,useSession } from '../modules/sessionmanager';
+import { getSession,useSession } from '../modules/sessionmanager';
 import {  makeHGBReport } from '../modules/App'
 import Screen from '../pages/Screen'
 import FooterRow from '../components/FooterRow'
@@ -13,8 +13,7 @@ const { session, status } = useSession()
     const [ sheet,  setSheet] = useState(null)
     useEffect(() => {
         if(status !== 'success') return;
-        let state = null;
-        try { state=JSON.parse(sessionStorage.getItem('session')); } catch(err) {}
+        let state=getSession();
         if(state && Object.keys(state).length>5) {
             setSheet(state.generated);
         }

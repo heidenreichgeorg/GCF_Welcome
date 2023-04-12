@@ -10,7 +10,7 @@ import { addTXNData, InputRow }  from '../modules/App';
 import { cents2EU, bigEUMoney }  from '../modules/money';
 import { book, prepareTXN } from '../modules/writeModule';
 import { D_Balance, D_FixAss, D_Page, D_Report, D_Schema, SCREENLINES, X_ASSETS, X_EQUITY, X_EQLIAB, X_INCOME, X_INCOME_REGULAR } from '../modules/terms.js'
-import { SX_SESSION,useSession } from '../modules/sessionmanager';
+import { getSession,resetSession,useSession } from '../modules/sessionmanager';
 
 export default function Operations() {
     
@@ -27,8 +27,7 @@ export default function Operations() {
         if(status !== 'success') return;
         setYear(session.year);
         setClient(session.client);
-        let state = null;
-        try { state=JSON.parse(sessionStorage.getItem('session')); } catch(err) {}
+        let state=getSession();
         if(state && Object.keys(state).length>5) {
             setSheet(state.generated);
         }
@@ -72,8 +71,8 @@ export default function Operations() {
 
         book(txn,session); 
 
+        resetSession();
         // invalidate current session
-        sessionStorage.setItem('session',"");
 
         console.log("BOOK O booked.");
   

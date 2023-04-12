@@ -5,7 +5,7 @@ import Screen from '../pages/Screen'
 import { addTXNData, getSelect, getValue, InputRow, setSelect }  from '../modules/App';
 import { book, prettyTXN, prepareTXN }  from '../modules/writeModule';
 import {CSEP, D_Adressen, D_Balance, D_FixAss, D_Page, D_History, D_Schema,  X_ASS_CASH, X_EQLIAB, X_INCOME, X_LIABILITY } from '../modules/terms.js'
-import { SX_SESSION, useSession } from '../modules/sessionmanager';
+import { getSession, resetSession, useSession } from '../modules/sessionmanager';
 import { cents2EU, bigEUMoney }  from '../modules/money';
 
 export default function Transfer() {
@@ -17,8 +17,7 @@ export default function Transfer() {
 
     useEffect(() => {
         if(status !== 'success') return;
-        let state = null;
-        try { state=JSON.parse(sessionStorage.getItem('session')); } catch(err) {}
+        let state=getSession();
         if(state && Object.keys(state).length>5) {
             setSheet(state.generated);
         }
@@ -103,8 +102,8 @@ export default function Transfer() {
 
         book(txn,session); 
 
+        resetSession();
         // invalidate current session
-        sessionStorage.setItem('session',"");
 
         console.log("BOOK O booked.");
   
