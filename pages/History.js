@@ -1,7 +1,7 @@
 
 import { useEffect, useState } from 'react';
 
-import { D_CarryOver, D_History, D_Page, D_Receipts, D_Schema, J_ACCT, SCREENLINES }  from '../modules/terms.js';
+import { D_Carry, D_CarryOff, D_CarryOver, D_History, D_Page, D_Receipts, D_Schema, J_ACCT, SCREENLINES }  from '../modules/terms.js';
 import Screen from '../pages/Screen'
 import FooterRow from '../components/FooterRow'
 import { cents2EU }  from '../modules/money';
@@ -17,6 +17,7 @@ const VOID ="-,--";
 var funcShowReceipt=null;
 var funcKeepReceipt=null;
 var funcHideReceipt=null;
+var funcCleaReceipt=null;
 var aSelText = {};
 var aJMoney = {};
 var aSelSaldo = {};
@@ -32,7 +33,8 @@ export default function History() {
 
     function removeCol(name) { console.log("REMOVE "+name); jHeads[name]='0'; setJHeads(JSON.parse(JSON.stringify(jHeads)));  }
 
-    funcKeepReceipt = (() => { console.log("KEEP jSUM="+JSON.stringify(jSum)); storeCarryOver(jSum)  } );  // keep jSum
+    funcCleaReceipt = (() => { storeCarryOver({}) });
+    funcKeepReceipt = (() => { storeCarryOver(jSum) });  
     funcHideReceipt = (() => setIsOpen(false)); 
     funcShowReceipt = (() => setIsOpen(true));
 
@@ -121,9 +123,22 @@ export default function History() {
     function makeLabel(index) { return (aPattern && aPattern.length>0) ?session.client+session.year+aPattern+index : ""}
 
     const tabName = 'HistoryContent';
-        
+ 
+
+
+    // carryOver checking
+    let carryOver = localStorage.getItem('carryOver');
+    let jCarry=[" "];
+    try { jCarry=JSON.parse(carryOver) } catch(e) {}
+    let arrCarry=[" "];
+    try { Object.keys(jCarry).forEach(acc=>{if(bigEUMoney(jCarry[acc])!=0n) arrCarry.push(acc+jCarry[acc])}) } catch(e) {}    
+    //<div className="attrLine"><div className="console">       {arrCarry.join('-')}              </div>  </div>
+    console.log("HISTORY CARRY OVER="+JSON.stringify( arrCarry ));
+    
+    
     return (
         <Screen prevFunc={prevFunc} nextFunc={nextFunc} tabSelector={isOpen ? [] : aPages.map((_,n)=>(1+n)) } tabName={tabName}>
+
 
             {isOpen &&             
                 (
@@ -131,6 +146,7 @@ export default function History() {
                     <button onClick={() => funcKeepReceipt()}>{D_CarryOver}</button>
                     <button onClick={() => funcHideReceipt()}>{D_Receipts}</button>
                     <TXNReceiptHeader text="" jAmounts={jColumnHeads} jColumnHeads={jColumnHeads} id="" removeCol={removeCol}/>                   
+                    <TXNReceiptHeader text={D_Carry} jAmounts={jPageSum} jColumnHeads={jColumnHeads} id=""/>                   
                     { console.log("aSelText# = "+Object.keys(aSelText).length) ||
                     Object.keys(aSelText).map((sym,i) => ( (aSelText[sym] && i>1) ? 
                                                             TXNReceipt(
@@ -141,7 +157,7 @@ export default function History() {
                                                                 (aSelSaldo[sym]==VOID)?"":makeLabel(i)) :
                                                                     ""
                                                                     )) }
-                    <TXNReceiptHeader text="" jAmounts={jSum} jColumnHeads={jColumnHeads} id="" removeCol={removeCol}/>                                                                                       
+                    <TXNReceiptHeader text={page.Sum} jAmounts={jSum} jColumnHeads={jColumnHeads} id="" removeCol={removeCol}/>                                                                                       
                 </div>
             )}
 
@@ -152,7 +168,7 @@ export default function History() {
                     { !isOpen && (sHistory.slice(n*SCREEN_TXNS,(n+1)*SCREEN_TXNS).map((row,k) => (  
                         <SigRow  key={"History2"+k} row={row} index={n} client={session.client}  year={session.year} />  
                     )))}
-                    <div className="attrline">&nbsp;</div>
+                    <div className="attrLine"><div className="console">       {arrCarry.join('-')}              </div>  </div>
                     <FooterRow left={page["client"]}  right={page["register"]} prevFunc={prevFunc} nextFunc={nextFunc}/>
                     <FooterRow left={page["reference"]} right={page["author"]} prevFunc={prevFunc} nextFunc={nextFunc}/>
                 </div>
@@ -305,13 +321,16 @@ function SearchForm(token) {
     return (
         <div className="attrLine">
             <form onSubmit={(e)=>(console.log("SEARCH "+JSON.stringify(e.target)))} >                
-                <div className="FIELD MOAM"></div>                
+                <div className="FIELD MOAM">                
+                    
+                </div>
                 <div className="FIELD LTXT">Line:<input type='edit' name='LPATTERN'/>&nbsp;</div>                
                 <div className="FIELD LTXT">Acct:<input type='edit' name='APATTERN'/></div>                
                 <input type='hidden' name='client' defaultValue={token.client}/>
                 <input type='hidden' name='year' defaultValue={token.year}/>
                 <div className="FIELD MOAM"><button autoFocus className='SYMB key'>Search</button></div>                
-                <div className="FIELD MOAM"><input type='button' name='SELECT' value='SELECT' onClick={(event) => (funcShowReceipt())}/></div>                
+                <div className="FIELD MOAM"><input type='button' name='SELECT' value='SELECT'     onClick={() => (funcShowReceipt())}/></div>                
+                <div className="FIELD MOAM"><input type='button' name='SELECT' value={D_CarryOff} onClick={() => (funcCleaReceipt())}/></div>
             </form>
         </div>
     )
@@ -338,8 +357,8 @@ function TXNReceipt(text,jAmounts,jColumnHeads,jSum,id,removeCol) {
 )}      
 
 function TXNReceiptHeader(args) {
-    console.log("HEAD "+JSON.stringify(args));
-    //return (<div>TXNReceipt</div>);
+    //console.log("HEAD "+JSON.stringify(args));
+    
     return TXNReceipt(args.text,args.jAmounts,args.jColumnHeads,null,args.id,args.removeCol);
 }
 

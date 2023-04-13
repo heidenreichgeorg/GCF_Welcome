@@ -87,7 +87,7 @@ let de_DE = {
     History:"Buchungen",
     Patterns:"Vorlagen",
     Status:"Status",
-
+    Sum:"Summe",
 
     // Anlagen
     AssetIdent: "Kennzeichen",

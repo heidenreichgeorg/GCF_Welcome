@@ -1,16 +1,18 @@
 
 export const  D_XBRL   = "XBRL";
 export const  D_Balance= "Bilanz";
-export const  D_FixAss  = "Anlagen";
-export const  D_History = "Historie";
-export const  D_Page = "Seite";
+export const  D_FixAss  ="Anlagen";
+export const  D_History ="Historie";
+export const  D_Page  =  "Seite";
 export const  D_Partner= "PartnerR";
 export const  D_Report = "Report";
 export const  D_Schema  = "Schema";
-export const  D_Muster = "Muster";
-export const  D_SteuerID = "SteuerID";
-export const  D_Adressen="Adressen";
-export const  D_Receipts="Belege"
+export const  D_Muster =  "Muster";
+export const  D_SteuerID= "SteuerID";
+export const  D_Adressen= "Adressen";
+export const  D_Receipts= "Belege"
+export const  D_Carry  =  "Übertrag"
+export const  D_CarryOff ="Löschen"
 export const  D_CarryOver="Übertragen"
 
 export const  X_ASSETS = 'de-gaap-ci_bs.ass';

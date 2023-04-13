@@ -11,7 +11,7 @@ export const REACT_APP_API_HOST="/api"
 const SessionContext = createContext<Session>({})
 
 const SX_SESSION = 'session';
-const SX_CARRYOVER = 'carryOver';
+const LX_CARRYOVER = 'carryOver';
 
 export function useSession() {
     return useContext(SessionContext)
@@ -33,19 +33,19 @@ export function storeCarryOver(jCarryOver:string) {
     if(jCarryOver) {
         try { 
             let strCarryOver = JSON.stringify(jCarryOver);
-            sessionStorage.setItem(SX_CARRYOVER,strCarryOver);
-            console.log("sessionStorage.setItem('carryOver',"+strCarryOver+")");
+            localStorage.setItem(LX_CARRYOVER,strCarryOver);
+            console.log("localStorage.setItem('carryOver',"+strCarryOver+")");
         }
         catch(e) {}
     }
 }
 
 export function getCarryOver() {
-    let strCarryOver = sessionStorage.getItem(SX_CARRYOVER);
+    let strCarryOver = localStorage.getItem(LX_CARRYOVER);
     let jCarryOver={};
     if(strCarryOver) try { 
         jCarryOver=JSON.parse(strCarryOver);
-        console.log("sessionStorage.getItem('carryOver')="+JSON.stringify(jCarryOver));
+        console.log("localStorage.getItem('carryOver')="+JSON.stringify(jCarryOver));
     }
     catch(e) {}
     return jCarryOver;

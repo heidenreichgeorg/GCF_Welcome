@@ -107,11 +107,11 @@ export default function Partner() {
 
     // 20230109
     function initColumns() {
-        Object.keys(jPage).map((key,pos)=>(pos==0?'Summe':jPage[key]="0"));
+        Object.keys(jPage).map((key,pos)=>(pos==0?page.Sum:jPage[key]="0"));
         return ""; // value walks into page
     }
     function addColumns(row) {
-        Object.keys(jPage).map((key,pos)=>(pos==0?'Summe':jPage[key]=(""+(BigInt(jPage[key])+BigInt(row[key])))));
+        Object.keys(jPage).map((key,pos)=>(pos==0?page.Sum:jPage[key]=(""+(BigInt(jPage[key])+BigInt(row[key])))));
         return "."; // value walks into page
     }
 
