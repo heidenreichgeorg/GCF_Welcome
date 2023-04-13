@@ -14,6 +14,8 @@ export const  D_Receipts= "Belege"
 export const  D_Carry  =  "Übertrag"
 export const  D_CarryOff ="Löschen"
 export const  D_CarryOver="Übertragen"
+export const  D_Account="Konto"
+
 
 export const  X_ASSETS = 'de-gaap-ci_bs.ass';
 export const  X_ASS_CASH ='de-gaap-ci_bs.ass.currAss.cashEquiv';

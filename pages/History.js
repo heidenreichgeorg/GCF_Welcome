@@ -1,7 +1,7 @@
 
 import { useEffect, useState } from 'react';
 
-import { D_Carry, D_CarryOff, D_CarryOver, D_History, D_Page, D_Receipts, D_Schema, J_ACCT, SCREENLINES }  from '../modules/terms.js';
+import { D_Account, D_Carry, D_CarryOff, D_CarryOver, D_History, D_Page, D_Receipts, D_Schema, J_ACCT, SCREENLINES }  from '../modules/terms.js';
 import Screen from '../pages/Screen'
 import FooterRow from '../components/FooterRow'
 import { cents2EU }  from '../modules/money';
@@ -33,7 +33,7 @@ export default function History() {
 
     function removeCol(name) { console.log("REMOVE "+name); jHeads[name]='0'; setJHeads(JSON.parse(JSON.stringify(jHeads)));  }
 
-    funcCleaReceipt = (() => { storeCarryOver({}) });
+    funcCleaReceipt = (() => { storeCarryOver({}); resetJSum(jHeads); });
     funcKeepReceipt = (() => { storeCarryOver(jSum) });  
     funcHideReceipt = (() => setIsOpen(false)); 
     funcShowReceipt = (() => setIsOpen(true));
@@ -104,6 +104,9 @@ export default function History() {
 
     let jColumnHeads=jHeads; // state variable, do not touch
 
+    let jSum=JSON.parse(JSON.stringify(jPageSum));
+    console.log("UNIFY jSum "+JSON.stringify(jSum));
+
     if(isOpen) {
         Object.keys(aSelText).forEach(sym => 
             {if(aJMoney[sym])  (names.forEach(acct => { 
@@ -112,31 +115,21 @@ export default function History() {
                                             if(bigEUMoney(value)!=0n) { 
                                                 try { jColumnHeads[acct]=acct; } catch(e) {}
                                             }
+
+                                            let carry=jSum[acct];
+                                            if(bigEUMoney(carry)!=0n) { 
+                                                try { jColumnHeads[acct]=acct; } catch(e) {}
+                                            }
                   } }))
             })
     }
     console.log("INIT jColumnHeads "+JSON.stringify(jColumnHeads));
 
-    let jSum=JSON.parse(JSON.stringify(jPageSum));
-    console.log("UNIFY jSum "+JSON.stringify(jSum));
 
     function makeLabel(index) { return (aPattern && aPattern.length>0) ?session.client+session.year+aPattern+index : ""}
 
     const tabName = 'HistoryContent';
  
-
-/*
-    // carryOver checking
-    let carryOver = localStorage.getItem('carryOver');
-    let jCarry=[" "];
-    try { jCarry=JSON.parse(carryOver) } catch(e) {}
-    let arrCarry=[" "];
-    try { Object.keys(jCarry).forEach(acc=>{if(bigEUMoney(jCarry[acc])!=0n) arrCarry.push(acc+jCarry[acc])}) } catch(e) {}    
-    //<div className="attrLine"><div className="console">       {arrCarry.join('-')}              </div>  </div>
-    console.log("HISTORY CARRY OVER="+JSON.stringify( arrCarry ));
-
-     <div className="attrLine"><div className="console">       {arrCarry.join('-')}              </div>  </div>
-    */
     
     return (
         <Screen prevFunc={prevFunc} nextFunc={nextFunc} tabSelector={isOpen ? [] : aPages.map((_,n)=>(1+n)) } tabName={tabName}>
@@ -147,8 +140,9 @@ export default function History() {
                 <div>                     
                     <button onClick={() => funcKeepReceipt()}>{D_CarryOver}</button>
                     <button onClick={() => funcHideReceipt()}>{D_Receipts}</button>
-                    <TXNReceiptHeader text="" jAmounts={jColumnHeads} jColumnHeads={jColumnHeads} id="" removeCol={removeCol}/>                   
-                    <TXNReceiptHeader text={D_Carry} jAmounts={jPageSum} jColumnHeads={jColumnHeads} id=""/>                   
+                    { TXNReceipt(D_Account, jColumnHeads, jColumnHeads, null, session.year, removeCol) }
+                    
+                    <TXNReceiptSum text={D_Carry} jAmounts={jPageSum} jColumnHeads={jColumnHeads} id=""/>                   
                     { console.log("aSelText# = "+Object.keys(aSelText).length) ||
                     Object.keys(aSelText).map((sym,i) => ( (aSelText[sym] && i>1) ? 
                                                             TXNReceipt(
@@ -159,7 +153,7 @@ export default function History() {
                                                                 (aSelSaldo[sym]==VOID)?"":makeLabel(i)) :
                                                                     ""
                                                                     )) }
-                    <TXNReceiptHeader text={page.Sum} jAmounts={jSum} jColumnHeads={jColumnHeads} id="" removeCol={removeCol}/>                                                                                       
+                    <TXNReceiptSum text={page.Sum} jAmounts={jSum} jColumnHeads={jColumnHeads} id="" removeCol={removeCol}/>                                                                                       
                 </div>
             )}
 
@@ -358,7 +352,7 @@ function TXNReceipt(text,jAmounts,jColumnHeads,jSum,id,removeCol) {
         </div>
 )}      
 
-function TXNReceiptHeader(args) {
+function TXNReceiptSum(args) {
     //console.log("HEAD "+JSON.stringify(args));
     
     return TXNReceipt(args.text,args.jAmounts,args.jColumnHeads,null,args.id,args.removeCol);

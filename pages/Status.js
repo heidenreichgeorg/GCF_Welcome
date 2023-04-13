@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { getSession, useSession, REACT_APP_API_HOST } from '../modules/sessionmanager';
+import { getSession, storeCarryOver, useSession, REACT_APP_API_HOST } from '../modules/sessionmanager';
 import Screen from '../pages/Screen'
 import FooterRow from '../components/FooterRow'
 import { cents2EU }  from '../modules/money';
@@ -30,6 +30,8 @@ export default function Status() {
         if(state && Object.keys(state).length>5) {
             setSheet(state.generated);
         }
+        // reset all stored carryOver sums
+        storeCarryOver({});
     }, [status])
 
     function login() {
