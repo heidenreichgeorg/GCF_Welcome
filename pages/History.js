@@ -125,7 +125,7 @@ export default function History() {
     const tabName = 'HistoryContent';
  
 
-
+/*
     // carryOver checking
     let carryOver = localStorage.getItem('carryOver');
     let jCarry=[" "];
@@ -134,7 +134,9 @@ export default function History() {
     try { Object.keys(jCarry).forEach(acc=>{if(bigEUMoney(jCarry[acc])!=0n) arrCarry.push(acc+jCarry[acc])}) } catch(e) {}    
     //<div className="attrLine"><div className="console">       {arrCarry.join('-')}              </div>  </div>
     console.log("HISTORY CARRY OVER="+JSON.stringify( arrCarry ));
-    
+
+     <div className="attrLine"><div className="console">       {arrCarry.join('-')}              </div>  </div>
+    */
     
     return (
         <Screen prevFunc={prevFunc} nextFunc={nextFunc} tabSelector={isOpen ? [] : aPages.map((_,n)=>(1+n)) } tabName={tabName}>
@@ -168,7 +170,7 @@ export default function History() {
                     { !isOpen && (sHistory.slice(n*SCREEN_TXNS,(n+1)*SCREEN_TXNS).map((row,k) => (  
                         <SigRow  key={"History2"+k} row={row} index={n} client={session.client}  year={session.year} />  
                     )))}
-                    <div className="attrLine"><div className="console">       {arrCarry.join('-')}              </div>  </div>
+                   
                     <FooterRow left={page["client"]}  right={page["register"]} prevFunc={prevFunc} nextFunc={nextFunc}/>
                     <FooterRow left={page["reference"]} right={page["author"]} prevFunc={prevFunc} nextFunc={nextFunc}/>
                 </div>
