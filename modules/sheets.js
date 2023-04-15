@@ -1,5 +1,6 @@
 const debug=1;
 
+/* global BigInt */
 
 // setting this will violate privacy 
 const debugWrite=1;
@@ -657,6 +658,20 @@ function getA1(j) {
     let secundo = alpha[j%26];
     return primo+secundo;       
 }
+export function symbolic(pat) {   
+    var res = '';
+    if(pat && pat.length>2) {
+        let tap = pat.split().reverse().join();
+        var sequence = tap+pat+tap+pat;
+        let len=sequence.length;
+        for(let p=0;p<sequence.length && p<199;p++) {            
+            res = (res + alpha[sequence.charCodeAt(p)%26]);  
+        }
+    }
+    //console.log("SYMBOLIC "+pat.substring(0,9)+"="+res.substring(0,9))
+    return res.substring(0,12);
+}
+
 
 function makeSum(xSheet,a1Cell,a1From,a1To) {
     let cell = xSheet[a1Cell]; // A1 access index
@@ -671,19 +686,5 @@ function getClientDir(client) {
     return getRoot()+client+Slash; 
 }
 
-
-
-
-export function symbolic(pat) {
-    var res = 0;
-    if(pat) {
-        var sequence = ' '+pat+pat+pat;
-        var base=71
-        for(let p=0;p<sequence.length && p<80;p++) {
-            res = (res + sequence.charCodeAt(p) & 0x1FFFFFEF)*base;  
-        }
-    }
-    return res & 0x3FFFFFF;
-}
 
 

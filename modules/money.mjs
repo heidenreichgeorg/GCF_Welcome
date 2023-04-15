@@ -30,6 +30,11 @@ export function bigEUMoney(strSet) {
     return bigMoney(strSet,1n,null); }
 
     
+export function cents20EU(amount) { 
+    if(!amount) return "0";
+    else return cents2EU(amount);
+}
+        
 
 export function cents2EU(amount) { 
     let cents=amount; 

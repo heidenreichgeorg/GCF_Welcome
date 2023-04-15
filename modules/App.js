@@ -1,4 +1,6 @@
 
+
+
 import { D_Balance, D_History, D_Report, D_Schema, D_Page, X_ASSETS, X_EQLIAB, X_EQUITY, X_INCOME, X_INCOME_REGULAR, SCREENLINES } from './terms.js'
 import { cents2EU }  from '../modules/money.mjs';
 import { iCpField, prettyTXN } from './writeModule'
@@ -43,18 +45,6 @@ export function getParam(strParam) {
     
     var searchParams = new URL(window.location.href).searchParams;
     return searchParams.get(strParam);
-}
-
-export function symbolic(pat) {   
-    var res = 0;
-    if(pat) {
-        var sequence = ' '+pat+pat+pat;
-        var base=71;
-        for(let p=0;p<sequence.length && p<80;p++) {
-            res = (res + sequence.charCodeAt(p) & 0x1FFFFFFEF)*base;  
-        }
-    }
-    return res & 0x3FFFFFFFF;
 }
 
 

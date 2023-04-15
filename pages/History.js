@@ -4,8 +4,9 @@ import { useEffect, useState } from 'react';
 import { D_Account, D_Carry, D_CarryOff, D_CarryOver, D_History, D_Page, D_Receipts, D_Schema, J_ACCT, SCREENLINES }  from '../modules/terms.js';
 import Screen from '../pages/Screen'
 import FooterRow from '../components/FooterRow'
-import { cents2EU }  from '../modules/money';
-import { getParam, symbolic }  from '../modules/App';
+import { cents20EU }  from '../modules/money';
+import { symbolic }  from '../modules/sheets';
+import { getParam }  from '../modules/App';
 import { CSEP,prettyTXN }  from '../modules/writeModule';
 import { getSession,getCarryOver,storeCarryOver, useSession } from '../modules/sessionmanager';
 import { bigEUMoney } from '../modules/money.mjs';
@@ -34,7 +35,7 @@ export default function History() {
     function removeCol(name) { console.log("REMOVE "+name); jHeads[name]='0'; setJHeads(JSON.parse(JSON.stringify(jHeads)));  }
 
     funcCleaReceipt = (() => { storeCarryOver({}); resetJSum(jHeads); });
-    funcKeepReceipt = (() => { storeCarryOver(jSum) });  
+    funcKeepReceipt = (() => { storeCarryOver(purgeCarryOver(jSum));  });  
     funcHideReceipt = (() => setIsOpen(false)); 
     funcShowReceipt = (() => setIsOpen(true));
 
@@ -61,6 +62,12 @@ export default function History() {
             }
     }, [status])
 
+function purgeCarryOver(jSum) {
+    let result={}; 
+    Object.keys(jSum).forEach(name => {if(bigEUMoney(jSum[name])!=0n) 
+        result[name]=jSum[name];});
+    return result;
+}
 
     function resetJSum(jColumnHeads) { 
         let jCarryOver=getCarryOver();
@@ -112,12 +119,16 @@ export default function History() {
             {if(aJMoney[sym])  (names.forEach(acct => { 
                 if(acct.length>2 && jColumnHeads[acct]=='1') {   
                                             let value=aJMoney[sym][acct]; 
+                                            let carry=jSum[acct];
                                             if(bigEUMoney(value)!=0n) { 
                                                 try { jColumnHeads[acct]=acct; } catch(e) {}
+                                                
+                                                if(!carry || carry.length==0) {
+                                                    jSum[acct]="0"; jPageSum[acct]="0";
+                                                }
                                             }
 
-                                            let carry=jSum[acct];
-                                            if(bigEUMoney(carry)!=0n) { 
+                                            if(carry && carry.length>0) { 
                                                 try { jColumnHeads[acct]=acct; } catch(e) {}
                                             }
                   } }))
@@ -143,15 +154,17 @@ export default function History() {
                     { TXNReceipt(D_Account, jColumnHeads, jColumnHeads, null, session.year, removeCol) }
                     
                     <TXNReceiptSum text={D_Carry} jAmounts={jPageSum} jColumnHeads={jColumnHeads} id=""/>                   
-                    { console.log("aSelText# = "+Object.keys(aSelText).length) ||
-                    Object.keys(aSelText).map((sym,i) => ( (aSelText[sym] && i>1) ? 
+                    { console.log("aSelText keys = "+Object.keys(aSelText).join('+')) ||
+                    Object.keys(aSelText).map((sym,i) => ( (sym && aSelText[sym] && aJMoney[sym] ) ? // && i>1
+                                                //console.log("Receipt "+sym+" for "+aSelText[sym]+" with "+aJMoney[sym]) && 
                                                             TXNReceipt(
                                                                 aSelText[sym].join(' '),
                                                                 aJMoney[sym],
                                                                 jColumnHeads,
                                                                 jSum,
-                                                                (aSelSaldo[sym]==VOID)?"":makeLabel(i)) :
-                                                                    ""
+                                                                sym) // && i>1
+//                                                                (aSelSaldo[sym]==VOID)?"":makeLabel(i)) 
+                                                                    :""
                                                                     )) }
                     <TXNReceiptSum text={page.Sum} jAmounts={jSum} jColumnHeads={jColumnHeads} id="" removeCol={removeCol}/>                                                                                       
                 </div>
@@ -162,7 +175,7 @@ export default function History() {
             {aPages.map((m,n) => ( 
                 <div className="FIELD"  key={"History0"+n}  id={tabName+n} style= {{ 'display': m }} >
                     { !isOpen && (sHistory.slice(n*SCREEN_TXNS,(n+1)*SCREEN_TXNS).map((row,k) => (  
-                        <SigRow  key={"History2"+k} row={row} index={n} client={session.client}  year={session.year} />  
+                        <SigRow  key={"History2"+k} row={row} index={n} client={session.client}  year={session.year} line={k} />  
                     )))}
                    
                     <FooterRow left={page["client"]}  right={page["register"]} prevFunc={prevFunc} nextFunc={nextFunc}/>
@@ -196,7 +209,7 @@ function handleChange(target,aRow,tRow,id) {
     }
 }
 
-function SigRow({row,index,client,year}) {
+function SigRow({row,index,client,year,line}) {
 
     let aRow = [0n,0n,0n,0n,0n,0n]
     try { let saRow = row.entry;
@@ -209,14 +222,21 @@ function SigRow({row,index,client,year}) {
     } catch(err) {}
 
     let saldo="";
-    if(isNaN(row.saldo)) saldo=VOID;
-    else saldo = cents2EU(row.saldo); // cents2EU
+    if(isNaN(row.saldo)) saldo="0";
+    else saldo = cents20EU(row.saldo); // cents2EU with 0 digit
 
-    let id= ((aRow[0].substring(4).replace(/\D/g, ""))+symbolic(aRow.join('')+JSON.stringify(tRow)));
+    
+    //let id = line+symbolic(aRow.join('')+line+JSON.stringify(tRow));
+    let id = symbolic(''+line+aRow.join('')+line+JSON.stringify(tRow));
 
     var selectAll = getParam("SELECTALL");
     if(selectAll && selectAll.length<1) selectAll=null;
-    if(selectAll) { 
+    if(selectAll 
+        && (index>0 || line>1) // SKIP OPENING GH20230413 was
+        ) { 
+        
+            console.log("ADDING("+id+") "+JSON.stringify(aRow));
+
         aSelText[id]=aRow;  
         aJMoney[id]=tRow;
         aSelSaldo[id]=""+saldo;         
@@ -281,9 +301,9 @@ function makeHistory(sheet) {
             var names=gSchema.Names;
             var iSaldo=0n;
 
-            for (let hash in jHistory)  {
+            for (let index in jHistory)  {
 
-                let jPrettyTXN = prettyTXN(jHistory,hash,lPattern,aPattern,names,aLen,eLen);
+                let jPrettyTXN = prettyTXN(jHistory,index,lPattern,aPattern,names,aLen,eLen);
 
                 // GH 20220703
                 if(jPrettyTXN.txnAcct) {
@@ -297,7 +317,7 @@ function makeHistory(sheet) {
                     var lMoney = {};
                     for (i=J_ACCT;i<txn.length;i++) { if(i!=aLen && i!=eLen && txn[i] && txn[i].length>1) lMoney[names[i]]=txn[i]; }  
 
-                    console.log("txn="+JSON.stringify(lMoney));
+                    console.log("makeHistory("+index+") for txn="+JSON.stringify(jHistory[index]).substring(14,60));
 
                     iSaldo += BigInt(jPrettyTXN.strSaldo);
                     
@@ -338,7 +358,9 @@ function TXNReceipt(text,jAmounts,jColumnHeads,jSum,id,removeCol) {
         let value = jAmounts[acct];        
         if(jSum && value && value.length>2) {   
             console.log("TXNReceipt "+acct+" add "+value);        
-            if(jSum[acct]) jSum[acct] = cents2EU(bigEUMoney(jSum[acct]) + bigEUMoney(value));
+            if(jSum[acct]) {
+                jSum[acct] = cents20EU(bigEUMoney(jSum[acct]) + bigEUMoney(value));
+            }
         }
     })
     if(jSum) console.log("TXNReceipt jSum "+JSON.stringify(jSum));
