@@ -280,3 +280,19 @@ export function sendDisplay(session,res) {
     }
 }
 
+export function symbolic(pat) {   
+    const alpha=['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'];
+    var res = '';
+    if(pat && pat.length>2) {
+        let tap = pat.split().reverse().join();
+        var sequence = tap+pat+tap+pat;
+        let len=sequence.length;
+        for(let p=0;p<len && p<16;p++) {            
+            let a = sequence.charCodeAt(p);
+            let z = sequence.charCodeAt(len-1-p)
+            res = (res + alpha[sequence.charCodeAt(a+z)%26]);  
+        }
+    }
+    //console.log("SYMBOLIC "+pat.substring(0,9)+"="+res.)
+    return res;
+}

@@ -2,11 +2,8 @@
 
 import type { NextApiRequest, NextApiResponse } from 'next'
 import  { formatTXN  } from '../../modules/compile'
-import  { getRoot,init,localhost,setSession,signIn, strSymbol, timeSymbol } from '../../modules/session'
+import  { getRoot,init,localhost,setSession,signIn, strSymbol, symbolic, timeSymbol } from '../../modules/session'
 import  { save2Bucket } from '../../modules/writeModule'
-import  { symbolic } from '../../modules/sheets'
-
-// localhost, save2Bucket
 
 
 let config:string|null;
@@ -165,3 +162,4 @@ function bookSheet(session:any,tBuffer:string[]|null,sessionTime:String,nextSess
 
   return session;
 }
+

@@ -5,7 +5,7 @@ import { D_Account, D_Carry, D_CarryOff, D_CarryOver, D_History, D_Page, D_Recei
 import Screen from '../pages/Screen'
 import FooterRow from '../components/FooterRow'
 import { cents20EU }  from '../modules/money';
-import { symbolic }  from '../modules/sheets';
+import { symbolic }  from '../modules/session';
 import { getParam }  from '../modules/App';
 import { CSEP,prettyTXN }  from '../modules/writeModule';
 import { getSession,getCarryOver,storeCarryOver, useSession } from '../modules/sessionmanager';
@@ -137,7 +137,7 @@ function purgeCarryOver(jSum) {
     console.log("INIT jColumnHeads "+JSON.stringify(jColumnHeads));
 
 
-    function makeLabel(index) { return (aPattern && aPattern.length>0) ?session.client+session.year+aPattern+index : ""}
+    function makeLabel(index) { let p= (aPattern && aPattern.length>0) ? aPattern: "p"; return session.client+session.year+p+index }
 
     const tabName = 'HistoryContent';
  
@@ -148,7 +148,7 @@ function purgeCarryOver(jSum) {
 
             {isOpen &&             
                 (
-                <div>                     
+                <div className="mTable">                     
                     <button onClick={() => funcKeepReceipt()}>{D_CarryOver}</button>
                     <button onClick={() => funcHideReceipt()}>{D_Receipts}</button>
                     { TXNReceipt(D_Account, jColumnHeads, jColumnHeads, null, session.year, removeCol) }
@@ -162,7 +162,7 @@ function purgeCarryOver(jSum) {
                                                                 aJMoney[sym],
                                                                 jColumnHeads,
                                                                 jSum,
-                                                                sym) // && i>1
+                                                                makeLabel(i)) // && i>1
 //                                                                (aSelSaldo[sym]==VOID)?"":makeLabel(i)) 
                                                                     :""
                                                                     )) }
@@ -364,14 +364,15 @@ function TXNReceipt(text,jAmounts,jColumnHeads,jSum,id,removeCol) {
         }
     })
     if(jSum) console.log("TXNReceipt jSum "+JSON.stringify(jSum));
+    
 
-    return(
-        <div className="FIELD" id={"PageContentReceipt"+id} key={"PageContentReceipt"+id}>
-            <div className="BIGCELL">
-                <div className="FIELD">{text} {id}</div>
-                <BalanceRow jValues={jAmounts} jColumnHeads={jColumnHeads} removeCol={removeCol}/>
-            </div>
+    return( // FIELD
+        <div>
+            <div className="attrLine"> <div className="FIELD"></div></div>
+            <div className="attrLine"> <div className="FIELD">{text} {id}</div></div>
+            <BalanceRow jValues={jAmounts} jColumnHeads={jColumnHeads} removeCol={removeCol}/>
         </div>
+        
 )}      
 
 function TXNReceiptSum(args) {
