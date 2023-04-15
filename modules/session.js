@@ -1,3 +1,5 @@
+/* global BigInt */
+
 import { networkInterfaces } from 'os';
 
 
@@ -281,18 +283,19 @@ export function sendDisplay(session,res) {
 }
 
 export function symbolic(pat) {   
-    const alpha=['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'];
-    var res = '';
+    const alpha=['5','7','11','13','17','19','23','29','31','37','39','41','43','47','51','53','57','59','61','67','71','73','79','81','83','87','89'];
+    var res = 0n;
     if(pat && pat.length>2) {
         let tap = pat.split().reverse().join();
-        var sequence = tap+pat+tap+pat;
+        var sequence = tap+pat+tap+pat+tap+pat+tap;
         let len=sequence.length;
-        for(let p=0;p<len && p<16;p++) {            
+        for(let p=0;p<len && p<20;p++) {            
             let a = sequence.charCodeAt(p);
             let z = sequence.charCodeAt(len-1-p)
-            res = (res + alpha[sequence.charCodeAt(a+z)%26]);  
+            let iNext = BigInt(alpha[(a+z)%26]);
+            res = (7n * res + iNext);  
         }
     }
     //console.log("SYMBOLIC "+pat.substring(0,9)+"="+res.)
-    return res;
+    return res.toString();
 }
