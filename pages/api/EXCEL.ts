@@ -44,19 +44,11 @@ export default function handler(
 
 function downloadExcel(session:any, res:NextApiResponse<any>) {
   
-    let sessionId = session.id; 
-  
-    console.log("0610 app.post EXCEL");
-
-    var result="SERVER LOADS DOWN";
-    
-    let year =session.year;
-    let client = session.client;
-    
+    console.log("1600 app.post EXCEL");
+    if(session) {
+        let sessionId = session.id; 
+        if(sessionId ) {
         
-    if(sessionId ) {
-        
-        if(session) {
             console.log("1610 GET EXCEL FOR "+session.id.slice(-4));
     
             if(session.sheetName) {
@@ -65,7 +57,6 @@ function downloadExcel(session:any, res:NextApiResponse<any>) {
                 let sheetName = session.sheetName;
                 console.log("1620 /EXCEL sheetName="+sheetName); 
                 if(client && year) {
-
 
                     console.log("1630 GET /EXCEL "+sheetName+ " for ("+client+","+year+")");
 
@@ -79,13 +70,8 @@ function downloadExcel(session:any, res:NextApiResponse<any>) {
                     return;
                 } else console.log("1621 GET /EXCEL NO CLIENT NO YEAR"+JSON.stringify(Object.keys(session)));
             } else console.log("1623 GET /EXCEL NO SHEETNAME IN SESSION"+JSON.stringify(Object.keys(session)));
-        } else console.log("1625 GET /EXCEL NO SESSION");
-            
-
-    } else {
-        
-        console.log("0615 app.post EXCEL NO sessionId");
-    }        
+        } else console.log("1625 GET /EXCEL NO sessionId");
+    } else { console.log("0615 app.post EXCEL NO session"); }        
 }
 
 

@@ -393,12 +393,7 @@ function makeXLTabs(sheetCells,jAssets,jHistory,jSchema,jPartner,jBalance,jXBRL,
     taxDetails.map((row) => (                
         Object.keys(row).map((fieldName) => (partner.push({'name':fieldName==='name'?'':fieldName,'amnt':row[fieldName]})))));
 
-
     partner.map((row) => (excelPartnerT.push(Object.keys(row).map((k) => (row[k])))));
-                
- 
-
-
 
     var numAddrs = 0;
     try {
@@ -414,8 +409,6 @@ function makeXLTabs(sheetCells,jAssets,jHistory,jSchema,jPartner,jBalance,jXBRL,
             console.dir("1433 sheets.makeXLTabs NO CREDITORS tab");
         }
     } catch(err) {console.dir("1431 sheets.makeXLTabs CREDITORS tab: "+err);}
-
-
 
     if(sheetCells) {        
         let strXBRL = [];

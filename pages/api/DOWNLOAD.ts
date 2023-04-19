@@ -71,12 +71,7 @@ function downloadJSON(session:any, res:NextApiResponse<any>) {
 
             let sessionTime=timeSymbol();
             let monthYearHour = sessionTime.slice(4,10);
-/*
-            // no state change, because no tBuffer is given
-            xlsxWrite(sessionId); 
-            console.log("1530 app.post DOWNLOAD writing XLSX");
 
-*/
             // download JSON
             let fileName = session.year+session.client+monthYearHour+'.json';
             console.log("1540 app.post DOWNLOAD download JSON as "+fileName);

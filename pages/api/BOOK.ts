@@ -81,9 +81,6 @@ function bookTransaction(session:any, res:NextApiResponse<any>) {
 
           // modifies session object and stores it under new sessionId
           session = bookSheet(session,arrTransaction,sessionTime,nextSessionId);
-          // 20220516 Sheets.xlsxWrite(req.body.sessionId,tBuffer,sessionTime,nextSessionId); 
-          // state change in YYYYCCCC.json
-
 
           
           let serverAddr = localhost();
