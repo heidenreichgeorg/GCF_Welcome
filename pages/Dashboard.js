@@ -74,6 +74,12 @@ export default function DashBoard({value}) {
     let arrAccounts = accPartners.map((partner) => ([jAccounts[partner.varCap].yearEnd,partner.resCap?jAccounts[partner.resCap].yearEnd:"0",jAccounts[partner.fixCap].yearEnd,partner.income]));
     let arrNumbers = arrAccounts.map((partner) => (partner.map((strNum)=>(BigInt(strNum)).toString())));
 
+
+    let aVarCap = accPartners.map((partner) => (jAccounts[partner.varCap].yearEnd));
+    let aFixCap = accPartners.map((partner) => (jAccounts[partner.fixCap].yearEnd));
+    let aIncome = accPartners.map((partner) => (partner.income));
+    let haloFeatures = { fixedCap:aFixCap, variableCap:aVarCap, income:aIncome };
+
 // scale to 80    
     let bigTotal = 0n;
     let bigFactor = 79n;
@@ -106,7 +112,7 @@ export default function DashBoard({value}) {
             </div>
 
             <div classname="attrLine">
-                <Halo/>
+                <Halo jFeatures={haloFeatures}/>
             </div>
 
 
