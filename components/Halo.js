@@ -10,7 +10,6 @@ const cScaleBlue="#5588CC";
 export default function Halo (args) {
 
     const radius = 100;
-    const max = 360000;
 
     console.log("HALO "+JSON.stringify(args.jFeatures));
 
@@ -45,8 +44,6 @@ export default function Halo (args) {
     let aWork = [];
     const strokeWidth = 5;
     var featureRad = radius-strokeWidth;
-    //let externalRad=makeGroup(aWork,jFeatures.fixedCap,   xcenter,ycenter,radius+20,strokeWidth,step,140,"EE4411"); 
-
 
     let angle=0; 
     Object.keys(jFeatures).forEach(title=>
@@ -62,16 +59,14 @@ export default function Halo (args) {
 
     // aWork,aScales are the output of the make operations
 
-//                 <g key={"circleDiv"+i} id="tooltip" display="none" style="position: absolute; display: none;">
-
-
     return (
-        <div>
         <svg height={30+outerRadius*2} width={30+outerRadius*2} >
+        <g>
             
             {
             aWork.map((jTask,i)=>(
             (
+                <g>
                     <circle
                         className="gauge_base"
                         cx={jTask.xcenter}
@@ -83,6 +78,8 @@ export default function Halo (args) {
                         transform={jTask.transform}
                         fill="transparent"
                     /> 
+                    <text x={jTask.xstart} y={jTask.ystart} font-size="5" transform={jTask.transform}>abcd</text>
+                </g>
                    
             )))
             }
@@ -126,10 +123,10 @@ export default function Halo (args) {
                  strokeWidth={1}
                  />
             }
+        </g>
         </svg>
         
 
-        </div>
     );
     // <div id="tooltip" display="none">...</div>
 }
@@ -156,16 +153,21 @@ function makeGroup(aWork,arrValues,xcenter,ycenter,radius,width,step,start) {
     var toggle=0;
     const circumference = radius * 2 * Math.PI;
     let base=start / step * circumference;
+    let begin=start;
     arrValues.forEach(value=>{
         const arc = (circumference * value) / step;
         const dash = `${arc} ${circumference}`;   
-        //console.log("ARC   base="+base+" dash "+dash);
+        const angle=2*Math.PI*begin/step;
+        const xstart=0;Math.cos(angle)*radius;
+        const ystart=0;Math.sin(angle)*radius;
         aWork.push({ transform: `rotate(${base}, ${xcenter}, ${ycenter})`, 
                     xcenter:xcenter, ycenter:ycenter, 
-                    radius:radius, 
+                    xstart:xstart+xcenter+radius,ystart:ystart+ycenter,
+                    radius:radius,                     
                     dash:dash, 
                     width:width+toggle, color:toggle==0?cArcBlue:cScaleBlue});
-        base+=(value / step)*radius*4;        
+        base+=(value / step)*radius*4;      
+        begin+=value;  
         toggle=5-toggle;
     });
     return radius-3;
@@ -185,13 +187,4 @@ function makeScales(aScales,aWork,begin,iter,xcenter,ycenter,radius) {
                     radius:radius, dash:dash, width:strokeWidth, color:cScaleBlue});
 }
 
-/*
- <rect 
-                        width="15"
-                        height="15"
-                        onMouseMove={(e)=>{showTooltip(e, 'Account'+i)}} 
-                        onMouseOut={hideTooltip}
-                        style="fill:rgb(0,0,0);"
-                    /> 
-                </g>
-*/
+
