@@ -10,8 +10,7 @@ const cDarkBlue ="#223388";
 
 // JSON of named features each feature is an array with 
 export default function Halo (args) {
-
-    const radius = 110;
+    const radius = args.radius;
 
     console.log("HALO "+JSON.stringify(args.arrPartners));
 
@@ -23,20 +22,12 @@ export default function Halo (args) {
     const ycenter=outerRadius+15;
 
     // named arrays of values { type:[] }
-    let jFeatures = { }
-
+    let jFeatures = {}
     let jNames = {}
-
-
     Object.keys(args.jFeatures).forEach(title=>
         {
             jFeatures[title] = args.jFeatures[title].map((value)=>parseInt(""+(bigEUMoney(value)/2000000n)))
-
-
-            let related = args.arrPartners.map((_,i)=>((args.arrPartners[i])[title]));
-            console.log("TYPE="+title+ " finds "+JSON.stringify(jFeatures[title])+" into "+JSON.stringify(related));
-
-            jNames[title]=related;
+            jNames[title]=args.arrPartners.map((_,i)=>((args.arrPartners[i])[title]));
         })
 
 
@@ -46,17 +37,14 @@ export default function Halo (args) {
     const strokeWidth = 5;
     var featureRad = radius-strokeWidth;
 
-
     let aScales=[];
     makeScales(aScales,aWork,130,11,xcenter,ycenter,radius);
     makeScales(aScales,aWork,310,11,xcenter,ycenter,radius);
-
-
-    let angle=0; 
+    
+    var featureBegin=0;
     Object.keys(jFeatures).forEach(title=>
     {
-        featureRad=makeGroup(aWork, jFeatures[title], jNames[title],xcenter,ycenter, featureRad, strokeWidth,step,  angle)-3 
-        angle+=20;
+        featureBegin=makeGroup(aWork, jFeatures[title], jNames[title], xcenter,ycenter, featureRad, strokeWidth, step, featureBegin);        
     })
 
 
@@ -115,29 +103,31 @@ export default function Halo (args) {
 const allColors = ["#2255BB","#2299BB","#4499BB","#6699BB","#2255DD","#2299DD","#3399CC","#9999CC"];
     
 function makeGroup(aWork,arrValues,names,xcenter,ycenter,radius,width,step,start) {
+    let pos=start;
     radius-=width;
     var toggle=0;
     const circumference = radius * 2 * Math.PI;
-    let base=start / step * circumference;
-    let begin=start;
+    let base=(pos * circumference) / step;
     var index=0;
     arrValues.forEach(value=>{
         const arc = (circumference * value) / step;
         const dash = `${arc} ${circumference}`;   
-        const angle=2*Math.PI*begin/step;
+        const angle=2*Math.PI*pos/step;
+        const degrees=360*pos/step;
         const xstart=0;Math.cos(angle)*radius;
         const ystart=0;Math.sin(angle)*radius;
-        aWork.push({ transform: `rotate(${base}, ${xcenter}, ${ycenter})`, 
+        aWork.push({ transform: `rotate(${degrees}, ${xcenter}, ${ycenter})`, 
                     xcenter:xcenter, ycenter:ycenter, 
-                    xstart:xstart+xcenter+radius,ystart:ystart+ycenter,
+                    xstart:xstart+xcenter+radius-(toggle==0?0:10),ystart:ystart+ycenter,
                     radius:radius,                     
                     dash:dash, text:names[index++],
-                    width:width+toggle, color:toggle==0?cArcBlue:cSkyBlue});
-        base+=(value / step)*radius*4;      
-        begin+=value;  
+                    width:width+toggle, 
+                    color:toggle==0?cArcBlue:cSkyBlue});
+        pos+=value;  
+        base=(pos *circumference) / step;      
         toggle=5-toggle;
     });
-    return radius-5;
+    return pos;
 }
 
 function makeScales(aScales,aWork,begin,iter,xcenter,ycenter,radius) {

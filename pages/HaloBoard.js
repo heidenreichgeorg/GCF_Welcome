@@ -82,7 +82,7 @@ export default function DashBoard({value}) {
     return (
         <Screen prevFunc={prevFunc} nextFunc={nextFunc} >
             <div classname="attrLine">
-                <Halo jFeatures={haloFeatures} arrPartners={namPartners}/>
+                <Halo jFeatures={haloFeatures} arrPartners={namPartners} radius={110}/>
             </div>
             <FooterRow  id={"F1"}  left={page["client"]}   right={page["register"]} prevFunc={prevFunc} nextFunc={nextFunc}/>
             <FooterRow  id={"F2"}  left={page["reference"]}  right={page["author"]} prevFunc={prevFunc} nextFunc={nextFunc}/>
