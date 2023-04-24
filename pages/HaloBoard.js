@@ -32,8 +32,8 @@ export default function DashBoard({value}) {
 
     if(!sheet) return null; //'Loading...';
 
-    function prevFunc() {console.log("CLICK PREVIOUS"); window.location.href="/Balance?client="+session.client+"&year="+session.year; }
-    function nextFunc() {  console.log("CLICK NEXT");   window.location.href="/FixedAssets?client="+session.client+"&year="+session.year; }
+    function prevFunc() {console.log("CLICK PREVIOUS"); window.location.href="/FixedAssets?client="+session.client+"&year="+session.year; }
+    function nextFunc() {  console.log("CLICK NEXT");   window.location.href="/HGB275S2Page?client="+session.client+"&year="+session.year; }
     
     let jValue={};
     let jAssets = sheet[D_FixAss];
@@ -58,8 +58,7 @@ export default function DashBoard({value}) {
     // add extra bar for current assets
     let iCur = BigInt(ass)-BigInt(fix);
     jValue.currency = ""+iCur;
-
-     
+    
     let page = sheet[D_Page];
 
 
@@ -71,47 +70,22 @@ export default function DashBoard({value}) {
     let accPartners = nPartners.map((partner) => ({varCap:jPartners[partner].varCap,resCap:jPartners[partner].resCap,fixCap:jPartners[partner].fixCap,income:jPartners[partner].income}));
     let arrAccounts = accPartners.map((partner) => ([jAccounts[partner.varCap].yearEnd,partner.resCap?jAccounts[partner.resCap].yearEnd:"0",jAccounts[partner.fixCap].yearEnd,partner.income]));
     let arrNumbers = arrAccounts.map((partner) => (partner.map((strNum)=>(BigInt(strNum)).toString())));
+    let namPartners = nPartners.map((partner) => ({varCap:jPartners[partner].varCap,resCap:jPartners[partner].resCap,fixCap:jPartners[partner].fixCap,income:jPartners[partner].varCap}));
 
 
     let aVarCap = accPartners.map((partner) => (jAccounts[partner.varCap].yearEnd));
     let aFixCap = accPartners.map((partner) => (jAccounts[partner.fixCap].yearEnd));
+    let aResCap = accPartners.map((partner) => (jAccounts[partner.resCap]?jAccounts[partner.resCap].yearEnd:"0"));
     let aIncome = accPartners.map((partner) => (partner.income));
-    let haloFeatures = { fixedCap:aFixCap, variableCap:aVarCap, income:aIncome };
-
-// scale to 80    
-    let bigTotal = 0n;
-    let bigFactor = 79n;
-    arrNumbers.map((partner) => (partner.map((strNum)=>(bigTotal=(BigInt(strNum)>bigTotal) ? BigInt(strNum) : bigTotal))));
-    let arrPartners = arrNumbers.map((partner) => (partner.map((strNum)=>(parseInt((bigFactor*BigInt(strNum))/bigTotal).toString()))));
-
-    
+    let haloFeatures = { income:aIncome, fixCap:aFixCap, varCap:aVarCap,  resCap:aResCap };
 
     return (
         <Screen prevFunc={prevFunc} nextFunc={nextFunc} >
-
             <div classname="attrLine">
-                <Gauge percent={parseInt((100n*BigInt(fix))/BigInt(ass))} radius={90} strDim={"%fixed"}  color={"#0020FF"}/>
-                <Gauge percent={parseInt((100n*BigInt(tan))/BigInt(fix))} radius={90} strDim={"tan/fix"}  color={"#333344"}/>
-                <Gauge percent={parseInt((100n*BigInt(gls))/BigInt(ass))} radius={90} strDim={"%gain"}  color={"#66EEAA"}/>
-                <Gauge percent={parseInt((100n*BigInt(eqt))/BigInt(ass))} radius={90} strDim={"%equity"} color={"#EE3311"}/> 
-                <Gauge percent={parseInt((100n*BigInt(gls))/BigInt(fix))} radius={90} strDim={"gain/fix"}  color={"#00FF00"}/>
+                <Halo jFeatures={haloFeatures} arrPartners={namPartners}/>
             </div>
-            <div classname="attrLine">
-                
-                <Gauge percent={parseInt((100n*BigInt(gls))/BigInt(eqt))} radius={90} strDim={"gain/eqt"}  color={"#CCCC22"}/>
-                <Slider value={parseInt((100n*BigInt(fix))/BigInt(eqt))} legend={"fix/eqt"}/>
-                <Gauge percent={parseInt((100n*BigInt(eqt))/BigInt(fix))} radius={90} strDim={"eqt/fix"} color={"#6040E0"}/> 
-                <Chart jValue={jValue} legend={"assets"}/>
-                <Relation scale={ass} left={cur} right={lia} legend={"cash/debt"} />
-            </div>
-            <div classname="attrLine">
-                <Relation scale={ass} left={fix} right={eqt} legend={"fix/eqt"} />
-                <BarList partners={arrPartners} legend={"partners"}/>
-            </div>
-
             <FooterRow  id={"F1"}  left={page["client"]}   right={page["register"]} prevFunc={prevFunc} nextFunc={nextFunc}/>
             <FooterRow  id={"F2"}  left={page["reference"]}  right={page["author"]} prevFunc={prevFunc} nextFunc={nextFunc}/>
-
         </Screen>
         )
    

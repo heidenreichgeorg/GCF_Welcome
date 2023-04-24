@@ -2,40 +2,41 @@ import React from "react";
 import { bigEUMoney } from "../modules/money.mjs";
 
 
+const cSkyBlue  ="#77CCEE";
 const cArcBlue  ="#66AADD";
 const cScaleBlue="#5588CC";
+const cDarkBlue ="#223388";
 
 
 // JSON of named features each feature is an array with 
 export default function Halo (args) {
 
-    const radius = 100;
+    const radius = 110;
 
-    console.log("HALO "+JSON.stringify(args.jFeatures));
+    console.log("HALO "+JSON.stringify(args.arrPartners));
 
-    //const logMax = Math.floor(Math.log10(max)-2);
-    //let step = 1; for(let i=0;i<logMax;i++) step=10*step;
-    //console.log("max= "+max+"   logMax="+logMax+" and step is "+step);
     const step=1000;
-
-    
-
 
     const lineRadius = radius-10;
     const outerRadius = radius+3;
     const xcenter=outerRadius+15;
     const ycenter=outerRadius+15;
 
-    let jFeatures = {
-      //  f1 : [10,20,30,40,50,60,70],
-//        f2 : [10,20,30,40,50,60,70],
-        //f3 : [10,20,30,40,50,60,70]
-    }
+    // named arrays of values { type:[] }
+    let jFeatures = { }
+
+    let jNames = {}
 
 
     Object.keys(args.jFeatures).forEach(title=>
         {
             jFeatures[title] = args.jFeatures[title].map((value)=>parseInt(""+(bigEUMoney(value)/2000000n)))
+
+
+            let related = args.arrPartners.map((_,i)=>((args.arrPartners[i])[title]));
+            console.log("TYPE="+title+ " finds "+JSON.stringify(jFeatures[title])+" into "+JSON.stringify(related));
+
+            jNames[title]=related;
         })
 
 
@@ -45,51 +46,27 @@ export default function Halo (args) {
     const strokeWidth = 5;
     var featureRad = radius-strokeWidth;
 
-    let angle=0; 
-    Object.keys(jFeatures).forEach(title=>
-    {
-        featureRad=makeGroup(aWork, jFeatures[title], xcenter,ycenter, featureRad, strokeWidth,step,  angle)-3 
-        angle+=20;
-    })
-
 
     let aScales=[];
     makeScales(aScales,aWork,130,11,xcenter,ycenter,radius);
     makeScales(aScales,aWork,310,11,xcenter,ycenter,radius);
 
+
+    let angle=0; 
+    Object.keys(jFeatures).forEach(title=>
+    {
+        featureRad=makeGroup(aWork, jFeatures[title], jNames[title],xcenter,ycenter, featureRad, strokeWidth,step,  angle)-3 
+        angle+=20;
+    })
+
+
     // aWork,aScales are the output of the make operations
 
     return (
-        <svg height={30+outerRadius*2} width={30+outerRadius*2} >
+        <svg viewBox="0 0 230 250" height="720" width="760" >
         <g>
-            
-            {
-            aWork.map((jTask,i)=>(
-            (
-                <g>
-                    <circle
-                        className="gauge_base"
-                        cx={jTask.xcenter}
-                        cy={jTask.ycenter}                
-                        r={jTask.radius}
-                        stroke={jTask.color}
-                        strokeDasharray={jTask.dash}
-                        strokeWidth={jTask.width}
-                        transform={jTask.transform}
-                        fill="transparent"
-                    /> 
-                    <text x={jTask.xstart} y={jTask.ystart} font-size="5" transform={jTask.transform}>abcd</text>
-                </g>
-                   
-            )))
-            }
-
-
-
-            {
-                
-                aScales.map((scale)=>(
-                     scale.jTask.map((j,i)=>
+            {   aScales.map((scale)=>(
+                    scale.jTask.map((j,i)=>
                     (
                         <line key={"Line"+i}
                             x1={xcenter+(lineRadius*Math.cos(j*Math.PI/180))} 
@@ -101,28 +78,32 @@ export default function Halo (args) {
                             />
                     )))                
                 )}
+                <line x1={-10}  y1={ycenter}  x2={2*xcenter+10}  y2={ycenter}  stroke={cArcBlue} strokeWidth={1} />
+                <line  x1={xcenter} y1={-10}  x2={xcenter}  y2={2*ycenter+10} stroke={cArcBlue} strokeWidth={1} />
             
             {
-                 <line
-                 x1={-10} 
-                 y1={ycenter} 
-                 x2={2*xcenter+10} 
-                 y2={ycenter} 
-                 stroke={cArcBlue}
-                 strokeWidth={1}
-                 />
+            aWork.map((jTask,i)=>(
+            (
+                <g fill={cDarkBlue} >
+                    <circle
+                        className="gauge_base"
+                        cx={jTask.xcenter}
+                        cy={jTask.ycenter}                
+                        r={jTask.radius}
+                        stroke={jTask.color}
+                        strokeDasharray={jTask.dash}
+                        strokeWidth={jTask.width}
+                        transform={jTask.transform}
+                        fill="transparent"
+                    /> 
+                    <text x={jTask.xstart} y={jTask.ystart} font-size="4" transform={jTask.transform}>{jTask.text}</text>
+                </g>                   
+            )))
             }
 
-            {
-                 <line
-                 x1={xcenter} 
-                 y1={-10} 
-                 x2={xcenter} 
-                 y2={2*ycenter+10} 
-                 stroke={cArcBlue}
-                 strokeWidth={1}
-                 />
-            }
+
+
+            
         </g>
         </svg>
         
@@ -132,28 +113,14 @@ export default function Halo (args) {
 }
 
 const allColors = ["#2255BB","#2299BB","#4499BB","#6699BB","#2255DD","#2299DD","#3399CC","#9999CC"];
-   
-function showTooltip(evt, text) {
-    let tooltip = document.getElementById("tooltip");
-    if(tooltip) {
-        tooltip.innerHTML = text;
-        tooltip.style.display = "block";
-        tooltip.style.left = evt.pageX + 10 + 'px';
-        tooltip.style.top  = evt.pageY + 10 + 'px';
-    }
-  }
-  
-  function hideTooltip() {
-    var tooltip = document.getElementById("tooltip");
-    if(tooltip) tooltip.style.display = "none";
-  }
- 
-function makeGroup(aWork,arrValues,xcenter,ycenter,radius,width,step,start) {
+    
+function makeGroup(aWork,arrValues,names,xcenter,ycenter,radius,width,step,start) {
     radius-=width;
     var toggle=0;
     const circumference = radius * 2 * Math.PI;
     let base=start / step * circumference;
     let begin=start;
+    var index=0;
     arrValues.forEach(value=>{
         const arc = (circumference * value) / step;
         const dash = `${arc} ${circumference}`;   
@@ -164,13 +131,13 @@ function makeGroup(aWork,arrValues,xcenter,ycenter,radius,width,step,start) {
                     xcenter:xcenter, ycenter:ycenter, 
                     xstart:xstart+xcenter+radius,ystart:ystart+ycenter,
                     radius:radius,                     
-                    dash:dash, 
-                    width:width+toggle, color:toggle==0?cArcBlue:cScaleBlue});
+                    dash:dash, text:names[index++],
+                    width:width+toggle, color:toggle==0?cArcBlue:cSkyBlue});
         base+=(value / step)*radius*4;      
         begin+=value;  
         toggle=5-toggle;
     });
-    return radius-3;
+    return radius-5;
 }
 
 function makeScales(aScales,aWork,begin,iter,xcenter,ycenter,radius) {
@@ -187,4 +154,19 @@ function makeScales(aScales,aWork,begin,iter,xcenter,ycenter,radius) {
                     radius:radius, dash:dash, width:strokeWidth, color:cScaleBlue});
 }
 
+
+function showTooltip(evt, text) {
+    let tooltip = document.getElementById("tooltip");
+    if(tooltip) {
+        tooltip.innerHTML = text;
+        tooltip.style.display = "block";
+        tooltip.style.left = evt.pageX + 10 + 'px';
+        tooltip.style.top  = evt.pageY + 10 + 'px';
+    }
+  }
+  
+  function hideTooltip() {
+    var tooltip = document.getElementById("tooltip");
+    if(tooltip) tooltip.style.display = "none";
+  }
 
