@@ -12,34 +12,35 @@ const cDarkBlue ="#223388";
 export default function Halo (args) {
     const radius = args.radius;
 
-    console.log("HALO "+JSON.stringify(args.arrPartners));
+    console.log("HALO jFeatures   "+JSON.stringify(args.jFeatures));
+    console.log("HALO arrPartners "+JSON.stringify(args.arrPartners));
 
-    const step=1000;
+    let step=1000; if (args.step && args.step>0) step=args.step;
 
     const lineRadius = radius-10;
     const outerRadius = radius+3;
-    const xcenter=outerRadius+15;
-    const ycenter=outerRadius+15;
+    const xcenter=args.x;
+    const ycenter=args.y;
 
-    // named arrays of values { type:[] }
     let jFeatures = {}
     let jNames = {}
-    Object.keys(args.jFeatures).forEach(title=>
-        {
-            jFeatures[title] = args.jFeatures[title].map((value)=>parseInt(""+(bigEUMoney(value)/2000000n)))
-            jNames[title]=args.arrPartners.map((_,i)=>((args.arrPartners[i])[title]));
-        })
-
-
-//============================================================        
 
     let aWork = [];
     const strokeWidth = 5;
     var featureRad = radius-strokeWidth;
 
+
     let aScales=[];
-    makeScales(aScales,aWork,130,11,xcenter,ycenter,radius);
-    makeScales(aScales,aWork,310,11,xcenter,ycenter,radius);
+    if(args.jFeatures) {
+        Object.keys(args.jFeatures).forEach(title=>
+            {
+                jFeatures[title] = args.jFeatures[title].map((value)=>parseInt(""+(bigEUMoney(value)/2000000n)))
+                jNames[title]=args.arrPartners.map((_,i)=>((args.arrPartners[i])[title]));
+            })    
+    } else {
+        makeScales(aScales,aWork,130,11,xcenter,ycenter,radius);
+        makeScales(aScales,aWork,310,11,xcenter,ycenter,radius);
+    }
     
     var featureBegin=0;
     Object.keys(jFeatures).forEach(title=>
@@ -51,7 +52,6 @@ export default function Halo (args) {
     // aWork,aScales are the output of the make operations
 
     return (
-        <svg viewBox="0 0 230 250" height="720" width="760" >
         <g>
             {   aScales.map((scale)=>(
                     scale.jTask.map((j,i)=>
@@ -93,7 +93,7 @@ export default function Halo (args) {
 
             
         </g>
-        </svg>
+        
         
 
     );
@@ -110,20 +110,24 @@ function makeGroup(aWork,arrValues,names,xcenter,ycenter,radius,width,step,start
     let base=(pos * circumference) / step;
     var index=0;
     arrValues.forEach(value=>{
-        const arc = (circumference * value) / step;
-        const dash = `${arc} ${circumference}`;   
-        const angle=2*Math.PI*pos/step;
-        const degrees=360*pos/step;
-        const xstart=0;Math.cos(angle)*radius;
-        const ystart=0;Math.sin(angle)*radius;
-        aWork.push({ transform: `rotate(${degrees}, ${xcenter}, ${ycenter})`, 
-                    xcenter:xcenter, ycenter:ycenter, 
-                    xstart:xstart+xcenter+radius-(toggle==0?0:10),ystart:ystart+ycenter,
-                    radius:radius,                     
-                    dash:dash, text:names[index++],
-                    width:width+toggle, 
-                    color:toggle==0?cArcBlue:cSkyBlue});
-        pos+=value;  
+        const absValue = Math.abs(value);
+        const arc = (circumference * absValue) / step;
+        if(arc) {
+            const dash = `${arc} ${circumference}`;   
+            const angle=2*Math.PI*pos/step;
+            const degrees=360*pos/step;
+            const xstart=0;Math.cos(angle)*radius;
+            const ystart=0;Math.sin(angle)*radius;
+            aWork.push({ transform: `rotate(${degrees}, ${xcenter}, ${ycenter})`, 
+                        xcenter:xcenter, ycenter:ycenter, 
+                        xstart:xstart+xcenter+radius-(toggle==0?0:10),ystart:ystart+ycenter,
+                        radius:radius,                     
+                        dash:dash, text:names[index],
+                        width:width+toggle, 
+                        color:toggle==0?cArcBlue:cSkyBlue});
+        }
+        index++;
+        pos+=absValue;  
         base=(pos *circumference) / step;      
         toggle=5-toggle;
     });

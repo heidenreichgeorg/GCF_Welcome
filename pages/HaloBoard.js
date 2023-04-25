@@ -63,15 +63,18 @@ export default function DashBoard({value}) {
 
 
     var jAccounts = sheet[D_Balance];
-//console.log(JSON.stringify(jAccounts));
+    let aAccounts = Object.keys(jAccounts);
+    let aYearEnd = aAccounts.map((name)=>((jAccounts[name].xbrl.startsWith("de-gaap-ci_is.netIncome.regular"))?jAccounts[name].yearEnd:"0"))
+    let aAssets  = aAccounts.map((name)=>((jAccounts[name].xbrl.startsWith("de-gaap-ci_bs.ass"))?jAccounts[name].yearEnd:"0"))
+    let nYearEnd = aAccounts.map((name)=>({'yearEnd':name}));
+    console.log("jAccounts "+JSON.stringify(jAccounts));
+    aAssets.pop(); aAssets.pop(); aAssets.pop();
+    aYearEnd.pop();
 
     let jPartners = sheet[D_Partner];
     let nPartners = Object.keys(jPartners);
     let accPartners = nPartners.map((partner) => ({varCap:jPartners[partner].varCap,resCap:jPartners[partner].resCap,fixCap:jPartners[partner].fixCap,income:jPartners[partner].income}));
-    let arrAccounts = accPartners.map((partner) => ([jAccounts[partner.varCap].yearEnd,partner.resCap?jAccounts[partner.resCap].yearEnd:"0",jAccounts[partner.fixCap].yearEnd,partner.income]));
-    let arrNumbers = arrAccounts.map((partner) => (partner.map((strNum)=>(BigInt(strNum)).toString())));
     let namPartners = nPartners.map((partner) => ({varCap:jPartners[partner].varCap,resCap:jPartners[partner].resCap,fixCap:jPartners[partner].fixCap,income:jPartners[partner].varCap}));
-
 
     let aVarCap = accPartners.map((partner) => (jAccounts[partner.varCap].yearEnd));
     let aFixCap = accPartners.map((partner) => (jAccounts[partner.fixCap].yearEnd));
@@ -82,7 +85,15 @@ export default function DashBoard({value}) {
     return (
         <Screen prevFunc={prevFunc} nextFunc={nextFunc} >
             <div classname="attrLine">
-                <Halo jFeatures={haloFeatures} arrPartners={namPartners} radius={110}/>
+            <svg viewBox="0 0 230 250" height="720" width="760" >
+                <Halo                                                    radius={110} x={120} y={120}/>
+
+                <Halo jFeatures={{"yearEnd":aAssets}} arrPartners={nYearEnd}   radius={70} x={120} y={120} step={2000}/>
+
+                <Halo jFeatures={{"yearEnd":aYearEnd}} arrPartners={nYearEnd} radius={90} x={120} y={120}   step={50}/>
+
+                <Halo jFeatures={haloFeatures} arrPartners={namPartners}      radius={110} x={120} y={120} step={2000}/>
+            </svg>
             </div>
             <FooterRow  id={"F1"}  left={page["client"]}   right={page["register"]} prevFunc={prevFunc} nextFunc={nextFunc}/>
             <FooterRow  id={"F2"}  left={page["reference"]}  right={page["author"]} prevFunc={prevFunc} nextFunc={nextFunc}/>
