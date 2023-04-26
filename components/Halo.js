@@ -72,8 +72,9 @@ export default function Halo (args) {
             {
             aWork.map((jTask,i)=>(
             (
-                <g fill={cDarkBlue} >
+                <g key={"gCircle"+i} fill={cDarkBlue} >
                     <circle
+                        key={"circle"+i} 
                         className="gauge_base"
                         cx={jTask.xcenter}
                         cy={jTask.ycenter}                
