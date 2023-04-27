@@ -1,7 +1,7 @@
 
 
 
-const debug=null;
+const debug=1;
 const debugTax=null;
 const debugYield=null;
 const debugRegular=null;
@@ -101,6 +101,7 @@ let de_DE = {
     // GainLoss GuV
     Carry4Loss:  "Verlustvortrag",
     Expenses:    "Ausgaben",
+    PaymentsIn:  "Einzahlungen",
     NextYear:    "Folgejahr",
     VariableCap: "Variables Kapital",
     CapGainTax:  "KapErtragSt",
@@ -1331,7 +1332,6 @@ export function formatTXN(session,reqBody) {
 
 
         let sessionId=session.id;
-        //let session = Server.getSession(sessionId);
         
         if(session) {
             if(debug) console.dir("compile.js formatTXN("+sessionId+") book "+JSON.stringify(reqBody));

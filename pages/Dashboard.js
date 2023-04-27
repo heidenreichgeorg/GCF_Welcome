@@ -32,7 +32,7 @@ export default function DashBoard({value}) {
 
     if(!sheet) return null; //'Loading...';
 
-    function prevFunc() {console.log("CLICK PREVIOUS"); window.location.href="/Balance?client="+session.client+"&year="+session.year; }
+    function prevFunc() {console.log("CLICK PREVIOUS"); window.location.href="/Claim?client="+session.client+"&year="+session.year; }
     function nextFunc() {  console.log("CLICK NEXT");   window.location.href="/FixedAssets?client="+session.client+"&year="+session.year; }
     
     let jValue={};

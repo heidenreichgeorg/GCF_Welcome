@@ -8,7 +8,7 @@ import {CSEP, D_Adressen, D_Balance, D_FixAss, D_Page, D_History, D_Schema,  X_A
 import { getSession, resetSession, useSession } from '../modules/sessionmanager';
 import { cents2EU, bigEUMoney }  from '../modules/money';
 
-export default function Transfer() {
+export default function Book() {
 
     const { session, status } = useSession()   
     const [ sheet,  setSheet] = useState(null)
@@ -98,22 +98,27 @@ export default function Transfer() {
         txn.year=session.year;
         txn.client=session.client;
 
-        console.log("BOOK B "+JSON.stringify(txn));
 
+        // GH20230428
+        txn.flag='1'; // flag that a pre-claim is being entered
+
+        console.log("BOOK build claim: "+JSON.stringify(txn));
+
+        
         book(txn,session); 
 
         resetSession();
         // invalidate current session
 
-        console.log("BOOK O booked.");
+        console.log("Book: claim booked.");
   
     }
 
 
     if(!sheet) return null; // 'Loading...';
 
-    function prevFunc() {console.log("CLICK PREVIOUS"); window.location.href="/Status?client="+session.client+"&year="+session.year; }
-    function nextFunc() {  console.log("CLICK NEXT");   window.location.href="/Accounts?client="+session.client+"&year="+session.year; }
+    function prevFunc() {console.log("CLICK PREVIOUS"); window.location.href="/Balance?client="+session.client+"&year="+session.year; }
+    function nextFunc() {  console.log("CLICK NEXT");   window.location.href="/Claim?client="+session.client+"&year="+session.year; }
 
     let page = sheet[D_Page];
 
@@ -147,25 +152,20 @@ export default function Transfer() {
     
     // build cRef2 = refCode list with assets codes
     var jAssets = sheet[D_FixAss];
-    let arrCode=["FEE","WITHDRAW","ADJUST",'DEP_MONEY',"DEP_IN_KIND"];
+    let arrCode=[];
     Object.keys(jAssets).map(function(key,n) {
         var row = jAssets[key];
         arrCode.push(row.idnt);
     });
+    arrCode.push("DEPOSITS");
     addTXNData(txn,'refCode',arrCode[0]);
 
 
     let creditorsT = sheet[D_Adressen];
     if(!creditorsT || creditorsT.length<1) {
         creditorsT =[
-            {'given':'Bayerische','surname':'Versicherungskammer','address':'Postfach','zip':'80430','city':'München','country':'DE'},
-            {'given':'BNP Paribas','surname':'S.A.','address':'Bahnhofstraße 55','zip':'90402','city':'Nürnberg','country':'DE'},
-            {'given':'Bundesanzeiger','surname':'Verlag','address':'Postfach 100534','zip':'50445','city':'Köln','country':'DE'},
-            {'given':'CosmosDirekt','surname':'Versicherung AG','address':'Halbergstr 50-60','zip':'66121','city':'Saarbrücken','country':'DE'},
-            {'given':'Entwässerungsbetrieb Erlangen','surname':'Stadt','address':'Schuhstraße 30','zip':'91052','city':'Erlangen','country':'DE'},
-            {'given':'Erlangen','surname':'Stadt','address':'Rathausplatz 1','zip':'91052','city':'Erlangen','country':'DE'},
-            {'given':'Nürnberg','surname':'Ind.u.Handelskammer','address':'Hauptmarkt 25-27','zip':'90403','city':'Nürnberg','country':'DE'},
-            {'given':'Reichel','surname':'Schornsteinfeger','address':'Bamberger Str. 10','zip':'96172','city':'Mühlhausen','country':'DE'}];
+            {'given':'Roby','surname':'Vau','address':'Taunusstraße 8','zip':'91056','city':'Erlangen','country':'DE'},
+            {'given':'George','surname':'Ferguson','address':'Eifelweg 22','zip':'91056','city':'Erlangen','country':'DE'}];
 
             session.creditorsT=creditorsT;
         }
@@ -193,7 +193,7 @@ export default function Transfer() {
         <Screen prevFunc={prevFunc} nextFunc={nextFunc} tabSelector={aNums} tabName={tabName}>
             <CreditorRow/> 
             <div className="attrLine">
-                <div className="FIELD XFER">{page.Expenses}</div>
+                <div className="FIELD XFER">{page.PaymentsIn}</div>
             </div>
             <div className="attrLine">
             <div className="FIELD XFER"></div>
@@ -246,7 +246,7 @@ export default function Transfer() {
             <CreditorRow/>
             <div className="attrLine">
                 <div className="FIELD SEP"></div><div className="FIELD SEP"></div><div className="FIELD SEP"></div>
-                <div className="FIELD MOAM"><input type="submit" className="key" value="BOOK" onClick={(e)=>onBook(e)}/></div>
+                <div className="FIELD MOAM"><input type="submit" className="key" value="BOOK CLAIM" onClick={(e)=>onBook(e)}/></div>
                 <div className="FIELD SEP"></div>
                 <div className="FIELD LNAM" key="aCredit">{arrCred.join()}</div>
                 <div className="FIELD SEP">AN</div>

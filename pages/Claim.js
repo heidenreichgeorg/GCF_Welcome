@@ -8,7 +8,7 @@ import {CSEP, D_Adressen, D_Balance, D_FixAss, D_Page, D_History, D_Schema,  X_A
 import { getSession, resetSession, useSession } from '../modules/sessionmanager';
 import { cents2EU, bigEUMoney }  from '../modules/money';
 
-export default function Transfer() {
+export default function Claim() {
 
     const { session, status } = useSession()   
     const [ sheet,  setSheet] = useState(null)
@@ -112,8 +112,8 @@ export default function Transfer() {
 
     if(!sheet) return null; // 'Loading...';
 
-    function prevFunc() {console.log("CLICK PREVIOUS"); window.location.href="/Status?client="+session.client+"&year="+session.year; }
-    function nextFunc() {  console.log("CLICK NEXT");   window.location.href="/Accounts?client="+session.client+"&year="+session.year; }
+    function prevFunc() {console.log("CLICK PREVIOUS"); window.location.href="/Book?client="+session.client+"&year="+session.year; }
+    function nextFunc() {  console.log("CLICK NEXT");   window.location.href="/Dashboard?client="+session.client+"&year="+session.year; }
 
     let page = sheet[D_Page];
 
@@ -314,7 +314,7 @@ function CreditorRow({ given,surname,address,zip,city,country,sender,onPreBook,k
     return(
         <div className="attrLine" key={"Creditor"+key}>
             {   (sender && sender.length>2) ?
-                (<div className="FIELD MOAM" id={"pre"+sender}><input type="submit" className="key" value="SELECT" onClick={(e)=>onPreBook(e,sender)}/></div>
+                (<div className="FIELD MOAM" id={"pre"+sender}><input type="submit" className="key" value="PRE-BOOK" onClick={(e)=>onPreBook(e,sender)}/></div>
                 ):( <div>&nbsp;</div> )}   
             <div className="FIELD SEP"> &nbsp;</div>
             <div className="FIELD XFER"> {given}</div>
