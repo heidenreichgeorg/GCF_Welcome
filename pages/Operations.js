@@ -87,8 +87,11 @@ export default function Operations() {
         if(account.xbrl.length>1) {
             var xbrl = account.xbrl.split('\.').reverse();
             var xbrl_pre = xbrl.pop()+ "."+ xbrl.pop();
-            if(xbrl.length>3 && ((xbrl_pre===X_INCOME) || (xbrl_pre===X_EQLIAB))) arrAcct.push(name);
+            if(xbrl.length>2) { // minimum of five levels in original xbrl, because of the two modifying pop(s)
+                if((xbrl_pre===X_INCOME) || (xbrl_pre===X_EQLIAB)) { arrAcct.push(name); console.log("Operations make arrAcct list add "+name);}
+            }
         }
+
     }
     addTXNData(txn,'refAcct',arrAcct[0]);
 
