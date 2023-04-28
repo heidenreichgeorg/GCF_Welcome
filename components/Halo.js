@@ -6,6 +6,7 @@ const cSkyBlue  ="#77CCEE";
 const cArcBlue  ="#66AADD";
 const cScaleBlue="#5588CC";
 const cDarkBlue ="#223388";
+const cTextBlue ="#9944CC";
 
 
 // JSON of named features each feature is an array with 
@@ -66,13 +67,11 @@ export default function Halo (args) {
                             />
                     )))                
                 )}
-                <line x1={-10}  y1={ycenter}  x2={2*xcenter+10}  y2={ycenter}  stroke={cArcBlue} strokeWidth={1} />
-                <line  x1={xcenter} y1={-10}  x2={xcenter}  y2={2*ycenter+10} stroke={cArcBlue} strokeWidth={1} />
             
             {
             aWork.map((jTask,i)=>(
             (
-                <g key={"gCircle"+i} fill={cDarkBlue} >
+                <g key={"gCircle"+i} fill={cTextBlue} >
                     <circle
                         key={"circle"+i} 
                         className="gauge_base"
