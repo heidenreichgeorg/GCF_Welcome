@@ -1,4 +1,6 @@
 
+// GH20230428 carvedOut makeHistory, not sure about jSum
+
 import { useEffect, useState } from 'react';
 
 import { D_Account, D_Carry, D_CarryOff, D_CarryOver, D_History, D_Page, D_Receipts, D_Schema, J_ACCT, SCREENLINES }  from '../modules/terms.js';
@@ -7,7 +9,7 @@ import FooterRow from '../components/FooterRow'
 import { cents20EU }  from '../modules/money';
 import { symbolic }  from '../modules/session';
 import { getParam }  from '../modules/App';
-import { CSEP,prettyTXN }  from '../modules/writeModule';
+import { CSEP,makeHistory }  from '../modules/writeModule';
 import { getSession,getCarryOver,storeCarryOver, useSession } from '../modules/sessionmanager';
 import { bigEUMoney } from '../modules/money.mjs';
 
@@ -97,7 +99,18 @@ function purgeCarryOver(jSum) {
     let page = sheet[D_Page];
     let names = sheet[D_Schema].Names;
 
-    let sHistory=makeHistory(sheet); // accumulates jSum
+
+    // GH20230428  accumulates jSum
+    const jHistory  = sheet[D_History];
+    let aLen = parseInt(sheet[D_Schema].assets);
+    let eLen = parseInt(sheet[D_Schema].eqliab);
+    const gSchema = sheet[D_Schema];    
+    var aPattern = getParam("APATTERN");
+    if(aPattern && aPattern.length<2) aPattern=null;
+    var lPattern = getParam("LPATTERN");
+    if(lPattern && lPattern.length<2) lPattern=null;
+    let sHistory=makeHistory(sheet,aPattern,lPattern,jHistory,aLen,eLen,gSchema,pageGlobal,SCREEN_TXNS); // accumulates jSum
+
 
     let sPages = (sHistory.length+1) / SCREEN_TXNS;    
     let strToken=token();
@@ -107,8 +120,6 @@ function purgeCarryOver(jSum) {
     for(let p=1;p<sPages-1;p++) aPages[p]='none'; 
     aPages[0]='block';
        
-    let aPattern = getParam("APATTERN");
-
     let jColumnHeads=jHeads; // state variable, do not touch
 
     let jSum=JSON.parse(JSON.stringify(jPageSum));
@@ -274,63 +285,6 @@ function SigRow({row,index,client,year,line}) {
         </div>
     )
 }
-
-function makeHistory(sheet) {       
-
-    console.log("makeHistory sheet="+Object.keys(sheet));
- 
-    const arrHistory = [];                
-    const jHistory  = sheet[D_History];
-    let aLen = parseInt(sheet[D_Schema].assets);
-    let eLen = parseInt(sheet[D_Schema].eqliab);
-    const gSchema = sheet[D_Schema];
-    const pageGlobal = sheet[D_Page];
-
-    if(pageGlobal) {
-        
-        arrHistory.push({entry:CSEP+CSEP+pageGlobal["History"]+CSEP+pageGlobal["header"]+CSEP+CSEP});
-        
-        // 20220701
-        var lPattern = getParam("LPATTERN");
-        if(lPattern && lPattern.length<2) lPattern=null;
-
-        var aPattern = getParam("APATTERN");
-        if(aPattern && aPattern.length<2) aPattern=null;
-
-        if(gSchema.Names && gSchema.Names.length>0) {
-            var names=gSchema.Names;
-            var iSaldo=0n;
-
-            for (let index in jHistory)  {
-
-                let jPrettyTXN = prettyTXN(jHistory,index,lPattern,aPattern,names,aLen,eLen);
-
-                // GH 20220703
-                if(jPrettyTXN.txnAcct) {
-                    let txn = jPrettyTXN.raw;
-                   
-                    // GH20221228 see ['','AN'] in App.js turned to ['AN'] 
-                        //jPrettyTXN.credit.join(CSEP)
-                        //jPrettyTXN.debit.join(CSEP)+CSEP+CSEP+CSEP
-                                           
-                    var i=0;                    
-                    var lMoney = {};
-                    for (i=J_ACCT;i<txn.length;i++) { if(i!=aLen && i!=eLen && txn[i] && txn[i].length>1) lMoney[names[i]]=txn[i]; }  
-
-                    console.log("makeHistory("+index+") for txn="+JSON.stringify(jHistory[index]).substring(14,60));
-
-                    iSaldo += BigInt(jPrettyTXN.strSaldo);
-                    
-                    arrHistory.push({'entry':jPrettyTXN.entry.join(CSEP), 'jMoney':lMoney,  'saldo':""+(iSaldo) });                    
-                                 
-                }
-            }
-
-            for (let i=1;i<SCREEN_TXNS;i++) arrHistory.push({entry:CSEP+CSEP+CSEP+CSEP+CSEP});
-        }
-    }
-    return arrHistory;
-}  
 
 
 function SearchForm(token) {

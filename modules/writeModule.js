@@ -246,3 +246,50 @@ export function startSessionDisplay(session,res) {
         sendDisplay(session,res);
     }
 }
+
+
+export function makeHistory(sheet,aPattern,lPattern,jHistory,aLen,eLen,gSchema,pageGlobal,screen_txns) {       
+
+    console.log("makeHistory sheet="+Object.keys(sheet));
+ 
+    const arrHistory = [];                    
+
+    if(pageGlobal) {
+        
+        arrHistory.push({entry:CSEP+CSEP+pageGlobal["History"]+CSEP+pageGlobal["header"]+CSEP+CSEP});
+        
+  
+        if(gSchema.Names && gSchema.Names.length>0) {
+            var names=gSchema.Names;
+            var iSaldo=0n;
+
+            for (let index in jHistory)  {
+
+                let jPrettyTXN = prettyTXN(jHistory,index,lPattern,aPattern,names,aLen,eLen);
+
+                // GH 20220703
+                if(jPrettyTXN.txnAcct) {
+                    let txn = jPrettyTXN.raw;
+                   
+                    // GH20221228 see ['','AN'] in App.js turned to ['AN'] 
+                        //jPrettyTXN.credit.join(CSEP)
+                        //jPrettyTXN.debit.join(CSEP)+CSEP+CSEP+CSEP
+                                           
+                    var i=0;                    
+                    var lMoney = {};
+                    for (i=J_ACCT;i<txn.length;i++) { if(i!=aLen && i!=eLen && txn[i] && txn[i].length>1) lMoney[names[i]]=txn[i]; }  
+
+                    console.log("makeHistory("+index+") for txn="+JSON.stringify(jHistory[index]).substring(14,60));
+
+                    iSaldo += BigInt(jPrettyTXN.strSaldo);
+                    
+                    arrHistory.push({'entry':jPrettyTXN.entry.join(CSEP), 'jMoney':lMoney,  'saldo':""+(iSaldo) });                    
+                                 
+                }
+            }
+
+            for (let i=1;i<screen_txns;i++) arrHistory.push({entry:CSEP+CSEP+CSEP+CSEP+CSEP});
+        }
+    }
+    return arrHistory;
+}  

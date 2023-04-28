@@ -1,7 +1,7 @@
 
 
 
-const debug=1;
+const debug=4;
 const debugTax=null;
 const debugYield=null;
 const debugRegular=null;
@@ -167,6 +167,7 @@ const D_Equity = "Kapital";
 const D_Balance= "Bilanz";
 const D_History= "Historie";
 const D_Partner= "PartnerR";
+const D_PreBook= "Vorgemerkt";
 const D_SHARES = "Anteile";
 const D_Report = "Report";
 const D_FixAss = "Anlagen";
@@ -211,6 +212,7 @@ function initBalance() {
     balance[D_Schema]= {};
     balance[D_FixAss]= {};
     balance[D_Partner]={}; 
+    balance[D_PreBook]=[];
     
     balance[D_Report]={
         xbrlTanFix : { level:3, xbrl: "de-gaap-ci_bs.ass.fixAss.tan", de_DE:'Sachanlagen'},
@@ -564,7 +566,11 @@ export function compile(sessionData) {
                             } catch(err) { console.dir("0351 SHEET LINE INPUT "+err); }
                         }
                     }
-                });
+                    else if(!key || parseInt(key)==0) {                    
+                        console.dir("0352 SHEET LINE PRE-BOOK "+JSON.stringify(row)); 
+                        balance[D_PreBook].push(row);
+                    }
+            });
                 if(debug>1) console.log("0368 compile: check partners");
 
                 // process the partners
@@ -770,6 +776,9 @@ function sendBalance(balance) {
 
     let partners=balance[D_Partner];
     gResponse[D_Partner]=partners;
+
+    let preBooked=balance[D_PreBook];
+    gResponse[D_PreBook]=preBooked;
 
     // 20230111 tax subject identifier in partner.taxID
     //let partnerIDs=balance[D_SteuerID];
@@ -1390,31 +1399,3 @@ function getYear() {  return currentYear; }
 module.exports['getYear']=getYear;
 
 
-/*
-async function send(res,session) {
-
-    if(session) {
-        let balance = session.generated;
-        // SERVER FUNCTION INTERPRET1 GH20220918
-
-        if(debug) console.dir("0400 send() Balance ="+JSON.stringify(Object.keys(balance)))
-        
-        res.writeHead(Sheets.HTTP_OK, {"Content-Type": "text/html"}); 
-
-        if(res && balance) {
-
-            // send the whole shares
-            let payLoad = JSON.stringify(balance);    
-            res.write(payLoad);
-            res.write("\n");
-            
-            if(debug) console.log("0410 OK send(balance) in session "+JSON.stringify(Object.keys(balance))); 
-
-        } else {
-            if(debug) console.log("0401 send NO BALANCE in  session "+JSON.stringify(Object.keys(session))); 
-            res.write("\n");
-        }
-    }
-    res.end(); 
-}
-*/
