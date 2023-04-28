@@ -37,33 +37,6 @@ const SY_MAXCEL=255;
 const SY_MAXCOL=511;
 const SY_MAXLINE=4190; // maximum number of characters in one row
 const SY_MAXROWS=4190; // maximum number of rows in the table
-function sy_purgeRow(row) {
-    if(!row) return null;
-    if(row.length>=(SY_MAXLINE)) {
-        console.log("***************************************"); 
-        console.log("*           SECURITY                  *"); 
-        console.log("***************************************"); 
-    }
-    return row.substring(0,SY_MAXLINE);
-}
-
-function sy_purgeCell(str) {     
-    if(!str) return '';
-    let letters = /^[A-Za-zäöüÄÖÜß]+$/;
-    let digits = /^[0-9,._ ]+$/;
-    var result=[];
-    for(var i=0;i<str.length && i<SY_MAXCEL;i++) {
-        let c=str.charAt(i);
-        if(c=='-') result.push(c);
-        else if(c.match(letters)) result.push(c);
-        else if(c.match(digits)) result.push(c);
-    }
-    return result.join('');
-    //return str.replace(/;\\\'\"/,'');
-}
-
-
-
 
 
 

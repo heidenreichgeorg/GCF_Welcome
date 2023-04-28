@@ -1,4 +1,4 @@
-
+const debug=null;
 
 
 import { D_Balance, D_History, D_Report, D_Schema, D_Page, X_ASSETS, X_EQLIAB, X_EQUITY, X_INCOME, X_INCOME_REGULAR, SCREENLINES } from './terms.js'
@@ -18,12 +18,12 @@ export function getSelect(targetId) {
 export function setSelect(targetId,value) { 
     var elem = document.getElementById(targetId);
     if(elem) {
-        console.log("App.setSelect "+targetId+" WITH "+value);
+        if(debug) console.log("App.setSelect "+targetId+" WITH "+value);
         let arrElem=elem.options;
         for(let i=0;i<arrElem.length;i++) {
             if(arrElem[i].value==value) {
                 elem.selectedIndex=i;
-                console.log("App.setSelect OPTION "+i);
+                if(debug) console.log("App.setSelect OPTION "+i);
             }
         }
     }
@@ -239,7 +239,7 @@ export function makeHGBReport(response) {
 
     var jReport = response[D_Report];
     
-    console.log("makeReport from response D_Report"+JSON.stringify(Object.keys(jReport)));
+    if(debug) console.log("makeReport from response D_Report"+JSON.stringify(Object.keys(jReport)));
     var jAccounts = response[D_Balance];
     let page = response[D_Page];
               

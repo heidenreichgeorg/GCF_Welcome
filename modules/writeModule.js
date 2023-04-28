@@ -140,7 +140,7 @@ export function prepareTXN(schema,flow, name,amount) {
     }
 
     flow = { 'credit':newCredit, 'debit':newDebit };
-    console.dir("prepareTXN "+JSON.stringify(flow));
+    if(debug) console.dir("prepareTXN "+JSON.stringify(flow));
     return flow;
 }
 

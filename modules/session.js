@@ -116,7 +116,7 @@ function processArgv(processArgv) {
             }        
             else if(attribute[0].toLowerCase()==='config') {
                 config = attribute[1];
-                console.log("0008B Starting server "+currentHash()+" SET FIREBASE CONFIG " + config);
+                console.log("0008B Starting server SET FIREBASE CONFIG " + config);
             }        
             else if(attribute[0].toLowerCase()==='auto') {
                 let autoSec = parseInt(attribute[1]);
@@ -233,7 +233,7 @@ export function timeSymbol() {
       (u.getUTCMilliseconds() / 1000).toFixed(3).slice(2, 5);
 };     
 
-export function currentHash() {
+ export function  currentHash() {
     return strSymbol(timeSymbol().slice(6,10)).slice(-4);
 }
 
@@ -252,7 +252,7 @@ export function sendDisplay(session,res) {
 
         const clientHead = "Login";
 
-        console.dir("5010 sendDisplay() rendering url="+url);
+        if(debug) console.dir("5010 sendDisplay() rendering url="+url);
 
         if(res) {
            // qr.toDataURL(url, (err, qrCodeDataUrl) => {
@@ -265,7 +265,7 @@ export function sendDisplay(session,res) {
                 const html = "nbsp;";
 
 
-                console.dir("5020 sendDisplay() rendering QR code with #"+html.length+ "chars");
+                if(debug) console.dir("5020 sendDisplay() rendering QR code with #"+html.length+ "chars");
                 
                 res.setHeader("Access-Control-Allow-Origin", "*");
                 res.setHeader("Access-Control-Allow-Headers","Origin, X-Requested-With, Content-Type, Accept, Authorization");        
@@ -277,7 +277,7 @@ export function sendDisplay(session,res) {
     } else {
         res.writeHead(HTTP_OK);
         res.end("\n<HTML>"+clientHead+"<BODY>"+banner+"</BODY></HTML>\n");
-        console.dir("5021 sendDisplay: no sessionId");
+        if(debug) console.dir("5021 sendDisplay: no sessionId");
 
     }
 }

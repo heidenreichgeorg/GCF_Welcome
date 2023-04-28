@@ -1,7 +1,5 @@
 
-
-
-const debug=4;
+const debug=null;
 const debugTax=null;
 const debugYield=null;
 const debugRegular=null;
@@ -285,6 +283,7 @@ export function compile(sessionData) {
 
             result[D_SteuerID] = {};
             result[D_Schema] = {};
+            result[D_PreBook] = [];
             try {
                 var iAssets=0;
                 var iEqLiab=0;
@@ -566,9 +565,10 @@ export function compile(sessionData) {
                             } catch(err) { console.dir("0351 SHEET LINE INPUT "+err); }
                         }
                     }
-                    else if(!key || parseInt(key)==0) {                    
+                    else if(row.length>20) {
+                        //if(!key || parseInt(key)==0) {                    
                         console.dir("0352 SHEET LINE PRE-BOOK "+JSON.stringify(row)); 
-                        balance[D_PreBook].push(row);
+                        result[D_PreBook].push(row);
                     }
             });
                 if(debug>1) console.log("0368 compile: check partners");
@@ -714,13 +714,13 @@ export function compile(sessionData) {
         if(debug) console.log('0386 compile.js compile() -> balance['+key+']'); 
     }
 
-    if(debug)console.log("0388 COMPILED = "+JSON.stringify(Object.keys(result)));
+    if(debug) console.log("0388 COMPILED = "+JSON.stringify(Object.keys(result)));
 
 
     let balance = sendBalance(result);
 
     
-    if(debug) console.log("0390 COMPILED         = "+JSON.stringify(Object.keys(balance)));
+    //if(debug) console.log("0390 COMPILED         = "+JSON.stringify(Object.keys(balance)));
     if(debug) console.log("0390 COMPILED HISTORY = "+JSON.stringify(Object.keys(balance[D_History])));
 
     if(debugReport) { 
@@ -750,7 +750,7 @@ function unixYear() {
 
 function iAccount(strAccountName,arrAcctNames) {
     let index=parseInt(arrAcctNames.map((strName,i) => (strAccountName==strName?(""+i):" ")).join('').trim());
-    console.log("     iAccount("+strAccountName+") = "+index);
+    if(debug) console.log("     iAccount("+strAccountName+") = "+index);
     return index;
 }
 
@@ -779,6 +779,7 @@ function sendBalance(balance) {
 
     let preBooked=balance[D_PreBook];
     gResponse[D_PreBook]=preBooked;
+    console.log("compile.js sendBalance preBooked "+JSON.stringify(preBooked));           
 
     // 20230111 tax subject identifier in partner.taxID
     //let partnerIDs=balance[D_SteuerID];
@@ -962,7 +963,7 @@ function sendBalance(balance) {
             if(p.resCap) {
                 // consolidate RE capital reserve
                 var rescap=bAccounts[p.resCap]; // index with name
-                console.dir("compile sendBalance partner "+p.name+ " CapitalReserve("+p.resCap+")="+JSON.stringify(rescap));
+                if(debug) console.dir("compile sendBalance partner "+p.name+ " CapitalReserve("+p.resCap+")="+JSON.stringify(rescap));
 
                 rescap.income="";
                 rescap.netIncomeOTC="";
