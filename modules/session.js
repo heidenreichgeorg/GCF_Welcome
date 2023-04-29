@@ -76,6 +76,8 @@ export function startSessionJSON(session,res) {
         res.setHeader("Access-Control-Allow-Headers","Origin, X-Requested-With, Content-Type, Accept, Authorization");
         res.json(session);
     } else console.log("0041 startSessionJSON("+client+","+year+") NO res object"); 
+
+    //console.log("0044 COMPILED PRE_BOOK = "+JSON.stringify(session.generated.Vorgemerkt));
 }
 
 
@@ -93,9 +95,10 @@ export function setRoot(root) {
 
 export function getRoot() {  return SERVEROOT; }
 
+
 export function init(/*app,*/ argv) {
 
-    console.log("0000 ARGV= "+JSON.stringify(argv));
+    console.log("AUTH "+currentHash()+" ARGV= "+JSON.stringify(argv));
 
     return processArgv(argv);
 }
@@ -111,15 +114,15 @@ function processArgv(processArgv) {
             //if(debug>1) 
             console.log("0006 Attribute " + index + ': ' + val);
             if(attribute[0].toLowerCase()==='root') {
-                setRoot(attribute[1]);
+                setRoot(attribute[1]); // local fs root
                 console.log("0008A Starting server SET ROOT TO " + getRoot());
             }        
             else if(attribute[0].toLowerCase()==='config') {
-                config = attribute[1];
+                config = attribute[1]; // config dir under root
                 console.log("0008B Starting server SET FIREBASE CONFIG " + config);
             }        
             else if(attribute[0].toLowerCase()==='auto') {
-                let autoSec = parseInt(attribute[1]);
+                let autoSec = parseInt(attribute[1]); // auto save time-interval
                 autoSave = autoSec * 1000;
                 console.log("0008C Starting server SET autoSave " + autoSec+ " [sec.]");
             }        

@@ -63,7 +63,7 @@ export function SessionProvider({ children,  default_value, onLoading, onError }
    
     
     let strSearch = router.asPath.split('?')[1];
-    console.log("0001 Sessionprovider "+stringify(router.query)+"  host="+REACT_APP_API_HOST+"  query="+strSearch);
+    console.log("7001 Sessionprovider "+stringify(router.query)+"  host="+REACT_APP_API_HOST+"  query="+strSearch);
 
 
     useEffect(() => {      
@@ -78,11 +78,12 @@ export function SessionProvider({ children,  default_value, onLoading, onError }
 
                 setStatus('success');
 
-                console.log("0002 Sessionprovider WARM SUCCESS");
+                console.log("7002 Sessionprovider WARM SUCCESS");
+
             }
             catch(err) {
                 setStatus('error')
-                console.log("0003 Sessionprovider WARM ERROR");
+                console.log("7003 Sessionprovider WARM ERROR");
             }
         } else { 
 
@@ -97,11 +98,12 @@ export function SessionProvider({ children,  default_value, onLoading, onError }
                 console.log("COLD data.sheetCells.length="+data.sheetCells.length);
                 setStatus('success');
 
-                console.log("0004 Sessionprovider COLD SUCCESS");
+                console.log("7004 Sessionprovider COLD SUCCESS");
+
             })
             .catch(() => {
                 setStatus('error')
-                console.log("0003 Sessionprovider COLD ERROR");
+                console.log("7005 Sessionprovider COLD ERROR");
             })
         }
     

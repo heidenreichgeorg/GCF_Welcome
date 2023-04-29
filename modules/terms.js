@@ -5,6 +5,7 @@ export const  D_FixAss  ="Anlagen";
 export const  D_History ="Historie";
 export const  D_Page  =  "Seite";
 export const  D_Partner= "PartnerR";
+export const D_PreBook= "Vorgemerkt";
 export const  D_Report = "Report";
 export const  D_Schema  = "Schema";
 export const  D_Muster =  "Muster";

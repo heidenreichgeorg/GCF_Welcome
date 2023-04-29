@@ -3,7 +3,7 @@
 
 import { useEffect, useState } from 'react';
 
-import { D_PreBook, D_Page,D_Schema, SCREENLINES }  from '../modules/terms.js';
+import { D_PreBook, D_History, D_Page,D_Schema, SCREENLINES }  from '../modules/terms.js';
 import Screen from '../pages/Screen'
 import FooterRow from '../components/FooterRow'
 import { cents20EU }  from '../modules/money';
@@ -32,6 +32,9 @@ export default function Claim() {
         if(state && Object.keys(state).length>5) {
             setSheet(state.generated);
             console.log("INIT PAGE#1 ")
+
+
+            // state.sheetCells are the payload lines
             }
     }, [status])
 
@@ -39,6 +42,8 @@ export default function Claim() {
     if(!sheet) return null; //'Loading...';
 
     const pageGlobal = sheet[D_Page];
+
+    console.log("7012 Sessionprovider "+JSON.stringify(sheet[D_PreBook]));
 
     function token() { return { client:session.client, year:session.year }}
 
@@ -49,6 +54,7 @@ export default function Claim() {
 
     let page = sheet[D_Page];
 
+    console.log("7010 Sessionprovider "+JSON.stringify(sheet.Vorgemerkt));
 
     // GH20230428  accumulates jSum
     const jHistory  = sheet[D_PreBook];

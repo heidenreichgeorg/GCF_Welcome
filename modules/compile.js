@@ -156,6 +156,7 @@ let jTerms={};
 
 // main response object
 // SCHEMA-part
+// must also repeat under terms.js !!!!
 const COLMIN=2;
 const D_Schema = "Schema"; // includes .Names .total .assets .eqliab  N1.author N2.residence  I1.iban I2.register I3.taxnumber  K1.reportYear K2.client
 const D_XBRL   = "XBRL";
@@ -722,6 +723,7 @@ export function compile(sessionData) {
     
     //if(debug) console.log("0390 COMPILED         = "+JSON.stringify(Object.keys(balance)));
     if(debug) console.log("0390 COMPILED HISTORY = "+JSON.stringify(Object.keys(balance[D_History])));
+    console.log("0390 COMPILED PRE_BOOK = "+JSON.stringify(balance[D_PreBook]));
 
     if(debugReport) { 
         let jHistory=balance[D_History];
@@ -757,14 +759,14 @@ function iAccount(strAccountName,arrAcctNames) {
 // in gResponse generate a copy of the balance, with all accounts closed 
 // and GAIN LOSS being distributed to partners
 function sendBalance(balance) {
-    let bAccounts = balance[D_Balance];
-    let bHistory = balance[D_History];
-    
     
     var gResponse = {}; 
+
+    let bAccounts = balance[D_Balance];
     gResponse[D_Balance]={}; 
     let gross  = gResponse[D_Balance];
 
+    let bHistory = balance[D_History];
     gResponse[D_History]={}; 
     let txns = gResponse[D_History];
 
@@ -778,8 +780,11 @@ function sendBalance(balance) {
     gResponse[D_Partner]=partners;
 
     let preBooked=balance[D_PreBook];
-    gResponse[D_PreBook]=preBooked;
-    console.log("compile.js sendBalance preBooked "+JSON.stringify(preBooked));           
+    gResponse[D_PreBook]=[];
+    preBooked.forEach(preTXN=>{
+        console.log("compile.js sendBalance preBook "+JSON.stringify(preTXN));           
+        gResponse[D_PreBook].push(preTXN);
+    })
 
     // 20230111 tax subject identifier in partner.taxID
     //let partnerIDs=balance[D_SteuerID];
