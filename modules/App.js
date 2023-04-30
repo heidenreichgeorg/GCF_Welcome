@@ -214,6 +214,7 @@ export function makeStatusData(response) {
         
                 let jPrettyTXN = prettyTXN(jHistory,hash,null,null,names,aLen,eLen);
                 jPrettyTXN.credit.shift();
+                jPrettyTXN.credit.push('AN'); // GH20230430
                 jPrettyTXN.debit.shift();
                 let aMount=jPrettyTXN.credit.concat(jPrettyTXN.debit);
                 aMount.push("-.--"); aMount.push("-.--"); aMount.push("-.--"); aMount.push("-.--"); 
