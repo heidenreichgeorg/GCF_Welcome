@@ -12,7 +12,7 @@ export default function Book() {
 
     const { session, status } = useSession()   
     const [ sheet,  setSheet] = useState(null)
-    const [ creditor, setCreditor ] = useState({'sender':'','acct0':'','acct1':'','acct2':'','iAmount0':'','iAmount1':'','iAmount2':''});
+    const [ debitor, setDebitor ] = useState({'sender':'','acct0':'','acct1':'','acct2':'','acct3':'','iAmount0':'','iAmount1':'','iAmount2':'','iAmount3':''});
     const [txn,setTxn] = useState({ 'date':"", 'sender':"", 'refAcct':"", 'reason':"", 'refCode':"", 'credit':{},'debit':{}  })
 
     useEffect(() => {
@@ -29,51 +29,62 @@ export default function Book() {
     function addPreData(shrtName,acctRef) { 
         let name = getSelect(shrtName);
         let amount=getValue(acctRef);
-        creditor[shrtName]=name; 
-        creditor[acctRef]=amount; 
-        console.log("addPreData ACCOUNT("+name+"):= VALUE("+amount+") "+JSON.stringify(creditor)); 
-        return creditor; } // avoid update
+        debitor[shrtName]=name; 
+        debitor[acctRef]=amount; 
+        console.log("addPreData ACCOUNT("+name+"):= VALUE("+amount+") "+JSON.stringify(debitor)); 
+        return debitor; } // avoid update
 
     
     function onPreBook(e,sender) {
         e.preventDefault();
-        creditor.sender = sender;
+        debitor.sender = sender;
 
         addPreData('acct0','iAmount0');
         addPreData('acct1','iAmount1');
         addPreData('acct2','iAmount2');
+        addPreData('acct3','iAmount3');
 
         txn.sender = sender;
-        txn.refAcct = creditor.acct0;
+        txn.refAcct = debitor.acct0;
 
-        console.log("onPreBook "+sender+" WITH "+txn.refAcct+" AS CRED "+JSON.stringify(creditor));
+        console.log("onPreBook "+sender+" WITH "+txn.refAcct+" AS CRED "+JSON.stringify(debitor));
     
         let controlRefAcct1 = document.getElementById("acct1");
         let controlRefAcct2 = document.getElementById("acct2");
+        let controlRefAcct3 = document.getElementById("acct3");
 
         let flow = { 'credit':{}, 'debit':{} };
         
-        let iam0 = bigEUMoney(creditor.iAmount0);
-        if(iam0 && iam0!=0n) flow=prepareTXN(sheet[D_Schema],flow,creditor.acct0,cents2EU(iam0));
+        let iam0 = bigEUMoney(debitor.iAmount0);
+        if(iam0 && iam0!=0n) flow=prepareTXN(sheet[D_Schema],flow,debitor.acct0,cents2EU(iam0));
         
-        let iam1 = bigEUMoney(creditor.iAmount1);
+        let iam1 = bigEUMoney(debitor.iAmount1);
         if(iam1 && iam1!=0n) {
-            flow=prepareTXN(sheet[D_Schema],flow,creditor.acct1,cents2EU(iam1));
+            flow=prepareTXN(sheet[D_Schema],flow,debitor.acct1,cents2EU(iam1));
             if(controlRefAcct1) {
-                console.log("SET SELECT1 "+controlRefAcct1.id+" WITH "+creditor.acct1);
-                setSelect("cReason",creditor.acct1);
+                console.log("SET SELECT1 "+controlRefAcct1.id+" WITH "+debitor.acct1);
+                setSelect("cReason",debitor.acct1);
             } 
         }
 
-        let iam2 = bigEUMoney(creditor.iAmount2);
+        let iam2 = bigEUMoney(debitor.iAmount2);
         if(iam2 && iam2!=0n) {
-            flow=prepareTXN(sheet[D_Schema],flow,creditor.acct2,cents2EU(iam2));
+            flow=prepareTXN(sheet[D_Schema],flow,debitor.acct2,cents2EU(iam2));
             if(controlRefAcct2) {
-                console.log("SET SELECT2 "+controlRefAcct2.id+" WITH "+creditor.acct2);
-                setSelect("cReason",creditor.acct2);
+                console.log("SET SELECT2 "+controlRefAcct2.id+" WITH "+debitor.acct2);
+                setSelect("cReason",debitor.acct2);
             }
         }
 
+
+        let iam3 = bigEUMoney(debitor.iAmount3);
+        if(iam3 && iam3!=0n) {
+            flow=prepareTXN(sheet[D_Schema],flow,debitor.acct3,cents2EU(iam3));
+            if(controlRefAcct3) {
+                console.log("SET SELECT3 "+controlRefAcct3.id+" WITH "+debitor.acct3);
+                setSelect("cReason",debitor.acct3);
+            }
+        }
 
 
 
@@ -161,15 +172,15 @@ export default function Book() {
     addTXNData(txn,'refCode',arrCode[0]);
 
 
-    let creditorsT = sheet[D_Adressen];
-    if(!creditorsT || creditorsT.length<1) {
-        creditorsT =[
+    let debitorsT = sheet[D_Adressen];
+    if(!debitorsT || debitorsT.length<1) {
+        debitorsT =[
             {'given':'Roby','surname':'Vau','address':'Taunusstraße 8','zip':'91056','city':'Erlangen','country':'DE'},
             {'given':'George','surname':'Ferguson','address':'Eifelweg 22','zip':'91056','city':'Erlangen','country':'DE'}];
 
-            session.creditorsT=creditorsT;
+            session.debitorsT=debitorsT;
         }
-    console.log("REFRESH PAGE "+JSON.stringify(creditor));
+    console.log("REFRESH PAGE "+JSON.stringify(debitor));
     console.log("REFRESH TXN "+JSON.stringify(txn));
 
         // Buchungssatz
@@ -179,24 +190,24 @@ export default function Book() {
     let arrDebt = [];
     Object.keys(txn.credit).map((accVal,i) => 
         (arrICred[i]<0n ? 
-            arrDebt.push(accVal+":"+cents2EU(arrICred[i]*-1n)) :
-            arrCred.push(accVal+":"+cents2EU(arrICred[i]*-1n))))
+            arrDebt.push(accVal+":"+cents2EU(arrICred[i])) :
+            arrCred.push(accVal+":"+cents2EU(arrICred[i]))))
 
      Object.keys(txn.debit).map((accVal,i)  => 
         (arrIDebt[i]<0n ? 
-            arrCred.push(accVal+":"+cents2EU(arrIDebt[i]*-1n)) :
-            arrDebt.push(accVal+":"+cents2EU(arrIDebt[i]*-1n))))
+            arrCred.push(accVal+":"+cents2EU(arrIDebt[i])) :
+            arrDebt.push(accVal+":"+cents2EU(arrIDebt[i]))))
 
 
     const tabName = 'TXNContent';
     return (
         <Screen prevFunc={prevFunc} nextFunc={nextFunc} tabSelector={aNums} tabName={tabName}>
-            <CreditorRow/> 
+            <DebitorRow/> 
             <div className="attrLine">
                 <div className="FIELD XFER">{page.PaymentsIn}</div>
             </div>
             <div className="attrLine">
-            <div className="FIELD XFER"></div>
+            <div className="FIELD SYMB"></div>
             <div className="FIELD MOAM"><input id="iAmount0"></input></div>
             <div className="FIELD XFER">
                         <select type="radio" key="acct0" id="acct0" name="acct0" onDrop={ignore} >
@@ -223,10 +234,19 @@ export default function Book() {
                             ))}
                         </select>
                 </div>
+                <div className="FIELD MOAM"></div>
+                <div className="FIELD MOAM"><input id="iAmount3"></input></div>
+                <div className="FIELD XFER">
+                        <select type="radio" key="acct3" id="acct3" name="acct3" onDrop={ignore} >
+                            {arrAcct.map((reason,i) => (
+                                <option key={"reason3"+i} id={"reason3"+i} value={reason}>{reason}</option>
+                            ))}
+                        </select>
+                </div>
             </div>
-            <CreditorRow/>             
-            { creditorsT.map((report,i) => 
-                (<CreditorRow given={report.given} surname={report.surname} 
+            <DebitorRow/>             
+            { debitorsT.map((report,i) => 
+                (<DebitorRow given={report.given} surname={report.surname} 
                             address={report.address} 
                             zip={report.zip} 
                             city={report.city} 
@@ -235,25 +255,25 @@ export default function Book() {
                             onPreBook={onPreBook}
                             key={i} />)
             )}
-            <CreditorRow/> 
-            <CreditorRow/>
-            <CreditorRow/>
-            <CreditorRow/>
-            <CreditorRow/>
-            <CreditorRow/> 
-            <CreditorRow/> 
+            <DebitorRow/> 
+            <DebitorRow/>
+            <DebitorRow/>
+            <DebitorRow/>
+            <DebitorRow/>
+            <DebitorRow/> 
+            <DebitorRow/> 
             <InputRow arrAcct={arrAcct} arrCode={arrCode} txn={txn}/>  
-            <CreditorRow/>
+            <DebitorRow/>
             <div className="attrLine">
                 <div className="FIELD SEP"></div><div className="FIELD SEP"></div><div className="FIELD SEP"></div>
                 <div className="FIELD MOAM"><input type="submit" className="key" value="BOOK CLAIM" onClick={(e)=>onBook(e)}/></div>
                 <div className="FIELD SEP"></div>
-                <div className="FIELD LNAM" key="aCredit">{arrCred.join()}</div>
+                <div className="FIELD LTXT" key="aCredit">{arrCred.join()}</div>
                 <div className="FIELD SEP">AN</div>
-                <div className="FIELD LNAM" key="aDebit">{arrDebt.join()}</div>
+                <div className="FIELD LTXT" key="aDebit">{arrDebt.join()}</div>
             </div>
-            <CreditorRow/> 
-            <CreditorRow/>
+            <DebitorRow/> 
+            <DebitorRow/>
             <FooterRow left={page["client"]}  right={page["register"]} prevFunc={prevFunc} nextFunc={nextFunc}/>
             <FooterRow left={page["reference"]} right={page["author"]} prevFunc={prevFunc} nextFunc={nextFunc}/>
         </Screen>
@@ -310,9 +330,9 @@ function makeTransferData(response,iSelected) {
 }
 
 
-function CreditorRow({ given,surname,address,zip,city,country,sender,onPreBook,key }) {
+function DebitorRow({ given,surname,address,zip,city,country,sender,onPreBook,key }) {
     return(
-        <div className="attrLine" key={"Creditor"+key}>
+        <div className="attrLine" key={"Debitor"+key}>
             {   (sender && sender.length>2) ?
                 (<div className="FIELD MOAM" id={"pre"+sender}><input type="submit" className="key" value="SELECT" onClick={(e)=>onPreBook(e,sender)}/></div>
                 ):( <div>&nbsp;</div> )}   
