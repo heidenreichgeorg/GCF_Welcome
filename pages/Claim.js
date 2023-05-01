@@ -3,14 +3,14 @@
 
 import { useEffect, useState } from 'react';
 
-import { D_PreBook, D_History, D_Page,D_Schema, SCREENLINES }  from '../modules/terms.js';
+import { D_PreBook, D_Balance, D_Page,D_Schema, X_ASSETS, X_ASS_CASH, X_LIABILITY, X_INCOME, X_EQLIAB, SCREENLINES }  from '../modules/terms.js';
 import Screen from '../pages/Screen'
 import FooterRow from '../components/FooterRow'
-import { bigEUMoney,cents2EU }  from '../modules/money';
+import { bigEUMoney,cents20EU }  from '../modules/money';
 import { symbolic }  from '../modules/session';
-import { getParam }  from '../modules/App';
-import { CSEP,makeHistory }  from '../modules/writeModule';
-import { getSession, useSession } from '../modules/sessionmanager';
+import { getParam,getSelect,getValue }  from '../modules/App';
+import { book, CSEP,makeHistory,prepareTXN }  from '../modules/writeModule';
+import { getSession, useSession, resetSession } from '../modules/sessionmanager';
 
 const SCREEN_TXNS=2+parseInt(SCREENLINES/3);
 
@@ -22,8 +22,7 @@ export default function Claim() {
 
     const { session, status } = useSession()   
     const [ sheet,  setSheet] = useState(null)
-    const [ debitor, setDebitor ] = useState({'sender':'','acct0':'','acct1':'','acct2':'','iAmount0':'','iAmount1':'','iAmount2':''});
-    const [txn,setTxn] = useState({ 'date':"", 'sender':"", 'refAcct':"", 'reason':"", 'refCode':"", 'credit':{},'debit':{}  })
+
 
     useEffect(() => {
     // run each rendering and re-rendering
@@ -42,65 +41,42 @@ export default function Claim() {
 
 
 
-    function addPreData(shrtName,acctRef) { 
-        let name = getSelect(shrtName);
-        let amount=getValue(acctRef);
-        debitor[shrtName]=name; 
-        debitor[acctRef]=amount; 
-        console.log("addPreData ACCOUNT("+name+"):= VALUE("+amount+") "+JSON.stringify(debitor)); 
-        return debitor; } // avoid update
-    
-    
+    let debitor={};
+
     function onSelect(e,sender) {
+
+// similar to Transaction.js
+
         e.preventDefault();
 
-        console.log("onSelect "+JSON.stringify(jHistory[sender-1]));
-/*
-        addPreData('acct0','iAmount0');
-        addPreData('acct1','iAmount1');
-        addPreData('acct2','iAmount2');
-*/    
-        txn.sender = sender;
-        txn.refAcct = debitor.acct0;
+        console.log("onSelect click "+JSON.stringify(jHistory[sender-1]));
     
-        console.log("onPreBook "+sender+" WITH "+txn.refAcct+" AS CRED "+JSON.stringify(debitor));
-    
-        let controlRefAcct1 = document.getElementById("acct1");
-        let controlRefAcct2 = document.getElementById("acct2");
-    
-        let flow = { 'credit':{}, 'debit':{} };
-        
-        let iam0 = bigEUMoney(debitor.iAmount0);
-        if(iam0 && iam0!=0n) flow=prepareTXN(sheet[D_Schema],flow,debitor.acct0,cents2EU(iam0));
-        
-        let iam1 = bigEUMoney(debitor.iAmount1);
-        if(iam1 && iam1!=0n) {
-            flow=prepareTXN(sheet[D_Schema],flow,debitor.acct1,cents2EU(iam1));
-            if(controlRefAcct1) {
-                console.log("SET SELECT1 "+controlRefAcct1.id+" WITH "+debitor.acct1);
-                setSelect("cReason",debitor.acct1);
-            } 
-        }
-    
-        let iam2 = bigEUMoney(debitor.iAmount2);
-        if(iam2 && iam2!=0n) {
-            flow=prepareTXN(sheet[D_Schema],flow,debitor.acct2,cents2EU(iam2));
-            if(controlRefAcct2) {
-                console.log("SET SELECT2 "+controlRefAcct2.id+" WITH "+debitor.acct2);
-                setSelect("cReason",debitor.acct2);
-            }
-        }
-    
-    
-    
-    
-        txn.credit = flow.credit;
-        txn.debit=flow.debit;
-        //console.log("SET FLOW "+JSON.stringify(flow));
-    
-        // renders complete page, because txn is a controlled variable
-        setTxn(JSON.parse(JSON.stringify(txn)))
-    
+        let raw = jHistory[sender-1];
+
+// onPreBook
+        let sSelect=makeHistory(sheet,aPattern,lPattern,[raw],aLen,eLen,gSchema,pageGlobal,SCREEN_TXNS)[1]; 
+
+
+        console.log("onSelect click "+JSON.stringify(sSelect));
+
+        // also see SigRow
+        debitor =sSelect.jMoney;
+
+
+        let txn={};
+        let aRow = [];
+        try { let saRow = sSelect.entry;
+            aRow = saRow.split(CSEP);
+            txn.date  = aRow[0];
+            txn.sender =aRow[1];
+            txn.refAcct=aRow[2];
+            txn.reason =aRow[3];
+            txn.refCode=aRow[4];
+        } catch(err) { console.log("onSelect aRow wrong "+JSON.stringify(aRow));  }    
+
+        console.log("onSelect txn "+JSON.stringify(txn));
+
+        onPreBook(debitor,txn);
     }    
     
 
@@ -139,12 +115,70 @@ export default function Claim() {
     for(let p=1;p<sPages-1;p++) aPages[p]='none'; 
     aPages[0]='block';
        
+    
+    var jAccounts = sheet[D_Balance];
+    let arrAcct=[];
+    let arrLiab=[];
+    let arrCash=[];
+    let arrAsst=[];
+    for (let name in jAccounts)   {
+        var account=jAccounts[name];
+        if(account.xbrl.length>1) {
+            var xbrl = account.xbrl.split('\.').reverse();
+            var xbrl_pre = account.xbrl;//xbrl.pop()+ "."+ xbrl.pop()+ "."+ xbrl.pop()+ "."+ xbrl.pop();
+            //console.log("Pattern "+xbrl_pre);
+            if(xbrl.length>2) { 
+                if(xbrl_pre.startsWith(X_INCOME) || xbrl_pre.startsWith(X_EQLIAB)) arrAcct.push(name);
+                if(xbrl_pre.startsWith(X_LIABILITY)) arrLiab.push(name);
+                if(xbrl_pre.startsWith(X_ASS_CASH)) arrCash.push(name);
+                if(xbrl_pre.startsWith(X_ASSETS)) arrAsst.push(name);
+            }
+        }
+    }
 
     const tabName = 'ClaimContent';
     return (
         <Screen prevFunc={prevFunc} nextFunc={nextFunc} tabSelector={ aPages.map((_,n)=>(1+n)) } tabName={tabName}>
             {aPages.map((m,n) => ( 
                 <div className="FIELD"  key={"Claim0"+n}  id={tabName+n} style= {{ 'display': m }} >
+                     <div className="attrLine">
+                        <div className="FIELD SYMB"></div>
+                        <div className="FIELD MOAM"><input id="iAmount0"></input></div>
+                        <div className="FIELD XFER">
+                            <select type="radio" key="acct0" id="acct0" name="acct0" onDrop={ignore} >
+                                {arrCash.map((reason,i) => (
+                                    <option key={"reason0"+i} id={"reason0"+i} value={reason}>{reason}</option>
+                                ))}
+                            </select>
+                         </div>
+                        <div className="SEP"></div>
+                        <div className="FIELD MOAM"><input id="iAmount1"></input></div>
+                        <div className="FIELD XFER">
+                            <select type="radio" key="acct1" id="acct1" name="acct1" onDrop={ignore} >
+                                {arrAsst.map((reason,i) => (
+                                    <option key={"reason1"+i} id={"reason1"+i} value={reason}>{reason}</option>
+                                ))}
+                            </select>
+                         </div>
+                         <div className="SEP"></div>
+                        <div className="FIELD MOAM"><input id="iAmount2"></input></div>
+                        <div className="FIELD XFER">
+                            <select type="radio" key="acct2" id="acct2" name="acct2" onDrop={ignore} >
+                                {arrAsst.map((reason,i) => (
+                                    <option key={"reason2"+i} id={"reason2"+i} value={reason}>{reason}</option>
+                                ))}
+                            </select>
+                         </div>
+                         <div className="SEP"></div>
+                        <div className="FIELD MOAM"><input id="iAmount3"></input></div>
+                        <div className="FIELD XFER">
+                            <select type="radio" key="acct3" id="acct3" name="acct3" onDrop={ignore} >
+                                {arrAsst.map((reason,i) => (
+                                    <option key={"reason3"+i} id={"reason3"+i} value={reason}>{reason}</option>
+                                ))}
+                            </select>
+                         </div>
+                    </div>
                     { (sHistory.slice(n*SCREEN_TXNS,(n+1)*SCREEN_TXNS).map((row,k) => (  
                         <SigRow  key={"Claim2"+k} row={row} index={n} client={session.client}  year={session.year} line={k} />  
                     )))}                   
@@ -159,6 +193,7 @@ export default function Claim() {
 
     function SigRow({row,index,client,year,line}) {
 
+        // also see in onSelect
         let aRow = [0n,0n,0n,0n,0n,0n]
         try { let saRow = row.entry;
             aRow = saRow.split(CSEP);
@@ -217,29 +252,53 @@ export default function Claim() {
             </div>
         )
     }
-
-}
-
-
-
-function handleChange(target,aRow,tRow,id) {
-        
-    console.log("click "+id+"="+JSON.stringify(aRow));
+    function ignore(e) { e.preventDefault(); }
     
-    if(aSelText) {    
-        if(aSelText && aSelText[id] && aSelText[id].length>0) {
-            console.log("DESELECT "+id);
-            aSelText[id]=null;
-            aSelSaldo[id]=null;
-            target.value='';
-            aJMoney[id]={};
-        } else  {
-            console.log("SELECT "+id);
-            aSelText[id]=aRow;
-            aSelSaldo[id]="0";
-            aJMoney[id]=tRow;
-            console.log("handleChange "+JSON.stringify(tRow))
-        }
+
+    
+    function onPreBook(debitor,txn) {
+
+        let flow = { 'credit':{}, 'debit':{} };        
+
+        // Asset accounts
+        assetsData('acct0','iAmount0');
+        assetsData('acct1','iAmount1');
+        assetsData('acct2','iAmount2');
+        assetsData('acct3','iAmount3');
+
+        // preset accounts
+        Object.keys(debitor).map(function(name,i) {flow=prepareTXN(sheet[D_Schema],flow,name,cents20EU(debitor[name]))});
+
+        console.log("BOOK F "+JSON.stringify(flow));
+
+        txn.credit = flow.credit;
+        txn.debit = flow.debit;
+
+        // WITH SERVER-SIDE SESSION MANAGEMENT
+        txn.sessionId = session.id; // won't book otherwise
+        // WITH CLIENT-SIDE CLIENT/YEAR as PRIM KEY
+        txn.year=session.year;
+        txn.client=session.client;
+
+        console.log("BOOK B "+JSON.stringify(txn));
+
+        book(txn,session); 
+
+ //       resetSession();
+        // invalidate current session
+
+        console.log("BOOK O booked.");
+  
     }
 
+    function assetsData(shrtName,acctRef) { 
+        let name = getSelect(shrtName);
+        let amount=cents20EU(bigEUMoney(getValue(acctRef)));
+        debitor[name]=amount; 
+        console.log("Claim.addPreData ACCOUNT("+name+"):= VALUE("+amount+") "+JSON.stringify(debitor)); 
+        return debitor; } // avoid update
+    
+ 
 }
+
+

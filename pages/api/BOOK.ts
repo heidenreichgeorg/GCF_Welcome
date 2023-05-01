@@ -1,5 +1,8 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 
+const debug=1;
+const debugWrite=1;
+
 import type { NextApiRequest, NextApiResponse } from 'next'
 import  { formatTXN  } from '../../modules/compile'
 import  { getRoot,init,localhost,setSession,signIn, strSymbol, symbolic, timeSymbol } from '../../modules/session'
@@ -107,10 +110,6 @@ function bookTransaction(session:any, res:NextApiResponse<any>) {
     return session;
 }
 
-
-
-const debug=true;
-const debugWrite=true;
 
 function bookSheet(session:any,tBuffer:string[]|null,sessionTime:String,nextSessionId:String) {
 

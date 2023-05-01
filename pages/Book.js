@@ -142,7 +142,6 @@ export default function Book() {
     
 
     var jAccounts = sheet[D_Balance];
-
     let arrAcct=[];
     let arrLiab=[];
     let arrAsst=[];
