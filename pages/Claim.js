@@ -52,22 +52,19 @@ export default function Claim() {
         console.log("onSelect click "+JSON.stringify(jHistory[sender-1]));
     
         let raw = jHistory[sender-1];
-
-// onPreBook
         let sSelect=makeHistory(sheet,aPattern,lPattern,[raw],aLen,eLen,gSchema,pageGlobal,SCREEN_TXNS)[1]; 
-
-
         console.log("onSelect click "+JSON.stringify(sSelect));
 
         // also see SigRow
         debitor =sSelect.jMoney;
 
+        let dateControl =document.getElementById("dateBooked");
 
         let txn={};
         let aRow = [];
         try { let saRow = sSelect.entry;
             aRow = saRow.split(CSEP);
-            txn.date  = aRow[0];
+            txn.date  = aRow[0]; if(dateControl) txn.date=dateControl.value;
             txn.sender =aRow[1];
             txn.refAcct=aRow[2];
             txn.reason =aRow[3];
@@ -76,7 +73,16 @@ export default function Claim() {
 
         console.log("onSelect txn "+JSON.stringify(txn));
 
-        onPreBook(debitor,txn);
+
+        // WITH SERVER-SIDE SESSION MANAGEMENT
+        txn.sessionId = session.id; // won't book otherwise
+        // WITH CLIENT-SIDE CLIENT/YEAR as PRIM KEY
+        txn.year=session.year;
+        txn.client=session.client;
+
+
+
+        onBook(debitor,txn);
     }    
     
 
@@ -139,46 +145,49 @@ export default function Claim() {
     const tabName = 'ClaimContent';
     return (
         <Screen prevFunc={prevFunc} nextFunc={nextFunc} tabSelector={ aPages.map((_,n)=>(1+n)) } tabName={tabName}>
+            <div className="attrLine">
+            <div className="FIELD SYMB"></div>
+            <div className="FIELD TEAM"><input id="dateBooked" type="date"></input></div>
+            <div className="FIELD SYMB"></div>
+            <div className="FIELD MOAM"><input id="iAmount0"></input></div>
+            <div className="FIELD XFER">
+                <select type="radio" key="acct0" id="acct0" name="acct0" onDrop={ignore} >
+                    {arrCash.map((reason,i) => (
+                        <option key={"reason0"+i} id={"reason0"+i} value={reason}>{reason}</option>
+                    ))}
+                </select>
+                </div>
+            <div className="SEP"></div>
+            <div className="FIELD MOAM"><input id="iAmount1"></input></div>
+            <div className="FIELD XFER">
+                <select type="radio" key="acct1" id="acct1" name="acct1" onDrop={ignore} >
+                    {arrAsst.map((reason,i) => (
+                        <option key={"reason1"+i} id={"reason1"+i} value={reason}>{reason}</option>
+                    ))}
+                </select>
+                </div>
+                <div className="SEP"></div>
+            <div className="FIELD MOAM"><input id="iAmount2"></input></div>
+            <div className="FIELD XFER">
+                <select type="radio" key="acct2" id="acct2" name="acct2" onDrop={ignore} >
+                    {arrAsst.map((reason,i) => (
+                        <option key={"reason2"+i} id={"reason2"+i} value={reason}>{reason}</option>
+                    ))}
+                </select>
+                </div>
+                <div className="SEP"></div>
+            <div className="FIELD MOAM"><input id="iAmount3"></input></div>
+            <div className="FIELD XFER">
+                <select type="radio" key="acct3" id="acct3" name="acct3" onDrop={ignore} >
+                    {arrAsst.map((reason,i) => (
+                        <option key={"reason3"+i} id={"reason3"+i} value={reason}>{reason}</option>
+                    ))}
+                </select>
+                </div>
+        </div>
             {aPages.map((m,n) => ( 
                 <div className="FIELD"  key={"Claim0"+n}  id={tabName+n} style= {{ 'display': m }} >
-                     <div className="attrLine">
-                        <div className="FIELD SYMB"></div>
-                        <div className="FIELD MOAM"><input id="iAmount0"></input></div>
-                        <div className="FIELD XFER">
-                            <select type="radio" key="acct0" id="acct0" name="acct0" onDrop={ignore} >
-                                {arrCash.map((reason,i) => (
-                                    <option key={"reason0"+i} id={"reason0"+i} value={reason}>{reason}</option>
-                                ))}
-                            </select>
-                         </div>
-                        <div className="SEP"></div>
-                        <div className="FIELD MOAM"><input id="iAmount1"></input></div>
-                        <div className="FIELD XFER">
-                            <select type="radio" key="acct1" id="acct1" name="acct1" onDrop={ignore} >
-                                {arrAsst.map((reason,i) => (
-                                    <option key={"reason1"+i} id={"reason1"+i} value={reason}>{reason}</option>
-                                ))}
-                            </select>
-                         </div>
-                         <div className="SEP"></div>
-                        <div className="FIELD MOAM"><input id="iAmount2"></input></div>
-                        <div className="FIELD XFER">
-                            <select type="radio" key="acct2" id="acct2" name="acct2" onDrop={ignore} >
-                                {arrAsst.map((reason,i) => (
-                                    <option key={"reason2"+i} id={"reason2"+i} value={reason}>{reason}</option>
-                                ))}
-                            </select>
-                         </div>
-                         <div className="SEP"></div>
-                        <div className="FIELD MOAM"><input id="iAmount3"></input></div>
-                        <div className="FIELD XFER">
-                            <select type="radio" key="acct3" id="acct3" name="acct3" onDrop={ignore} >
-                                {arrAsst.map((reason,i) => (
-                                    <option key={"reason3"+i} id={"reason3"+i} value={reason}>{reason}</option>
-                                ))}
-                            </select>
-                         </div>
-                    </div>
+          
                     { (sHistory.slice(n*SCREEN_TXNS,(n+1)*SCREEN_TXNS).map((row,k) => (  
                         <SigRow  key={"Claim2"+k} row={row} index={n} client={session.client}  year={session.year} line={k} />  
                     )))}                   
@@ -256,9 +265,9 @@ export default function Claim() {
     
 
     
-    function onPreBook(debitor,txn) {
+    function onBook(debitor,txn) {
 
-        let flow = { 'credit':{}, 'debit':{} };        
+        let flow = { 'credit':{}, 'debit':{}, 'balance':"0" };        
 
         // Asset accounts
         assetsData('acct0','iAmount0');
@@ -269,25 +278,22 @@ export default function Claim() {
         // preset accounts
         Object.keys(debitor).map(function(name,i) {flow=prepareTXN(sheet[D_Schema],flow,name,cents20EU(debitor[name]))});
 
-        console.log("BOOK F "+JSON.stringify(flow));
+        console.log("BOOK flow="+JSON.stringify(flow));
 
         txn.credit = flow.credit;
         txn.debit = flow.debit;
 
-        // WITH SERVER-SIDE SESSION MANAGEMENT
-        txn.sessionId = session.id; // won't book otherwise
-        // WITH CLIENT-SIDE CLIENT/YEAR as PRIM KEY
-        txn.year=session.year;
-        txn.client=session.client;
+        console.log("BOOK transaction="+JSON.stringify(txn));
 
-        console.log("BOOK B "+JSON.stringify(txn));
-
-        book(txn,session); 
-
- //       resetSession();
+        if(flow.balance && flow.balance.length==0) 
+            book(txn,session); 
+        else console.log("BOOK O booked with remaining claim "+flow.balance);
+ 
+ 
         // invalidate current session
-
-        console.log("BOOK O booked.");
+       //       resetSession();
+ 
+        
   
     }
 

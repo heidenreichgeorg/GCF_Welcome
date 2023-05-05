@@ -267,7 +267,7 @@ function where(array,key) {
 }
 
 
-
+/*
 function getMax(response) {
     var jHistory = response[D_History];
     if(jHistory) return Object.keys(jHistory).length-1;
@@ -308,7 +308,7 @@ function makeTransferData(response,iSelected) {
     }  
    return transferData;
 }
-
+*/
 
 function CreditorRow({ given,surname,address,zip,city,country,sender,onPreBook,key }) {
     return(

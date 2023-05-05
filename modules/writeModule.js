@@ -5,7 +5,7 @@ import * as fs from 'fs';
 import { accessFirebase,bucketUpload,loadFBConfig } from './fireBaseBucket'
 import {  J_ACCT, COLMIN, DOUBLE } from './terms.js'
 import { REACT_APP_API_HOST } from "./sessionmanager"
-import { bigEUMoney, cents2EU } from './money'
+import { bigEUMoney, cents2EU,cents20EU } from './money'
 import { setSession,strSymbol,timeSymbol } from './session'
 import { compile } from './compile'
 
@@ -122,7 +122,8 @@ export function prepareTXN(schema,flow, name,amount) {
     var aLen =       schema.assets;
     var eLen =       schema.eqliab;
 
-
+    let iBalance=0n;
+    if(flow.balance) iBalance=bigEUMoney(flow.balance);
     var newCredit=flow.credit;
     var newDebit=flow.debit;
 
@@ -132,14 +133,14 @@ export function prepareTXN(schema,flow, name,amount) {
                 && amount && amount !='0') { 
                 
                 let iValue = bigEUMoney(amount);
-                let entry = { index:i, value: cents2EU(iValue) }
-                if(i<aLen && i!=eLen) {newCredit[name]=entry;}
-                if(i>aLen && i!=eLen) {newDebit[name]= entry;}
+                let entry = { index:i, value: cents20EU(iValue) }
+                if(i<aLen && i!=eLen) {newCredit[name]=entry; iBalance+=iValue; }
+                if(i>aLen && i!=eLen) {newDebit[name]= entry; iBalance-=iValue; }
             }
         }
     }
 
-    flow = { 'credit':newCredit, 'debit':newDebit };
+    flow = { 'credit':newCredit, 'debit':newDebit, 'balance':cents2EU(iBalance) };
     if(debug) console.dir("prepareTXN "+JSON.stringify(flow));
     return flow;
 }
