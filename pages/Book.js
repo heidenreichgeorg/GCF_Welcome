@@ -32,23 +32,25 @@ export default function Book() {
         debitor[shrtName]=name; 
         debitor[acctRef]=amount; 
         console.log("addPreData ACCOUNT("+name+"):= VALUE("+amount+") "+JSON.stringify(debitor)); 
-        return debitor; } // avoid update
+        return name; 
+    } 
 
     
     function onPreBook(e,sender) {
         e.preventDefault();
         debitor.sender = sender;
 
-        addPreData('acct0','iAmount0');
-        addPreData('acct1','iAmount1');
-        addPreData('acct2','iAmount2');
-        addPreData('acct3','iAmount3');
+        let a0= addPreData('acct0','iAmount0');
+        let a1= addPreData('acct1','iAmount1');
+        let a2= addPreData('acct2','iAmount2');
+        let a3= addPreData('acct3','iAmount3');
 
         txn.sender = sender;
-        txn.refAcct = debitor.acct0;
+        txn.refAcct = (a0?a0 +" ": "") + (a1?a1+" ":"") + (a2?a2 : "");
 
         console.log("onPreBook "+sender+" WITH "+txn.refAcct+" AS CRED "+JSON.stringify(debitor));
     
+        let controlRefAcct0 = document.getElementById("acct0");
         let controlRefAcct1 = document.getElementById("acct1");
         let controlRefAcct2 = document.getElementById("acct2");
         let controlRefAcct3 = document.getElementById("acct3");
@@ -144,7 +146,6 @@ export default function Book() {
     var jAccounts = sheet[D_Balance];
     let arrAcct=[];
     let arrLiab=[];
-    let arrAsst=[];
     for (let name in jAccounts)   {
         var account=jAccounts[name];
         if(account.xbrl.length>1) {
@@ -154,7 +155,6 @@ export default function Book() {
             if(xbrl.length>2) { 
                 if(xbrl_pre.startsWith(X_INCOME) || xbrl_pre.startsWith(X_EQLIAB)) arrAcct.push(name);
                 if(xbrl_pre.startsWith(X_LIABILITY)) arrLiab.push(name);
-                if(xbrl_pre.startsWith(X_ASS_CASH)) arrAsst.push(name);
             }
         }
     }
@@ -210,7 +210,7 @@ export default function Book() {
             <div className="FIELD MOAM"><input id="iAmount0"></input></div>
             <div className="FIELD XFER">
                         <select type="radio" key="acct0" id="acct0" name="acct0" onDrop={ignore} >
-                            {arrAsst.map((reason,i) => (
+                            {arrLiab.map((reason,i) => (
                                 <option key={"reason0"+i} id={"reason0"+i} value={reason}>{reason}</option>
                             ))}
                         </select>
@@ -279,54 +279,11 @@ export default function Book() {
     )
     
 }
-// <select type="radio" key="cReason2" id="acct2" name="cReason2" onChange={(e)=>addPreData('acct2',getSelect(e.target.id),'iAmount2',getValue('iAmount2'))} onDrop={ignore} >
 
 function where(array,key) {
     for(let i=0;i<array.length;i++) if((array[i]+CSEP).startsWith(key)) return i;
 }
 
-
-
-function getMax(response) {
-    var jHistory = response[D_History];
-    if(jHistory) return Object.keys(jHistory).length-1;
-    return 0;
-}
-
-
-function makeTransferData(response,iSelected) {
-
-    var jHistory = response[D_History];
-    var gSchema = response[D_Schema];
-
-    let transferData={ date:'',sender:'',refAcct:'',reason:'',refCode:'',lTran:["","","","","",""]};
-
-    if(jHistory && gSchema.Names && gSchema.Names.length>0) {
-        var names=gSchema.Names;
-        var aLen = gSchema.assets;
-        var eLen = gSchema.eqliab;
-        var bLine=0;
-
-        for (let hash in jHistory)  {
-
-            if(bLine===iSelected) {
-                let txn = jHistory[hash];
-                transferData.date   = txn[1];
-                transferData.sender = txn[2];
-                transferData.refAcct = txn[3];
-                transferData.reason  =  txn[4];
-                transferData.refCode  =  txn[5];
-                
-                let jPrettyTXN = prettyTXN(jHistory,hash,null,null,names,aLen,eLen);
-                transferData.aNames = jPrettyTXN.aNames;                                
-                transferData.aAmount= jPrettyTXN.aAmount;
-                transferData.lTran=jPrettyTXN.aNames.map((n,i)=>(n+jPrettyTXN.aAmount[i]));
-            }
-            bLine++;
-        }
-    }  
-   return transferData;
-}
 
 
 function DebitorRow({ given,surname,address,zip,city,country,sender,onPreBook,key }) {
