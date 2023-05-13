@@ -5,15 +5,10 @@
 import { useEffect, useState  } from 'react';
 import Screen from './Screen'
 import { getSession,useSession } from '../modules/sessionmanager';
-import { D_FixAss,  D_Balance, D_Page, D_Partner, D_Report }  from '../modules/terms.js';
+import { D_FixAss,  D_Balance, D_Page, D_Partner }  from '../modules/terms.js';
 import FooterRow from '../components/FooterRow';
 
-import BarList from '../components/BarList'
-import Chart from '../components/Chart'
-import Gauge from '../components/Gauge'
 import Halo from '../components/Halo'
-import Relation from '../components/Relation'
-import Slider from '../components/Slider'
 
 
 import { makeStatusData }  from '../modules/App';
@@ -101,11 +96,11 @@ export default function DashBoard({value}) {
 
                 <Halo                                                    radius={110} x={xcenter} y={ycenter}/>
 
-                <Halo jFeatures={{"yearEnd":aAssets}} arrPartners={nYearEnd}   radius={70} x={xcenter} y={ycenter} step={2000}/>
+                <Halo jFeatures={{"yearEnd":aAssets}} arrPartners={nYearEnd}   radius={70} x={xcenter} y={ycenter} step={1400}/>
 
-                <Halo jFeatures={{"yearEnd":aYearEnd}} arrPartners={nYearEnd} radius={90} x={xcenter} y={ycenter}   step={50}/>
+                <Halo jFeatures={{"yearEnd":aYearEnd}} arrPartners={nYearEnd} radius={90} x={xcenter} y={ycenter}   step={140}/>
 
-                <Halo jFeatures={haloFeatures} arrPartners={namPartners}      radius={110} x={xcenter} y={ycenter} step={2000}/>
+                <Halo jFeatures={haloFeatures} arrPartners={namPartners}      radius={110} x={xcenter} y={ycenter} step={1000}/>
             </svg>
             </div>
             <FooterRow  id={"F1"}  left={page["client"]}   right={page["register"]} prevFunc={prevFunc} nextFunc={nextFunc}/>

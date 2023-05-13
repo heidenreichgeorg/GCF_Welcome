@@ -39,8 +39,8 @@ export default function Halo (args) {
                 jNames[title]=args.arrPartners.map((_,i)=>((args.arrPartners[i])[title]));
             })    
     } else {
-        makeScales(aScales,aWork,130,11,xcenter,ycenter,radius);
-        makeScales(aScales,aWork,310,11,xcenter,ycenter,radius);
+        makeScales(aScales,aWork,130,11,xcenter,ycenter,radius); // left outer ring
+        makeScales(aScales,aWork,310,11,xcenter,ycenter,radius); // right outer ring
     }
     
     var featureBegin=0;
@@ -81,10 +81,10 @@ export default function Halo (args) {
                         stroke={jTask.color}
                         strokeDasharray={jTask.dash}
                         strokeWidth={jTask.width}
-                        transform={jTask.transform}
+                        transform={jTask.arctransform}
                         fill="transparent"
                     /> 
-                    <text x={jTask.xstart} y={jTask.ystart} font-size="4" transform={jTask.transform}>{jTask.text}</text>
+                    <text x={jTask.xstart} y={jTask.ystart} font-size="4" transform={jTask.txttransform}>{jTask.text}</text>
                 </g>                   
             )))
             }
@@ -112,20 +112,28 @@ function makeGroup(aWork,arrValues,names,xcenter,ycenter,radius,width,step,start
     arrValues.forEach(value=>{
         const absValue = Math.abs(value);
         const arc = (circumference * absValue) / step;
+        
         if(arc) {
             const dash = `${arc} ${circumference}`;   
             const angle=2*Math.PI*pos/step;
             const degrees=360*pos/step;
-            const xstart=0;Math.cos(angle)*radius;
-            const ystart=0;Math.sin(angle)*radius;
-            aWork.push({ transform: `rotate(${degrees}, ${xcenter}, ${ycenter})`, 
+            const xstart=xcenter+radius-(toggle==0?0:10);//Math.cos(angle)*radius;
+            const ystart=ycenter;//Math.sin(angle)*radius;
+            aWork.push({
+                        arctransform: `rotate(${degrees}, ${xcenter}, ${ycenter})`, 
                         xcenter:xcenter, ycenter:ycenter, 
-                        xstart:xstart+xcenter+radius-(toggle==0?0:10),ystart:ystart+ycenter,
+                        xstart:xstart,ystart:ystart,
                         radius:radius,                     
-                        dash:dash, text:names[index],
+                        dash:dash, 
+                        text:names[index],
+                        //txttransform: `rotate(${-degrees}, ${xstart}, ${ystart})`, 
+                        txttransform: `rotate(${degrees}, ${xcenter}, ${ycenter})`, 
                         width:width+toggle, 
                         color:toggle==0?cArcBlue:cSkyBlue});
+                        
+                
         }
+        
         index++;
         pos+=absValue;  
         base=(pos *circumference) / step;      
@@ -147,20 +155,4 @@ function makeScales(aScales,aWork,begin,iter,xcenter,ycenter,radius) {
                     xcenter:xcenter, ycenter:ycenter, 
                     radius:radius, dash:dash, width:strokeWidth, color:cScaleBlue});
 }
-
-
-function showTooltip(evt, text) {
-    let tooltip = document.getElementById("tooltip");
-    if(tooltip) {
-        tooltip.innerHTML = text;
-        tooltip.style.display = "block";
-        tooltip.style.left = evt.pageX + 10 + 'px';
-        tooltip.style.top  = evt.pageY + 10 + 'px';
-    }
-  }
-  
-  function hideTooltip() {
-    var tooltip = document.getElementById("tooltip");
-    if(tooltip) tooltip.style.display = "none";
-  }
 
