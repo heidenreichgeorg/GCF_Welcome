@@ -59,7 +59,9 @@ export function prettyTXN(jHistory,hash,lPattern,aPattern,names,aLen,eLen) {
                     // GH20220307 EU-style numbers with two decimal digits
                     let strCents = parts[j].replace('.','').replace(',','');
                       //console.log("strCents="+strCents);
-                    let item = BigInt(strCents); 
+                    let item = 0;
+                    
+                    try { item = BigInt(strCents) } catch(e) { console.error("Malformed TXN "+txnLine); }
 
                     // GH20220703
                     if(    !txnAcct
