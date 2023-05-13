@@ -6,7 +6,7 @@ import { useEffect, useState, useRef } from 'react';
 
 import Screen from '../pages/Screen'
 import FooterRow from '../components/FooterRow'
-import { addTXNData, InputRow }  from '../modules/App';
+import { addTXNData, FieldRow, InputRow }  from '../modules/App';
 import { cents2EU, bigEUMoney }  from '../modules/money';
 import { book, prepareTXN } from '../modules/writeModule';
 import { D_Balance, D_FixAss, D_Page, D_Report, D_Schema, SCREENLINES, X_ASSETS, X_EQUITY, X_EQLIAB, X_INCOME, X_INCOME_REGULAR } from '../modules/terms.js'
@@ -127,7 +127,7 @@ export default function Operations() {
                 ))
             }
             <InputRow arrAcct={arrAcct} arrCode={arrCode} txn={txn}/>    
-            
+            <FieldRow/>
             <FooterRow left={page["client"]}  right={page["register"]} prevFunc={prevFunc} nextFunc={nextFunc}/>
             <FooterRow left={page["reference"]} right={page["author"]} prevFunc={prevFunc} nextFunc={nextFunc}/>
         </Screen>

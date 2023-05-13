@@ -479,4 +479,23 @@ export function InputRow({ arrAcct, arrCode, txn }) {
         </div>)
 }
 
+export function FieldRow({ txn }) {
+
+    return(
+        <div className="attrRow">            
+            <div className="FIELD SYMB"> &nbsp;</div>
+            <div className="FIELD XFER"></div>
+            <div className="FIELD SEP">&nbsp;</div>
+            <div className="BIGCELL LNAM"></div>
+            <div className="FIELD SEP">&nbsp;</div>
+            <div className="FIELD LNAM"></div>
+            <div className="BIGCELL R105">New Asset:</div>
+            <div className="FIELD XFER">
+                <input type="edit" id="cRef2" name="cRef2" onChange={(e)=>addTXNData(txn,'refCode',getSelect(e.target.id))} onDrop={ignore} >
+                </input>                
+            </div>
+        </div>);
+}
+
+
 export function addTXNData(txn,shrtName,a) { txn[shrtName]=a; console.log("App.addTXNData TXN("+a+") "+JSON.stringify(txn)); return txn; } // avoid update
