@@ -84,7 +84,7 @@ export default function Halo (args) {
                         transform={jTask.arctransform}
                         fill="transparent"
                     /> 
-                    <text x={jTask.xstart} y={jTask.ystart} font-size="4" transform={jTask.txttransform}>{jTask.text}</text>
+                    <text x={jTask.xTip} y={jTask.yTip} font-size="4" transform={jTask.txttransform}>{jTask.text}</text>
                 </g>                   
             )))
             }
@@ -105,30 +105,32 @@ const allColors = ["#2255BB","#2299BB","#4499BB","#6699BB","#2255DD","#2299DD","
 function makeGroup(aWork,arrValues,names,xcenter,ycenter,radius,width,step,start) {
     let pos=start;
     radius-=width;
-    var toggle=0;
+    var shift=0;
     const circumference = radius * 2 * Math.PI;
     let base=(pos * circumference) / step;
     var index=0;
     arrValues.forEach(value=>{
         const absValue = Math.abs(value);
         const arc = (circumference * absValue) / step;
-        
+        shift++;        
+        let toggle=(shift%2);
         if(arc) {
             const dash = `${arc} ${circumference}`;   
             const angle=2*Math.PI*pos/step;
             const degrees=360*pos/step;
-            const xstart=xcenter+radius-(toggle==0?0:10);//Math.cos(angle)*radius;
-            const ystart=ycenter;//Math.sin(angle)*radius;
+            const xTip=xcenter+((shift%3)+6)+(Math.cos(angle)*radius)-7;
+            const yTip=ycenter-((shift%3)-6)+(Math.sin(angle)*radius)-3;
             aWork.push({
                         arctransform: `rotate(${degrees}, ${xcenter}, ${ycenter})`, 
                         xcenter:xcenter, ycenter:ycenter, 
-                        xstart:xstart,ystart:ystart,
+                        xTip:xTip,yTip:yTip,
                         radius:radius,                     
                         dash:dash, 
                         text:names[index],
-                        //txttransform: `rotate(${-degrees}, ${xstart}, ${ystart})`, 
-                        txttransform: `rotate(${degrees}, ${xcenter}, ${ycenter})`, 
-                        width:width+toggle, 
+                        //txttransform: `rotate(${-degrees}, ${0}, ${0})`, 
+                        //txttransform: `rotate(${degrees}, ${xcenter}, ${ycenter})`, 
+                        // ,rotate(${-degrees}, ${xTip}, ${yTip})
+                        width:width+toggle*5, 
                         color:toggle==0?cArcBlue:cSkyBlue});
                         
                 

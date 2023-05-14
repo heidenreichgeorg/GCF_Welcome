@@ -96,11 +96,12 @@ export default function DashBoard({value}) {
 
                 <Halo                                                    radius={110} x={xcenter} y={ycenter}/>
 
-                <Halo jFeatures={{"yearEnd":aAssets}} arrPartners={nYearEnd}   radius={70} x={xcenter} y={ycenter} step={1400}/>
+                <Halo jFeatures={{"yearEnd":aAssets}} arrPartners={nYearEnd}   radius={110} x={xcenter} y={ycenter} step={1300}/>
 
-                <Halo jFeatures={{"yearEnd":aYearEnd}} arrPartners={nYearEnd} radius={90} x={xcenter} y={ycenter}   step={140}/>
+                <Halo jFeatures={haloFeatures} arrPartners={namPartners}      radius={90} x={xcenter} y={ycenter} step={1100}/>
 
-                <Halo jFeatures={haloFeatures} arrPartners={namPartners}      radius={110} x={xcenter} y={ycenter} step={1000}/>
+                <Halo jFeatures={{"yearEnd":aYearEnd}} arrPartners={nYearEnd} radius={70} x={xcenter} y={ycenter}   step={50}/>
+
             </svg>
             </div>
             <FooterRow  id={"F1"}  left={page["client"]}   right={page["register"]} prevFunc={prevFunc} nextFunc={nextFunc}/>
