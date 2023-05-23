@@ -38,8 +38,11 @@ const { session, status } = useSession()
     return (
         <Screen prevFunc={prevFunc} nextFunc={nextFunc} tabSelector={aPages}  tabName={tabName}>
             {report.map((balance,n) => ( 
-                <div className="FIELD"  key={"HGB0"+n}  id={tabName+n} style= {{ 'display': aPages[n]}} >
-                    <div className="attrLine">{page.GainLoss + ' ' + session.year}</div>
+                <div className="attrLine"  key={"HGB0"+n}  id={tabName+n} style= {{ 'display': aPages[n]}} > 
+                    <div className="FIELD">
+                        <div className="FIELD LNAM">&nbsp;</div>
+                        <div className="FIELD LNAM">{page.GainLoss + ' ' + session.year}</div>
+                    </div>
                     {balance.map((row,i) => (
                         <HGB275Row  key={"HGB1"+i}  jArgs={row} id={"Args"+i} />    
                     ))}
@@ -55,15 +58,14 @@ const { session, status } = useSession()
 function HGB275Row({ jArgs, id }) {
     return(
         <div className={"attrLine line"+id} >
-            <div className="FIELD LNAM"> {jArgs.tw1}</div>
-            <div className="FIELD MOAM"> {(jArgs.am3)}</div>
-            <div className="FIELD MOAM"> {(jArgs.am2)}</div>
-            <div className="FIELD MOAM"> {(jArgs.am1)}</div>
+            <div className="FIELD C100"></div>
+            <div className="FIELD SEP">&nbsp;</div>
             <div className="FIELD SEP">|&nbsp;</div>
             <div className="FIELD LNAM"> {jArgs.tx1}</div>
             <div className="FIELD MOAM"> {(jArgs.an3)}</div>
             <div className="FIELD MOAM"> {(jArgs.an2)}</div>
             <div className="FIELD MOAM"> {(jArgs.an1)}</div>
+            <div className="FIELD SEP">|&nbsp;</div>
         </div>
     )
 }
