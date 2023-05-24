@@ -86,21 +86,21 @@ export default function DashBoard({value}) {
             <svg viewBox="0 0 230 250" height="720" width="760" background-color="#000000">
                 <defs>
                     <radialGradient id="bgGradient">
-                        <stop offset="10%" stop-color="#081166" />
+                        <stop offset="10%" stop-color="#081177" />
                         <stop offset="95%" stop-color="#000022" />
                     </radialGradient>
                 </defs>
                 <circle cx={xcenter} cy={ycenter} r="140" fill="url('#bgGradient')" />
-                <line x1={-10}  y1={ycenter}  x2={2*xcenter+10}  y2={ycenter}  stroke="#000033" strokeWidth={1} />
-                <line  x1={xcenter} y1={-10}  x2={xcenter}  y2={2*ycenter+10} stroke="#000033" strokeWidth={1} />
+                <line x1={-10}  y1={ycenter}  x2={2*xcenter+10}  y2={ycenter}      stroke="#000033" strokeWidth={1} />
+                <line  x1={xcenter} y1={-10}  x2={xcenter}       y2={2*ycenter+10} stroke="#000033" strokeWidth={1} />
 
                 <Halo                                                    radius={110} x={xcenter} y={ycenter}/>
 
-                <Halo jFeatures={{"yearEnd":aAssets}} arrPartners={nYearEnd}   radius={110} x={xcenter} y={ycenter} step={1300}/>
+                <Halo jFeatures={{"yearEnd":aAssets}} arrPartners={nYearEnd}   radius={110} x={xcenter} y={ycenter} />
 
-                <Halo jFeatures={haloFeatures} arrPartners={namPartners}      radius={90} x={xcenter} y={ycenter} step={1100}/>
+                <Halo jFeatures={haloFeatures} arrPartners={namPartners}      radius={90} x={xcenter} y={ycenter}/>
 
-                <Halo jFeatures={{"yearEnd":aYearEnd}} arrPartners={nYearEnd} radius={70} x={xcenter} y={ycenter}   step={50}/>
+                <Halo jFeatures={{"yearEnd":aYearEnd}} arrPartners={nYearEnd} radius={70} x={xcenter} y={ycenter} />
 
             </svg>
             </div>

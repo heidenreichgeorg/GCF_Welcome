@@ -2,21 +2,30 @@ import React from "react";
 import { bigEUMoney } from "../modules/money.mjs";
 
 
-const cSkyBlue  ="#77CCEE";
-const cArcBlue  ="#66AADD";
-const cScaleBlue="#5588CC";
-const cDarkBlue ="#223388";
-const cTextBlue ="#9944CC";
+const iDark =0;
+const iSky = 1;
+const iArc = 2;
+const iScale=3;
+const iText =4;
+
+// from Coolors.co
+const cPalette =[ "#8ECAE6","#219EBC","#023047","#FFB703","#FB8500" ];
+
+function c(i) { return (i<cPalette.length&&i>=0)? cPalette[i]: cPalette[0];}
 
 
 // JSON of named features each feature is an array with 
 export default function Halo (args) {
+
+
     const radius = args.radius;
 
     console.log("HALO jFeatures   "+JSON.stringify(args.jFeatures));
     console.log("HALO arrPartners "+JSON.stringify(args.arrPartners));
 
-    let step=1000; if (args.step && args.step>0) step=args.step;
+    //let step=1000; if (args.step && args.step>0) step=args.step;
+    
+
 
     const lineRadius = radius-10;
     const outerRadius = radius+3;
@@ -42,13 +51,23 @@ export default function Halo (args) {
         makeScales(aScales,aWork,130,11,xcenter,ycenter,radius); // left outer ring
         makeScales(aScales,aWork,310,11,xcenter,ycenter,radius); // right outer ring
     }
+
     
+    var computeBegin=0;
+    Object.keys(jFeatures).forEach(title=>
+        {
+            computeBegin=computeGroup( jFeatures[title], computeBegin);        
+        })
+    let step = Math.floor((computeBegin*12+2)/100)*10;
+    console.log( "HALO ends at "+computeBegin+" with  step="+step);
+    
+
+
     var featureBegin=0;
     Object.keys(jFeatures).forEach(title=>
     {
         featureBegin=makeGroup(aWork, jFeatures[title], jNames[title], xcenter,ycenter, featureRad, strokeWidth, step, featureBegin);        
     })
-
 
     // aWork,aScales are the output of the make operations
 
@@ -62,7 +81,7 @@ export default function Halo (args) {
                             y1={ycenter+(lineRadius*Math.sin(j*Math.PI/180))} 
                             x2={xcenter+(radius*Math.cos(j*Math.PI/180))} 
                             y2={ycenter+(radius*Math.sin(j*Math.PI/180))} 
-                            stroke={cArcBlue}
+                            stroke={c(iArc)}
                             strokeWidth={1}
                             />
                     )))                
@@ -71,7 +90,7 @@ export default function Halo (args) {
             {
             aWork.map((jTask,i)=>(
             (
-                <g key={"gCircle"+i} fill={cTextBlue} >
+                <g key={"gCircle"+i} fill={c(iText)} >
                     <circle
                         key={"circle"+i} 
                         className="gauge_base"
@@ -97,11 +116,15 @@ export default function Halo (args) {
         
 
     );
-    // <div id="tooltip" display="none">...</div>
 }
 
-const allColors = ["#2255BB","#2299BB","#4499BB","#6699BB","#2255DD","#2299DD","#3399CC","#9999CC"];
     
+function computeGroup(arrValues,start) {
+    let pos=start;
+    arrValues.forEach(value=>{   pos+= Math.abs(value);  });
+    return pos;
+}
+
 function makeGroup(aWork,arrValues,names,xcenter,ycenter,radius,width,step,start) {
     let pos=start;
     radius-=width;
@@ -127,13 +150,8 @@ function makeGroup(aWork,arrValues,names,xcenter,ycenter,radius,width,step,start
                         radius:radius,                     
                         dash:dash, 
                         text:names[index],
-                        //txttransform: `rotate(${-degrees}, ${0}, ${0})`, 
-                        //txttransform: `rotate(${degrees}, ${xcenter}, ${ycenter})`, 
-                        // ,rotate(${-degrees}, ${xTip}, ${yTip})
                         width:width+toggle*5, 
-                        color:toggle==0?cArcBlue:cSkyBlue});
-                        
-                
+                        color:toggle==0?c(iArc):c(iSky)});
         }
         
         index++;
@@ -155,6 +173,6 @@ function makeScales(aScales,aWork,begin,iter,xcenter,ycenter,radius) {
     const dash = `${arc} ${circumference}`;    
     aWork.push({ transform: `rotate(${begin}, ${xcenter}, ${ycenter})`, 
                     xcenter:xcenter, ycenter:ycenter, 
-                    radius:radius, dash:dash, width:strokeWidth, color:cScaleBlue});
+                    radius:radius, dash:dash, width:strokeWidth, color:c(iScale)});
 }
 
