@@ -58,7 +58,7 @@ export default function Halo (args) {
         {
             computeBegin=computeGroup( jFeatures[title], computeBegin);        
         })
-    let step = Math.floor((computeBegin*12+2)/100)*10;
+    let step = Math.floor((computeBegin*11+10)/100)*10;
     console.log( "HALO ends at "+computeBegin+" with  step="+step);
     
 
@@ -141,8 +141,8 @@ function makeGroup(aWork,arrValues,names,xcenter,ycenter,radius,width,step,start
             const dash = `${arc} ${circumference}`;   
             const angle=2*Math.PI*pos/step;
             const degrees=360*pos/step;
-            const xTip=xcenter+((shift%3)+6)+(Math.cos(angle)*radius)-7;
-            const yTip=ycenter-((shift%3)-6)+(Math.sin(angle)*radius)-3;
+            const xTip=xcenter+(Math.cos(angle))*(radius+5);
+            const yTip=ycenter+(Math.sin(angle))*(radius+5);
             aWork.push({
                         arctransform: `rotate(${degrees}, ${xcenter}, ${ycenter})`, 
                         xcenter:xcenter, ycenter:ycenter, 
