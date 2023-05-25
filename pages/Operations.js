@@ -108,15 +108,7 @@ export default function Operations() {
 
     const aNums = [0];
     return (
-            <Screen prevFunc={prevFunc} nextFunc={nextFunc} tabSelector={aNums} >
-            
-            <div className="attrRow">
-            <div className="FIELD KEY" onClick={onBook}>BOOK</div>                                                   
-                <div className="FIELD KEY">{cents2EU(txn.diff)}</div>                        
-                <div className="FIELD SEP"> &nbsp;</div>
-                <div className="FIELD SEP"> &nbsp;</div>
-            </div>
-
+            <Screen prevFunc={prevFunc} nextFunc={nextFunc} tabSelector={aNums} >            
             {
                 report.map((row,l) => (
                     <StatusRow  key={"Operations0"+l} 
@@ -128,6 +120,13 @@ export default function Operations() {
             }
             <InputRow arrAcct={arrAcct} arrCode={arrCode} txn={txn}/>    
             <FieldRow/>
+            <div className="attrRow">
+                <input type="submit" className="key" value="Book" onClick={onBook}/>
+                <div className="FIELD SEP"> &nbsp;</div>
+                <div className="FIELD KEY">{cents2EU(txn.diff)}</div>                        
+                <div className="FIELD SEP"> &nbsp;</div>
+            </div>
+
             <FooterRow left={page["client"]}  right={page["register"]} prevFunc={prevFunc} nextFunc={nextFunc}/>
             <FooterRow left={page["reference"]} right={page["author"]} prevFunc={prevFunc} nextFunc={nextFunc}/>
         </Screen>
