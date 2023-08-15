@@ -451,6 +451,7 @@ export function InputRow({ arrAcct, arrCode, txn }) {
     let date=txn.date;
     let sender=txn.sender;
     let reason=txn.reason;
+    let reasonInfo=txn.reasonInfo;
 
     return(
         <div className="attrRow">            
@@ -462,7 +463,7 @@ export function InputRow({ arrAcct, arrCode, txn }) {
             <div className="FIELD XFER">
                 <select type="radio" id="cReason" name="cReason" onChange={(e)=>addTXNData(txn,'refAcct',getSelect(e.target.id))} onDrop={ignore} >
                     {arrAcct.map((reason,i) => (
-                        <option key={"reason0"+i} id={"reason0"+i} value={reason}>{reason}</option>
+                        <option key={"reason0"+i} id={"reason0"+i} value={reason} onClick={()=>{console.log("Note "+reasonInfo)}}>{reason}</option>
                     ))}
                 </select>                
             </div>

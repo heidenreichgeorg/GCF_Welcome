@@ -9,7 +9,7 @@ import { bigEUMoney, cents2EU,cents20EU } from './money'
 import { setSession,strSymbol,timeSymbol } from './session'
 import { compile } from './compile'
 
-const debug=null;
+const debug=1;
 
 const HTMLSPACE=" "; 
 
@@ -176,24 +176,29 @@ export function book(jTXN,session) {
 
 export async function sendFile(sig, response) {  // was fs.exists() GH20230401
     // Check if file specified by the filePath exists
-    fs.access(sig.serverFile, function (exists) {
-        if (exists) {
-            // Content-type is very interesting part that guarantee that
-            // Web browser will handle response in an appropriate manner.
-            //response.writeHead(200, {
-            //    "Content-Type": "application/octet-stream",
-            //    "Content-Disposition": "attachment; filename=" + sig.serverFile
-            //});
-            if(debug) console.log("1650 TRANSFER "+sig.serverFile);
-            fs.createReadStream(sig.serverFile).pipe(response);
-            if(debug) console.log("1660 PIPING "+sig.serverFile);
-            return;
-        }
-        response.writeHead(400, { "Content-Type": "text/plain" });
-        response.setHeader("Access-Control-Allow-Origin", "*");
-        response.setHeader("Access-Control-Allow-Headers","Origin, X-Requested-With, Content-Type, Accept, Authorization");
-        response.end("ERROR File does not exist");
-    });
+    try {
+        fs.access(sig.serverFile, function (exists) {
+            if (exists) {
+                
+                // Content-type is very interesting part that guarantee that
+                // Web browser will handle response in an appropriate manner.
+                response.writeHead(200, {
+                    "Content-Type": "application/octet-stream",
+                    "Content-Disposition": "attachment; filename=" + sig.serverFile
+                });
+                if(debug) console.log("1670 TRANSFER "+sig.serverFile);
+                fs.createReadStream(sig.serverFile).pipe(response);
+                if(debug) console.log("1680 PIPING "+sig.serverFile);
+                return;
+            }
+            else console.dir("1665 WRONG PATH OR MISSING ACCESS "+sig.serverFile);
+
+            response.writeHead(400, { "Content-Type": "text/plain" });
+            response.setHeader("Access-Control-Allow-Origin", "*");
+            response.setHeader("Access-Control-Allow-Headers","Origin, X-Requested-With, Content-Type, Accept, Authorization");
+            response.end("ERROR File does not exist");
+        });
+    } catch(e) { console.dir("1655 WRONG/MISSING "+sig.serverFile); }
 }
 
 

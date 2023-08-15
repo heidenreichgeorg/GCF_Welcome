@@ -46,7 +46,7 @@ export function signIn(config,query,remote,res,startSessionCB) {
     } else {
         console.log ( "0029 signIn file no valid client for query="+JSON.stringify(query)+",addr="+remote);
 
-        res.send("FORWARD FILE");
+        res.end("FORWARD FILE"); // GH20230708 was res.send
     }
 
     return null;

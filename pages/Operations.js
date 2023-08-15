@@ -17,7 +17,7 @@ export default function Operations() {
     const [sheet, setSheet]  = useState() // returns a pair with object-location plus setter function for that location
     const [ year, setYear]   = useState()
     const [client,setClient] = useState()
-    const [txn,setTxn] = useState({'add':{},'sub':{},'diff':"0", 'date':"", 'sender':"", 'refAcct':"", 'reason':"", 'refCode':""  })
+    const [txn,setTxn] = useState({'add':{},'sub':{},'diff':"0", 'date':"", 'sender':"", 'refAcct':"", 'reason':"", 'reasonInfo':"", 'refCode':""  })
 
     const { session, status } = useSession()
 
@@ -81,6 +81,7 @@ export default function Operations() {
     // build refAcct list with all GALS / EQUITY account names
     var jAccounts = sheet[D_Balance];
     let arrAcct=['INVEST','SELL','YIELD'];
+    let arrInfo=['Activate all investment-related cost. No gain/equity move allowed.','Remaining gains go to FSAL','Remaining gains go to EDIV or EZIN or decrease the asset value.'];
 
     for (let name in jAccounts)   {
         var account=jAccounts[name];
@@ -88,7 +89,7 @@ export default function Operations() {
             var xbrl = account.xbrl.split('\.').reverse();
             var xbrl_pre = xbrl.pop()+ "."+ xbrl.pop();
             if(xbrl.length>2) { // minimum of five levels in original xbrl, because of the two modifying pop(s)
-                if((xbrl_pre===X_INCOME) || (xbrl_pre===X_EQLIAB)) { arrAcct.push(name); console.log("Operations make arrAcct list add "+name);}
+                if((xbrl_pre===X_INCOME) || (xbrl_pre===X_EQLIAB)) { arrAcct.push(name); arrInfo.push("Gain/loss go to this account:"+name); console.log("Operations make arrAcct list add "+name);}
             }
         }
 
