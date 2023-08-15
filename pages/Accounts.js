@@ -13,7 +13,6 @@ export default function Accounts() {
     const [sheet, setSheet]  = useState()
     const [ year, setYear]   = useState()
     const [client,setClient] = useState()
-
     const { session, status } = useSession()
 
     useEffect(() => {
@@ -54,15 +53,51 @@ export default function Accounts() {
                     {report.map((row) => 
                         <AccountsRow  key={"Accounts1"+n} am1={row.gLeft} tx1={row.nLeft} am2={row.gMidl} tx2={row.nMidl} am3={row.gRite} tx3={row.nRite} />                       
                     )}                    
-                    <FooterRow left={page["client"]}  right={page["register"]} prevFunc={prevFunc} nextFunc={nextFunc}/>
-                    <FooterRow left={page["reference"]} right={page["author"]} prevFunc={prevFunc} nextFunc={nextFunc}/>
+                    <FooterRow left={page["client"]}  right={page["register"]} prevFunc={prevFunc} nextFunc={nextFunc} miscFunc={addAccount}/>
+                    <FooterRow left={page["reference"]} right={page["author"]} prevFunc={prevFunc} nextFunc={nextFunc} miscFunc={addAccount}/>
                 </div>
             )}
         </Screen>
     )
     
-}
 
+
+    function addAccount() {
+            
+        const rqHeaders = {  'Accept': 'application/octet-stream',
+                            'Access-Control-Allow-Origin':'*',
+                            'Access-Control-Allow-Headers':'Origin, X-Requested-With, Content-Type, Accept, Authorization' };
+
+        console.log("1110 Accounts.addAccount sessionId = "+session.id);
+        
+        const rqOptions = { method: 'GET', headers: rqHeaders, mode:'cors'};
+        try {                
+            fetch(`${REACT_APP_API_HOST}/ADDACCOUNT?client=${client}&year=${year}`, rqOptions)
+            .then((response) => response.blob())
+            .then((blob) => URL.createObjectURL(blob))
+            .then((url) => console.log("1120Accounts.addAccount  URL= "+ makeAddAsset(url,session.client,session.year)))
+            .catch((err) => console.error("1127 Accounts.addAccount ERR "+err));           
+        } catch(err) { console.log("1117 GET /ADDACCOUNT Accounts.addAccount :"+err);}
+        console.log("1140 Accounts.addAccount EXIT");
+    }
+
+    function makeAddAsset(url,client,year) { 
+        console.log("1196 makeAddAsset JSON "+url);
+        if(client) {
+            if(year) {
+                let a = document.createElement('a');
+                a.href = url
+                a.download = "ADDACCT"+client+year+".json";
+                a.style.display = 'block'; // was none
+                a.className = "key";
+                a.innerHTML = "Download";
+                document.body.appendChild(a); 
+                console.log("1198 makeAddAsset make button");
+            } else console.log("1197 makeAddAsset JSON client("+client+"), NO year");
+        } else console.log("1195 makeAddAsset JSON NO client");
+        return url;
+    };
+}
 function makeAccountsPosition(response,currentPage) {
 
     const page = response[D_Page];
