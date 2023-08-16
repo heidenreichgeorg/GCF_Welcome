@@ -24,7 +24,6 @@ export default function handler(
   res: NextApiResponse<any>
 ) {
   if(req) {
-    //res.set('Access-Control-Allow-Origin', '*');
 
     if(req.query) {       
       console.log("0060 BOOK.handler query="+JSON.stringify(req.query));
@@ -90,9 +89,7 @@ function bookTransaction(session:any, res:NextApiResponse<any>) {
           // async
           save2Bucket(config,session,client,year,getRoot())
               .then(result => { 
-                if(res) {
-                    res.setHeader("Access-Control-Allow-Origin", "*");
-                    res.setHeader("Access-Control-Allow-Headers","Origin, X-Requested-With, Content-Type, Accept, Authorization");            
+                if(res) {          
                     res.json({url:serverAddr+'/LATEST', client, year, 'result':result  })
                 }
               });

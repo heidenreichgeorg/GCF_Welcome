@@ -18,7 +18,6 @@ export default function handler(
   req: NextApiRequest,
   res: NextApiResponse<any>
 ) {
-  //res.set('Access-Control-Allow-Origin', '*');
   console.log("EXCEL.handler "+JSON.stringify(req.query));
   sessionTime=timeSymbol();
   nextSessionId= strSymbol(sessionTime+client+year+sessionTime);
@@ -77,9 +76,7 @@ function downloadJSON(session:any, res:NextApiResponse<any>) {
             console.log("1540 app.post DOWNLOAD download JSON as "+fileName);
             res.setHeader('status',HTTP_OK);
             res.setHeader('Content-Type', 'application/json; charset=utf-8');
-            res.setHeader('Content-Disposition','attachment fileName="'+fileName+'"');
-            res.setHeader("Access-Control-Allow-Origin", "*");
-            res.setHeader("Access-Control-Allow-Headers","Origin, X-Requested-With, Content-Type, Accept, Authorization");    
+            res.setHeader('Content-Disposition','attachment fileName="'+fileName+'"');  
             res.json(session);    
 
         } else {

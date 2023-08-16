@@ -20,7 +20,6 @@ export default function handler(
   req: NextApiRequest,
   res: NextApiResponse<any>
 ) {
-  //res.set('Access-Control-Allow-Origin', '*');
   console.log("EXCEL.handler "+JSON.stringify(req.query));
   sessionTime=timeSymbol();
   nextSessionId= strSymbol(sessionTime+client+year+sessionTime);

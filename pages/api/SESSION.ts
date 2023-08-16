@@ -12,7 +12,6 @@ export default function handler(
   req: NextApiRequest,
   res: NextApiResponse<any>
 ) {
-  //res.set('Access-Control-Allow-Origin', '*');
   console.log("SESSION.handler "+JSON.stringify(req.query));
 
   config =  init(/*app,*/ process.argv); // GH20221003 do that per module
