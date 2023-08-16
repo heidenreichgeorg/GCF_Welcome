@@ -122,11 +122,10 @@ async function bucketDownload(bpStorage,client,year,jData,startSessionCB,callRes
     function(url) {
 
       if(debug) console.log('Firebase.download fetch '+url)
+/* UTF-8      
           const decoder = new TextDecoder('UTF-8');
-          const toString = (bytes) => {
-              const array = new Uint8Array(bytes);
-              return decoder.decode(array);
-          };          
+          const toString = (bytes) => { const array = new Uint8Array(bytes);  return decoder.decode(array); }
+*/                 
         let session = {};
         https.get(url, res => {
           let body = '';
@@ -136,7 +135,7 @@ async function bucketDownload(bpStorage,client,year,jData,startSessionCB,callRes
           res.on('end', () => {
             try {
               if(debugReport) console.dir("Firebase.download body "+body);
-              let buf = toString(body);
+              // UTF-8 let buf = toString(body);
               session = JSON.parse(body);
             }
             catch(err) {
@@ -147,7 +146,8 @@ async function bucketDownload(bpStorage,client,year,jData,startSessionCB,callRes
 
             if(debugReport) console.dir("Firebase.download session "+JSON.stringify(session));
             // AVOID double HEADERS 
-            startSessionCB(session,callRes);
+            startSessionCB(session,callRes,jData); 
+            // 3rd param to startSessionCB JData is from config = 1st arg on calling fireBaseBucket.js
           })
         }).on('error', function(error) {     
 
@@ -282,7 +282,7 @@ async function bucketUpload(bpStorage,client,year,jData,startSessionCB,callRes) 
               if(debug) console.log("Firebase fbWriteJSON to: "+downloadUrl);          
               
               // 20221127
-              startSessionCB(jData,callRes);
+              startSessionCB(jData,callRes,{});
               }
             }
           );
@@ -401,12 +401,12 @@ export function loadFBConfig(dir,config) {
 
 
 
-export function fbDownload(config,client,year,callBack,res,root) {
-    if(config) {
+export function fbDownload(jConfig,client,year,callBack,res,root) {
+    if(jConfig && jConfig.bucket) {
         // FIREBASE
-        const fbConfig = loadFBConfig(root,config);
+        const fbConfig = loadFBConfig(root,jConfig.bucket);
         if(fbConfig) {        
-            accessFirebase(bucketDownload,fbConfig,client,year,null,callBack,res);
+            accessFirebase(bucketDownload,fbConfig,client,year,jConfig,callBack,res);
             return "fbDownload";
         } else {
             console.log("0033 server.fbDownload NO FIREBASE CONFIG")

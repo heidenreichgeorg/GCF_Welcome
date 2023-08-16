@@ -219,9 +219,9 @@ export async function sendFile(sig, response) {  // was fs.exists() GH20230401
             }
             else console.dir("1665 WRONG PATH OR MISSING ACCESS "+sig.serverFile);
 
-            response.writeHead(400, { "Content-Type": "text/plain" });
-            response.setHeader("Access-Control-Allow-Origin", "*");
-            response.setHeader("Access-Control-Allow-Headers","Origin, X-Requested-With, Content-Type, Accept, Authorization");
+            response.writeHead(400, {
+                "Content-Type": "text/plain"
+            });
             response.end("ERROR File does not exist");
         });
     } catch(e) { console.dir("1655 WRONG/MISSING "+sig.serverFile); }

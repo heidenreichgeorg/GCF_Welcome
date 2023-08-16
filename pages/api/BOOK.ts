@@ -9,8 +9,6 @@ import  { getRoot,init,localhost,setSession,signIn, strSymbol, symbolic, timeSym
 import  { save2Bucket } from '../../modules/writeModule'
 
 
-let config:string|null;
-
 
 // data that can be computed synchronously
 let reqBody:String[] | null;
@@ -18,6 +16,7 @@ let sessionTime="";
 let nextSessionId= "";
 let client = "";
 let year="";
+
 
 export default function handler(
   req: NextApiRequest,
@@ -28,9 +27,10 @@ export default function handler(
     if(req.query) {       
       console.log("0060 BOOK.handler query="+JSON.stringify(req.query));
 
-      config =  init(/*app,*/ process.argv); // GH20221003 do that per module
-
-      console.log("0062 BOOK.handler config="+config);
+      let bucket = init(process.argv) as String
+      let jConfig = { 'bucket':bucket } as any;
+    
+      console.log("0062 BOOK.handler config="+jConfig.bucket);
 
       if(req.body) {       
         reqBody = req.body;
@@ -41,7 +41,7 @@ export default function handler(
         sessionTime=timeSymbol();
         nextSessionId= strSymbol(sessionTime+client+year+sessionTime);
 
-        signIn(config,query,req.socket.remoteAddress,res,bookTransaction); 
+        signIn(jConfig,query,req.socket.remoteAddress,res,bookTransaction); 
 
         
       }
@@ -63,12 +63,12 @@ export default function handler(
 }
 
 
-function bookTransaction(session:any, res:NextApiResponse<any>) {
+function bookTransaction(session:any, res:NextApiResponse<any>,jData:any) {
   
     let sessionId = session.id; 
     let arrTransaction = formatTXN(session,reqBody);
   
-    console.log("0610 app.post BOOK config("+config+")");
+    console.log("0610 app.post BOOK config("+JSON.stringify(jData)+")");
 
     var result="SERVER BOOKED";
     
@@ -87,7 +87,7 @@ function bookTransaction(session:any, res:NextApiResponse<any>) {
           
           let serverAddr = localhost();
           // async
-          save2Bucket(config,session,client,year,getRoot())
+          save2Bucket(jData.bucket,session,client,year,getRoot())
               .then(result => { 
                 if(res) {          
                     res.json({url:serverAddr+'/LATEST', client, year, 'result':result  })

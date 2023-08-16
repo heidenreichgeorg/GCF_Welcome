@@ -22,7 +22,8 @@ export default function handler(
   sessionTime=timeSymbol();
   nextSessionId= strSymbol(sessionTime+client+year+sessionTime);
 
-  config =  init(/*app,*/ process.argv); // GH20221003 do that per module
+  let bucket = init(process.argv) as String
+  let jConfig = { 'bucket':bucket } as any;
 
   if(req && req.query && req.socket) {       
 
@@ -33,7 +34,7 @@ export default function handler(
     const query:JSON = <JSON><unknown> { "ext":"JSON", "client":client, "year":year  };
     console.log("    EXCEL.handler "+JSON.stringify(query));
 
-      signIn(config,query,req.socket.remoteAddress,res,downloadJSON); 
+      signIn(jConfig,query,req.socket.remoteAddress,res,downloadJSON); 
   }
   else res.json({ id: '0123', code : "NO VALID QUERY"})
 }

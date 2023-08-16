@@ -14,7 +14,8 @@ export default function handler(
 ) {
   console.log("SESSION.handler "+JSON.stringify(req.query));
 
-  config =  init(/*app,*/ process.argv); // GH20221003 do that per module
+  let bucket = init(process.argv) as String
+  let jConfig = { 'bucket':bucket } as any;
 
   if(req && req.query && req.socket) {       
       
@@ -23,7 +24,7 @@ export default function handler(
       console.log("    SESSION.handler "+JSON.stringify(query));
     
       if(auth==currentHash())
-        signIn(config,query,req.socket.remoteAddress,res,startSessionJSON); 
+        signIn(jConfig,query,req.socket.remoteAddress,res,startSessionJSON); 
       else  res.json({ id: '0666', code : "NO VALID AUTH"})
   }
   else res.json({ id: '0123', code : "NO VALID QUERY"})

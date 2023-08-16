@@ -1,5 +1,5 @@
 
-
+import { J_ACCT } from '../modules/terms.js'
 import { HTTP_OK, HTTP_WRONG, timeSymbol } from '../modules/session.js'
 import { REACT_APP_API_HOST } from '../modules/sessionmanager.tsx';
 
@@ -39,7 +39,7 @@ export default function Welcome() {
                         } catch(err) { 
                             //console.dir("WELCOMEDROP CANNOT PARSE "+fileBuffer); 
                             let sheetLines = fileBuffer.split(CSV_RS);
-                            if(sheetLines.length>6) {
+                            if(sheetLines.length>J_ACCT) {
                                 console.error("0820 UPLOAD CSV WITH "+sheetLines.length+" lines");                  
                                 console.dir("\n0822 UPLOAD CSV N-line "+JSON.stringify(sheetLines[0])); 
                                 console.dir("\n0824 UPLOAD CSV K-line "+JSON.stringify(sheetLines[4]));                   

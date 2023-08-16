@@ -5,7 +5,7 @@ import Screen from '../pages/Screen'
 import FooterRow from '../components/FooterRow'
 import { cents2EU}  from '../modules/money';
 
-import { D_Balance, D_Page, D_Report, X_ASSETS, X_INCOME, X_EQLIAB, SCREENLINES } from '../modules/terms.js'
+import { D_Balance, D_Page, D_Report, J_ACCT, X_ASSETS, X_INCOME, X_EQLIAB, SCREENLINES } from '../modules/terms.js'
 import { getSession,useSession, REACT_APP_API_HOST } from '../modules/sessionmanager';
 
 export default function Accounts() {
@@ -13,6 +13,7 @@ export default function Accounts() {
     const [sheet, setSheet]  = useState()
     const [ year, setYear]   = useState()
     const [client,setClient] = useState()
+    const [addAfter, setAddAfter] = useState(J_ACCT);
     const { session, status } = useSession()
 
     useEffect(() => {
@@ -27,7 +28,6 @@ export default function Accounts() {
 
     if(!sheet) return null; // 'Loading...';
 
-    
     function prevFunc() {console.log("CLICK PREVIOUS"); window.location.href="/Transfer?client="+client+"&year="+year; }
     function nextFunc() {  console.log("CLICK NEXT");   window.location.href="/Balance?client="+client+"&year="+year; }
 
@@ -51,33 +51,33 @@ export default function Accounts() {
                             'Access-Control-Allow-Origin':'*',
                             'Access-Control-Allow-Headers':'Origin, X-Requested-With, Content-Type, Accept, Authorization' };
 
-        console.log("1110 Accounts.addAccount sessionId = "+session.id);
+        console.log("1110 Accounts.addAccount("+addAfter+") sessionId = "+session.id);
         
         const rqOptions = { method: 'GET', headers: rqHeaders, mode:'cors'};
         try {                
-            fetch(`${REACT_APP_API_HOST}/ADDACCOUNT?client=${client}&year=${year}`, rqOptions)
+            fetch(`${REACT_APP_API_HOST}/ADDACCOUNT?column=${addAfter}&client=${client}&year=${year}`, rqOptions)
             .then((response) => response.blob())
             .then((blob) => URL.createObjectURL(blob))
-            .then((url) => console.log("1120 Accounts.addAccount  URL= "+ makeAddAsset(url,session.client,session.year)))
+            .then((url) => console.log("1120 Accounts.addAccount  URL= "+ makeDownloadURL(url,session.client,session.year)))
             .catch((err) => console.error("1127 Accounts.addAccount ERR "+err));           
         } catch(err) { console.log("1117 GET /ADDACCOUNT Accounts.addAccount :"+err);}
         console.log("1140 Accounts.addAccount EXIT");
     }
 
-    function makeAddAsset(url,client,year) { 
-        console.log("1196 makeAddAsset JSON "+url);
+    function makeDownloadURL(url,client,year) { 
+        console.log("1196 makeDownloadURL JSON "+url);
         if(client) {
             if(year) {
                 let a = document.createElement('a');
                 a.href = url
                 a.download = "ADDACCT"+client+year+".json";
-                a.style.display = 'block'; // was none
+                a.style.display = 'block'; 
                 a.className = "key";
                 a.innerHTML = "Download";
                 document.body.appendChild(a); 
-                console.log("1198 makeAddAsset make button");
-            } else console.log("1197 makeAddAsset JSON client("+client+"), NO year");
-        } else console.log("1195 makeAddAsset JSON NO client");
+                console.log("1198 makeDownloadURL make button");
+            } else console.log("1197 makeDownloadURL JSON client("+client+"), NO year");
+        } else console.log("1195 makeDownloadURL JSON NO client");
         return url;
     };
 
@@ -93,9 +93,13 @@ export default function Accounts() {
                         page.AcctClose+' '+session.year,
                         page.AcctNext+' '+(parseInt(session.year)+1)][n]}</div>
                     {report.map((row,d) => 
-                        <AccountsRow  key={"Accounts1"+n}  am1={row.gLeft} tx1={row.nLeft} ac1={row.iLeft}
+                        <AccountsRow  key={"Accounts"+n+""+d}  am1={row.gLeft} tx1={row.nLeft} ac1={row.iLeft}
                                                            am2={row.gMidl} tx2={row.nMidl} ac2={row.iMidl}
-                                                           am3={row.gRite} tx3={row.nRite} ac3={row.iRite} />                       
+                                                           am3={row.gRite} tx3={row.nRite} ac3={row.iRite}
+                                                           set={(args)=>{
+                                                                console.log('\n'); 
+                                                                console.log("ACCOUNTS setAddAfter("+JSON.stringify(args)+")"); 
+                                                                return setAddAfter(args.x);}} />                       
                     )}                    
                     <FooterRow left={page["client"]}  right={page["register"]} prevFunc={prevFunc} nextFunc={nextFunc} miscFunc={addAccount}/>
                     <FooterRow left={page["reference"]} right={page["author"]} prevFunc={prevFunc} nextFunc={nextFunc} miscFunc={addAccount}/>
@@ -216,20 +220,19 @@ function makeAccountsPosition(response,currentPage) {
    return statusData;
 }
 
-function AccountsRow({ am1,tx1,ac1, am2,tx2,ac2,  am3,tx3,ac3 }) {
+function AccountsRow({ am1,tx1,ac1, am2,tx2,ac2,  am3,tx3,ac3 , set}) {
 
-    // <div className="FIELD" > {''+ac1+'-'+ac2+'-'+ac3 } &rarr;&rarr; </div>    
 
     return(
             <div className="attrLine">
                 <div className="FIELD MOAM"> {cents2EU(am1)}</div>
-                <div className="FIELD SYMB"> {tx1} <a onClick="()=>{addAccount({ac1})}">{ac1}</a></div>
+                <div className="FIELD SYMB"> {tx1} <a onClick={() => set({ x:ac1 })}>{ac1}</a></div>
                 <div className="FIELD SEP"> &nbsp;</div>
                 <div className="FIELD MOAM"> {cents2EU(am2)}</div>
-                <div className="FIELD SYMB"> {tx2} {ac2}</div>
+                <div className="FIELD SYMB"> {tx2} <a onClick={() => set({ x:ac2 })}>{ac2}</a></div>
                 <div className="FIELD SEP"> &nbsp;</div>
                 <div className="FIELD MOAM"> {cents2EU(am3)}</div>
-                <div className="FIELD SYMB"> {tx3} {ac3}</div>        
+                <div className="FIELD SYMB"> {tx3} <a onClick={() => set({ x:ac3 })}>{ac3}</a></div>        
                 
             </div>
     )

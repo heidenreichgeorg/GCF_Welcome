@@ -5,11 +5,8 @@ import  { init, signIn, strSymbol, timeSymbol   } from '../../modules/session'
 import  { sendFile} from '../../modules/writeModule'
 import  { xlsxWrite  } from '../../modules/sheets'
 
-let config:string|null;
-
 
 // data that can be computed synchronously
-let reqBody:String[] | null;
 var client:string|string[]|undefined;
 var year:string|string[]|undefined;
 let sessionTime="";
@@ -24,7 +21,8 @@ export default function handler(
   sessionTime=timeSymbol();
   nextSessionId= strSymbol(sessionTime+client+year+sessionTime);
 
-  config =  init(/*app,*/ process.argv); // GH20221003 do that per module
+  let bucket = init(process.argv) as String
+  let jConfig = { 'bucket':bucket } as any;
 
   if(req && req.query && req.socket) {       
 
@@ -35,7 +33,7 @@ export default function handler(
     const query:JSON = <JSON><unknown> { "ext":"JSON", "client":client, "year":year  };
     console.log("    EXCEL.handler "+JSON.stringify(query));
 
-      signIn(config,query,req.socket.remoteAddress,res,downloadExcel); 
+      signIn(jConfig,query,req.socket.remoteAddress,res,downloadExcel); 
   }
   else res.json({ id: '0123', code : "NO VALID QUERY"})
 }

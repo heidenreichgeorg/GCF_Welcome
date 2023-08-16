@@ -11,6 +11,7 @@ let config:string|null;
 let reqBody:String[] | null;
 var client:string|string[]|undefined;
 var year:string|string[]|undefined;
+var column:string|undefined;
 let sessionTime="";
 let nextSessionId= "";
 
@@ -23,31 +24,35 @@ export default function handler(
   sessionTime=timeSymbol();
   nextSessionId= strSymbol(sessionTime+client+year+sessionTime);
 
-  config =  init(/*app,*/ process.argv); // GH20221003 do that per module
 
   if(req && req.query && req.socket) {       
 
 
+    let bucket = init(process.argv) as String
+    let jConfig = { 'bucket':bucket } as any;
+      
+    jConfig.column=req.query.column; 
+    // trick to use config as carrier from client req.query into jData input to the callback
     
     client =  req.query.client;
     year = req.query.year;
-    const query:JSON = <JSON><unknown> { "ext":"JSON", "client":client, "year":year  };
-    console.log("    ADDACCOUNT.handler "+JSON.stringify(query));
+    const query = { "ext":"JSON", "client":client, "year":year  };
+    console.log("0001 ADDACCOUNT.handler "+JSON.stringify(query));
 
-      signIn(config,query,req.socket.remoteAddress,res,downloadPlusAcct); 
+      signIn(jConfig,query,req.socket.remoteAddress,res,downloadPlusAcct); 
   }
   else res.json({ id: '0123', code : "NO VALID QUERY"})
 }
 
 
-function downloadPlusAcct(session:any, res:NextApiResponse<any>) {
+function downloadPlusAcct(session:any, res:NextApiResponse<any>, jData:any) {
   
     console.log("1600 app.post ADDACCOUNT");
     if(session) {
         let sessionId = session.id; 
         if(sessionId ) {
         
-            console.log("1610 GET ADDACCOUNT FOR "+session.id.slice(-4));
+            console.log("1610 GET ADDACCOUNT ("+JSON.stringify(jData)+")FOR "+session.id.slice(-4));
     
             if(session.sheetName) {
                 let client = session.client;
@@ -57,11 +62,11 @@ function downloadPlusAcct(session:any, res:NextApiResponse<any>) {
                 if(client && year) {
 
                     console.log("1640 GET /ADDACCOUNT "+sheetName+ " for ("+client+","+year+")");
-                    session.serverFile= getRoot()+ session.client + Slash+ "NACT" + session.year + session.client + ".json"
+                    session.serverFile = getRoot()+ session.client + Slash+ "NACT" + session.year + session.client + ".json"
                     writeFile(session);
 
                     try {
-                        console.log("1660 GET /ADDACCOUNT JSON "+JSON.stringify(session));
+                        console.log("1660 GET /ADDACCOUNT JSON "+JSON.stringify(session.serverFile));
 
                         // check file and send response to client
                         sendFile(session, res);

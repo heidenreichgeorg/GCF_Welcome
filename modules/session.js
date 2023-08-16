@@ -17,7 +17,8 @@ export const Slash = '/';
 var nets;
 
 // load JSON file from Firebase storage
-export function signIn(config,query,remote,res,startSessionCB) {
+// GH20230816 config from string to {'bucket':bucket }
+export function signIn(jConfig,query,remote,res,startSessionCB) {
     
     nets = networkInterfaces();
 
@@ -38,7 +39,7 @@ export function signIn(config,query,remote,res,startSessionCB) {
             let id=null;
             {
                 console.log ( "0014 signIn READ BUCKET FOR COLD id ="+id);
-                fbDownload(config,client,year,startSessionCB,res,getRoot()); // avoid double response
+                fbDownload(jConfig,client,year,startSessionCB,res,getRoot()); // avoid double response
             }
                         
         } else console.log ( "0027 signIn file no valid year for query="+JSON.stringify(query)+",addr="+remote);
@@ -106,7 +107,7 @@ export function init(/*app,*/ argv) {
 
 
 function processArgv(processArgv) {
-    let config=null;
+    let config = {};
     processArgv.forEach(function (val, index, array) {
         if(debug>1) console.log("0000 Starting server " + index + ': ' + val);
         let attribute=val.split('=');
