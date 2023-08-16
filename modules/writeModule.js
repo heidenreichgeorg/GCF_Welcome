@@ -174,6 +174,30 @@ export function book(jTXN,session) {
 }
 
 
+export async function writeFile(session) {  //GH20230815
+    // write to filePath exists
+    try {
+                
+                
+                var writeStream = fs.createWriteStream(session.serverFile);
+                if(debug) console.log("1670 CREATED "+session.serverFile);
+
+                writeStream.write(JSON.stringify(session),'UTF8');
+                if(debug) console.log("1680 WRITTEN "+session.serverFile);
+
+                writeStream.end();
+                if(debug) console.log("1690 CLOSED "+session.serverFile);
+
+                writeStream.on('finish',function(){ console.log("1690 writeFile finished"); });
+
+                writeStream.on('error',function(err){ console.log("1681 writeFile error: "+err.stack); });
+
+                return;
+         
+        
+    } catch(e) { console.dir("1655 WRONG/MISSING "+session.serverFile); }
+}
+
 export async function sendFile(sig, response) {  // was fs.exists() GH20230401
     // Check if file specified by the filePath exists
     try {
@@ -189,6 +213,8 @@ export async function sendFile(sig, response) {  // was fs.exists() GH20230401
                 if(debug) console.log("1670 TRANSFER "+sig.serverFile);
                 fs.createReadStream(sig.serverFile).pipe(response);
                 if(debug) console.log("1680 PIPING "+sig.serverFile);
+                fs.close();
+                if(debug) console.log("1690 CLOSING "+sig.serverFile);
                 return;
             }
             else console.dir("1665 WRONG PATH OR MISSING ACCESS "+sig.serverFile);

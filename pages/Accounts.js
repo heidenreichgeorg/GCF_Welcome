@@ -6,7 +6,7 @@ import FooterRow from '../components/FooterRow'
 import { cents2EU}  from '../modules/money';
 
 import { D_Balance, D_Page, D_Report, X_ASSETS, X_INCOME, X_EQLIAB, SCREENLINES } from '../modules/terms.js'
-import { getSession,useSession } from '../modules/sessionmanager';
+import { getSession,useSession, REACT_APP_API_HOST } from '../modules/sessionmanager';
 
 export default function Accounts() {
     
@@ -42,23 +42,6 @@ export default function Accounts() {
     let pageText =  ['Init', 'Close',  'Next'].map((name) =>( page[name] ));
 
     const tabName = 'AccountsContent';
-    return (
-        <Screen prevFunc={prevFunc} nextFunc={nextFunc} tabSelector={pageText} tabName={tabName}>
-            { aStands.map((report,n)=>
-                <div className="FIELD" key={"Accounts0"+n} id={tabName+n} style= {{ 'display': aPages[n]}} >
-                    <div className="attrLine">{[
-                        page.AcctOpen+' '+session.year,
-                        page.AcctClose+' '+session.year,
-                        page.AcctNext+' '+(parseInt(session.year)+1)][n]}</div>
-                    {report.map((row) => 
-                        <AccountsRow  key={"Accounts1"+n} am1={row.gLeft} tx1={row.nLeft} am2={row.gMidl} tx2={row.nMidl} am3={row.gRite} tx3={row.nRite} />                       
-                    )}                    
-                    <FooterRow left={page["client"]}  right={page["register"]} prevFunc={prevFunc} nextFunc={nextFunc} miscFunc={addAccount}/>
-                    <FooterRow left={page["reference"]} right={page["author"]} prevFunc={prevFunc} nextFunc={nextFunc} miscFunc={addAccount}/>
-                </div>
-            )}
-        </Screen>
-    )
     
 
 
@@ -75,7 +58,7 @@ export default function Accounts() {
             fetch(`${REACT_APP_API_HOST}/ADDACCOUNT?client=${client}&year=${year}`, rqOptions)
             .then((response) => response.blob())
             .then((blob) => URL.createObjectURL(blob))
-            .then((url) => console.log("1120Accounts.addAccount  URL= "+ makeAddAsset(url,session.client,session.year)))
+            .then((url) => console.log("1120 Accounts.addAccount  URL= "+ makeAddAsset(url,session.client,session.year)))
             .catch((err) => console.error("1127 Accounts.addAccount ERR "+err));           
         } catch(err) { console.log("1117 GET /ADDACCOUNT Accounts.addAccount :"+err);}
         console.log("1140 Accounts.addAccount EXIT");
@@ -97,6 +80,31 @@ export default function Accounts() {
         } else console.log("1195 makeAddAsset JSON NO client");
         return url;
     };
+
+
+
+
+    return (
+        <Screen prevFunc={prevFunc} nextFunc={nextFunc} tabSelector={pageText} tabName={tabName}>
+            { aStands.map((report,n)=>
+                <div className="FIELD" key={"Accounts0"+n} id={tabName+n} style= {{ 'display': aPages[n]}} >
+                    <div className="attrLine">{[
+                        page.AcctOpen+' '+session.year,
+                        page.AcctClose+' '+session.year,
+                        page.AcctNext+' '+(parseInt(session.year)+1)][n]}</div>
+                    {report.map((row,d) => 
+                        <AccountsRow  key={"Accounts1"+n}  am1={row.gLeft} tx1={row.nLeft} ac1={row.iLeft}
+                                                           am2={row.gMidl} tx2={row.nMidl} ac2={row.iMidl}
+                                                           am3={row.gRite} tx3={row.nRite} ac3={row.iRite} />                       
+                    )}                    
+                    <FooterRow left={page["client"]}  right={page["register"]} prevFunc={prevFunc} nextFunc={nextFunc} miscFunc={addAccount}/>
+                    <FooterRow left={page["reference"]} right={page["author"]} prevFunc={prevFunc} nextFunc={nextFunc} miscFunc={addAccount}/>
+                </div>
+            )}
+        </Screen>
+    )
+    
+
 }
 function makeAccountsPosition(response,currentPage) {
 
@@ -150,7 +158,7 @@ function makeAccountsPosition(response,currentPage) {
     if(maxCom>maxRow) maxRow=maxCom;
     if(maxCor>maxRow) maxRow=maxCor;
 
-    let statusData = []; for(let i=0;i<=maxRow && i<=SCREENLINES;i++) statusData[i]={};
+    let statusData = []; for(let i=0;i<=maxRow && i<=SCREENLINES;i++) statusData[i]={ };
     if(maxRow>SCREENLINES) maxRow=SCREENLINES; // 20221201
     
     let iLeft=0;
@@ -164,7 +172,7 @@ function makeAccountsPosition(response,currentPage) {
         console.log("STATUS.JS STATUSDATA LEFT "+iLeft+" "+name+"="+value);
 
         if(iLeft<SCREENLINES) {
-            statusData[iLeft]={"gLeft":value,"nLeft":iName};
+            statusData[iLeft]={ "iLeft":account.index, "gLeft":value,"nLeft":iName };
         }
         iLeft++;
     }
@@ -178,7 +186,7 @@ function makeAccountsPosition(response,currentPage) {
         var account=aMidl[name];
         var value = account[currentPage];
         var iName = account.name;
-
+        statusData[iMidl].iMidl = account.index;
         statusData[iMidl].gMidl = value;
         statusData[iMidl].nMidl = iName;
         iMidl++;
@@ -195,6 +203,7 @@ function makeAccountsPosition(response,currentPage) {
         var iName = account.name;
 
         if(iRite<SCREENLINES) {
+            statusData[iRite].iRite = account.index;
             statusData[iRite].gRite = value;
             statusData[iRite].nRite = iName;
             iRite++;
@@ -207,20 +216,22 @@ function makeAccountsPosition(response,currentPage) {
    return statusData;
 }
 
-function AccountsRow({ am1,tx1, am2, tx2, am3, tx3, d, n, l}) {
+function AccountsRow({ am1,tx1,ac1, am2,tx2,ac2,  am3,tx3,ac3 }) {
+
+    // <div className="FIELD" > {''+ac1+'-'+ac2+'-'+ac3 } &rarr;&rarr; </div>    
 
     return(
-        <div className="attrLine">
-            <div className="FIELD MOAM"> {cents2EU(am1)}</div>
-            <div className="FIELD SYMB"> {tx1}</div>
-            <div className="FIELD SEP"> &nbsp;</div>
-            <div className="FIELD MOAM"> {cents2EU(am2)}</div>
-            <div className="FIELD SYMB"> {tx2}</div>
-            <div className="FIELD SEP"> &nbsp;</div>
-            <div className="FIELD MOAM"> {cents2EU(am3)}</div>
-            <div className="FIELD SYMB"> {tx3}</div>            
-        </div>
-        
+            <div className="attrLine">
+                <div className="FIELD MOAM"> {cents2EU(am1)}</div>
+                <div className="FIELD SYMB"> {tx1} <a onClick="()=>{addAccount({ac1})}">{ac1}</a></div>
+                <div className="FIELD SEP"> &nbsp;</div>
+                <div className="FIELD MOAM"> {cents2EU(am2)}</div>
+                <div className="FIELD SYMB"> {tx2} {ac2}</div>
+                <div className="FIELD SEP"> &nbsp;</div>
+                <div className="FIELD MOAM"> {cents2EU(am3)}</div>
+                <div className="FIELD SYMB"> {tx3} {ac3}</div>        
+                
+            </div>
     )
 }
 

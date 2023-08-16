@@ -1,8 +1,8 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next'
 
-import  { init, signIn, strSymbol, timeSymbol   } from '../../modules/session'
-import  { sendFile} from '../../modules/writeModule'
+import  { getRoot, init, signIn, Slash, strSymbol, timeSymbol } from '../../modules/session'
+import  { sendFile, writeFile } from '../../modules/writeModule'
 
 let config:string|null;
 
@@ -58,12 +58,15 @@ function downloadPlusAcct(session:any, res:NextApiResponse<any>) {
                 if(client && year) {
 
                     console.log("1640 GET /ADDACCOUNT "+sheetName+ " for ("+client+","+year+")");
+                    session.serverFile= getRoot()+ session.client + Slash+ "NACT" + session.year + session.client + ".json"
+                    writeFile(session);
 
                     try {
                         console.log("1660 GET /ADDACCOUNT JSON "+JSON.stringify(session));
 
+                        // check file and send response to client
                         sendFile(session, res);
-                        // close file
+                        
                     } catch(e) { console.dir("ADDACCOUNT.ts sendFile "+e)}
                     return;
                 } else console.log("1641 GET /ADDACCOUNT NO CLIENT NO YEAR"+JSON.stringify(Object.keys(session)));

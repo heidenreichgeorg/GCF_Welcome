@@ -153,11 +153,11 @@ export function makeStatusData(response) {
         if(debug) console.log("STATUS.JS STATUSDATA LEFT "+iLeft+" "+name+"="+yearEnd);
 
         if(iLeft<SCREENLINES) {
-            statusData[iLeft]={"gLeft":yearEnd,"nLeft":iName, "tLeft":(account.xbrl!=X_ASSETS)?"A":""};
+            statusData[iLeft]={"iLeft":iLeft, "gLeft":yearEnd,"nLeft":iName, "tLeft":(account.xbrl!=X_ASSETS)?"A":""};
         }
         iLeft++;
     }
-    for (let i=iLeft;i<maxRow && i<SCREENLINES;i++) { statusData[i]={ "gLeft":null, "nLeft": " " }; }
+    for (let i=iLeft;i<maxRow && i<SCREENLINES;i++) { statusData[i]={"iLeft":0, "gLeft":null, "nLeft": " " }; }
 
 
     let iMidl=0;
@@ -168,12 +168,13 @@ export function makeStatusData(response) {
         var yearEnd = account.yearEnd;
         var iName = account.name;
 
+        statusData[iMidl].iMidl = iMidl; 
         statusData[iMidl].gMidl = yearEnd;
         statusData[iMidl].nMidl = iName;
         statusData[iMidl].tMidl = (account.xbrl!=X_INCOME_REGULAR)?'G':'';
         iMidl++;
     }
-    for (let i=iMidl;i<maxRow && i<SCREENLINES;i++) { statusData[i].gMidl=null; statusData[i].nMidl=' '; }
+    for (let i=iMidl;i<maxRow && i<SCREENLINES;i++) {  statusData[i].iMidl=0; statusData[i].gMidl=null; statusData[i].nMidl=' '; }
 
 
     let iRite=0;
@@ -185,6 +186,7 @@ export function makeStatusData(response) {
         var iName = account.name;
 
         if(iRite<SCREENLINES) {
+            statusData[iRite].iRite = iRite; 
             statusData[iRite].gRite = yearEnd;
             statusData[iRite].nRite = iName;
             statusData[iRite].tRite = !(account.xbrl==X_EQLIAB)?(account.xbrl.startsWith(X_EQUITY))?'E':'L':'';
@@ -192,7 +194,7 @@ export function makeStatusData(response) {
         }
         
     }
-    for (let i=iRite;i<maxRow && i<SCREENLINES;i++) { statusData[i].gRite=null; statusData[i].nRite=' '; }
+    for (let i=iRite;i<maxRow && i<SCREENLINES;i++) { statusData[i].iRite=0; statusData[i].gRite=null; statusData[i].nRite=' '; }
 
     // build fourth column with recent transactions
     if(jHistory && gSchema.Names && gSchema.Names.length>0) {
