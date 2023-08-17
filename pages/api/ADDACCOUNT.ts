@@ -3,6 +3,7 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 
 import  { getRoot, init, signIn, Slash, strSymbol, timeSymbol } from '../../modules/session'
 import  { sendFile, writeFile } from '../../modules/writeModule'
+import { J_ACCT } from '@/modules/terms';
 
 let config:string|null;
 
@@ -11,7 +12,7 @@ let config:string|null;
 let reqBody:String[] | null;
 var client:string|string[]|undefined;
 var year:string|string[]|undefined;
-var column:string|undefined;
+
 let sessionTime="";
 let nextSessionId= "";
 
@@ -45,38 +46,59 @@ export default function handler(
 }
 
 
+// insert account into <row> after <column> in <line>
+function addAccount(row:any,line:number,column:number) {
+    let result = (column<row.length) ? row.slice(0,column+1) : row;
+    if(line<10) {
+        result.push("NACC");
+        console.log("+"+column+" #"+line+":"+JSON.stringify(result));
+    }  else result.push("");
+    return (column<row.length) ? result.concat(row.slice(column+1)) : result;    
+}
+
+
 function downloadPlusAcct(session:any, res:NextApiResponse<any>, jData:any) {
   
-    console.log("1600 app.post ADDACCOUNT");
+    console.log("1700 app.post ADDACCOUNT");
     if(session) {
         let sessionId = session.id; 
-        if(sessionId ) {
+        if(sessionId && jData.column) {
         
-            console.log("1610 GET ADDACCOUNT ("+JSON.stringify(jData)+")FOR "+session.id.slice(-4));
+            let iColumn = parseInt(jData.column);
+            console.log("1710 GET ADDACCOUNT ("+JSON.stringify(jData)+") INTO "+iColumn+" FOR "+session.id);
     
+
+            // 20230816
+            if(iColumn>J_ACCT && session.sheetCells) {
+                console.log("1720 /ADDACCOUNT map addAccount"); 
+                let sheetCells = session.sheetCells.map((row:any,line:number)=>( addAccount(row,line,iColumn)));
+                session.sheetCells = sheetCells;
+            } else console.log("1721 /ADDACCOUNT no columns"); 
+
+
             if(session.sheetName) {
                 let client = session.client;
                 let year = session.year;
                 let sheetName = session.sheetName;
-                console.log("1620 /ADDACCOUNT sheetName="+sheetName); 
+                console.log("1730 /ADDACCOUNT sheetName="+sheetName); 
                 if(client && year) {
 
-                    console.log("1640 GET /ADDACCOUNT "+sheetName+ " for ("+client+","+year+")");
+                    console.log("1740 GET /ADDACCOUNT "+sheetName+ " for ("+client+","+year+")");
                     session.serverFile = getRoot()+ session.client + Slash+ "NACT" + session.year + session.client + ".json"
                     writeFile(session);
 
                     try {
-                        console.log("1660 GET /ADDACCOUNT JSON "+JSON.stringify(session.serverFile));
+                        console.log("1760 GET /ADDACCOUNT JSON "+JSON.stringify(session.serverFile));
 
                         // check file and send response to client
                         sendFile(session, res);
                         
                     } catch(e) { console.dir("ADDACCOUNT.ts sendFile "+e)}
                     return;
-                } else console.log("1641 GET /ADDACCOUNT NO CLIENT NO YEAR"+JSON.stringify(Object.keys(session)));
-            } else console.log("1643 GET /ADDACCOUNT NO SHEETNAME IN SESSION"+JSON.stringify(Object.keys(session)));
-        } else console.log("1645 GET /ADDACCOUNT NO sessionId");
-    } else { console.log("1615 app.post ADDACCOUNT NO session"); }        
+                } else console.log("1741 GET /ADDACCOUNT NO CLIENT NO YEAR"+JSON.stringify(Object.keys(session)));
+            } else console.log("1743 GET /ADDACCOUNT NO SHEETNAME IN SESSION"+JSON.stringify(Object.keys(session)));
+        } else console.log("1745 GET /ADDACCOUNT NO sessionId");
+    } else { console.log("1715 app.post ADDACCOUNT NO session"); }        
 }
 
 
