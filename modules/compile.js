@@ -1394,6 +1394,8 @@ export function formatTXN(session,reqBody) {
         // receiver will append this to sheetCells
     } else console.log("compile.js formatTXN() no TXN ");
 
+    console.log("0068 formatTXN returns "+(bookingForm ? bookingForm.join(';'): "null"));
+
     return bookingForm;
 
 }

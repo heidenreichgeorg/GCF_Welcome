@@ -24,8 +24,9 @@ export default function FixedAssets() {
 
     
     function prevFunc() {console.log("CLICK PREVIOUS"); window.location.href="/Dashboard?client="+session.client+"&year="+session.year; }
-    function nextFunc() {  console.log("CLICK NEXT");   window.location.href="/HaloBoard?client="+session.client+"&year="+session.year; }
-    
+    //function nextFunc() {  console.log("CLICK NEXT");   window.location.href="/HaloBoard?client="+session.client+"&year="+session.year; }
+    function nextFunc() {  console.log("CLICK NEXT");  window.location.href="/HGB275S2Page?client="+session.client+"&year="+session.year;  }
+
     let page = sheet[D_Page];
     var jReport = sheet[D_Report];
     var jAssets = sheet[D_FixAss];
