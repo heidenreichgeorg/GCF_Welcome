@@ -25,9 +25,8 @@ export default function Balance() {
     if(!sheet) return null; //'Loading...';
 
     
-    function prevFunc() {console.log("CLICK PREVIOUS"); window.location.href="/Accounts?client="+session.client+"&year="+session.year; }
-    //function nextFunc() {  console.log("CLICK NEXT");   window.location.href="/Book?client="+session.client+"&year="+session.year; }
-    function nextFunc() {  console.log("CLICK NEXT");   window.location.href="FixedAssets?client="+session.client+"&year="+session.year; }
+    function prevFunc() { console.log("CLICK PREVIOUS"); window.location.href="/Accounts?client="+session.client+"&year="+session.year; }
+    function nextFunc() { console.log("CLICK NEXT");     window.location.href="FixedAssets?client="+session.client+"&year="+session.year; }
     
     let page = sheet[D_Page];
     
@@ -138,9 +137,9 @@ function makeBalance(response,value) {
             var xbrl = full_xbrl.split('\.');
             var side = xbrl[1];
            
-            //console.log('makeBalance side='+side + "  in "+full_xbrl + "= "+dispValue);
+            console.log('makeBalance side='+side + "  in "+full_xbrl + "= "+dispValue);
 
-            if(side==='ass') {
+            if(side=='ass') {
                 if(iLeft<SCREENLINES) {
                     if(!balance[iLeft]) balance[iLeft]={};
                     balance[iLeft].tw1=iName;
@@ -167,7 +166,7 @@ function makeBalance(response,value) {
 
         } else {
             // divider line out
-            //console.log('makeBalance unknown '+JSON.stringify(account));
+            console.log('makeBalance unknown '+JSON.stringify(account));
         }
     }
 

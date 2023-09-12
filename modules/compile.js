@@ -7,6 +7,7 @@ const debugRegular=null;
 // SETTING THIS WILL VIOLATE PRIVACY AT THE ADMIN CONSOLE !!! 
 const debugReport=null;
 
+/* xglobal BigInt */
 
 
 // K2 accounts must go first in EQLIAB
@@ -126,6 +127,7 @@ let de_DE = {
     AvgCurrent:  "mittl. Umlaufvermögen",
     OpCapital:   "betriebsnotw.Kapital",
     TaxClaims:   "Steuerforderung",
+    SecLosses:   "Verluste Anl VK",
     CapMargin:   "Kapitalrendite",
 
     // Buttons
@@ -217,10 +219,13 @@ function initBalance() {
         xbrlTanFix : { level:3, xbrl: "de-gaap-ci_bs.ass.fixAss.tan", de_DE:'Sachanlagen'},
         xbrlFinFix : { level:3, xbrl: "de-gaap-ci_bs.ass.fixAss.fin", de_DE:'Finanzanlagen'},
         xbrlFixed  : { level:2, xbrl: "de-gaap-ci_bs.ass.fixAss", de_DE:'Anlagevermögen'},
-        abrlABank:  {   level:4, xbrl: "de-gaap-ci_bs.ass.currAss.cashEquiv.bank", de_DE:'Bankkonto'},
-        abrlAmoney: {  level:3, xbrl: "de-gaap-ci_bs.ass.currAss.cashEquiv", de_DE:'Geldinstr.'},
+        abrlABank:   { level:4, xbrl: "de-gaap-ci_bs.ass.currAss.cashEquiv.bank", de_DE:'Bankkonto'},
+        abrlAmoney:  { level:3, xbrl: "de-gaap-ci_bs.ass.currAss.cashEquiv", de_DE:'Geldinstr.'},
+        xbrAuxUtils: { level:4, xbrl: "de-gaap-ci_bs.ass.currAss.receiv.trade", de_DE:'LuL Forderungen'},     
         xbrlPaidTax: { level:4, xbrl: "de-gaap-ci_bs.ass.currAss.receiv.other.otherTaxRec", de_DE:'gezahlte Steuer'},     
         // KESO KEST AQST= de-gaap-ci_bs.ass.currAss.receiv.other.otherTaxRec.CapTax 
+        xbrlSecLoss:{  level:4, xbrl: "de-gaap-ci_bs.ass.currAss.receiv.unpaidCapital", de_DE:'Aktienverluste'}, // GH20230910
+        //                used in json de-gaap-ci_bs.ass.currAss.receiv.unpaidCapital
         xbrlArec:  {   level:3, xbrl: "de-gaap-ci_bs.ass.currAss.receiv", de_DE:'Forderungen'},
         xbrlAcurr:  {  level:2, xbrl: "de-gaap-ci_bs.ass.currAss", de_DE:'Umlaufvermögen'},
         xbrlAssets :{  level:1, xbrl: "de-gaap-ci_bs.ass", de_DE:'Aktiva'},
@@ -240,7 +245,7 @@ function initBalance() {
         xbrlEquity: {  level:2, xbrl: "de-gaap-ci_bs.eqLiab.equity", de_DE:'Eigenkapital'},
         xbrlRegFin: {  level:3, xbrl: "de-gaap-ci_is.netIncome.regular.fin", de_DE:de_DE.RegularFIN},      
         xbrlRegOTC: {  level:3, xbrl: "de-gaap-ci_is.netIncome.regular.operatingTC", de_DE:de_DE.RegularOTC},      
-        xbrlRegular:{  level:2, xbrl: "de-gaap-ci_is.netIncome.regular", de_DE:'Gewinn/Verlust'},      
+        xbrlRegular:{  level:2, xbrl: "de-gaap-ci_is.netIncome.regular", de_DE:'Gewinn/Verlust'},     
         xbrlEqLiab :{  level:2, xbrl: "de-gaap-ci_bs.eqLiab", de_DE:'Passiva'}, // see HGBBeginYear.html HGBRegular.html
         xbrlIncome: {  level:1, xbrl: "de-gaap-ci_bs.eqLiab.income", de_DE:'Passiva Gewinn'},
         // see sendBalance(), CloseAndSave.htmlReport.xbrlIncome.closing.split(CSEP);
@@ -603,7 +608,7 @@ export function compile(sessionData) {
                     name    Name (Text in Spalte mit FK oder KK)
 
             sendBalance
-                    cyLoss Laufende Verluste aus Veraesserungen VAVA
+                    cyLoss Laufende Verluste aus Veraeusserungen VAVA
                     keso
                     kest
                     income
@@ -804,6 +809,7 @@ function sendBalance(balance) {
     }
 
     var iTaxPaid=0n;
+    var iSoldSecurityLoss=0n;
                 
     // ADD bAccounts' saldi to gReport
     for (let name in bAccounts)   {
@@ -824,6 +830,12 @@ function sendBalance(balance) {
                     iTaxPaid += BigInt(account.yearEnd);
                     if(debugReport) console.log("compile.js sendBalance Tax Paid="+iTaxPaid);
                     account.next="0";
+                }
+                else if(axbrl.startsWith(bReport.xbrlSecLoss.xbrl)) { // move sold-security losses
+                    iSoldSecurityLoss += BigInt(account.yearEnd);
+                    if(debugReport) console.log("compile.js sendBalance Sold-Security Loss="+iSoldSecurityLoss);
+                    account.next="0";
+                    // GH 20230910 OPEN : kill partner capital 
                 }
                 else account.next=account.yearEnd;
 
@@ -849,12 +861,12 @@ function sendBalance(balance) {
 
 
     // find common VAVA account GH202112222 and distribute current-year changes to partners
-    var all_cs;
+    var all_cs=null;
     var big_cyloss=0n;
     var all_iSale=-1;
     var assets = balance[D_Schema].assets;
     for(var lossCol=J_ACCT;lossCol<assets;lossCol++) {
-        if( arrXBRL[lossCol] && arrXBRL[lossCol].includes('receiv.other.CapLoss')) {
+        if( arrXBRL[lossCol] && arrXBRL[lossCol].includes('unpaidCapital')) { // GH20230910
             all_cs=gNames[lossCol]; // Kontoname gemeinschaftl Verluste aus Verkaeufen von Aktien
             all_iSale=lossCol;      // Spalte    gemeinschaftl Verluste aus Verkaeufen von Aktien
         }
@@ -864,7 +876,7 @@ function sendBalance(balance) {
     if(all_cs) {
         //  distribute current-year VAVA changes to partners
         let vava = balance[D_Balance][all_cs];
-        if(vava && vava.init) {
+        if(vava) {
             big_cyloss = Account.bigChange(vava)
 
             if(debugReport) {
@@ -952,14 +964,16 @@ function sendBalance(balance) {
             let iYearEnd =  varcap.yearEnd ? BigInt(varcap.yearEnd) : 0n;
             let iIncome  = varcap.income ? BigInt(varcap.income) : 0n;
             let iTaxPaid = p.tax ? BigInt(p.tax) : 0n;
-            varcap.next =   ""+(iYearEnd + iIncome - iTaxPaid); 
+            let iSecLoss = p.cyLoss ? BigInt(p.cyLoss) : 0n;
+            varcap.next =   ""+(iYearEnd + iIncome - iTaxPaid -iSecLoss); 
 
             // 20221029 detailed partner account info
             p.init = varcap.init;
             p.credit = varcap.credit;
             p.debit = varcap.debit;
             p.yearEnd = varcap.yearEnd;
-            p.close =  ""+(iYearEnd + iIncome); 
+            p.close =  ""+(iYearEnd + iIncome);
+            p.cyLoss = ""+iSecLoss; 
             p.next=varcap.next;
 
 
@@ -977,17 +991,6 @@ function sendBalance(balance) {
 
                 
                 /* Buchungen auf RE.. zählen als Entnahme oder Einlage GH20230202
-                deswegen diese Code nicht ausführen, sonst zählt bewegung von/zu Re.. als wenn es beim Partner verbleiben würde
-                let iResCredit = rescap.credit ? BigInt(rescap.credit) : 0n;
-                if(iResCredit!=0n) {
-                    p.credit = ""+(BigInt(p.credit)+iResCredit);
-                }
-
-                let iResDebit  = rescap.debit ? BigInt(rescap.debit) : 0n;
-                if(iResDebit!=0n) {
-                    p.debit = ""+(BigInt(p.debit)+iResDebit);
-                }
-                if(debugReport) console.log('compile sendBalance  '+JSON.stringify(p) + "\n ==>> MODIFY RExx "+JSON.stringify(rescap));
                 */
             }
                         

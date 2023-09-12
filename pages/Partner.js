@@ -8,6 +8,11 @@ for each account in D_Balance with XBRL=de-gaap-ci_bs.ass.currAss.receiv.other.o
         account.xbrl==X_ASSET_CAPTAX
 
     for each partner in D_Partner take gain/denom
+
+    GH20230910
+for each account in D_Balance with XBRL=de-gaap-ci_bs.ass.currAss.receiv.unpaidCapital
+        account.xbrl==X_ASSET_UNPCAP
+
 */
 
 /* xglobal BigInt */
@@ -19,7 +24,7 @@ import FooterRow from '../components/FooterRow'
 import { REACT_APP_API_HOST,getSession,useSession } from '../modules/sessionmanager';
 import { cents2EU } from  '../modules/money'
 import { makeHGBReport } from "../modules/App.js"
-import { X_ASSET_CAPTAX, D_Balance, D_Partner, D_Page, SCREENLINES }  from '../modules/terms.js';
+import { X_ASSET_CAPTAX, X_ASSET_UNPCAP, D_Balance, D_Partner, D_Page, SCREENLINES }  from '../modules/terms.js';
 
 export default function Partner() {
 
@@ -73,11 +78,37 @@ export default function Partner() {
             ifix++;
         } 
 
-        console.log("Partner("+index+") with "+igain+"/"+ideno+"response ="+iSum+" % "+taxPaid);
+        console.log("Partner("+index+") with "+igain+"/"+ideno+" from gain ="+iSum+" % "+taxPaid);
         return result;
     }
 
-    Object.keys(jReport).map((index) => (taxDetails.push(makeTax(jReport[index],index))));
+    function reduceCapital(partner,deficit,index) {
+        var ifix=0n; // ifix are cents to compensate for rounding when capital deficit is shared among partners
+        let igain=BigInt(partner.gain);
+        let ideno=BigInt(partner.denom);               
+
+        let cyLoss =partner.cyLoss;
+        var iSum=0n;
+        while(iSum<cyLoss && ifix<20n) {
+            iSum=0n;
+            var cFix=ifix;
+            let deficitAccounts = Object.keys(jBalance).filter((name)=>jBalance[name].xbrl==X_ASSET_UNPCAP); // GH20230124
+            deficitAccounts.map(function(name) { 
+                    let iPosition = 4n + BigInt(jBalance[name].yearEnd+"0");
+                    if(iSum+cFix>=cyLoss) cFix=0n;
+                    let iShare = cFix+(iPosition*igain/ideno/10n);
+                    if(cFix>0) cFix--;
+                    iSum = iSum + iShare;
+                    deficit[name] = cents2EU(iShare)})
+            ifix++;
+        } 
+
+        console.log("Partner("+index+") with "+igain+"/"+ideno+" from deficit ="+iSum+" % "+cyLoss);
+        return deficit;
+    }
+
+
+    Object.keys(jReport).map((index) => (taxDetails.push(reduceCapital(jReport[index],makeTax(jReport[index],index)))));
     
 
     let hKeys=Object.keys(taxDetails[0]);
@@ -103,6 +134,7 @@ export default function Partner() {
             'netIncomeFin':0,
             'close':0,
             'tax':0,
+            'cyLoss':0,
             'next':0 };
 
     // 20230109
@@ -148,6 +180,7 @@ export default function Partner() {
                             'netIncomeFin':page.RegularFIN,
                             'close':page.Close,
                             'tax':page.PaidTax,
+                            'cyLoss':page.SecLosses,
                             'next':page.NextYear} } />
                                         
                     <PartnerRow p={jReport[partnerNo]}/>    
@@ -255,6 +288,7 @@ function PartnerRow(mRow) {
             <div className="FIELD MONY">{cents2EU(mRow.p.netIncomeFin)}</div>
             <div className="FIELD MOAM">{cents2EU(mRow.p.close)}</div>
             <div className="FIELD MONY">{cents2EU(mRow.p.tax)}</div>
+            <div className="FIELD MOAM">{cents2EU(mRow.p.cyLoss)}</div>
             <div className="FIELD MOAM">{cents2EU(mRow.p.next)}</div>
         </div>
     )
@@ -273,6 +307,7 @@ function PartnerTitleRow(mRow) {
             <div className="FIELD TENY">{cents2EU(mRow.p.netIncomeFin)}</div>
             <div className="FIELD TEAM">{cents2EU(mRow.p.close)}</div>
             <div className="FIELD TENY">{cents2EU(mRow.p.tax)}</div>
+            <div className="FIELD TEAM">{cents2EU(mRow.p.cyLoss)}</div>
             <div className="FIELD TEAM">{cents2EU(mRow.p.next)}</div>
         </div>
     )

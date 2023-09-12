@@ -209,7 +209,7 @@ D_REPORT = {
         "Variables Eigenkapital4",
         "Variables Eigenkapital5",
         "Variables Eigenkapital6",
-        "Stammkapital1",
+        "Stammkapital 1",
         "Stammkapital 2",
         "Stammkapital Partner1",
         "Stammkapital Partner2",

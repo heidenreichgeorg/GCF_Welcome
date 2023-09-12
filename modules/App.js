@@ -111,8 +111,10 @@ export function makeStatusData(response) {
                     if(account.xbrl.startsWith(jReport.xbrlTanFix.xbrl)) { // accumulate tangible fixed assets
                         iTan = iTan + iClose;
                     }
+                    console.log("makeStatusData Fixed Assets: "+JSON.stringify(account))
                 } else if(account.xbrl.startsWith(jReport.xbrlAcurr.xbrl)) { // accumulate current assets#
                     iCur = iCur + iClose;
+                    console.log("makeStatusData Currency Assets: "+JSON.stringify(account))
                 }
             }
             if(xbrl_pre===X_INCOME) {
@@ -258,7 +260,8 @@ export function makeHGBReport(response) {
         var chgb9 = 0n; // Ertrag aus Beteiligungen
         var chgbA = 0n; // Wertpapierertrag
         var chgbB = 0n; // Zinseinnahmen
-        var chgbD = 0n; // Zinsaufwand
+        var chgbC = 0n; // Zinsaufwand
+        var chgbD = 0n; // Finanzergebnis
         var chgbE = 0n; // gezahlte Steuern v Einkommen und Ertrag
         var chgbF = 0n; // Steuerforderung d Gesellschafter
         // Jahresueberschuss
@@ -294,12 +297,13 @@ export function makeHGBReport(response) {
                 
                 // EZIN = de-gaap-ci_is.netIncome.regular.fin.netInterest.income
                 if(full_xbrl.startsWith('de-gaap-ci_is.netIncome.regular.fin.netParticipation')) { chgb9+=BigInt(yearEnd); }
-                if(full_xbrl.startsWith('de-gaap-ci_is.netIncome.regular.fin.sale')) { chgbA+=BigInt(yearEnd); }
+                if(full_xbrl.startsWith('de-gaap-ci_is.netIncome.regular.fin.sale')) { chgbA+=BigInt(yearEnd);chgbD+=BigInt(yearEnd);  }
+                if(full_xbrl.startsWith('de-gaap-ci_bs.ass.currAss.receiv.unpaidC')) { chgbA-=BigInt(yearEnd); }
                 if(full_xbrl.startsWith('de-gaap-ci_is.netIncome.regular.fin.netInterest')) { chgbB+=BigInt(yearEnd);  console.log("EZIN = "+yearEnd+ " from "+JSON.stringify(account)); }
-                if(full_xbrl.startsWith('de-gaap-ci_is.netIncome.regular.fin.expenses')) { chgbD+=BigInt(yearEnd); }
+                if(full_xbrl.startsWith('de-gaap-ci_is.netIncome.regular.fin.expenses')) { chgbC+=BigInt(yearEnd); }
                 if(full_xbrl.startsWith('de-gaap-ci_is.is.netIncome.tax')) { chgbE-=BigInt(yearEnd); }
 
-               // console.log("READ xbrl="+full_xbrl+" "+chgb5+" "+chgb7+" "+chgb8+" "+chgbA+" "+chgbB+" "+chgbD+" "+chgbE+" "+chgbF);
+               // console.log("READ xbrl="+full_xbrl+" "+chgb5+" "+chgb7+" "+chgb8+" "+chgbA+" "+chgbB+" "+chgbC+" "+chgbD+" "+chgbE+" "+chgbF);
                
             }
 
@@ -387,14 +391,16 @@ export function makeHGBReport(response) {
         fillRight(balance,chgb9,page.PartYield,8,1);
         fillRight(balance,chgbA,page.FinSale,9,1);
         fillRight(balance,chgbB,page.NetInterest,10,1);
-        fillRight(balance,chgbD,page.InterestCost,11,1);
+        fillRight(balance,chgbC,page.InterestCost,11,1);
         
-        let fin = chgb9+chgbA+chgbB+chgbD;
+        let fin = chgb9+chgbA+chgbB+chgbC;
         fillRight(balance,fin,page.FinYield,12,3);
+        fillRight(balance,chgb9+chgbD,'('+page.RegularFIN+')',13,1);
+
         let gain = regularOTC+fin;
         // Jahresueberschuss
-        fillRight(balance,gain,page.closing,13,3);
-        fillRight(balance,-chgbF,page.CapTax,14,3); // -- this part needed for 
+        fillRight(balance,gain,page.closing,14,3);
+        fillRight(balance,-chgbF,page.CapTax,15,3); // -- this part needed for 
         let netGain = gain-chgbF;
         fillRight(balance,netGain,"Netto-Gewinn",16,3);
 
