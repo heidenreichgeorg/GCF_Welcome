@@ -31,7 +31,7 @@ export default function Transfer() {
         let amount=getValue(acctRef);
         creditor[shrtName]=name; 
         creditor[acctRef]=amount; 
-        console.log("addPreData ACCOUNT("+name+"):= VALUE("+amount+") "+JSON.stringify(creditor)); 
+        console.log("Transfer.addPreData ACCOUNT("+name+"):= VALUE("+amount+") "+JSON.stringify(creditor)); 
         return creditor; } // avoid update
 
     
@@ -46,7 +46,7 @@ export default function Transfer() {
         txn.sender = sender;
         txn.refAcct = creditor.acct0;
 
-        console.log("onPreBook "+sender+" WITH "+txn.refAcct+" AS CRED "+JSON.stringify(creditor));
+        console.log("Transfer.addPreData "+sender+" WITH "+txn.refAcct+" AS CRED "+JSON.stringify(creditor));
     
         let controlRefAcct1 = document.getElementById("acct1");
         let controlRefAcct2 = document.getElementById("acct2");
@@ -60,7 +60,7 @@ export default function Transfer() {
         if(iam1 && iam1!=0n) {
             flow=prepareTXN(sheet[D_Schema],flow,creditor.acct1,cents2EU(iam1));
             if(controlRefAcct1) {
-                console.log("SET SELECT1 "+controlRefAcct1.id+" WITH "+creditor.acct1);
+                console.log("Transfer.addPreData SET SELECT1 "+controlRefAcct1.id+" WITH "+creditor.acct1);
                 setSelect("cReason",creditor.acct1);
             } 
         }
@@ -69,7 +69,7 @@ export default function Transfer() {
         if(iam2 && iam2!=0n) {
             flow=prepareTXN(sheet[D_Schema],flow,creditor.acct2,cents2EU(iam2));
             if(controlRefAcct2) {
-                console.log("SET SELECT2 "+controlRefAcct2.id+" WITH "+creditor.acct2);
+                console.log("Transfer.addPreData SET SELECT2 "+controlRefAcct2.id+" WITH "+creditor.acct2);
                 setSelect("cReason",creditor.acct2);
             }
         }
@@ -79,7 +79,7 @@ export default function Transfer() {
 
         txn.credit = flow.credit;
         txn.debit=flow.debit;
-        //console.log("SET FLOW "+JSON.stringify(flow));
+        //console.log("Transfer.addPreData SET FLOW "+JSON.stringify(flow));
 
         // renders complete page, because txn is a controlled variable
         setTxn(JSON.parse(JSON.stringify(txn)))
@@ -98,14 +98,14 @@ export default function Transfer() {
         txn.year=session.year;
         txn.client=session.client;
 
-        console.log("BOOK B "+JSON.stringify(txn));
+        console.log("Transfer.onBook BOOK B "+JSON.stringify(txn));
 
         book(txn,session); 
 
         resetSession();
         // invalidate current session
 
-        console.log("BOOK O booked.");
+        console.log("Transfer.onBook BOOK txn booked."+JSON.stringify(txn));
   
     }
 
@@ -135,7 +135,7 @@ export default function Transfer() {
         if(account.xbrl.length>1) {
             var xbrl = account.xbrl.split('\.').reverse();
             var xbrl_pre = account.xbrl;//xbrl.pop()+ "."+ xbrl.pop()+ "."+ xbrl.pop()+ "."+ xbrl.pop();
-            //console.log("Pattern "+xbrl_pre);
+            //console.log("Transfer.onBook Pattern "+xbrl_pre);
             if(xbrl.length>2) { 
                 if(xbrl_pre.startsWith(X_INCOME) || xbrl_pre.startsWith(X_EQLIAB)) arrAcct.push(name);
                 if(xbrl_pre.startsWith(X_LIABILITY)) arrLiab.push(name);
@@ -170,7 +170,7 @@ export default function Transfer() {
             session.creditorsT=creditorsT;
         }
     console.log("REFRESH PAGE "+JSON.stringify(creditor));
-    console.log("REFRESH TXN "+JSON.stringify(txn));
+    console.log("Transfer.onBook REFRESH TXN "+JSON.stringify(txn));
 
         // Buchungssatz
     let arrICred = Object.keys(txn.credit).map((accVal) => (bigEUMoney(txn.credit[accVal].value)))

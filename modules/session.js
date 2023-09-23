@@ -78,7 +78,7 @@ export function startSessionJSON(session,res) {
         res.json(session);
     } else console.log("0041 startSessionJSON("+client+","+year+") NO res object"); 
 
-    //console.log("0044 COMPILED PRE_BOOK = "+JSON.stringify(session.generated.Vorgemerkt));
+    //console.log("0044 COMPILED PRE-BOOK = "+JSON.stringify(session.generated.Vorgemerkt));
 }
 
 

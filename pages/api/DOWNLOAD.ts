@@ -18,7 +18,7 @@ export default function handler(
   req: NextApiRequest,
   res: NextApiResponse<any>
 ) {
-  console.log("EXCEL.handler "+JSON.stringify(req.query));
+  console.log("DOWNLOAD.handler "+JSON.stringify(req.query));
   sessionTime=timeSymbol();
   nextSessionId= strSymbol(sessionTime+client+year+sessionTime);
 
@@ -32,7 +32,7 @@ export default function handler(
     client =  req.query.client;
     year = req.query.year;
     const query:JSON = <JSON><unknown> { "ext":"JSON", "client":client, "year":year  };
-    console.log("    EXCEL.handler "+JSON.stringify(query));
+    console.log("    DOWNLOAD.handler "+JSON.stringify(query));
 
       signIn(jConfig,query,req.socket.remoteAddress,res,downloadJSON); 
   }
@@ -85,12 +85,12 @@ function downloadJSON(session:any, res:NextApiResponse<any>) {
             res.writeHead(HTTP_OK, {"Content-Type": "text/html"});    
             res.end("\nINVALID SESSION.\n");
         }
-        } else console.log("1625 GET /EXCEL NO SESSION");
+        } else console.log("1625 GET /DOWNLOAD NO SESSION");
             
 
     } else {
         
-        console.log("0615 app.post EXCEL NO sessionId");
+        console.log("0615 app.post DOWNLOAD NO sessionId");
     }        
 }
 

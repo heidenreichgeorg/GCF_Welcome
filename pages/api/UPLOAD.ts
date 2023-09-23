@@ -19,7 +19,7 @@ export default function handler(
     let strTimeSymbol = timeSymbol();
     console.log("\n\n0800 UPLOAD at "+strTimeSymbol);
 
-    config =  init(/*app,*/ process.argv); // GH20221003 do that per module
+    let config =  init(/*app,*/ process.argv); // GH20221003 do that per module
 
     nets = networkInterfaces();
 

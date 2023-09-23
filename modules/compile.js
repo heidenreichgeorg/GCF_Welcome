@@ -1,8 +1,10 @@
 
 const debug=null;
 const debugTax=null;
-const debugYield=null;
+const debugPreBook=null;
+const debugAssets=1;
 const debugRegular=null;
+
 
 // SETTING THIS WILL VIOLATE PRIVACY AT THE ADMIN CONSOLE !!! 
 const debugReport=null;
@@ -177,6 +179,7 @@ const D_Adressen="Adressen";
 const D_Page = "Seite";   // client register reference author
 
 
+import { cents2EU }  from '../modules/money';
 
 
 
@@ -332,7 +335,7 @@ export function compile(sessionData) {
 
 
                         // GH20211015 result[D_Schema]={ "Names": aNames }; crashes                        
-                        if(debug) console.log("0114 SCHEMA N assets="+iAssets+ " eqLiab="+iEqLiab+ " Total="+iTotal);
+                        if(debugAssets) console.log("0114 SCHEMA N assets="+iAssets+ " eqLiab="+iEqLiab+ " Total="+iTotal);
                         
                     }
                     else if(key && key==='C') {
@@ -352,7 +355,7 @@ export function compile(sessionData) {
                         result[D_Schema].client    = row[3];
                     }
                     else if(key && key==='A') {
-                        if(debugReport) console.log("0270 compile.compile ASSET  "+row);
+                        if(debugAssets) console.log("0270 compile.compile ASSET  "+row);
                         const assetInfo = row;
                         if(assetInfo.length>J_ACCT) {
                             var date = assetInfo[1];
@@ -371,7 +374,7 @@ export function compile(sessionData) {
                                                          "rest":""+irest,
                                                          "cost":""+icost,
                                                          "gain":"0" }; // GH20230303
-                                if(debug>1) console.log("0280 BOOK  "+idnt+" = "+result[D_FixAss][idnt].init+ "for #"+nmbr+" at "+icost);                                
+                                if(debugAssets) console.log("0280 BOOK  "+idnt+" = "+result[D_FixAss][idnt].init+ "for #"+nmbr+" at "+icost);                                
                             }
                         }
                     }
@@ -483,10 +486,12 @@ export function compile(sessionData) {
                                                                 "rest":""+init,
                                                                 "cost":""+icost,
                                                                 "gain":"0"}; // GH20230202
-                                        if(debug>1) console.log("0372 INVEST "+idnt+" = "+result[D_FixAss][idnt].rest+ " for #"+nmbr+" at "+icost);
+                                        if(debugAssets) console.log("0372 INVEST "+idnt+" for "+cents2EU(result[D_FixAss][idnt].rest)+ " for #"+nmbr+" at "+cents2EU(icost));
                                     }
 
                                     else if(aLine[3].trim()==='SELL') {
+
+                                        const reason = aLine[2].trim();
 
                                         var iSel = parseInt(aLine[4].trim());
                                         var iamnt = bigAsset(aLine,iAssets);
@@ -499,7 +504,18 @@ export function compile(sessionData) {
                                         var irest = BigInt(result[D_FixAss][idnt].rest);
                                         var iremn = irest+iamnt;
 
-                                        var icost =bigCost(idnt,nmbr,init);
+                                        // reduce cost basis for price per piece
+                                        //var icost =bigCost(idnt,nmbr,init);
+                                        var icost =bigCost(idnt,nmbr,iremn);
+                                        
+
+                                        // SELL
+                                        // GH20230923
+                                        // REDUCE INITIAL PRICE FOR REMAINING PEICES OF THAT ASSET
+                                        // GH20230923
+                                        init= BigInt(nmbr)*icost;
+
+
                                         // OPEN
                                         // MUST VERIFY existing identifier
                                         result[D_FixAss][idnt]={"date":date, 
@@ -510,14 +526,17 @@ export function compile(sessionData) {
                                                                 "rest":""+iremn,
                                                                 "cost":""+icost,
                                                                 "gain":"0" }; // GH20230303
-                                        if(debug>1) console.log("0374 SELL "+idnt+" = "+irest+"+"+iamnt+" =  "+result[D_FixAss][idnt].rest);
+                                        if(debugAssets) console.log(
+                                                    "0374 SELL "+reason+" "+iSel+" (worth "+cents2EU(iamnt)+
+                                                    ") from "+iNum+" of Asset "+idnt+" resulting in "+
+                                                    nmbr+" worth "+cents2EU(iremn) + " at "+cents2EU(icost)+" each");
                                     }
 
                                     else if(aLine[3].trim()==='YIELD') {
 
                                         var iamnt = bigAsset(aLine,iAssets);
 
-                                        if(debug>0) console.log("YIELD "+iamnt+" for "+idnt+" in "+aLine.join(';'));
+                                        if(debugAssets) console.log("YIELD "+iamnt+" for "+idnt+" in "+aLine.join(';'));
 
                                         if(result[D_FixAss]) {
                                             if(result[D_FixAss][idnt]) {
@@ -545,7 +564,7 @@ export function compile(sessionData) {
                                                                         "rest":""+irest,
                                                                         "cost":""+icost,
                                                                         "gain":"0" }; // GH20230303
-                                                if(debugYield) console.log("0376 YIELD amount="+iamnt+" changes "+idnt+" from "+icurr+" to "+result[D_FixAss][idnt].rest);
+                                                if(debugAssets) console.log("0376 YIELD amount="+iamnt+" changes "+idnt+" from "+cents2EU(icurr)+" to "+cents2EU(result[D_FixAss][idnt].rest));
 
                                                 } else  console.log("0371 YIELD UNKNOWN "+idnt+" ASSET");
                                         } else {
@@ -560,7 +579,7 @@ export function compile(sessionData) {
                                             if(result[D_FixAss][idnt]) {
                                                 var iGain = BigInt(result[D_FixAss][idnt].gain);
                                                 result[D_FixAss][idnt].gain = ""+(iGain+Sheets.bigEUMoney(aLine[iAcc]));
-                                                if(debugRegular) console.log("0378 compile: Asset gain is "+iGain);
+                                                if(debugRegular) console.log("0378 compile: Asset gain is "+cents2EU(iGain));
                                             }
                                         }
                                     } else {
@@ -573,7 +592,7 @@ export function compile(sessionData) {
                     }
                     else if(row.length>20) {
                         //if(!key || parseInt(key)==0) {                    
-                        console.dir("0352 SHEET LINE PRE-BOOK "+JSON.stringify(row)); 
+                        if(debugPreBook) console.dir("0352 SHEET LINE PRE-BOOK "+JSON.stringify(row)); 
                         result[D_PreBook].push(row);
                     }
             });
@@ -728,7 +747,7 @@ export function compile(sessionData) {
     
     //if(debug) console.log("0390 COMPILED         = "+JSON.stringify(Object.keys(balance)));
     if(debug) console.log("0390 COMPILED HISTORY = "+JSON.stringify(Object.keys(balance[D_History])));
-    console.log("0390 COMPILED PRE_BOOK = "+JSON.stringify(balance[D_PreBook]));
+    if(debugPreBook) console.log("0390 COMPILED PRE_BOOK = "+JSON.stringify(balance[D_PreBook]));
 
     if(debugReport) { 
         let jHistory=balance[D_History];
@@ -787,7 +806,7 @@ function sendBalance(balance) {
     let preBooked=balance[D_PreBook];
     gResponse[D_PreBook]=[];
     preBooked.forEach(preTXN=>{
-        console.log("compile.js sendBalance preBook "+JSON.stringify(preTXN));           
+        if(debugPreBook) console.log("compile.js sendBalance preBook "+JSON.stringify(preTXN));           
         gResponse[D_PreBook].push(preTXN);
     })
 
