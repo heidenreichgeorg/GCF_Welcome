@@ -63,7 +63,7 @@ export default function FixedAssets() {
                     iRest+=BigInt(row.rest);
                     return (
                         <FixedAssetsRow  key={"Fixed0"+n}  p={{idnt:row.idnt,type:row.type,date:row.date,
-                            init:cents2EU(row.init),
+                            init:cents2EU(row.orig),
                             nmbr:row.nmbr,
                             rest:cents2EU(row.rest),
                             cost:cents2EU(row.cost),

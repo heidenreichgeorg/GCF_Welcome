@@ -19,6 +19,7 @@ export const  D_Account="Konto"
 
 
 export const  X_ASSETS = 'de-gaap-ci_bs.ass';
+export const  X_ASS_FIX ='de-gaap-ci_bs.ass.fixAss';
 export const  X_ASS_CASH ='de-gaap-ci_bs.ass.currAss.cashEquiv';
 export const  X_ASSET_TAX = 'ass.currAss.receiv.other.otherTaxRec';
 export const  X_ASSET_CAPTAX='de-gaap-ci_bs.ass.currAss.receiv.other.otherTaxRec.CapTax';

@@ -38,6 +38,7 @@ const HTMLSPACE=" ";
 // OBSOLETE extra XML pattern
 // SYNTHETIC
 const xbrlAssets = "de-gaap-ci_bs.ass";
+const xbrlFixed = "de-gaap-ci_bs.ass.fixAss";
 const xbrlEqLiab = "de-gaap-ci_bs.eqLiab";
 const xbrlEqlInc = "de-gaap-ci_bs.eqlInc";
 const xbrlEqlReg = "de-gaap-ci_bs.regularIncome";
@@ -360,21 +361,21 @@ export function compile(sessionData) {
                         if(assetInfo.length>J_ACCT) {
                             var date = assetInfo[1];
                             var type = assetInfo[2];
-                            var init = Sheets.bigEUMoney(assetInfo[3]); // bigENMoney AnschaffungsK parse huge EN format string
+                            var orig = Sheets.bigEUMoney(assetInfo[3]); // bigENMoney AnschaffungsK parse huge EN format string
                             var nmbr = assetInfo[4];
                             var idnt = assetInfo[5];
                             if(idnt && idnt.length>COLMIN && nmbr && nmbr.length>0) {
-                                var irest =bigAsset(assetInfo,iAssets);
-                                var icost =bigCost(idnt,nmbr,init);
+                                var irest =bigAssetValueChange(assetInfo,iAssets,result[D_XBRL]);
+                                var icost =bigCost(idnt,nmbr,orig);
                                 result[D_FixAss][idnt]={ "date":date, 
                                                          "type":type,
-                                                         "init":""+init,
+                                                         "orig":""+orig,
                                                          "nmbr":nmbr,
                                                          "idnt":idnt,
                                                          "rest":""+irest,
                                                          "cost":""+icost,
                                                          "gain":"0" }; // GH20230303
-                                if(debugAssets) console.log("0280 BOOK  "+idnt+" = "+result[D_FixAss][idnt].init+ "for #"+nmbr+" at "+icost);                                
+                                if(debugAssets) console.log("0280 BOOK  "+idnt+" = "+result[D_FixAss][idnt].orig+ "for #"+nmbr+" at "+icost);                                
                             }
                         }
                     }
@@ -406,6 +407,10 @@ export function compile(sessionData) {
                         //if(debug>1) console.log("BOOK "+row.join(CSEP));
                         if(row.length>MINTXN && result[D_Schema].Names){
                             try {
+
+                                if(debugReport) console.log("BOOK "+aLine.join(';'));
+                                console.log();
+
 
                                 var gNames = result[D_Schema].Names;
                                 var gDesc  = result[D_Schema].Desc;
@@ -462,7 +467,7 @@ export function compile(sessionData) {
                                     })
                                 } else console.error("0367 Asset Line is not an array "+JSON.stringify(aLine));
                                 firstLine=null;                
-                                // 2697211	2021-01-19	BAY001	INVEST	200	BAYR_1
+                                // Schema for asset line 2697211	2021-01-19	BAY001	INVEST	200	BAYR_1
                                 
                                 if(aLine[3] && aLine[3].trim().length>1) {
                                     let iAcc=iAccount(aLine[3].trim(),result[D_Schema].Names);
@@ -474,29 +479,29 @@ export function compile(sessionData) {
 
                                     // process YIELD,INVEST,SELL;(REGULAR)
                                     if(aLine[3].trim()==='INVEST') {
-
-                                        var init = bigAsset(aLine,iAssets);
-                                        var icost = bigCost(idnt,nmbr,init);
-            
-                                        result[D_FixAss][idnt]={"date":date, 
-                                                                "type":type,
-                                                                "init":""+init,
-                                                                "nmbr":nmbr,
-                                                                "idnt":idnt,
-                                                                "rest":""+init,
-                                                                "cost":""+icost,
-                                                                "gain":"0"}; // GH20230202
-                                        if(debugAssets) console.log("0372 INVEST "+idnt+" for "+cents2EU(result[D_FixAss][idnt].rest)+ " for #"+nmbr+" at "+cents2EU(icost));
+                                        try {
+                                            var orig = bigAssetValueChange(aLine,iAssets,result[D_XBRL]);
+                                            var icost = bigCost(idnt,nmbr,orig);
+                
+                                            result[D_FixAss][idnt]={"date":date, 
+                                                                    "type":type,
+                                                                    "orig":""+orig,
+                                                                    "nmbr":nmbr,
+                                                                    "idnt":idnt,
+                                                                    "rest":""+orig,
+                                                                    "cost":""+icost,
+                                                                    "gain":"0"}; // GH20230202
+                                            if(debugAssets) console.log("0372 INVEST "+idnt+" for "+
+                                            cents2EU(result[D_FixAss][idnt].rest)+ " for #"+nmbr+" at "+cents2EU(icost));
+                                        } catch(err) { console.dir("0365 SHEET LINE SELL "+err); }
                                     }
 
                                     else if(aLine[3].trim()==='SELL') {
 
-                                        const reason = aLine[2].trim();
-
                                         var iSel = parseInt(aLine[4].trim());
-                                        var iamnt = bigAsset(aLine,iAssets);
+                                        var iamnt = bigAssetValueChange(aLine,iAssets,result[D_XBRL]);  // asset value change
 
-                                        var init = BigInt(result[D_FixAss][idnt].init);
+                                        var orig = BigInt(result[D_FixAss][idnt].orig);
 
                                         // sales reduce number of assets and amount of asset value
                                         var iNum = parseInt(result[D_FixAss][idnt].nmbr);
@@ -505,44 +510,42 @@ export function compile(sessionData) {
                                         var iremn = irest+iamnt;
 
                                         // reduce cost basis for price per piece
-                                        //var icost =bigCost(idnt,nmbr,init);
+                                        //var icost =bigCost(idnt,nmbr,orig);
                                         var icost =bigCost(idnt,nmbr,iremn);
                                         
 
                                         // SELL
                                         // GH20230923
-                                        // REDUCE INITIAL PRICE FOR REMAINING PEICES OF THAT ASSET
+                                        // REDUCE INITIAL PRICE FOR REMAINING PIECES OF THAT ASSET
                                         // GH20230923
-                                        init= BigInt(nmbr)*icost;
+                                        orig= ((orig*BigInt(nmbr)*10n)+4n)/BigInt(iNum*10);
 
 
                                         // OPEN
                                         // MUST VERIFY existing identifier
                                         result[D_FixAss][idnt]={"date":date, 
                                                                 "type":type,
-                                                                "init":""+init,
+                                                                "orig":""+orig,
                                                                 "nmbr":nmbr,
                                                                 "idnt":idnt,
                                                                 "rest":""+iremn,
                                                                 "cost":""+icost,
                                                                 "gain":"0" }; // GH20230303
                                         if(debugAssets) console.log(
-                                                    "0374 SELL "+reason+" "+iSel+" (worth "+cents2EU(iamnt)+
+                                                    "0374 SELL "+type+" "+iSel+" (worth "+cents2EU(iamnt)+
                                                     ") from "+iNum+" of Asset "+idnt+" resulting in "+
                                                     nmbr+" worth "+cents2EU(iremn) + " at "+cents2EU(icost)+" each");
                                     }
 
                                     else if(aLine[3].trim()==='YIELD') {
 
-                                        var iamnt = bigAsset(aLine,iAssets);
-
-                                        if(debugAssets) console.log("YIELD "+iamnt+" for "+idnt+" in "+aLine.join(';'));
+                                        var iamnt = bigAssetValueChange(aLine,iAssets,result[D_XBRL]); // asset value change
 
                                         if(result[D_FixAss]) {
                                             if(result[D_FixAss][idnt]) {
                                                 var date = result[D_FixAss][idnt].date;
                                                 var type = result[D_FixAss][idnt].type;
-                                                var iVal = result[D_FixAss][idnt].init;
+                                                var iVal = result[D_FixAss][idnt].orig;
                                                 var nmbr =  result[D_FixAss][idnt].nmbr;
                                                 var icurr = BigInt(result[D_FixAss][idnt].rest);
 
@@ -558,7 +561,7 @@ export function compile(sessionData) {
                                                 // MUST VERIFY existing identifier
                                                 result[D_FixAss][idnt]={ "date":date,
                                                                         "type":type,
-                                                                        "init":iVal,
+                                                                        "orig":iVal,
                                                                         "nmbr":nmbr,
                                                                         "idnt":idnt,
                                                                         "rest":""+irest,
@@ -570,18 +573,20 @@ export function compile(sessionData) {
                                         } else {
                                             if(debug>1) console.log("0373 YIELD UNKNOWN "+idnt);
                                         }
-                                    } else if(iAcc>0){
-                                        const xbrl=result[D_XBRL][iAcc];
-                                        const xRegular=result[D_Report].xbrlRegular.xbrl;
-                                        if(xbrl && xbrl.startsWith(xRegular)) {
-                                            // GH20230202
-                                            if(debugRegular) console.log("0378 compile: ("+aLine[iAcc]+") regular income:"+xbrl);
-                                            if(result[D_FixAss][idnt]) {
-                                                var iGain = BigInt(result[D_FixAss][idnt].gain);
-                                                result[D_FixAss][idnt].gain = ""+(iGain+Sheets.bigEUMoney(aLine[iAcc]));
-                                                if(debugRegular) console.log("0378 compile: Asset gain is "+cents2EU(iGain));
+                                    } else if(iAcc>0) {
+                                        try {
+                                            const xbrl=result[D_XBRL][iAcc];
+                                            const xRegular=result[D_Report].xbrlRegular.xbrl;
+                                            if(xbrl && xbrl.startsWith(xRegular)) {
+                                                // GH20230202
+                                                if(debugRegular) console.log("0378 compile: ("+aLine[iAcc]+") regular income:"+xbrl);
+                                                if(result[D_FixAss][idnt]) {
+                                                    var iGain = BigInt(result[D_FixAss][idnt].gain);
+                                                    result[D_FixAss][idnt].gain = ""+(iGain+Sheets.bigEUMoney(aLine[iAcc]));
+                                                    if(debugRegular) console.log("0378 compile: Asset gain is "+cents2EU(iGain));
+                                                }
                                             }
-                                        }
+                                        } catch(err) { console.dir("0353 SHEET LINE GAIN "+err); }
                                     } else {
                                         if(debug>1) console.log("0354 compile: normal booking transaction");
                                     }
@@ -1334,14 +1339,19 @@ function makePage(balance) {
 }
 
 
-function bigAsset(row,iAssets) {
+function bigAssetValueChange(row,iAssets,aXBRL) {
+    // aXBRL == result[D_XBRL]
     var column=J_ACCT;
     var iValue = 0n;
     var run=true;
     try {
-        while(run && iValue<1n && column<iAssets) {
+        while(run && iValue==0 && column<iAssets) { // was  iValue<1n  GH20230924
             var test = row[column];
-            if(test && test.length > 0 && Sheets.bigEUMoney(test)!=0n) {iValue=Sheets.bigEUMoney(test); run=false;}
+            if(test && test.length > 0 && Sheets.bigEUMoney(test)!=0n  && aXBRL[column].startsWith(xbrlFixed)) {
+                iValue=Sheets.bigEUMoney(test); 
+                console.log("ASSET ("+aXBRL[column]+") VALUE CHANGE="+iValue)
+                run=false;
+            }
             column++;
         } // shares before cash / account
     } catch(err) { console.dir("asset value("+row+")="+iValue+"   ERROR "+err); }
