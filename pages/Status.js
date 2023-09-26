@@ -3,7 +3,7 @@ import { getSession, storeCarryOver, useSession, REACT_APP_API_HOST } from '../m
 import Screen from '../pages/Screen'
 import FooterRow from '../components/FooterRow'
 import { cents2EU }  from '../modules/money';
-import { D_Page,D_Balance,X_ASS_FIXTAN,X_ASS_FIXFIN,X_ASS_RECEIV,X_ASS_CASH,X_INCOME_REGULAR,X_LIABILITY,X_EQUITY_VAR_UNL,X_EQUITY_VAR_LIM } from '../modules/terms.js'
+import { D_Page,D_Balance,T_CREDIT,T_DEBIT,X_ASS_FIXTAN,X_ASS_FIXFIN,X_ASS_RECEIV,X_ASS_CASH,X_INCOME_REGULAR,X_LIABILITY,X_EQUITY_VAR_UNL,X_EQUITY_VAR_LIM } from '../modules/terms.js'
 import { book }  from '../modules/writeModule';
 
 
@@ -19,6 +19,16 @@ export default function Status() {
     const [ year, setYear]   = useState()
     const [client,setClient] = useState()
     const { session, status } = useSession()
+    const [txn,setTxn] = useState({ 'date':"", 'sender':"", 'refAcct':"", 'reason':"", 'refCode':"", 'credit':[],'debit':[]  })
+
+    function addDebit(attribute) {        
+        if(attribute && attribute.name && attribute.value) 
+            {txn.debit.push(attribute);}
+    }
+    function addCredit(attribute) { 
+        if(attribute && attribute.name && attribute.value) 
+            {txn.credit.push(attribute);}
+    }
 
     useEffect(() => {
         if(status !== 'success') return;
@@ -78,6 +88,71 @@ export default function Status() {
     }
 
 
+    function trackValue(slider,label) {
+        let display=document.getElementById(label);
+        display.innerHTML=slider.value;
+    }
+    
+    function takeValue(accButton) {
+        let ctlAccount=document.getElementById(accButton.id);
+        const name=accButton.id.split('_')[0];
+        console.log("takeValue id="+accButton.id+"  value="+ctlAccount.value);
+
+        let ctlTotal=document.getElementById(VAL_ID_TOTAL);
+        let ctlEuros=document.getElementById(VAL_ID_FIRST);
+        let ctlCents=document.getElementById(VAL_ID_SECND);
+        const euros=ctlEuros.innerHTML;
+        const cents=ctlCents.innerHTML;
+        const bigEuros = BigInt(euros)*100n;
+        const bigCents = BigInt(cents);
+        let strAmount = cents2EU(bigEuros+bigCents);
+    
+        ctlTotal.innerHTML = strAmount;
+    
+        let attribute = { 'name':name, 'value':strAmount };
+        addCredit(attribute);
+        setTxn(JSON.parse(JSON.stringify(txn))); // render full page
+    }
+    
+    function Slider({ start, end, label }) {
+        return(
+            <div>
+                <div className="attrRow"></div>
+                <input className="coinSlider"  type="range" min={start} end={end} id="coinRange" onChange={((ev)=>trackValue(ev.target,label))}></input>                            
+                <div className="attrLine">{label} <div className="FIELD SYMB" id={label}>0</div></div>
+                <div className="attrRow"></div>
+            </div>
+        )
+    }
+
+    function AccountSelectRow({ gName, arrInfo }) {
+        return(
+            <div className="attrLine">
+                <div className="FIELD LNAM">{gName}</div>
+                { arrInfo?arrInfo.map((aInfo)=>(
+                    <div>
+                        <div className="FIELD SEP"> &nbsp;</div>
+                        <div className="FIELD SYMB" id={strAccountButtonId(gName,aInfo.name)} onClick={((ev)=>takeValue(ev.target))}> {aInfo.name}</div>
+                    </div>
+                )):""}
+            </div>
+        )
+    }
+
+    function AccountDragRow({ gName, arrInfo }) {
+        return(
+            <div className="attrLine">
+                <div className="FIELD LNAM">{gName}</div>
+                { arrInfo?arrInfo.map((aInfo)=>(
+                    <div>
+                        <div className="FIELD SEP"> &nbsp;</div>
+                        <div className="CNAM key" id={strAccountButtonId(gName,aInfo.name)} > {aInfo.name+':'+aInfo.value}</div>
+                    </div>
+                )):""}
+            </div>
+        )
+    }
+
     function handleReview() {        
         book({'client':session.client,'year':session.year},session)
     }
@@ -106,7 +181,6 @@ export default function Status() {
 
     // GH20230926
     const arrAccounts = listAccounts(sheet[D_Balance]);
-    var list=[];
 
     const tabName = "Overview";
     let pageText =  ['DashBoard',  'Transaction'].map((name) =>( page[name] ));
@@ -150,8 +224,12 @@ export default function Status() {
                 <AccountSelectRow gName={page['velimp']}  
                     arrInfo={ arrAccounts.filter((acct)=>(acct.xbrl.startsWith(X_EQUITY_VAR_LIM)))}  />
                 <AccountSelectRow gName=''  />
-                <Slider start='0' end='99'  />
+                <div className="attrLine">Total<div className="FIELD SYMB" id={VAL_ID_TOTAL}>0</div></div>
+                <Slider start='0' end='99' label={VAL_ID_FIRST} />
+                <Slider start='0' end='99' label={VAL_ID_SECND} />
                 <AccountSelectRow gName=''  />
+                <AccountDragRow gName={T_CREDIT} arrInfo={txn.credit}/>
+                <AccountDragRow gName={T_DEBIT} arrInfo={txn.debit}/>
             </div>
             
 
@@ -189,32 +267,12 @@ function StatusRow({ am1,tx1, am2, tx2, am3, tx3, d, n, l, click}) {
     )
 }
 
-function Slider({ start, end }) {
-    return(
-        <div>
-            <div className="attrRow"></div>
-            <input className="coinSlider"  type="range" min={start} end={end}  id="coinRange"></input>                            
-            <div className="attrRow"></div>
-        </div>
-    )
-}
-
-function AccountSelectRow({ gName, arrInfo }) {
-    return(
-        <div className="attrLine">
-            <div className="FIELD LNAM">{gName}</div>
-            { arrInfo?arrInfo.map((aInfo)=>(
-                <div>
-                    <div className="FIELD SEP"> &nbsp;</div>
-                    <div className="FIELD SYMB" id={strAccountButtonId(gName,aInfo.name)}> {aInfo.name}</div>
-                </div>
-            )):""}
-        </div>
-    )
-}
+const VAL_ID_FIRST = 'Euros';
+const VAL_ID_SECND = 'Cents';
+const VAL_ID_TOTAL = 'Total';
 
 function strAccountButtonId(gName,aName) {
-return  'book'+gName+'_'+aName;
+return  aName+'_'+gName;
 }
 
 

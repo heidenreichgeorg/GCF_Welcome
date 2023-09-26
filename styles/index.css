@@ -43,6 +43,7 @@ input[type="radio"]::before {content: "#"; }
 .C100     { width: 6rem; }
 .R105     { width: 6rem; text-align: right; }
 .SNAM     { width: 7rem; text-align: left;  }
+.CNAM     { width: 7rem; text-align: center;  }
 .IDNT     { width: 8rem; text-align: right; }
 .LNAM     { width: 9rem; text-align: left;}
 .XFER     { width: 9rem; text-align: left;  }

@@ -16,6 +16,8 @@ export const  D_Carry  =  "Übertrag"
 export const  D_CarryOff ="Löschen"
 export const  D_CarryOver="Übertragen"
 export const  D_Account="Konto"
+export const  T_DEBIT="HABEN";
+export const  T_CREDIT="SOLL";
 
 
 export const  X_ASSETS = 'de-gaap-ci_bs.ass';
