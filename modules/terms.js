@@ -20,7 +20,10 @@ export const  D_Account="Konto"
 
 export const  X_ASSETS = 'de-gaap-ci_bs.ass';
 export const  X_ASS_FIX ='de-gaap-ci_bs.ass.fixAss';
+export const  X_ASS_FIXTAN ='de-gaap-ci_bs.ass.fixAss.tan';
+export const  X_ASS_FIXFIN ='de-gaap-ci_bs.ass.fixAss.fin';
 export const  X_ASS_CASH ='de-gaap-ci_bs.ass.currAss.cashEquiv';
+export const  X_ASS_RECEIV='de-gaap-ci_bs.ass.currAss.receiv';
 export const  X_ASSET_TAX = 'ass.currAss.receiv.other.otherTaxRec';
 export const  X_ASSET_CAPTAX='de-gaap-ci_bs.ass.currAss.receiv.other.otherTaxRec.CapTax';
 export const  X_ASSET_UNPCAP='de-gaap-ci_bs.ass.currAss.receiv.unpaidCapital';
@@ -28,6 +31,8 @@ export const  X_ASSET_UNPCAP='de-gaap-ci_bs.ass.currAss.receiv.unpaidCapital';
 export const  X_EQLIAB = 'de-gaap-ci_bs.eqLiab';
 export const  X_LIABILITY = 'de-gaap-ci_bs.eqLiab.liab';
 export const  X_EQUITY = 'de-gaap-ci_bs.eqLiab.equity';
+export const  X_EQUITY_VAR_UNL='de-gaap-ci_bs.eqLiab.equity.subscribed.unlimitedLiablePartners.VK';
+export const  X_EQUITY_VAR_LIM='de-gaap-ci_bs.eqLiab.equity.subscribed.limitedLiablePartners.VK';
 export const  X_INCOME = 'de-gaap-ci_is.netIncome';
 
 export const  X_INCOME_REGULAR = 'de-gaap-ci_is.netIncome.regular';

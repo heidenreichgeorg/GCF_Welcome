@@ -3,10 +3,12 @@ body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
   font-family: Bahnschrift, monospace, sans-serif; }
 
 .dosBorder{  padding: 14px; border-style: none; border-radius: 10px; border-width: 2px; border-color: #AEADAE;  background-color: #FFF; color: #0F0F0F; }
+.witBorder{  padding: 14px; border-style: none; border-radius: 10px; border-width: 2px; border-color: #FEFEFE;  background-color: #FFF; color: #0F0F0F; }
 .mTable   { font-family: Bahnschrift,monospace;                             height: 18px;             display:table;    page-break-after: always  }
 
 
 .console  { color:#0F0F8F; background-color:inherit; font-family :Courier; font-size: 8px; }
+.coinSlider { width:75em; background:#f4d4d4;}
 
 input  { color:#0F0F0F; background-color:inherit; font-family :Bahnschrift; font-size: 10px;  width:80px;}
 input[type="radio"] {
@@ -19,7 +21,6 @@ input[type="radio"] {
 }
 input[type="radio"]::before {content: "#"; }
 
-input[type=range] { -webkit-appearance: none;  width: 200px; margin: 0; padding: 0; display: block; height: 50px; }
 
 .attrRow  { width:75rem; padding: 1px; float: left;               min-height: 16px; height: 17px; font-family :inherit; font-size: 11px; font-weight:400; text-align: center;}
 .attrLine { width:75rem; padding: 1px; float: left;               min-height: 16px; height: 17px; font-family :inherit; font-size: 11px; font-weight:400; text-align: center;}

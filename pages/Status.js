@@ -3,15 +3,13 @@ import { getSession, storeCarryOver, useSession, REACT_APP_API_HOST } from '../m
 import Screen from '../pages/Screen'
 import FooterRow from '../components/FooterRow'
 import { cents2EU }  from '../modules/money';
-import { D_Page } from '../modules/terms.js'
+import { D_Page,D_Balance,X_ASS_FIXTAN,X_ASS_FIXFIN,X_ASS_RECEIV,X_ASS_CASH,X_INCOME_REGULAR,X_LIABILITY,X_EQUITY_VAR_UNL,X_EQUITY_VAR_LIM } from '../modules/terms.js'
 import { book }  from '../modules/writeModule';
 
 
 
 
 import { makeStatusData }  from '../modules/App';
-
-
 
 
 
@@ -105,25 +103,66 @@ export default function Status() {
     let sheet_status = makeStatusData(sheet);
     let report = sheet_status.report;
 
-    const aNums = [0];
+
+    // GH20230926
+    const arrAccounts = listAccounts(sheet[D_Balance]);
+    var list=[];
+
+    const tabName = "Overview";
+    let pageText =  ['DashBoard',  'Transaction'].map((name) =>( page[name] ));
+    let aPages = ['block'];
+    for(let p=1;p<pageText.length;p++) aPages[p]='none'; 
+
     return (
-        <Screen prevFunc={prevFunc} nextFunc={nextFunc} tabSelector={aNums} >
-            <StatusRow am1={page.Assets} am2={page.Gain}  am3={page.eqliab}/>
-            {
-                report.map((row,l) => (
-                    <StatusRow  key={"Status"+l}  
-                                        am1={row.gLeft} tx1={row.nLeft} 
-                                        am2={row.gMidl} tx2={row.nMidl} 
-                                        am3={row.gRite} tx3={row.nRite} 
-                                        d={row.dTran} n={row.nTran} l={row.lTran}
-                                        click={(l==0)?handleReview:null}/>                       
-                ))
-            }
+        <Screen prevFunc={prevFunc} nextFunc={nextFunc} tabSelector={pageText}  tabName={tabName}> 
+           
+           <div className="FIELD" key={"Status"} id={'Overview0'} style= {{ 'display': aPages[0]}} >
+
+                <StatusRow am1={page.Assets} am2={page.Gain}  am3={page.eqliab}/>
+                {
+                    report.map((row,l) => (
+                        <StatusRow  key={"Status"+l}  
+                                            am1={row.gLeft} tx1={row.nLeft} 
+                                            am2={row.gMidl} tx2={row.nMidl} 
+                                            am3={row.gRite} tx3={row.nRite} 
+                                            d={row.dTran} n={row.nTran} l={row.lTran}
+                                            click={(l==0)?handleReview:null}/>                       
+                    ))
+                }
+            </div>
+
+            <div className="FIELD" key={"Eingabe"} id={'Overview1'} style= {{ 'display': aPages[1]}} >
+                <AccountSelectRow gName={page['Transaction']}  />
+                <AccountSelectRow gName={page['tanfix']} 
+                    arrInfo={ arrAccounts.filter((acct)=>(acct.xbrl.startsWith(X_ASS_FIXTAN)))} />
+                <AccountSelectRow gName={page['finfix']} 
+                    arrInfo={ arrAccounts.filter((acct)=>(acct.xbrl.startsWith(X_ASS_FIXFIN)))}  />
+                <AccountSelectRow gName={page['cash']}  
+                    arrInfo={ arrAccounts.filter((acct)=>(acct.xbrl.startsWith(X_ASS_CASH)))}  />
+                <AccountSelectRow gName={page['rec']}  
+                    arrInfo={ arrAccounts.filter((acct)=>(acct.xbrl.startsWith(X_ASS_RECEIV)))}  />
+                <AccountSelectRow gName={page['liab']}  
+                    arrInfo={ arrAccounts.filter((acct)=>(acct.xbrl.startsWith(X_LIABILITY)))}  />
+                <AccountSelectRow gName={page['RegularOTC']}  
+                    arrInfo={ arrAccounts.filter((acct)=>(acct.xbrl.startsWith(X_INCOME_REGULAR)))}  />
+                <AccountSelectRow gName={page['veulip']}  
+                    arrInfo={ arrAccounts.filter((acct)=>(acct.xbrl.startsWith(X_EQUITY_VAR_UNL)))}  />
+                <AccountSelectRow gName={page['velimp']}  
+                    arrInfo={ arrAccounts.filter((acct)=>(acct.xbrl.startsWith(X_EQUITY_VAR_LIM)))}  />
+                <AccountSelectRow gName=''  />
+                <Slider start='0' end='99'  />
+                <AccountSelectRow gName=''  />
+            </div>
+            
+
+
             <FooterRow left={page["client"]}  right={page["register"]} prevFunc={prevFunc} nextFunc={nextFunc} miscFunc={handleXLSave}/>
             <FooterRow left={page["reference"]} right={page["author"]} prevFunc={prevFunc} nextFunc={nextFunc} miscFunc={handleXLSave}/>
         </Screen>
     )   
 }
+
+
 
 function showAccount(shrtName) { console.log("SHOW ACCOUNT "+shrtName); window.open("/History?client=HGKG&year=2023&APATTERN="+shrtName+"&SELECTALL=1"); }
 
@@ -150,5 +189,44 @@ function StatusRow({ am1,tx1, am2, tx2, am3, tx3, d, n, l, click}) {
     )
 }
 
+function Slider({ start, end }) {
+    return(
+        <div>
+            <div className="attrRow"></div>
+            <input className="coinSlider"  type="range" min={start} end={end}  id="coinRange"></input>                            
+            <div className="attrRow"></div>
+        </div>
+    )
+}
+
+function AccountSelectRow({ gName, arrInfo }) {
+    return(
+        <div className="attrLine">
+            <div className="FIELD LNAM">{gName}</div>
+            { arrInfo?arrInfo.map((aInfo)=>(
+                <div>
+                    <div className="FIELD SEP"> &nbsp;</div>
+                    <div className="FIELD SYMB" id={strAccountButtonId(gName,aInfo.name)}> {aInfo.name}</div>
+                </div>
+            )):""}
+        </div>
+    )
+}
+
+function strAccountButtonId(gName,aName) {
+return  'book'+gName+'_'+aName;
+}
 
 
+function listAccounts(jAccounts) {
+    var result = [];
+    for (let name in jAccounts)   {
+        var account=jAccounts[name];
+        if(account.xbrl.length>1) {
+            
+            result.push({'name':account.name, 'xbrl':account.xbrl });
+        }
+    }
+    console.log("listAccounts returns "+JSON.stringify(result))
+    return result;
+}

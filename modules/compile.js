@@ -89,6 +89,7 @@ let de_DE = {
     History:"Buchungen",
     Patterns:"Vorlagen",
     Status:"Status",
+    Transaction:"Eingabe",
     Sum:"Summe",
 
     // Anlagen

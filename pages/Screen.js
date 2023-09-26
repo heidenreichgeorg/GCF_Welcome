@@ -137,14 +137,14 @@ export default function Screen({ children, prevFunc, nextFunc, tabSelector, tabN
         </div>
     ); 
     
-    function makeTab(tabName,tabNum) { return (e) => { console.log("onClick("+tabName+","+tabNum+")"); select(tabName,tabNum)}}
+    //function makeTab(tabName,tabNum) { return (e) => { console.log("onClick("+tabName+","+tabNum+")"); select(tabName,tabNum)}}
 
     function makeSelect(tabName,target) { 
         var elem = document.getElementById(target.id);
         if(elem) {
             let index=elem.selectedIndex;
-            var value = elem.options[index].value;
-            select(tabName,index,value);
+            //var value = elem.options[index].value;
+            select(tabName,index);
         }
     }
 
