@@ -19,15 +19,27 @@ export default function Status() {
     const [ year, setYear]   = useState()
     const [client,setClient] = useState()
     const { session, status } = useSession()
-    const [txn,setTxn] = useState({ 'date':"", 'sender':"", 'refAcct':"", 'reason':"", 'refCode':"", 'credit':[],'debit':[]  })
+    const [txn,setTxn] = useState({ 'date':"", 'sender':"", 'refAcct':"", 'reason':"", 'refCode':"", 'credit':{},'debit':{}  })
 
     function addDebit(attribute) {        
-        if(attribute && attribute.name && attribute.value) 
-            {txn.debit.push(attribute);}
+        console.log("addDebit1 "+JSON.stringify(attribute));
+        if(attribute && attribute.name && attribute.value) {
+            txn.debit[attribute.name]=attribute.value;
+            delete txn.credit[attribute.name];
+            setTxn(JSON.parse(JSON.stringify(txn))); // render full page
+            console.log("addDebit2 "+JSON.stringify(attribute.name)+" with "+JSON.stringify(attribute.data));
+        }
+
     }
+
     function addCredit(attribute) { 
-        if(attribute && attribute.name && attribute.value) 
-            {txn.credit.push(attribute);}
+        console.log("addCredit1 "+JSON.stringify(attribute));
+        if(attribute && attribute.name && attribute.value) {
+            txn.credit[attribute.name]=attribute.value;
+            delete txn.debit[attribute.name];
+            setTxn(JSON.parse(JSON.stringify(txn))); // render full page
+            console.log("addCredit2 "+JSON.stringify(attribute.name)+" with "+JSON.stringify(attribute.data));
+        }
     }
 
     useEffect(() => {
@@ -114,11 +126,11 @@ export default function Status() {
         setTxn(JSON.parse(JSON.stringify(txn))); // render full page
     }
     
-    function Slider({ start, end, label }) {
+    function Slider({ min, max, label }) {
         return(
             <div>
                 <div className="attrRow"></div>
-                <input className="coinSlider"  type="range" min={start} end={end} id="coinRange" onChange={((ev)=>trackValue(ev.target,label))}></input>                            
+                <input className="coinSlider"  type="range" min={min} max={max} id="coinRange" onChange={((ev)=>trackValue(ev.target,label))}></input>                            
                 <div className="attrLine">{label} <div className="FIELD SYMB" id={label}>0</div></div>
                 <div className="attrRow"></div>
             </div>
@@ -139,19 +151,52 @@ export default function Status() {
         )
     }
 
-    function AccountDragRow({ gName, arrInfo }) {
+    function allowDrop(ev) {
+        ev.preventDefault();
+    }
+
+    function drag(ev,group,aInfo) {
+        ev.dataTransfer.setData("text", ev.target.id);
+        ev.dataTransfer.setData("html", ev.target.innerHTML);
+        ev.dataTransfer.setData("attr", JSON.stringify(aInfo));
+        ev.dataTransfer.setData("group",group);        
+        console.log("drag "+ev.target.id+"  "+JSON.stringify(aInfo));
+    }
+
+    function drop(ev) {
+        ev.preventDefault();
+        var name = ev.dataTransfer.getData("text");
+        var attr = ev.dataTransfer.getData("attr");
+        var data = ev.dataTransfer.getData("html");
+        var group= ev.dataTransfer.getData("group");
+        //let type = name.split('_')[1];
+        console.log("drop "+JSON.stringify(name)+" from "+group+" as "+JSON.stringify(data));
+        
+           if(group==T_DEBIT) addCredit(JSON.parse(attr));
+           if(group==T_CREDIT) addDebit(JSON.parse(attr));
+        
+    }
+
+
+    function AccountDragRow({ gName, jInfo }) {
+        var keys = Object.keys(jInfo);
+        var arrInfo=keys.map((a)=>({'name':a, 'value':jInfo[a]}));
+        console.log("showing "+JSON.stringify(arrInfo));
         return(
-            <div className="attrLine">
-                <div className="FIELD LNAM">{gName}</div>
+            <div className="attrRow" id={gName}  onDragOver={((ev)=>allowDrop(ev))} onDrop={((ev)=>drop(ev))} >
+                <div className="FIELD LNAM" >{gName}</div>
                 { arrInfo?arrInfo.map((aInfo)=>(
-                    <div>
+                    <div draggable="true"  onDragStart={((ev)=>drag(ev,gName,aInfo))} id={strAccountButtonId(gName,aInfo.name)}>
                         <div className="FIELD SEP"> &nbsp;</div>
-                        <div className="CNAM key" id={strAccountButtonId(gName,aInfo.name)} > {aInfo.name+':'+aInfo.value}</div>
+                        <div className="CNAM key" > {aInfo.name+':'+aInfo.value}</div>
                     </div>
                 )):""}
             </div>
         )
     }
+
+
+
 
     function handleReview() {        
         book({'client':session.client,'year':session.year},session)
@@ -223,16 +268,18 @@ export default function Status() {
                     arrInfo={ arrAccounts.filter((acct)=>(acct.xbrl.startsWith(X_EQUITY_VAR_UNL)))}  />
                 <AccountSelectRow gName={page['velimp']}  
                     arrInfo={ arrAccounts.filter((acct)=>(acct.xbrl.startsWith(X_EQUITY_VAR_LIM)))}  />
-                <AccountSelectRow gName=''  />
+                
                 <div className="attrLine">Total<div className="FIELD SYMB" id={VAL_ID_TOTAL}>0</div></div>
-                <Slider start='0' end='99' label={VAL_ID_FIRST} />
-                <Slider start='0' end='99' label={VAL_ID_SECND} />
-                <AccountSelectRow gName=''  />
-                <AccountDragRow gName={T_CREDIT} arrInfo={txn.credit}/>
-                <AccountDragRow gName={T_DEBIT} arrInfo={txn.debit}/>
-            </div>
-            
 
+                <Slider min='0' max='99' label={VAL_ID_FIRST} />
+                <Slider min='0' max='99' label={VAL_ID_SECND} />                
+                
+                <div className="attrLine">Diff<div className="FIELD SYMB" id={VAL_ID_DIFF}>0</div></div>
+                <AccountSelectRow gName=''  />
+
+                <AccountDragRow gName={T_CREDIT} jInfo={txn.credit} />
+                <AccountDragRow gName={T_DEBIT}  jInfo={txn.debit} />
+            </div>            
 
             <FooterRow left={page["client"]}  right={page["register"]} prevFunc={prevFunc} nextFunc={nextFunc} miscFunc={handleXLSave}/>
             <FooterRow left={page["reference"]} right={page["author"]} prevFunc={prevFunc} nextFunc={nextFunc} miscFunc={handleXLSave}/>
@@ -270,6 +317,7 @@ function StatusRow({ am1,tx1, am2, tx2, am3, tx3, d, n, l, click}) {
 const VAL_ID_FIRST = 'Euros';
 const VAL_ID_SECND = 'Cents';
 const VAL_ID_TOTAL = 'Total';
+const VAL_ID_DIFF  = 'Diff';
 
 function strAccountButtonId(gName,aName) {
 return  aName+'_'+gName;
