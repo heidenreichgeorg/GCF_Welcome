@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { getSession, storeCarryOver, useSession, REACT_APP_API_HOST } from '../modules/sessionmanager';
 import Screen from '../pages/Screen'
 import FooterRow from '../components/FooterRow'
-import { cents2EU }  from '../modules/money';
+import { cents2EU,bigEUMoney }  from '../modules/money';
 import { D_Page,D_Balance,T_CREDIT,T_DEBIT,X_ASS_FIXTAN,X_ASS_FIXFIN,X_ASS_RECEIV,X_ASS_CASH,X_INCOME_REGULAR,X_LIABILITY,X_EQUITY_VAR_UNL,X_EQUITY_VAR_LIM } from '../modules/terms.js'
 import { book }  from '../modules/writeModule';
 
@@ -13,35 +13,26 @@ import { makeStatusData }  from '../modules/App';
 
 
 
+
 export default function Status() {
     
     const [sheet, setSheet]  = useState()
     const [ year, setYear]   = useState()
     const [client,setClient] = useState()
     const { session, status } = useSession()
-    const [txn,setTxn] = useState({ 'date':"", 'sender':"", 'refAcct':"", 'reason':"", 'refCode':"", 'credit':{},'debit':{}  })
+    const [txn,setTxn] = useState({ 'date':"", 'sender':"Sender", 'refAcct':"", 'reason':"", 'refCode':"", 'credit':{},'debit':{}  })
 
-    function addDebit(attribute) {        
-        console.log("addDebit1 "+JSON.stringify(attribute));
-        if(attribute && attribute.name && attribute.value) {
-            txn.debit[attribute.name]=attribute.value;
-            delete txn.credit[attribute.name];
-            setTxn(JSON.parse(JSON.stringify(txn))); // render full page
-            console.log("addDebit2 "+JSON.stringify(attribute.name)+" with "+JSON.stringify(attribute.data));
-        }
-
+    function update() {
+        let bigSum=0n;
+        let cKeys=Object.keys(txn.credit);
+        let dKeys=Object.keys(txn.debit);
+        cKeys.forEach((acct)=>{bigSum+=bigEUMoney(txn.credit[acct]); console.log("+"+txn.credit[acct])})
+        dKeys.forEach((acct)=>{bigSum-=bigEUMoney(txn.debit[acct]); console.log("+"+txn.debit[acct])})
+        txn.balance=cents2EU(bigSum);
+        setTxn(JSON.parse(JSON.stringify(txn))); // render full page
+        console.log("update "+JSON.stringify(txn)+" = "+cents2EU(bigSum));
     }
-
-    function addCredit(attribute) { 
-        console.log("addCredit1 "+JSON.stringify(attribute));
-        if(attribute && attribute.name && attribute.value) {
-            txn.credit[attribute.name]=attribute.value;
-            delete txn.debit[attribute.name];
-            setTxn(JSON.parse(JSON.stringify(txn))); // render full page
-            console.log("addCredit2 "+JSON.stringify(attribute.name)+" with "+JSON.stringify(attribute.data));
-        }
-    }
-
+    
     useEffect(() => {
         if(status !== 'success') return;
         setYear(session.year);
@@ -53,6 +44,37 @@ export default function Status() {
         // reset all stored carryOver sums
         storeCarryOver({});
     }, [status])
+
+
+    function addDebit(attribute) {                
+        if(attribute && attribute.name && attribute.value) {
+            txn.debit[attribute.name]=attribute.value;
+            delete txn.credit[attribute.name];
+            update();
+        }
+    }
+
+    function addCredit(attribute) {       
+        if(attribute && attribute.name && attribute.value) {
+            txn.credit[attribute.name]=attribute.value;
+            delete txn.debit[attribute.name];
+            update();
+        }
+    }
+
+    
+    function onBook(target) {       
+        console.log("KEEP1 "+JSON.stringify(txn));
+        let ctlSender=document.getElementById(VAL_ID_SENDR);
+        let sender=ctlSender.value;
+        if(sender && sender.length>2) {
+            txn.sender=sender;
+            update();
+            console.log("KEEP2 "+JSON.stringify(txn));
+        }
+    }
+
+
 
     function login() {
         let params = new URLSearchParams(window.location.search);
@@ -99,23 +121,28 @@ export default function Status() {
         console.log("1140 Status.handleXLSave EXIT");
     }
 
-
     function trackValue(slider,label) {
         let display=document.getElementById(label);
         display.innerHTML=slider.value;
+        txn[label]=slider.value;
     }
+
+
     
     function takeValue(accButton) {
         let ctlAccount=document.getElementById(accButton.id);
         const name=accButton.id.split('_')[0];
         console.log("takeValue id="+accButton.id+"  value="+ctlAccount.value);
 
+        //let ctlSender=document.getElementById(VAL_ID_SENDR);
         let ctlTotal=document.getElementById(VAL_ID_TOTAL);
+        let ctlMajor=document.getElementById(VAL_ID_MAJOR);
         let ctlEuros=document.getElementById(VAL_ID_FIRST);
         let ctlCents=document.getElementById(VAL_ID_SECND);
+        const major=ctlMajor.innerHTML;
         const euros=ctlEuros.innerHTML;
         const cents=ctlCents.innerHTML;
-        const bigEuros = BigInt(euros)*100n;
+        const bigEuros = (BigInt(major)*100n+BigInt(euros))*100n;
         const bigCents = BigInt(cents);
         let strAmount = cents2EU(bigEuros+bigCents);
     
@@ -123,15 +150,17 @@ export default function Status() {
     
         let attribute = { 'name':name, 'value':strAmount };
         addCredit(attribute);
-        setTxn(JSON.parse(JSON.stringify(txn))); // render full page
+        update(); // render full page
     }
     
-    function Slider({ min, max, label }) {
+    function Slider({ min, max, label, value }) {
+        let strValue = value.toString();
+        // value={strValue} 
         return(
             <div>
                 <div className="attrRow"></div>
-                <input className="coinSlider"  type="range" min={min} max={max} id="coinRange" onChange={((ev)=>trackValue(ev.target,label))}></input>                            
-                <div className="attrLine">{label} <div className="FIELD SYMB" id={label}>0</div></div>
+                <input className="coinSlider" type="range" min={min} max={max} id={"slider"+label} onChange={((ev)=>trackValue(ev.target,label))}></input>                            
+                <div className="attrLine">{label} <div className="FIELD SYMB" id={label}>{strValue}</div></div>
                 <div className="attrRow"></div>
             </div>
         )
@@ -163,6 +192,7 @@ export default function Status() {
         console.log("drag "+ev.target.id+"  "+JSON.stringify(aInfo));
     }
 
+
     function drop(ev) {
         ev.preventDefault();
         var name = ev.dataTransfer.getData("text");
@@ -172,9 +202,8 @@ export default function Status() {
         //let type = name.split('_')[1];
         console.log("drop "+JSON.stringify(name)+" from "+group+" as "+JSON.stringify(data));
         
-           if(group==T_DEBIT) addCredit(JSON.parse(attr));
-           if(group==T_CREDIT) addDebit(JSON.parse(attr));
-        
+        if(group==T_DEBIT) addCredit(JSON.parse(attr));
+        if(group==T_CREDIT) addDebit(JSON.parse(attr));        
     }
 
 
@@ -232,6 +261,8 @@ export default function Status() {
     let aPages = ['block'];
     for(let p=1;p<pageText.length;p++) aPages[p]='none'; 
 
+    let bigSum = bigEUMoney(txn.balance);
+
     return (
         <Screen prevFunc={prevFunc} nextFunc={nextFunc} tabSelector={pageText}  tabName={tabName}> 
            
@@ -269,12 +300,18 @@ export default function Status() {
                 <AccountSelectRow gName={page['velimp']}  
                     arrInfo={ arrAccounts.filter((acct)=>(acct.xbrl.startsWith(X_EQUITY_VAR_LIM)))}  />
                 
-                <div className="attrLine">Total<div className="FIELD SYMB" id={VAL_ID_TOTAL}>0</div></div>
+                <div className="attrLine">Total<div className="FIELD SYMB" id={VAL_ID_TOTAL}>{cents2EU(bigSum)}</div></div>
 
-                <Slider min='0' max='99' label={VAL_ID_FIRST} />
-                <Slider min='0' max='99' label={VAL_ID_SECND} />                
+                <Slider  min='0'  max='99' label={VAL_ID_MAJOR} value={bigSum/10000n}/>
+                <Slider  min='0'  max='99' label={VAL_ID_FIRST} value={bigSum/100n%100n}/>
+                <Slider  min='0'  max='99' label={VAL_ID_SECND} value={bigSum%100n}/>                
                 
-                <div className="attrLine">Diff<div className="FIELD SYMB" id={VAL_ID_DIFF}>0</div></div>
+                <div className="attrLine">
+                    <input className="FIELD SYMB" id={VAL_ID_SENDR}/>
+                    <div className="FIELD LNAM" id={VAL_ID_DIFF}>{txn.balance==''?
+                    (<div className="CNAM key" onClick={onBook}>KEEP</div>)
+                    :txn.balance}</div>
+                        Sender</div>
                 <AccountSelectRow gName=''  />
 
                 <AccountDragRow gName={T_CREDIT} jInfo={txn.credit} />
@@ -314,10 +351,12 @@ function StatusRow({ am1,tx1, am2, tx2, am3, tx3, d, n, l, click}) {
     )
 }
 
+const VAL_ID_MAJOR = '100EU';
 const VAL_ID_FIRST = 'Euros';
 const VAL_ID_SECND = 'Cents';
 const VAL_ID_TOTAL = 'Total';
 const VAL_ID_DIFF  = 'Diff';
+const VAL_ID_SENDR = 'Sender';
 
 function strAccountButtonId(gName,aName) {
 return  aName+'_'+gName;
