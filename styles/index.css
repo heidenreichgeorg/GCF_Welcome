@@ -22,8 +22,8 @@ input[type="radio"] {
 input[type="radio"]::before {content: "#"; }
 
 
-.attrRow  { width:75rem; padding: 1px; float: left;               min-height: 16px; height: 17px; font-family :inherit; font-size: 11px; font-weight:400; text-align: center;}
-.attrLine { width:75rem; padding: 1px; float: left;               min-height: 16px; height: 17px; font-family :inherit; font-size: 11px; font-weight:400; text-align: center;}
+.attrRow  {                       width:75rem; padding: 1px; float: left;  min-height: 16px; height: 17px; font-family :inherit; font-size: 11px; font-weight:400; text-align: center;}
+.attrLine { vertical-align: top;  width:75rem; padding: 1px; float: left;  min-height: 16px; height: 17px; font-family :inherit; font-size: 11px; font-weight:400; text-align: center;}
 .attrLine:nth-child(even) { background: #f0f0f0;  border: 1px dotted gray;}
 
 .key      {  height:16px;  margin: 0px; border-color: rgb(167, 152, 152); border-style: solid; float: left; background-color:transparent; font-family:  inherit; font-size: inherit; font-weight:600; color: #000; }
@@ -34,7 +34,7 @@ input[type="radio"]::before {content: "#"; }
 .FIELD    { overflow:hidden; padding: 1px; border: none; float: left;                                 font-family: inherit; font-size: inherit; font-weight:inherit; color: inherit;} 
 
 .SEP      { width: 1rem; text-align: center;  }		
-.TRASH    { width: 1rem; text-align: center; font-size:24px; height:28px;}		
+.TRASH    { width: 1rem; text-align: center; font-size:21px; height:17px; vertical-align: top;}		
 .TAG      { width: 2rem; text-align: left;  }		
 .SYMB     { width: 3rem;  text-align: left; }		
 .TEAM     { width:5.3rem; text-align: right; }
@@ -45,6 +45,7 @@ input[type="radio"]::before {content: "#"; }
 .R105     { width: 6rem; text-align: right; }
 .SNAM     { width: 7rem; text-align: left;  }
 .CNAM     { width: 7rem; text-align: center;  }
+.CNAMF    { width:7.3rem; text-align: center;  }
 .IDNT     { width: 8rem; text-align: right; }
 .LNAM     { width: 9rem; text-align: left;}
 .XFER     { width: 9rem; text-align: left;  }

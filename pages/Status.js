@@ -21,6 +21,7 @@ export default function Status() {
     const [client,setClient] = useState()
     const { session, status } = useSession()
     const [txn,setTxn] = useState({ 'date':"", 'sender':"Sender", 'refAcct':"", 'reason':"", 'refCode':"", 'credit':{},'debit':{}  })
+    const [claims,setClaims] = useState([])
 
     function update() {
         let bigSum=0n;
@@ -63,12 +64,17 @@ export default function Status() {
     }
 
     
-    function onBook(target) {       
+    function onBook(event) {       
         console.log("KEEP1 "+JSON.stringify(txn));
         let ctlSender=document.getElementById(VAL_ID_SENDR);
         let sender=ctlSender.value;
+        let ctlREason=document.getElementById(VAL_ID_REASN);
+        let reason=ctlReason.value;
         if(sender && sender.length>2) {
             txn.sender=sender;
+            txn.reason=reason;
+            claims.push(txn)
+
             update();
             console.log("KEEP2 "+JSON.stringify(txn));
         }
@@ -236,27 +242,34 @@ export default function Status() {
 
     function AccountTemplateRow({ gName, jInfo }) {
         var creditKeys = Object.keys(jInfo.credit);
-        var arrCreditInfo=creditKeys.map((a)=>({'name':a, 'value':jInfo[a]}));
+        var arrCreditInfo=creditKeys.map((a)=>({'name':a, 'value':jInfo.credit[a]}));
         var debitKeys = Object.keys(jInfo.debit);
-        var arrDebitInfo=debitKeys.map((a)=>({'name':a, 'value':jInfo[a]}));
+        var arrDebitInfo=debitKeys.map((a)=>({'name':a, 'value':jInfo.debit[a]}));
         console.log("AccountTemplateRow+"+JSON.stringify(arrCreditInfo)+"  "+JSON.stringify(arrDebitInfo));
         return(
-            <div className="attrRow" id={gName}  >
-                <div className="FIELD SNAM" >BOOK</div>
-                <div className="FIELD SNAM" >{txn.sender}</div>
-                { arrCreditInfo?arrCreditInfo.map((aInfo,n)=>(
-                    <div key={gName+n} draggable="true" id={strAccountTemplateId(gName,aInfo.name)}>
-                        <div className="FIELD SEP"> &nbsp;</div>
-                        <div className="CNAM key" > {aInfo.name+':'+aInfo.value}</div>
-                    </div>
-                )):""}
-                <div className="FIELD SNAM" >AN</div>
-                { arrDebitInfo?arrDebitInfo.map((aInfo,n)=>(
-                    <div key={gName+n} draggable="true" id={strAccountTemplateId(gName,aInfo.name)}>
-                        <div className="FIELD SEP"> &nbsp;</div>
-                        <div className="CNAM key" > {aInfo.name+':'+aInfo.value}</div>
-                    </div>
-                )):""}
+            <div className="attrLine">                    
+                <div className="attrLine" id={gName}  >
+                <div className="FIELD TRASH" id={VAL_ID_TRASH} onDrop={(ev)=>(removeAcct(ev))}>&#128465;</div>
+                    <div className="FIELD SYM" ></div>
+                    <div className="FIELD SYM" >BOOK</div>
+                    <div className="FIELD SNAM" >{jInfo.sender}</div>
+                    <div className="FIELD SYM" ></div>
+                    <div className="FIELD SNAM" >{jInfo.reason}</div>
+                    { arrCreditInfo?arrCreditInfo.map((aInfo,n)=>(
+                        <div key={gName+n} draggable="true" id={strAccountTemplateId(gName,aInfo.name)}>
+                            <div className="FIELD SEP"> &nbsp;</div>
+                            <div className="FIELD CNAM" > {aInfo.name+':'+aInfo.value}</div>
+                        </div>
+                    )):""}
+                    <div className="FIELD SNAM" >AN</div>
+                    { arrDebitInfo?arrDebitInfo.map((aInfo,n)=>(
+                        <div key={gName+n} draggable="true" id={strAccountTemplateId(gName,aInfo.name)}>
+                            <div className="FIELD SEP"> &nbsp;</div>
+                            <div className="FIELD CNAM" > {aInfo.name+':'+aInfo.value}</div>
+                        </div>
+                    )):""}
+                    <div className="attrRow" ></div>
+                </div>
             </div>
         )
     }
@@ -284,7 +297,7 @@ export default function Status() {
         return url;
     };
       
-
+/*
     function onBook() {        
         // KKEP transaction in template storage
         txn.year=session.year;
@@ -303,7 +316,7 @@ export default function Status() {
 
         console.log("onBook: claim booked.");  
     }
-
+*/
 
 
     let page = sheet[D_Page];
@@ -315,7 +328,7 @@ export default function Status() {
     const arrAccounts = listAccounts(sheet[D_Balance]);
 
     const tabName = "Overview";
-    let pageText =  ['DashBoard',  'Transaction', 'Templates'].map((name) =>( page[name] ));
+    let pageText =  ['DashBoard',  'Transaction', 'Patterns'].map((name) =>( page[name] ));
     let aPages = ['block'];
     for(let p=1;p<pageText.length;p++) aPages[p]='none'; 
 
@@ -359,9 +372,7 @@ export default function Status() {
                     arrInfo={ arrAccounts.filter((acct)=>(acct.xbrl.startsWith(X_EQUITY_VAR_LIM)))}  />
                 
                 <div className="attrLine" onDragOver={((ev)=>allowDrop(ev))}><div className="FIELD SNAM" id={VAL_ID_TOTAL}>{cents2EU(bigSum)+'  Total'}</div>
-                    <div className="FIELD TRASH" id={VAL_ID_TRASH}  
-                         
-                        onDrop={(ev)=>(removeAcct(ev))}>&#128465;</div>
+                    <div className="FIELD TRASH" id={VAL_ID_TRASH} onDrop={(ev)=>(removeAcct(ev))}>&#128465;</div>
                 </div>
 
                 <Slider  min='0'  max='99' label={VAL_ID_MAJOR} value={bigSum/10000n}/>
@@ -369,8 +380,11 @@ export default function Status() {
                 <Slider  min='0'  max='99' label={VAL_ID_SECND} value={bigSum%100n}/>                
                 
                 <div className="attrLine">
+                    <div className="FIELD SYMB">Sender</div>
                     <input className="FIELD SYMB" id={VAL_ID_SENDR}/>
-                    <div className="FIELD CNAM" id={VAL_ID_DIFF}>{txn.balance==''?
+                    <div className="FIELD SYMB">Reason</div>
+                    <input className="FIELD SYMB" id={VAL_ID_REASN}/>
+                    <div className="FIELD CNAMF" id={VAL_ID_DIFF}>{txn.balance==''?
                         (<div className="CNAM key" onClick={onBook}>KEEP</div>)
                         :txn.balance}
                         Sender</div>
@@ -383,7 +397,11 @@ export default function Status() {
             </div>            
 
             <div className="FIELD" key={"Vorlagen"} id={'Overview2'} style= {{ 'display': aPages[2]}} >
-                <AccountTemplateRow gName={page['Templates']} jInfo={txn}   />
+                {claims.map((txnClaim,i)=>( 
+                
+                <AccountTemplateRow gName={page['Patterns']} jInfo={txnClaim}   />
+                ))
+                }
             </div>
 
 
@@ -426,6 +444,7 @@ const VAL_ID_SECND = 'Cents';
 const VAL_ID_TOTAL = 'Total';
 const VAL_ID_DIFF  = 'Diff';
 const VAL_ID_SENDR = 'Sender';
+const VAL_ID_REASN = 'Reason';
 const VAL_ID_TRASH = 'Trash';
 
 const SYM_ACCOUNT_SELECT = '_';
