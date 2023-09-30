@@ -131,7 +131,7 @@ export default function Status() {
     
     function takeValue(accButton) {
         let ctlAccount=document.getElementById(accButton.id);
-        const name=accButton.id.split('_')[0];
+        const name=accButton.id.split(SYM_ACCOUNT_DRAG)[0];
         console.log("takeValue id="+accButton.id+"  value="+ctlAccount.value);
 
         //let ctlSender=document.getElementById(VAL_ID_SENDR);
@@ -170,10 +170,10 @@ export default function Status() {
         return(
             <div className="attrLine">
                 <div className="FIELD LNAM">{gName}</div>
-                { arrInfo?arrInfo.map((aInfo)=>(
-                    <div>
+                { arrInfo?arrInfo.map((aInfo,n)=>(
+                    <div key={gName+n}>
                         <div className="FIELD SEP"> &nbsp;</div>
-                        <div className="FIELD SYMB" id={strAccountButtonId(gName,aInfo.name)} onClick={((ev)=>takeValue(ev.target))}> {aInfo.name}</div>
+                        <div className="FIELD SYMB" id={strAccountSelectId(gName,aInfo.name)} onClick={((ev)=>takeValue(ev.target))}> {aInfo.name}</div>
                     </div>
                 )):""}
             </div>
@@ -199,13 +199,23 @@ export default function Status() {
         var attr = ev.dataTransfer.getData("attr");
         var data = ev.dataTransfer.getData("html");
         var group= ev.dataTransfer.getData("group");
-        //let type = name.split('_')[1];
         console.log("drop "+JSON.stringify(name)+" from "+group+" as "+JSON.stringify(data));
         
         if(group==T_DEBIT) addCredit(JSON.parse(attr));
         if(group==T_CREDIT) addDebit(JSON.parse(attr));        
     }
 
+    function removeAcct(ev) {
+        ev.preventDefault();
+        var name = ev.dataTransfer.getData("text").split(SYM_ACCOUNT_DRAG)[0];
+        var attr = ev.dataTransfer.getData("attr");
+        var group= ev.dataTransfer.getData("group");
+        console.log("removeAcct "+name+"  attr:"+attr+ " from "+group);
+        
+        if(group==T_DEBIT) delete txn.debit[name];
+        if(group==T_CREDIT) delete txn.credit[name];
+        update();
+    }
 
     function AccountDragRow({ gName, jInfo }) {
         var keys = Object.keys(jInfo);
@@ -214,8 +224,8 @@ export default function Status() {
         return(
             <div className="attrRow" id={gName}  onDragOver={((ev)=>allowDrop(ev))} onDrop={((ev)=>drop(ev))} >
                 <div className="FIELD LNAM" >{gName}</div>
-                { arrInfo?arrInfo.map((aInfo)=>(
-                    <div draggable="true"  onDragStart={((ev)=>drag(ev,gName,aInfo))} id={strAccountButtonId(gName,aInfo.name)}>
+                { arrInfo?arrInfo.map((aInfo,n)=>(
+                    <div key={gName+n} draggable="true"  onDragStart={((ev)=>drag(ev,gName,aInfo))} id={strAccountButtonId(gName,aInfo.name)}>
                         <div className="FIELD SEP"> &nbsp;</div>
                         <div className="CNAM key" > {aInfo.name+':'+aInfo.value}</div>
                     </div>
@@ -224,6 +234,32 @@ export default function Status() {
         )
     }
 
+    function AccountTemplateRow({ gName, jInfo }) {
+        var creditKeys = Object.keys(jInfo.credit);
+        var arrCreditInfo=creditKeys.map((a)=>({'name':a, 'value':jInfo[a]}));
+        var debitKeys = Object.keys(jInfo.debit);
+        var arrDebitInfo=debitKeys.map((a)=>({'name':a, 'value':jInfo[a]}));
+        console.log("AccountTemplateRow+"+JSON.stringify(arrCreditInfo)+"  "+JSON.stringify(arrDebitInfo));
+        return(
+            <div className="attrRow" id={gName}  >
+                <div className="FIELD SNAM" >BOOK</div>
+                <div className="FIELD SNAM" >{txn.sender}</div>
+                { arrCreditInfo?arrCreditInfo.map((aInfo,n)=>(
+                    <div key={gName+n} draggable="true" id={strAccountTemplateId(gName,aInfo.name)}>
+                        <div className="FIELD SEP"> &nbsp;</div>
+                        <div className="CNAM key" > {aInfo.name+':'+aInfo.value}</div>
+                    </div>
+                )):""}
+                <div className="FIELD SNAM" >AN</div>
+                { arrDebitInfo?arrDebitInfo.map((aInfo,n)=>(
+                    <div key={gName+n} draggable="true" id={strAccountTemplateId(gName,aInfo.name)}>
+                        <div className="FIELD SEP"> &nbsp;</div>
+                        <div className="CNAM key" > {aInfo.name+':'+aInfo.value}</div>
+                    </div>
+                )):""}
+            </div>
+        )
+    }
 
 
 
@@ -248,6 +284,28 @@ export default function Status() {
         return url;
     };
       
+
+    function onBook() {        
+        // KKEP transaction in template storage
+        txn.year=session.year;
+        txn.client=session.client;
+
+        txn.sessionId = session.id; // won't book otherwise        
+        txn.flag='1'; // flag that a pre-claim is being entered
+
+        console.log("onBook build claim: "+JSON.stringify(txn));
+
+        
+        book(txn,session); 
+
+        //resetSession();
+        // invalidate current session
+
+        console.log("onBook: claim booked.");  
+    }
+
+
+
     let page = sheet[D_Page];
     let sheet_status = makeStatusData(sheet);
     let report = sheet_status.report;
@@ -257,7 +315,7 @@ export default function Status() {
     const arrAccounts = listAccounts(sheet[D_Balance]);
 
     const tabName = "Overview";
-    let pageText =  ['DashBoard',  'Transaction'].map((name) =>( page[name] ));
+    let pageText =  ['DashBoard',  'Transaction', 'Templates'].map((name) =>( page[name] ));
     let aPages = ['block'];
     for(let p=1;p<pageText.length;p++) aPages[p]='none'; 
 
@@ -300,7 +358,11 @@ export default function Status() {
                 <AccountSelectRow gName={page['velimp']}  
                     arrInfo={ arrAccounts.filter((acct)=>(acct.xbrl.startsWith(X_EQUITY_VAR_LIM)))}  />
                 
-                <div className="attrLine">Total<div className="FIELD SYMB" id={VAL_ID_TOTAL}>{cents2EU(bigSum)}</div></div>
+                <div className="attrLine" onDragOver={((ev)=>allowDrop(ev))}><div className="FIELD SNAM" id={VAL_ID_TOTAL}>{cents2EU(bigSum)+'  Total'}</div>
+                    <div className="FIELD TRASH" id={VAL_ID_TRASH}  
+                         
+                        onDrop={(ev)=>(removeAcct(ev))}>&#128465;</div>
+                </div>
 
                 <Slider  min='0'  max='99' label={VAL_ID_MAJOR} value={bigSum/10000n}/>
                 <Slider  min='0'  max='99' label={VAL_ID_FIRST} value={bigSum/100n%100n}/>
@@ -308,15 +370,22 @@ export default function Status() {
                 
                 <div className="attrLine">
                     <input className="FIELD SYMB" id={VAL_ID_SENDR}/>
-                    <div className="FIELD LNAM" id={VAL_ID_DIFF}>{txn.balance==''?
-                    (<div className="CNAM key" onClick={onBook}>KEEP</div>)
-                    :txn.balance}</div>
+                    <div className="FIELD CNAM" id={VAL_ID_DIFF}>{txn.balance==''?
+                        (<div className="CNAM key" onClick={onBook}>KEEP</div>)
+                        :txn.balance}
                         Sender</div>
+                    </div>
+                        
                 <AccountSelectRow gName=''  />
 
                 <AccountDragRow gName={T_CREDIT} jInfo={txn.credit} />
                 <AccountDragRow gName={T_DEBIT}  jInfo={txn.debit} />
             </div>            
+
+            <div className="FIELD" key={"Vorlagen"} id={'Overview2'} style= {{ 'display': aPages[2]}} >
+                <AccountTemplateRow gName={page['Templates']} jInfo={txn}   />
+            </div>
+
 
             <FooterRow left={page["client"]}  right={page["register"]} prevFunc={prevFunc} nextFunc={nextFunc} miscFunc={handleXLSave}/>
             <FooterRow left={page["reference"]} right={page["author"]} prevFunc={prevFunc} nextFunc={nextFunc} miscFunc={handleXLSave}/>
@@ -357,10 +426,14 @@ const VAL_ID_SECND = 'Cents';
 const VAL_ID_TOTAL = 'Total';
 const VAL_ID_DIFF  = 'Diff';
 const VAL_ID_SENDR = 'Sender';
+const VAL_ID_TRASH = 'Trash';
 
-function strAccountButtonId(gName,aName) {
-return  aName+'_'+gName;
-}
+const SYM_ACCOUNT_SELECT = '_';
+const SYM_ACCOUNT_DRAG = '_';
+
+function strAccountSelectId(gName,aName) { return  aName+SYM_ACCOUNT_SELECT+gName; }
+function strAccountButtonId(gName,aName) { return  aName+SYM_ACCOUNT_DRAG+gName; }
+function strAccountTemplateId(gName,aName) { return  aName+'T'+gName; }
 
 
 function listAccounts(jAccounts) {

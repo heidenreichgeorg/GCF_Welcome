@@ -34,6 +34,7 @@ input[type="radio"]::before {content: "#"; }
 .FIELD    { overflow:hidden; padding: 1px; border: none; float: left;                                 font-family: inherit; font-size: inherit; font-weight:inherit; color: inherit;} 
 
 .SEP      { width: 1rem; text-align: center;  }		
+.TRASH    { width: 1rem; text-align: center; font-size:24px; height:28px;}		
 .TAG      { width: 2rem; text-align: left;  }		
 .SYMB     { width: 3rem;  text-align: left; }		
 .TEAM     { width:5.3rem; text-align: right; }
