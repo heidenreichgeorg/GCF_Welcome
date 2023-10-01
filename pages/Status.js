@@ -3,16 +3,27 @@ import { getSession, storeCarryOver, useSession, REACT_APP_API_HOST } from '../m
 import Screen from '../pages/Screen'
 import FooterRow from '../components/FooterRow'
 import { cents2EU,bigEUMoney }  from '../modules/money';
-import { D_Page,D_Balance,T_CREDIT,T_DEBIT,X_ASS_FIXTAN,X_ASS_FIXFIN,X_ASS_RECEIV,X_ASS_CASH,X_INCOME_REGULAR,X_LIABILITY,X_EQUITY_VAR_UNL,X_EQUITY_VAR_LIM } from '../modules/terms.js'
-import { book }  from '../modules/writeModule';
+import { J_ACCT,CSEP,D_Balance,D_Page,D_PreBook,D_Schema,T_CREDIT,T_DEBIT,X_ASS_FIXTAN,X_ASS_FIXFIN,X_ASS_RECEIV,X_ASS_CASH,X_INCOME_REGULAR,X_LIABILITY,X_EQUITY_VAR_UNL,X_EQUITY_VAR_LIM } from '../modules/terms.js'
+import { book,prepareTXN }  from '../modules/writeModule';
 
 
 
 
 import { makeStatusData }  from '../modules/App';
 
+// the ORIGINAL FORMAT from journal sheet is 
+// columns format CSV with these columns 
+// HASH DATE SENDER REFACCT REASON REFCODE GRSB EBKS CDAK COGK FSTF NKFO KEST KESO VAVA - 
 
 
+// addDebit,addCredit,makeTxnFormat(jHistory[index],names,aLen,eLen) will generate the 
+// txn format 
+// { 'date':"", 'sender':"Sender", 'refAcct':"", 'reason':"", 'refCode':"", 'debit':{'name':VALUE}, credit:{ 'name':VALUE}}
+
+// onkeep/buildTransaction will generate the 
+// flow format 
+// "sender":SENDER,"reason":REASON,"credit":{"COGK":{"index":10,"value":"100,00"}},"debit":{"K2TO":{"index":33,"value":"100,00"}},"balance":""}
+// this format is for AccountTemplateRow and the external book method
 
 export default function Status() {
     
@@ -24,14 +35,16 @@ export default function Status() {
     const [claims,setClaims] = useState([])
 
     function update() {
-        let bigSum=0n;
-        let cKeys=Object.keys(txn.credit);
-        let dKeys=Object.keys(txn.debit);
-        cKeys.forEach((acct)=>{bigSum+=bigEUMoney(txn.credit[acct]); console.log("+"+txn.credit[acct])})
-        dKeys.forEach((acct)=>{bigSum-=bigEUMoney(txn.debit[acct]); console.log("+"+txn.debit[acct])})
-        txn.balance=cents2EU(bigSum);
-        setTxn(JSON.parse(JSON.stringify(txn))); // render full page
-        console.log("update "+JSON.stringify(txn)+" = "+cents2EU(bigSum));
+        if(txn) {
+            let bigSum=0n;
+            let cKeys=Object.keys(txn.credit);
+            let dKeys=Object.keys(txn.debit);
+            cKeys.forEach((acct)=>{bigSum+=bigEUMoney(txn.credit[acct]); console.log("+"+txn.credit[acct])})
+            dKeys.forEach((acct)=>{bigSum-=bigEUMoney(txn.debit[acct]); console.log("+"+txn.debit[acct])})
+            txn.balance=cents2EU(bigSum);
+            setTxn(JSON.parse(JSON.stringify(txn))); // render full page
+            console.log("update "+JSON.stringify(txn)+" = "+cents2EU(bigSum));
+        }
     }
     
     useEffect(() => {
@@ -46,7 +59,7 @@ export default function Status() {
         storeCarryOver({});
     }, [status])
 
-
+    
     function addDebit(attribute) {                
         if(attribute && attribute.name && attribute.value) {
             txn.debit[attribute.name]=attribute.value;
@@ -64,22 +77,44 @@ export default function Status() {
     }
 
     
-    function onBook(event) {       
-        console.log("KEEP1 "+JSON.stringify(txn));
+    function onKeep(event) {       
+        console.log("onKeep ENTER "+JSON.stringify(txn));
         let ctlSender=document.getElementById(VAL_ID_SENDR);
         let sender=ctlSender.value;
-        let ctlREason=document.getElementById(VAL_ID_REASN);
+        let ctlReason=document.getElementById(VAL_ID_REASN);
         let reason=ctlReason.value;
         if(sender && sender.length>2) {
-            txn.sender=sender;
-            txn.reason=reason;
-            claims.push(txn)
 
+            txn.sender=sender;
+            txn.refAcct='RefAcct';
+            txn.reason=reason;
+            txn.refCode='RefCode';
+            let flow = buildTransaction(txn);
+
+            claims.push(flow);
+            //bookTemplate(flow);
+            
             update();
-            console.log("KEEP2 "+JSON.stringify(txn));
+            console.log("onKeep flow "+JSON.stringify(flow));
+
+            
         }
     }
 
+    function buildTransaction(simpleTXN) {
+        let flow = { 'sender':simpleTXN.sender, 'reason':simpleTXN.reason, 'credit':{}, 'debit':{} };
+
+        var arrCreditInfo=list(simpleTXN,'credit');        
+        var arrDebitInfo=list(simpleTXN,'debit');
+
+        console.log("KEEP1 "+JSON.stringify(arrCreditInfo));
+        console.log("KEEP2 "+JSON.stringify(arrDebitInfo));
+    
+        arrCreditInfo.forEach((acct)=>{flow=prepareTXN(sheet[D_Schema],flow,acct.name,acct.value);});
+        arrDebitInfo.forEach((acct) =>{flow=prepareTXN(sheet[D_Schema],flow,acct.name,acct.value);});
+        
+        return flow;
+    }
 
 
     function login() {
@@ -127,12 +162,12 @@ export default function Status() {
         console.log("1140 Status.handleXLSave EXIT");
     }
 
+
     function trackValue(slider,label) {
         let display=document.getElementById(label);
         display.innerHTML=slider.value;
         txn[label]=slider.value;
     }
-
 
     
     function takeValue(accButton) {
@@ -168,20 +203,6 @@ export default function Status() {
                 <input className="coinSlider" type="range" min={min} max={max} id={"slider"+label} onChange={((ev)=>trackValue(ev.target,label))}></input>                            
                 <div className="attrLine">{label} <div className="FIELD SYMB" id={label}>{strValue}</div></div>
                 <div className="attrRow"></div>
-            </div>
-        )
-    }
-
-    function AccountSelectRow({ gName, arrInfo }) {
-        return(
-            <div className="attrLine">
-                <div className="FIELD LNAM">{gName}</div>
-                { arrInfo?arrInfo.map((aInfo,n)=>(
-                    <div key={gName+n}>
-                        <div className="FIELD SEP"> &nbsp;</div>
-                        <div className="FIELD SYMB" id={strAccountSelectId(gName,aInfo.name)} onClick={((ev)=>takeValue(ev.target))}> {aInfo.name}</div>
-                    </div>
-                )):""}
             </div>
         )
     }
@@ -223,10 +244,26 @@ export default function Status() {
         update();
     }
 
+
+    function AccountSelectRow({ gName, arrInfo }) {
+        return(
+            <div className="attrLine">
+                <div className="FIELD LNAM">{gName}</div>
+                { arrInfo?arrInfo.map((aInfo,n)=>(
+                    <div key={gName+n}>
+                        <div className="FIELD SEP"> &nbsp;</div>
+                        <div className="FIELD SYMB" id={strAccountSelectId(gName,aInfo.name)} onClick={((ev)=>takeValue(ev.target))}> {aInfo.name}</div>
+                    </div>
+                )):""}
+            </div>
+        )
+    }
+
+    
     function AccountDragRow({ gName, jInfo }) {
         var keys = Object.keys(jInfo);
         var arrInfo=keys.map((a)=>({'name':a, 'value':jInfo[a]}));
-        console.log("showing "+JSON.stringify(arrInfo));
+        console.log("AccountDragRow "+JSON.stringify(arrInfo));
         return(
             <div className="attrRow" id={gName}  onDragOver={((ev)=>allowDrop(ev))} onDrop={((ev)=>drop(ev))} >
                 <div className="FIELD LNAM" >{gName}</div>
@@ -240,12 +277,11 @@ export default function Status() {
         )
     }
 
-    function AccountTemplateRow({ gName, jInfo }) {
-        var creditKeys = Object.keys(jInfo.credit);
-        var arrCreditInfo=creditKeys.map((a)=>({'name':a, 'value':jInfo.credit[a]}));
-        var debitKeys = Object.keys(jInfo.debit);
-        var arrDebitInfo=debitKeys.map((a)=>({'name':a, 'value':jInfo.debit[a]}));
-        console.log("AccountTemplateRow+"+JSON.stringify(arrCreditInfo)+"  "+JSON.stringify(arrDebitInfo));
+
+    function AccountTemplateRow({ gName, jInfo }) {        
+        var arrCreditInfo=list(jInfo,'credit');        
+        var arrDebitInfo=list(jInfo,'debit');
+        console.log("AccountTemplateRow+"+JSON.stringify(arrCreditInfo)+"  "+JSON.stringify(arrDebitInfo)+ " from "+JSON.stringify(jInfo));
         return(
             <div className="attrLine">                    
                 <div className="attrLine" id={gName}  >
@@ -258,14 +294,14 @@ export default function Status() {
                     { arrCreditInfo?arrCreditInfo.map((aInfo,n)=>(
                         <div key={gName+n} draggable="true" id={strAccountTemplateId(gName,aInfo.name)}>
                             <div className="FIELD SEP"> &nbsp;</div>
-                            <div className="FIELD CNAM" > {aInfo.name+':'+aInfo.value}</div>
+                            <div className="FIELD CNAM" > {aInfo.value.index+'#'+aInfo.name+':'+aInfo.value.value}</div>
                         </div>
                     )):""}
                     <div className="FIELD SNAM" >AN</div>
                     { arrDebitInfo?arrDebitInfo.map((aInfo,n)=>(
                         <div key={gName+n} draggable="true" id={strAccountTemplateId(gName,aInfo.name)}>
                             <div className="FIELD SEP"> &nbsp;</div>
-                            <div className="FIELD CNAM" > {aInfo.name+':'+aInfo.value}</div>
+                            <div className="FIELD CNAM" > {aInfo.value.index+'#'+aInfo.name+':'+aInfo.value.value}</div>
                         </div>
                     )):""}
                     <div className="attrRow" ></div>
@@ -297,27 +333,75 @@ export default function Status() {
         return url;
     };
       
-/*
-    function onBook() {        
-        // KKEP transaction in template storage
-        txn.year=session.year;
-        txn.client=session.client;
+    function makeTxnFormat(columns,names,aLen) {
+        let result=[];
+        columns.forEach((cell,i)=>{if(i>J_ACCT && i<aLen && cell && cell.length>0)  result.push({'name':names[i],'iValue':bigEUMoney(columns[i])})});
+        columns.forEach((cell,i)=>{if(i>aLen && cell && cell.length>0)  result.push({'name':names[i],'iValue':-1n * bigEUMoney(columns[i])})});
+        let credit={};
+        let debit={};
+        result.forEach((move)=>{if(move.iValue>0n) credit[move.name]=cents2EU(move.iValue); else debit[move.name]=cents2EU(-1n*move.iValue)});
+        return {
+             'hash':columns[0],
+            "date":columns[1],
+            "sender":columns[2],
+            "refAcct":columns[3],
+            "reason":columns[4],
+            "refCode":columns[5],
+            'credit':credit,
+            'debit':debit
+        }
+    }
 
-        txn.sessionId = session.id; // won't book otherwise        
-        txn.flag='1'; // flag that a pre-claim is being entered
+    function bookTemplate(jTXN) {   
+        
+        
+        jTXN.year=session.year;
+        jTXN.client=session.client;
 
-        console.log("onBook build claim: "+JSON.stringify(txn));
+        jTXN.sessionId = session.id; // won't book otherwise        
+        jTXN.flag='1'; // flag that a pre-claim is being entered
+
+        console.log("bookTemplate build : "+JSON.stringify(jTXN));
 
         
-        book(txn,session); 
+        book(jTXN,session); 
 
         //resetSession();
         // invalidate current session
 
-        console.log("onBook: claim booked.");  
+        console.log("bookTemplate:  booked.");  
     }
-*/
 
+
+    function getClaims() {
+        
+        const arrHistory = [];                            
+        const jHistory  = sheet[D_PreBook];
+        console.log("getClaims CLAIM ENTER "+JSON.stringify(jHistory));
+
+        const gSchema = sheet[D_Schema];    
+        let aLen = parseInt(gSchema.assets);
+        let eLen = parseInt(gSchema.eqliab);
+        var aPattern = null;//getParam("APATTERN");
+        if(aPattern && aPattern.length<2) aPattern=null;
+        var lPattern = null;//getParam("LPATTERN");
+        if(lPattern && lPattern.length<2) lPattern=null;
+
+        if(page) {            
+            arrHistory.push({entry:CSEP+CSEP+page["History"]+CSEP+page["header"]+CSEP+CSEP});                  
+            if(gSchema.Names && gSchema.Names.length>0) {
+                var names=gSchema.Names;                
+                for (let index in jHistory)  {
+                    let jtxn=makeTxnFormat(jHistory[index],names,aLen,eLen);
+                    console.log("getClaims txn format="+JSON.stringify(jtxn));
+                    let jPreTXN=buildTransaction(jtxn);
+                    console.log("getClaims preTXN="+JSON.stringify(jPreTXN));
+                    arrHistory.push(jPreTXN);
+                }
+            }
+        }
+        return arrHistory;
+    }
 
     let page = sheet[D_Page];
     let sheet_status = makeStatusData(sheet);
@@ -333,6 +417,12 @@ export default function Status() {
     for(let p=1;p<pageText.length;p++) aPages[p]='none'; 
 
     let bigSum = bigEUMoney(txn.balance);
+
+
+    // append pending new claims to persistent template list
+    let jTemplates = getClaims();
+    claims.forEach((claim)=>{jTemplates.push(claim);});
+
 
     return (
         <Screen prevFunc={prevFunc} nextFunc={nextFunc} tabSelector={pageText}  tabName={tabName}> 
@@ -385,7 +475,7 @@ export default function Status() {
                     <div className="FIELD SYMB">Reason</div>
                     <input className="FIELD SYMB" id={VAL_ID_REASN}/>
                     <div className="FIELD CNAMF" id={VAL_ID_DIFF}>{txn.balance==''?
-                        (<div className="CNAM key" onClick={onBook}>KEEP</div>)
+                        (<div className="CNAM key" onClick={onKeep}>KEEP</div>)
                         :txn.balance}
                         Sender</div>
                     </div>
@@ -397,10 +487,9 @@ export default function Status() {
             </div>            
 
             <div className="FIELD" key={"Vorlagen"} id={'Overview2'} style= {{ 'display': aPages[2]}} >
-                {claims.map((txnClaim,i)=>( 
-                
-                <AccountTemplateRow gName={page['Patterns']} jInfo={txnClaim}   />
-                ))
+                {jTemplates.map((txnClaim,i)=>(                 
+                    <AccountTemplateRow gName={page['Patterns']} jInfo={txnClaim}   />
+                    ))
                 }
             </div>
 
@@ -438,6 +527,9 @@ function StatusRow({ am1,tx1, am2, tx2, am3, tx3, d, n, l, click}) {
     )
 }
 
+
+
+
 const VAL_ID_MAJOR = '100EU';
 const VAL_ID_FIRST = 'Euros';
 const VAL_ID_SECND = 'Cents';
@@ -466,4 +558,10 @@ function listAccounts(jAccounts) {
     }
     console.log("listAccounts returns "+JSON.stringify(result))
     return result;
+}
+
+function list(jInfo,type) {
+    var json = jInfo[type]
+    var keys =  json ? Object.keys(json) : [];
+    return  keys.map((a)=>({'name':a, 'value':json[a]}));
 }

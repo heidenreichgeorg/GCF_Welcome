@@ -142,7 +142,10 @@ export function prepareTXN(schema,flow, name,amount) {
         }
     }
 
-    flow = { 'credit':newCredit, 'debit':newDebit, 'balance':cents2EU(iBalance) };
+    flow.credit=newCredit;
+    flow.debit=newDebit;
+    flow.balance=cents2EU(iBalance);
+    
     if(debug) console.dir("prepareTXN "+JSON.stringify(flow));
     return flow;
 }
