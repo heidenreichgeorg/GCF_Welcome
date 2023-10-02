@@ -5,10 +5,6 @@ import FooterRow from '../components/FooterRow'
 import { cents2EU,bigEUMoney }  from '../modules/money';
 import { J_ACCT,CSEP,D_Balance,D_Page,D_PreBook,D_Schema,T_CREDIT,T_DEBIT,X_ASS_FIXTAN,X_ASS_FIXFIN,X_ASS_RECEIV,X_ASS_CASH,X_INCOME_REGULAR,X_LIABILITY,X_EQUITY_VAR_UNL,X_EQUITY_VAR_LIM } from '../modules/terms.js'
 import { book,prepareTXN }  from '../modules/writeModule';
-
-
-
-
 import { makeStatusData }  from '../modules/App';
 
 // the ORIGINAL FORMAT from journal sheet is 
@@ -85,6 +81,7 @@ export default function Status() {
         let reason=ctlReason.value;
         if(sender && sender.length>2) {
 
+            txn.date="";
             txn.sender=sender;
             txn.refAcct='RefAcct';
             txn.reason=reason;
@@ -101,7 +98,7 @@ export default function Status() {
     }
 
     function buildTransaction(simpleTXN) {
-        let flow = { 'sender':simpleTXN.sender, 'reason':simpleTXN.reason, 'credit':{}, 'debit':{} };
+        let flow = { 'date':simpleTXN.date, 'sender':simpleTXN.sender, 'reason':simpleTXN.reason, 'credit':{}, 'debit':{} };
 
         var arrCreditInfo=list(simpleTXN,'credit');        
         var arrDebitInfo=list(simpleTXN,'debit');
@@ -230,7 +227,7 @@ export default function Status() {
         if(group==T_CREDIT) addDebit(JSON.parse(attr));        
     }
 
-    function removeAcct(ev) {
+    function removeAcct(ev) { // from input form, page#2
         ev.preventDefault();
         var name = ev.dataTransfer.getData("text").split(SYM_ACCOUNT_DRAG)[0];
         var attr = ev.dataTransfer.getData("attr");
@@ -242,26 +239,30 @@ export default function Status() {
         update();
     }
 
-    function removePreTXN(ev,index) {
+    function removePreTXN(ev,index) { // from Templates page#3
         ev.preventDefault();
         
         console.log("removePreTXN "+ev.target.id+"="+index);
-        
         var jTemplates = sheet[D_PreBook];
+        var moriturus=jTemplates[index];
+
         if(jTemplates && jTemplates.length>index) {
             let jHead=(index>0)?sheet[D_PreBook].slice(0,index-1):[];
             let jTail=sheet[D_PreBook].slice(index);
             sheet[D_PreBook] = jHead.concat(jTail);
-            console.log("removePreTXN "+ev.target.id+" at "+index+" "+JSON.stringify(sheet[D_PreBook]));
+            console.log("removePreTXN "+ev.target.id+" at "+index+" "+JSON.stringify(sheet[D_PreBook][index]));
         }
-        /* EXAMPLE: modify sheetCells in session object
-            if(iColumn>J_ACCT && session.sheetCells) {
-                console.log("1720 /ADDACCOUNT map addAccount"); 
-                let sheetCells = session.sheetCells.map((row:any,line:number)=>( addAccount(row,line,iColumn)));
-                session.sheetCells = sheetCells;
-            } else console.log("1721 /ADDACCOUNT no columns"); 
+        // modify sheetCells in session object
+        console.log("removePreTXN kill "+JSON.stringify(moriturus)); 
+        let line = parseInt(moriturus[1])
+        console.log("removePreTXN date="+moriturus[1]+"#"+line); 
+        if(moriturus && session.sheetCells && line>0) {
+                let headCells = session.sheetCells.splice(0,line-1);
+                let tailCells = session.sheetCells.splice(line);
+                session.sheetCells = headCells.concat(tailCells);
+        } else console.log("removePreTXN no columns"); 
 
-        */
+        
         
         update();
     }
@@ -310,6 +311,7 @@ export default function Status() {
                 <div className="FIELD TRASH" id={VAL_ID_TRASH} onClick={(ev)=>(removePreTXN(ev,index))}>&#128465;</div>
                     <div className="FIELD SYM" ></div>
                     <div className="FIELD SYM" >BOOK</div>
+                    <div className="FIELD SYM" >{jInfo.date}</div>
                     <div className="FIELD SNAM" >{jInfo.sender}</div>
                     <div className="FIELD SYM" ></div>
                     <div className="FIELD SNAM" >{jInfo.reason}</div>

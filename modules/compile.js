@@ -281,7 +281,6 @@ export function compile(sessionData) {
 
     // digest aoaCells and write into balance object
     var firstLine=1;
-    var lineCount=0;
 
     if(aoaCells && aoaCells.length>J_MINROW) {
 
@@ -301,9 +300,9 @@ export function compile(sessionData) {
                 var iTotal=0;
 
                 // print all lines
-                aoaCells.forEach(row => {
+                aoaCells.forEach((row,lineCount) => {
 
-                    lineCount++;
+                    
                     
                     if(debug>3) console.log("0110 compile.compile "+JSON.stringify(row));
                         
@@ -599,6 +598,7 @@ export function compile(sessionData) {
                     else if(row.length>20) {
                         //if(!key || parseInt(key)==0) {                    
                         if(debugPreBook) console.dir("0352 SHEET LINE PRE-BOOK "+JSON.stringify(row)); 
+                        row[1]=lineCount; // GH20231002 allow trace-back and put lineCount into date field
                         result[D_PreBook].push(row);
                     }
             });
