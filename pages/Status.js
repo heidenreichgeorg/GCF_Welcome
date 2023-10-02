@@ -16,7 +16,7 @@ import { makeStatusData }  from '../modules/App';
 // HASH DATE SENDER REFACCT REASON REFCODE GRSB EBKS CDAK COGK FSTF NKFO KEST KESO VAVA - 
 
 
-// addDebit,addCredit,makeTxnFormat(jHistory[index],names,aLen,eLen) will generate the 
+// addDebit,addCredit,makeTxnFormat(jTemplates[index],names,aLen,eLen) will generate the 
 // txn format 
 // { 'date':"", 'sender':"Sender", 'refAcct':"", 'reason':"", 'refCode':"", 'debit':{'name':VALUE}, credit:{ 'name':VALUE}}
 
@@ -92,7 +92,6 @@ export default function Status() {
             let flow = buildTransaction(txn);
 
             claims.push(flow);
-            //bookTemplate(flow);
             
             update();
             console.log("onKeep flow "+JSON.stringify(flow));
@@ -175,7 +174,6 @@ export default function Status() {
         const name=accButton.id.split(SYM_ACCOUNT_DRAG)[0];
         console.log("takeValue id="+accButton.id+"  value="+ctlAccount.value);
 
-        //let ctlSender=document.getElementById(VAL_ID_SENDR);
         let ctlTotal=document.getElementById(VAL_ID_TOTAL);
         let ctlMajor=document.getElementById(VAL_ID_MAJOR);
         let ctlEuros=document.getElementById(VAL_ID_FIRST);
@@ -244,6 +242,30 @@ export default function Status() {
         update();
     }
 
+    function removePreTXN(ev,index) {
+        ev.preventDefault();
+        
+        console.log("removePreTXN "+ev.target.id+"="+index);
+        
+        var jTemplates = sheet[D_PreBook];
+        if(jTemplates && jTemplates.length>index) {
+            let jHead=(index>0)?sheet[D_PreBook].slice(0,index-1):[];
+            let jTail=sheet[D_PreBook].slice(index);
+            sheet[D_PreBook] = jHead.concat(jTail);
+            console.log("removePreTXN "+ev.target.id+" at "+index+" "+JSON.stringify(sheet[D_PreBook]));
+        }
+        /* EXAMPLE: modify sheetCells in session object
+            if(iColumn>J_ACCT && session.sheetCells) {
+                console.log("1720 /ADDACCOUNT map addAccount"); 
+                let sheetCells = session.sheetCells.map((row:any,line:number)=>( addAccount(row,line,iColumn)));
+                session.sheetCells = sheetCells;
+            } else console.log("1721 /ADDACCOUNT no columns"); 
+
+        */
+        
+        update();
+    }
+
 
     function AccountSelectRow({ gName, arrInfo }) {
         return(
@@ -278,28 +300,28 @@ export default function Status() {
     }
 
 
-    function AccountTemplateRow({ gName, jInfo }) {        
+    function AccountTemplateRow({ gName, jInfo, index }) {        
         var arrCreditInfo=list(jInfo,'credit');        
         var arrDebitInfo=list(jInfo,'debit');
         console.log("AccountTemplateRow+"+JSON.stringify(arrCreditInfo)+"  "+JSON.stringify(arrDebitInfo)+ " from "+JSON.stringify(jInfo));
         return(
-            <div className="attrLine">                    
+            <div className="attrLine" key={index+gName}>                    
                 <div className="attrLine" id={gName}  >
-                <div className="FIELD TRASH" id={VAL_ID_TRASH} onDrop={(ev)=>(removeAcct(ev))}>&#128465;</div>
+                <div className="FIELD TRASH" id={VAL_ID_TRASH} onClick={(ev)=>(removePreTXN(ev,index))}>&#128465;</div>
                     <div className="FIELD SYM" ></div>
                     <div className="FIELD SYM" >BOOK</div>
                     <div className="FIELD SNAM" >{jInfo.sender}</div>
                     <div className="FIELD SYM" ></div>
                     <div className="FIELD SNAM" >{jInfo.reason}</div>
                     { arrCreditInfo?arrCreditInfo.map((aInfo,n)=>(
-                        <div key={gName+n} draggable="true" id={strAccountTemplateId(gName,aInfo.name)}>
+                        <div key={index+gName+'C'+n} draggable="true" id={strAccountTemplateId(gName,aInfo.name)}>
                             <div className="FIELD SEP"> &nbsp;</div>
                             <div className="FIELD CNAM" > {aInfo.value.index+'#'+aInfo.name+':'+aInfo.value.value}</div>
                         </div>
                     )):""}
                     <div className="FIELD SNAM" >AN</div>
                     { arrDebitInfo?arrDebitInfo.map((aInfo,n)=>(
-                        <div key={gName+n} draggable="true" id={strAccountTemplateId(gName,aInfo.name)}>
+                        <div key={index+gName+'D'+n} draggable="true" id={strAccountTemplateId(gName,aInfo.name)}>
                             <div className="FIELD SEP"> &nbsp;</div>
                             <div className="FIELD CNAM" > {aInfo.value.index+'#'+aInfo.name+':'+aInfo.value.value}</div>
                         </div>
@@ -376,8 +398,8 @@ export default function Status() {
     function getClaims() {
         
         const arrHistory = [];                            
-        const jHistory  = sheet[D_PreBook];
-        console.log("getClaims CLAIM ENTER "+JSON.stringify(jHistory));
+        const jTemplates  = sheet[D_PreBook];
+        console.log("getClaims CLAIM ENTER "+JSON.stringify(jTemplates));
 
         const gSchema = sheet[D_Schema];    
         let aLen = parseInt(gSchema.assets);
@@ -391,8 +413,8 @@ export default function Status() {
             arrHistory.push({entry:CSEP+CSEP+page["History"]+CSEP+page["header"]+CSEP+CSEP});                  
             if(gSchema.Names && gSchema.Names.length>0) {
                 var names=gSchema.Names;                
-                for (let index in jHistory)  {
-                    let jtxn=makeTxnFormat(jHistory[index],names,aLen,eLen);
+                for (let index in jTemplates)  {
+                    let jtxn=makeTxnFormat(jTemplates[index],names,aLen,eLen);
                     console.log("getClaims txn format="+JSON.stringify(jtxn));
                     let jPreTXN=buildTransaction(jtxn);
                     console.log("getClaims preTXN="+JSON.stringify(jPreTXN));
@@ -488,7 +510,7 @@ export default function Status() {
 
             <div className="FIELD" key={"Vorlagen"} id={'Overview2'} style= {{ 'display': aPages[2]}} >
                 {jTemplates.map((txnClaim,i)=>(                 
-                    <AccountTemplateRow gName={page['Patterns']} jInfo={txnClaim}   />
+                    <AccountTemplateRow gName={page['Patterns']} jInfo={txnClaim} index={i} />
                     ))
                 }
             </div>
