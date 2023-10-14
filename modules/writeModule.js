@@ -207,8 +207,6 @@ export async function sendFile(sig, response) {  // was fs.exists() GH20230401
         fs.access(sig.serverFile, function (exists) {
             if (exists) {
                 
-                // Content-type is very interesting part that guarantee that
-                // Web browser will handle response in an appropriate manner.
                 response.writeHead(200, {
                     "Content-Type": "application/octet-stream",
                     "Content-Disposition": "attachment; filename=" + sig.serverFile
@@ -220,12 +218,12 @@ export async function sendFile(sig, response) {  // was fs.exists() GH20230401
                 if(debug) console.log("1690 CLOSING "+sig.serverFile);
                 return;
             }
-            else console.dir("1665 WRONG PATH OR MISSING ACCESS "+sig.serverFile);
+            else console.dir("1665 FILE EXISTS OR WRONG PATH OR MISSING ACCESS "+sig.serverFile);
 
             response.writeHead(400, {
                 "Content-Type": "text/plain"
             });
-            response.end("ERROR File does not exist");
+            response.end("ERROR- CANNOT CREATE FILE");
         });
     } catch(e) { console.dir("1655 WRONG/MISSING "+sig.serverFile); }
 }

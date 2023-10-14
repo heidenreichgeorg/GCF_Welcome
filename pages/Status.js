@@ -93,7 +93,7 @@ export default function Status() {
             update();
             console.log("onKeep flow "+JSON.stringify(flow));
 
-            
+            bookTemplate(flow);
         }
     }
 
@@ -111,6 +111,29 @@ export default function Status() {
         
         return flow;
     }
+
+    
+    function bookTemplate(jTXN) {   
+        
+        
+        jTXN.year=session.year;
+        jTXN.client=session.client;
+
+        jTXN.sessionId = session.id; // won't book otherwise        
+        jTXN.flag='1'; // flag that a pre-claim is being entered
+
+        console.log("bookTemplate build : "+JSON.stringify(jTXN));
+
+        
+        book(jTXN,session); 
+
+        //resetSession();
+        // invalidate current session
+
+        console.log("bookTemplate:  booked.");  
+    }
+
+
 
 
     function login() {
@@ -301,7 +324,7 @@ export default function Status() {
     }
 
 
-    function AccountTemplateRow({ gName, jInfo, index }) {        
+    function AccountTemplateRow({ gName, jInfo, index, key }) {        
         var arrCreditInfo=list(jInfo,'credit');        
         var arrDebitInfo=list(jInfo,'debit');
         console.log("AccountTemplateRow+"+JSON.stringify(arrCreditInfo)+"  "+JSON.stringify(arrDebitInfo)+ " from "+JSON.stringify(jInfo));
@@ -374,26 +397,6 @@ export default function Status() {
             'credit':credit,
             'debit':debit
         }
-    }
-
-    function bookTemplate(jTXN) {   
-        
-        
-        jTXN.year=session.year;
-        jTXN.client=session.client;
-
-        jTXN.sessionId = session.id; // won't book otherwise        
-        jTXN.flag='1'; // flag that a pre-claim is being entered
-
-        console.log("bookTemplate build : "+JSON.stringify(jTXN));
-
-        
-        book(jTXN,session); 
-
-        //resetSession();
-        // invalidate current session
-
-        console.log("bookTemplate:  booked.");  
     }
 
 
@@ -512,7 +515,7 @@ export default function Status() {
 
             <div className="FIELD" key={"Vorlagen"} id={'Overview2'} style= {{ 'display': aPages[2]}} >
                 {jTemplates.map((txnClaim,i)=>(                 
-                    <AccountTemplateRow gName={page['Patterns']} jInfo={txnClaim} index={i} />
+                    <AccountTemplateRow gName={page['Patterns']} jInfo={txnClaim} index={i} key={i}/>
                     ))
                 }
             </div>

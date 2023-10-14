@@ -1,5 +1,12 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 
+// LOGIN + (LOCK) + appends pre-formatted transaction to sheetFile + WRITE ALL + (UNLOCK) + LOGOUT
+
+// pops last transaction if empty transaction is given: REMOVES LAST TXN from DB
+
+
+
+
 const debug=1;
 const debugWrite=1;
 
