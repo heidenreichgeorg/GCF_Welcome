@@ -18,6 +18,7 @@ let sessionTime="";
 let nextSessionId= "";
 
 
+// left free lower lane is a white button
 export default function handler(
   req: NextApiRequest,
   res: NextApiResponse<any>
@@ -76,7 +77,7 @@ function downloadPlusAcct(session:any, res:NextApiResponse<any>, jData:any) {
                 if(client && year) {
 
                     console.log("1740 GET /ADDACCOUNT "+sheetName+ " for ("+client+","+year+")");
-                    session.serverFile = getRoot()+ session.client + Slash+ "NACT" + session.year + session.client + ".json"
+                    session.serverFile = getRoot()+ session.client + Slash+ "NACT" + session.year + timeSymbol() + ".json"
                     writeFile(session);
 
                     try {

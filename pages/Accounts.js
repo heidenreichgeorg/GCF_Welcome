@@ -101,14 +101,13 @@ export default function Accounts() {
                                                                 console.log("ACCOUNTS setAddAfter("+JSON.stringify(args)+")"); 
                                                                 return setAddAfter(args.x);}} />                       
                     )}                    
-                    <FooterRow left={page["client"]}  right={page["register"]} prevFunc={prevFunc} nextFunc={nextFunc} miscFunc={addAccount}/>
+                    <FooterRow left={page["client"]+" "+addAfter}  right={page["register"]} prevFunc={prevFunc} nextFunc={nextFunc} miscFunc={addAccount}/>
                     <FooterRow left={page["reference"]} right={page["author"]} prevFunc={prevFunc} nextFunc={nextFunc} miscFunc={addAccount}/>
                 </div>
             )}
         </Screen>
     )
     
-
 }
 function makeAccountsPosition(response,currentPage) {
 
