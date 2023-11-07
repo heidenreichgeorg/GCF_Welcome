@@ -1,6 +1,8 @@
 
 /* global BigInt */
 
+const debug=false;
+
 
 import { useEffect, useState, useRef } from 'react';
 
@@ -197,8 +199,7 @@ export default function Operations() {
 
 function makeOperationsForm(response,formAdd,formSub) {
 
-    const debug=null;
-
+    
     const page = response[D_Page];
     
     let iFixed=0n;

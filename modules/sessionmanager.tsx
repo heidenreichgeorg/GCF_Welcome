@@ -21,6 +21,7 @@ export function getSession() {
     let state = null;
     let strSession=sessionStorage.getItem(SX_SESSION);
     if(strSession) try { state=JSON.parse(strSession); } catch(err) {}
+    console.log("getSession = "+strSession)
     return state;
 }
 

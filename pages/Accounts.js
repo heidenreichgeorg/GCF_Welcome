@@ -8,6 +8,8 @@ import { cents2EU}  from '../modules/money';
 import { D_Balance, D_Page, D_Report, J_ACCT, X_ASSETS, X_INCOME, X_EQLIAB, SCREENLINES } from '../modules/terms.js'
 import { getSession,useSession, REACT_APP_API_HOST } from '../modules/sessionmanager';
 
+const debug=false;
+
 export default function Accounts() {
     
     const [sheet, setSheet]  = useState()
@@ -51,7 +53,7 @@ export default function Accounts() {
                             'Access-Control-Allow-Origin':'*',
                             'Access-Control-Allow-Headers':'Origin, X-Requested-With, Content-Type, Accept, Authorization' };
 
-        console.log("1110 Accounts.addAccount("+addAfter+") sessionId = "+session.id);
+        if(debug) console.log("1110 Accounts.addAccount("+addAfter+") sessionId = "+session.id);
         
         const rqOptions = { method: 'GET', headers: rqHeaders, mode:'cors'};
         try {                
@@ -65,7 +67,7 @@ export default function Accounts() {
     }
 
     function makeDownloadURL(url,client,year) { 
-        console.log("1196 makeDownloadURL JSON "+url);
+        if(debug) console.log("1196 makeDownloadURL JSON "+url);
         if(client) {
             if(year) {
                 let a = document.createElement('a');
@@ -75,7 +77,7 @@ export default function Accounts() {
                 a.className = "key";
                 a.innerHTML = "Download";
                 document.body.appendChild(a); 
-                console.log("1198 makeDownloadURL make button");
+                if(debug) console.log("1198 makeDownloadURL make button");
             } else console.log("1197 makeDownloadURL JSON client("+client+"), NO year");
         } else console.log("1195 makeDownloadURL JSON NO client");
         return url;
@@ -114,28 +116,28 @@ function makeAccountsPosition(response,currentPage) {
     const page = response[D_Page];
 
     var jReport = response[D_Report];
-    console.log("makeAccountsPosition from response D_Report"+JSON.stringify(Object.keys(jReport)));
+    if(debug) console.log("makeAccountsPosition from response D_Report"+JSON.stringify(Object.keys(jReport)));
 
     var jAccounts = response[D_Balance];
     // add three additional accounts: ASSETS, EQLIAB, GAINLOSS
     if(jReport["xbrlAssets"].account) { 
         let ass = jReport["xbrlAssets"].account; 
-        console.log("ASSET "+JSON.stringify(ass)); 
+        if(debug) console.log("ASSET "+JSON.stringify(ass)); 
         jAccounts["xbrlAssets"]=ass;
     }
     if(jReport["xbrlEqLiab"].account) { 
         let eql = jReport["xbrlEqLiab"].account; 
-        console.log("EQLIB "+JSON.stringify(eql)); 
+        if(debug) console.log("EQLIB "+JSON.stringify(eql)); 
         jAccounts["xbrlEqLiab"]=eql;
     }
     if(jReport["xbrlRegular"].account) { 
         let gls = jReport["xbrlRegular"].account; 
-        console.log("GALOS "+JSON.stringify(gls)); 
+        if(debug) console.log("GALOS "+JSON.stringify(gls)); 
         jAccounts["xbrlRegular"]=gls;
     }
-    console.log("makeAccountsPosition from response D_Balance"+JSON.stringify(Object.keys(jAccounts)));
+    if(debug) console.log("makeAccountsPosition from response D_Balance"+JSON.stringify(Object.keys(jAccounts)));
 
-    console.log(JSON.stringify(response));
+    if(debug) console.log("makeAccountsPosition = "+JSON.stringify(response));
     
     // build three columns
     let aLeft={};
@@ -172,7 +174,7 @@ function makeAccountsPosition(response,currentPage) {
         var value = account[currentPage];
         var iName = account.name;
 
-        console.log("STATUS.JS STATUSDATA LEFT "+iLeft+" "+name+"="+value);
+        if(debug) console.log("STATUS.JS STATUSDATA LEFT "+iLeft+" "+name+"="+value);
 
         if(iLeft<SCREENLINES) {
             statusData[iLeft]={ "iLeft":account.index, "gLeft":value,"nLeft":iName };
