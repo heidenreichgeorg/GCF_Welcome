@@ -36,7 +36,6 @@ import * as fbAuth  from "firebase/auth"
 //import * as FS from 'firebase/firestore'; 
 
 //const {Datastore} = require('@google-cloud/datastore');
-import { getRoot } from './session'
 
 const https = require('https');
 
@@ -372,7 +371,7 @@ export function loadFBConfig(dir,config) {
     var fbConfig=null;
     if(config) {
         
-        let fileName = getRoot()+config+".json";
+        let fileName = dir+config+".json";
         // mount volume in docker-compose.yml
         //     volumes:      
         //      - sec:/usr/sec 
@@ -390,9 +389,9 @@ export function loadFBConfig(dir,config) {
                 } catch(err) { console.dir("0055 FAILED PARSING CONFIG "+fileName); }
               } else console.log("0057 READ SEC FILE  - EMPTY");
           } catch(err) { console.dir("0055 FAILED READING CONFIG "+fileName); }
-           if(!fbConfig) console.log("0059 loadFBConfig CWD="+process.cwd()+" ROOT="+getRoot()+" NO/INVALID CONFIG FILE "+fileName);
+           if(!fbConfig) console.log("0059 loadFBConfig CWD="+process.cwd()+" ROOT="+dir+" NO/INVALID CONFIG FILE "+fileName);
         } else {
-            console.log("0053 loadFBConfig NO DIR "+getRoot());
+            console.log("0053 loadFBConfig NO DIR "+dir);
             return null;
         }
     } else console.log("0051 loadFBConfig NO CONFIG ");
