@@ -17,6 +17,7 @@ export const Slash = '/';
 var nets;
 
 // load JSON file from Firebase storage
+// query = { client:CLIENT, year:YEAR }
 // GH20230816 config from string to {'bucket':bucket }
 export function signIn(jConfig,query,remote,res,startSessionCB) {
     
