@@ -100,7 +100,11 @@ export function getRoot() {  return SERVEROOT; }
 
 export function init(/*app,*/ argv) {
 
-    console.log("AUTH "+currentHash()+" ARGV= "+JSON.stringify(argv));
+    console.log(" ARGV= "+JSON.stringify(argv));
+    console.log("USE "+currentHash()+" FOR AUTH IN SIGN-IN");
+    console.log("USE "+currentHash()+" FOR AUTH IN SIGN-IN");
+    console.log("USE "+currentHash()+" FOR AUTH IN SIGN-IN");
+    console.log("USE "+currentHash()+" FOR AUTH IN SIGN-IN");
 
     return processArgv(argv);
 }
