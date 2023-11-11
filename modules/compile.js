@@ -493,7 +493,7 @@ export function compile(sessionData) {
                                                                     "gain":"0"}; // GH20230202
                                             if(debugAssets) console.log("0372 INVEST "+idnt+" for "+
                                             cents2EU(result[D_FixAss][idnt].rest)+ " for #"+nmbr+" at "+cents2EU(icost));
-                                        } catch(err) { console.dir("0365 SHEET LINE SELL "+err); }
+                                        } catch(err) { console.dir("0365 SHEET LINE INVEST "+err); }
                                     }
 
                                     else if(aLine[3].trim()==='SELL') {
