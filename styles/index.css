@@ -35,7 +35,7 @@ input[type="radio"]::before {content: "#"; }
 
 .SEP      { width: 0.8rem; text-align: center;  }		
 .TRASH    { width: 1rem; text-align: center; font-size:21px; height:17px; vertical-align: top;}		
-.TAG      { width: 2rem; text-align: left;  }		
+.TAG      { width: 1.8rem; text-align: left;  }		
 .SYMB     { width: 3rem;  text-align: left; }		
 .MOAM     { width:5.2rem; text-align: right; font-family:monospace; }
 .TEAM     { width:5.3rem; text-align: right; }

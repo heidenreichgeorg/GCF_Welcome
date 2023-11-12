@@ -28,7 +28,7 @@ export default function Status() {
     const [client,setClient] = useState()
     const { session, status } = useSession()
     const [txn,setTxn] = useState({ 'date':"", 'sender':"Sender", 'refAcct':"", 'reason':"", 'refCode':"", 'credit':{},'debit':{}  })
-    const [claims,setClaims] = useState([])
+    const [patterns,setPatterns] = useState([])
 
     function update() {
         if(txn) {
@@ -56,23 +56,7 @@ export default function Status() {
     }, [status])
 
     
-    function addDebit(attribute) {                
-        if(attribute && attribute.name && attribute.value) {
-            txn.debit[attribute.name]=attribute.value;
-            delete txn.credit[attribute.name];
-            update();
-        }
-    }
 
-    function addCredit(attribute) {       
-        if(attribute && attribute.name && attribute.value) {
-            txn.credit[attribute.name]=attribute.value;
-            delete txn.debit[attribute.name];
-            update();
-        }
-    }
-
-    
 
 
 
@@ -98,8 +82,8 @@ export default function Status() {
         
     );
     
+    function noFunc() {  console.log("CLICK NO");  }
     function prevFunc() {console.log("CLICK PREVIOUS"); window.location.href="/Partner?client="+client+"&year="+year; } 
-    //function nextFunc() {  console.log("CLICK NEXT");   window.location.href="/Transfer?client="+client+"&year="+year; }
     function nextFunc() {  console.log("CLICK NEXT");   window.location.href="/Accounts?client="+client+"&year="+year; }
 
     function handleXLSave() {
@@ -154,12 +138,9 @@ export default function Status() {
     let aPages = ['block'];
     for(let p=1;p<pageText.length;p++) aPages[p]='none'; 
 
-    let bigSum = bigEUMoney(txn.balance);
-
-
 
     return (
-        <Screen prevFunc={prevFunc} nextFunc={nextFunc} tabSelector={pageText}  tabName={tabName}> 
+        <Screen prevFunc={noFunc} nextFunc={noFunc} tabSelector={pageText}  tabName={tabName}> 
            
            <div className="FIELD" key={"Status"} id={'Overview0'} style= {{ 'display': aPages[0]}} >
 
@@ -331,31 +312,73 @@ function StatusRow({ am1,tx1, am2, tx2, am3, tx3, d, n, l, click}) {
     )
 }
 
-function BookingRow({ am1,tx1, am2, tx2, am3, tx3, am4, tx4, am5, tx5, am6, tx6, am7, tx7,  d, refe, sender, click}) {
-    return( 
+
+//   value={cents2EU(am1)}
+
+function BookingRow({ key, am1, tx1, am2, tx2, am3, tx3, am4, tx4, am5, tx5, am6, tx6, am7, tx7,  d, refe, sender}) {
+    return( <div>
         <div className="attrLine">
             <div className="FIELD SNAM"> {d}</div>
+            </div>
+        <div className="attrLine">
+
+        {(tx1) ? ( <div>
             <div className="FIELD TAG" > {tx1}</div>
-            <div className="key MOAM"> {cents2EU(am1)}</div>
+            <input type ="number" className="key MOAM" onClick={(() => click(key,tx1))}/>
+            <div className="FIELD TAG" ></div>
+        </div>):''}
+            
+        {(tx2) ? ( <div>
             <div className="FIELD TAG" > {tx2}</div>
-            <div className="key MOAM"> {cents2EU(am2)}</div>
+            <input type ="number" className="key MOAM" onClick={(() => click(key,tx2))}/>
+            <div className="FIELD TAG" ></div>
+        </div>):''}
+
+        {(tx3) ? ( <div>
             <div className="FIELD TAG" > {tx3}</div>
-            <div className="key MOAM"> {cents2EU(am3)}</div>
+            <input type ="number" className="key MOAM" onClick={(() => click(key,tx3))}/>
+            <div className="FIELD TAG" ></div>
+        </div>):''}
+
+        {(tx4) ? ( <div>
             <div className="FIELD TAG" > {tx4}</div>
-            <div className="key MOAM"> {cents2EU(am4)}</div>
-            <div className="key SNAM"> {sender}</div>
-            <div className="key SNAM"> {refe}</div>
-            <div className="FIELD TAG" > {tx5}</div>
-            <div className="key MOAM"> {cents2EU(am5)}</div>
-            <div className="FIELD TAG" > {tx6}</div>
-            <div className="key MOAM"> {cents2EU(am6)}</div>
-            <div className="FIELD TAG" > {tx7}</div>
-            <div className="key MOAM"> {cents2EU(am7)}</div>
-            <div className="SEP"></div>
-            <div className="key">&nbsp;X&nbsp;</div>
+            <input type ="number" className="key MOAM" onClick={(() => click(key,tx4))}/>
+            <div className="FIELD TAG" ></div>
+        </div>):''}
+
+        <div className="FIELD SYMB" >Sender</div>
+        <input type ="text" className="key MOAM" value={sender} onClick={(() => click(key,'sender'))}/>
+        <div className="FIELD TAG" ></div>
+
+        <div className="FIELD SYMB" >Reference</div>
+        <input type ="text" className="key MOAM" value={refe} onClick={(() => click(key,'refe'))}/>
+        <div className="FIELD TAG" >AN</div>
+            
+        {(tx5) ? ( <div>
+            <div className="FIELD TAG"> {tx5}</div>
+            <input type ="number" className="key MOAM" onClick={(() => click(key,tx5))}/>
+            <div className="FIELD TAG" ></div>
+        </div>):''}
+
+        {(tx6) ? ( <div>
+            <div className="FIELD TAG"> {tx6}</div>
+            <input type ="number" className="key MOAM" onClick={(() => click(key,tx6))}/>
+            <div className="FIELD TAG" ></div>
+        </div>):''}
+
+        {(tx7) ? ( <div>
+            <div className="FIELD TAG"> {tx7}</div>
+            <input type ="number" className="key MOAM" onClick={(() => click(key,tx7))}/>
+        </div>):''}
+        <div className="FIELD TAG" ></div>
+            <button className="key"> X </button>
         </div>
-    )
+    </div>)
 }
 
+
+function click(key,field) {
+    console.log("click on "+field+ "in "+key);
+   }
 
 
