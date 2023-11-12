@@ -3,7 +3,7 @@ import { getSession, storeCarryOver, useSession, REACT_APP_API_HOST } from '../m
 import Screen from '../pages/Screen'
 import FooterRow from '../components/FooterRow'
 import { cents2EU,bigEUMoney }  from '../modules/money';
-import { J_ACCT,CSEP,D_Balance,D_Page,D_PreBook,D_Schema,T_CREDIT,T_DEBIT,X_ASS_FIXTAN,X_ASS_FIXFIN,X_ASS_RECEIV,X_ASS_CASH,X_INCOME_REGULAR,X_LIABILITY,X_EQUITY_VAR_UNL,X_EQUITY_VAR_LIM } from '../modules/terms.js'
+import { D_Page } from '../modules/terms.js'
 import { book,prepareTXN }  from '../modules/writeModule';
 import { makeStatusData }  from '../modules/App';
 
@@ -73,66 +73,6 @@ export default function Status() {
     }
 
     
-    function onKeep(event) {       
-        console.log("onKeep ENTER "+JSON.stringify(txn));
-        let ctlSender=document.getElementById(VAL_ID_SENDR);
-        let sender=ctlSender.value;
-        let ctlReason=document.getElementById(VAL_ID_REASN);
-        let reason=ctlReason.value;
-        if(sender && sender.length>2) {
-
-            txn.date="";
-            txn.sender=sender;
-            txn.refAcct='RefAcct';
-            txn.reason=reason;
-            txn.refCode='RefCode';
-            let flow = buildTransaction(txn);
-
-            claims.push(flow);
-            
-            update();
-            console.log("onKeep flow "+JSON.stringify(flow));
-
-            bookTemplate(flow);
-        }
-    }
-
-    function buildTransaction(simpleTXN) {
-        let flow = { 'date':simpleTXN.date, 'sender':simpleTXN.sender, 'reason':simpleTXN.reason, 'credit':{}, 'debit':{} };
-
-        var arrCreditInfo=list(simpleTXN,'credit');        
-        var arrDebitInfo=list(simpleTXN,'debit');
-
-        console.log("KEEP1 "+JSON.stringify(arrCreditInfo));
-        console.log("KEEP2 "+JSON.stringify(arrDebitInfo));
-    
-        arrCreditInfo.forEach((acct)=>{flow=prepareTXN(sheet[D_Schema],flow,acct.name,acct.value);});
-        arrDebitInfo.forEach((acct) =>{flow=prepareTXN(sheet[D_Schema],flow,acct.name,acct.value);});
-        
-        return flow;
-    }
-
-    
-    function bookTemplate(jTXN) {   
-        
-        
-        jTXN.year=session.year;
-        jTXN.client=session.client;
-
-        jTXN.sessionId = session.id; // won't book otherwise        
-        jTXN.flag='1'; // flag that a pre-claim is being entered
-
-        console.log("bookTemplate build : "+JSON.stringify(jTXN));
-
-        
-        book(jTXN,session); 
-
-        //resetSession();
-        // invalidate current session
-
-        console.log("bookTemplate:  booked.");  
-    }
-
 
 
 
@@ -182,182 +122,6 @@ export default function Status() {
     }
 
 
-    function trackValue(slider,label) {
-        let display=document.getElementById(label);
-        display.innerHTML=slider.value;
-        txn[label]=slider.value;
-    }
-
-    
-    function takeValue(accButton) {
-        let ctlAccount=document.getElementById(accButton.id);
-        const name=accButton.id.split(SYM_ACCOUNT_DRAG)[0];
-        console.log("takeValue id="+accButton.id+"  value="+ctlAccount.value);
-
-        let ctlTotal=document.getElementById(VAL_ID_TOTAL);
-        let ctlMajor=document.getElementById(VAL_ID_MAJOR);
-        let ctlEuros=document.getElementById(VAL_ID_FIRST);
-        let ctlCents=document.getElementById(VAL_ID_SECND);
-        const major=ctlMajor.innerHTML;
-        const euros=ctlEuros.innerHTML;
-        const cents=ctlCents.innerHTML;
-        const bigEuros = (BigInt(major)*100n+BigInt(euros))*100n;
-        const bigCents = BigInt(cents);
-        let strAmount = cents2EU(bigEuros+bigCents);
-    
-        ctlTotal.innerHTML = strAmount;
-    
-        let attribute = { 'name':name, 'value':strAmount };
-        addCredit(attribute);
-        update(); // render full page
-    }
-    
-    function Slider({ min, max, label, value }) {
-        let strValue = value.toString();
-        // value={strValue} 
-        return(
-            <div>
-                <div className="attrRow"></div>
-                <input className="coinSlider" type="range" min={min} max={max} id={"slider"+label} onChange={((ev)=>trackValue(ev.target,label))}></input>                            
-                <div className="attrLine">{label} <div className="FIELD SYMB" id={label}>{strValue}</div></div>
-                <div className="attrRow"></div>
-            </div>
-        )
-    }
-
-    function allowDrop(ev) {
-        ev.preventDefault();
-    }
-
-    function drag(ev,group,aInfo) {
-        ev.dataTransfer.setData("text", ev.target.id);
-        ev.dataTransfer.setData("html", ev.target.innerHTML);
-        ev.dataTransfer.setData("attr", JSON.stringify(aInfo));
-        ev.dataTransfer.setData("group",group);        
-        console.log("drag "+ev.target.id+"  "+JSON.stringify(aInfo));
-    }
-
-
-    function drop(ev) {
-        ev.preventDefault();
-        var name = ev.dataTransfer.getData("text");
-        var attr = ev.dataTransfer.getData("attr");
-        var data = ev.dataTransfer.getData("html");
-        var group= ev.dataTransfer.getData("group");
-        console.log("drop "+JSON.stringify(name)+" from "+group+" as "+JSON.stringify(data));
-        
-        if(group==T_DEBIT) addCredit(JSON.parse(attr));
-        if(group==T_CREDIT) addDebit(JSON.parse(attr));        
-    }
-
-    function removeAcct(ev) { // from input form, page#2
-        ev.preventDefault();
-        var name = ev.dataTransfer.getData("text").split(SYM_ACCOUNT_DRAG)[0];
-        var attr = ev.dataTransfer.getData("attr");
-        var group= ev.dataTransfer.getData("group");
-        console.log("removeAcct "+name+"  attr:"+attr+ " from "+group);
-        
-        if(group==T_DEBIT) delete txn.debit[name];
-        if(group==T_CREDIT) delete txn.credit[name];
-        update();
-    }
-
-    function removePreTXN(ev,index) { // from Templates page#3
-        ev.preventDefault();
-        
-        console.log("removePreTXN "+ev.target.id+"="+index);
-        var jTemplates = sheet[D_PreBook];
-        var moriturus=jTemplates[index];
-
-        if(jTemplates && jTemplates.length>index) {
-            let jHead=(index>0)?sheet[D_PreBook].slice(0,index-1):[];
-            let jTail=sheet[D_PreBook].slice(index);
-            sheet[D_PreBook] = jHead.concat(jTail);
-            console.log("removePreTXN "+ev.target.id+" at "+index+" "+JSON.stringify(sheet[D_PreBook][index]));
-        }
-        // modify sheetCells in session object
-        console.log("removePreTXN kill "+JSON.stringify(moriturus)); 
-        let line = parseInt(moriturus[1])
-        console.log("removePreTXN date="+moriturus[1]+"#"+line); 
-        if(moriturus && session.sheetCells && line>0) {
-                let headCells = session.sheetCells.splice(0,line-1);
-                let tailCells = session.sheetCells.splice(line);
-                session.sheetCells = headCells.concat(tailCells);
-        } else console.log("removePreTXN no columns"); 
-
-        
-        
-        update();
-    }
-
-
-    function AccountSelectRow({ gName, arrInfo }) {
-        return(
-            <div className="attrLine">
-                <div className="FIELD LNAM">{gName}</div>
-                { arrInfo?arrInfo.map((aInfo,n)=>(
-                    <div key={gName+n}>
-                        <div className="FIELD SEP"> &nbsp;</div>
-                        <div className="FIELD SYMB" id={strAccountSelectId(gName,aInfo.name)} onClick={((ev)=>takeValue(ev.target))}> {aInfo.name}</div>
-                    </div>
-                )):""}
-            </div>
-        )
-    }
-
-    
-    function AccountDragRow({ gName, jInfo }) {
-        var keys = Object.keys(jInfo);
-        var arrInfo=keys.map((a)=>({'name':a, 'value':jInfo[a]}));
-        console.log("AccountDragRow "+JSON.stringify(arrInfo));
-        return(
-            <div className="attrRow" id={gName}  onDragOver={((ev)=>allowDrop(ev))} onDrop={((ev)=>drop(ev))} >
-                <div className="FIELD LNAM" >{gName}</div>
-                { arrInfo?arrInfo.map((aInfo,n)=>(
-                    <div key={gName+n} draggable="true"  onDragStart={((ev)=>drag(ev,gName,aInfo))} id={strAccountButtonId(gName,aInfo.name)}>
-                        <div className="FIELD SEP"> &nbsp;</div>
-                        <div className="CNAM key" > {aInfo.name+':'+aInfo.value}</div>
-                    </div>
-                )):""}
-            </div>
-        )
-    }
-
-
-    function AccountTemplateRow({ gName, jInfo, index, key }) {        
-        var arrCreditInfo=list(jInfo,'credit');        
-        var arrDebitInfo=list(jInfo,'debit');
-        console.log("AccountTemplateRow+"+JSON.stringify(arrCreditInfo)+"  "+JSON.stringify(arrDebitInfo)+ " from "+JSON.stringify(jInfo));
-        return(
-            <div className="attrLine" key={index+gName}>                    
-                <div className="attrLine" id={gName}  >
-                <div className="FIELD TRASH" id={VAL_ID_TRASH} onClick={(ev)=>(removePreTXN(ev,index))}>&#128465;</div>
-                    <div className="FIELD SYM" ></div>
-                    <div className="FIELD SYM" >BOOK</div>
-                    <div className="FIELD SYM" >{jInfo.date}</div>
-                    <div className="FIELD SNAM" >{jInfo.sender}</div>
-                    <div className="FIELD SYM" ></div>
-                    <div className="FIELD SNAM" >{jInfo.reason}</div>
-                    { arrCreditInfo?arrCreditInfo.map((aInfo,n)=>(
-                        <div key={index+gName+'C'+n} draggable="true" id={strAccountTemplateId(gName,aInfo.name)}>
-                            <div className="FIELD SEP"> &nbsp;</div>
-                            <div className="FIELD CNAM" > {aInfo.value.index+'#'+aInfo.name+':'+aInfo.value.value}</div>
-                        </div>
-                    )):""}
-                    <div className="FIELD SNAM" >AN</div>
-                    { arrDebitInfo?arrDebitInfo.map((aInfo,n)=>(
-                        <div key={index+gName+'D'+n} draggable="true" id={strAccountTemplateId(gName,aInfo.name)}>
-                            <div className="FIELD SEP"> &nbsp;</div>
-                            <div className="FIELD CNAM" > {aInfo.value.index+'#'+aInfo.name+':'+aInfo.value.value}</div>
-                        </div>
-                    )):""}
-                    <div className="attrRow" ></div>
-                </div>
-            </div>
-        )
-    }
-
-
 
     function handleReview() {        
         book({'client':session.client,'year':session.year},session)
@@ -380,75 +144,18 @@ export default function Status() {
         return url;
     };
       
-    function makeTxnFormat(columns,names,aLen) {
-        let result=[];
-        columns.forEach((cell,i)=>{if(i>J_ACCT && i<aLen && cell && cell.length>0)  result.push({'name':names[i],'iValue':bigEUMoney(columns[i])})});
-        columns.forEach((cell,i)=>{if(i>aLen && cell && cell.length>0)  result.push({'name':names[i],'iValue':-1n * bigEUMoney(columns[i])})});
-        let credit={};
-        let debit={};
-        result.forEach((move)=>{if(move.iValue>0n) credit[move.name]=cents2EU(move.iValue); else debit[move.name]=cents2EU(-1n*move.iValue)});
-        return {
-             'hash':columns[0],
-            "date":columns[1],
-            "sender":columns[2],
-            "refAcct":columns[3],
-            "reason":columns[4],
-            "refCode":columns[5],
-            'credit':credit,
-            'debit':debit
-        }
-    }
-
-
-    function getClaims() {
-        
-        const arrHistory = [];                            
-        const jTemplates  = sheet[D_PreBook];
-        console.log("getClaims CLAIM ENTER "+JSON.stringify(jTemplates));
-
-        const gSchema = sheet[D_Schema];    
-        let aLen = parseInt(gSchema.assets);
-        let eLen = parseInt(gSchema.eqliab);
-        var aPattern = null;//getParam("APATTERN");
-        if(aPattern && aPattern.length<2) aPattern=null;
-        var lPattern = null;//getParam("LPATTERN");
-        if(lPattern && lPattern.length<2) lPattern=null;
-
-        if(page) {            
-            arrHistory.push({entry:CSEP+CSEP+page["History"]+CSEP+page["header"]+CSEP+CSEP});                  
-            if(gSchema.Names && gSchema.Names.length>0) {
-                var names=gSchema.Names;                
-                for (let index in jTemplates)  {
-                    let jtxn=makeTxnFormat(jTemplates[index],names,aLen,eLen);
-                    console.log("getClaims txn format="+JSON.stringify(jtxn));
-                    let jPreTXN=buildTransaction(jtxn);
-                    console.log("getClaims preTXN="+JSON.stringify(jPreTXN));
-                    arrHistory.push(jPreTXN);
-                }
-            }
-        }
-        return arrHistory;
-    }
-
     let page = sheet[D_Page];
     let sheet_status = makeStatusData(sheet);
     let report = sheet_status.report;
 
 
-    // GH20230926
-    const arrAccounts = listAccounts(sheet[D_Balance]);
-
     const tabName = "Overview";
-    let pageText =  ['DashBoard',  'Transaction', 'Patterns'].map((name) =>( page[name] ));
+    let pageText =  ['DashBoard', 'Patterns'].map((name) =>( page[name] ));
     let aPages = ['block'];
     for(let p=1;p<pageText.length;p++) aPages[p]='none'; 
 
     let bigSum = bigEUMoney(txn.balance);
 
-
-    // append pending new claims to persistent template list
-    let jTemplates = getClaims();
-    claims.forEach((claim)=>{jTemplates.push(claim);});
 
 
     return (
@@ -469,64 +176,134 @@ export default function Status() {
                 }
             </div>
 
-            <div className="FIELD" key={"Eingabe"} id={'Overview1'} style= {{ 'display': aPages[1]}} >
-                <AccountSelectRow gName={page['Transaction']}  />
-                <AccountSelectRow gName={page['tanfix']} 
-                    arrInfo={ arrAccounts.filter((acct)=>(acct.xbrl.startsWith(X_ASS_FIXTAN)))} />
-                <AccountSelectRow gName={page['finfix']} 
-                    arrInfo={ arrAccounts.filter((acct)=>(acct.xbrl.startsWith(X_ASS_FIXFIN)))}  />
-                <AccountSelectRow gName={page['cash']}  
-                    arrInfo={ arrAccounts.filter((acct)=>(acct.xbrl.startsWith(X_ASS_CASH)))}  />
-                <AccountSelectRow gName={page['rec']}  
-                    arrInfo={ arrAccounts.filter((acct)=>(acct.xbrl.startsWith(X_ASS_RECEIV)))}  />
-                <AccountSelectRow gName={page['liab']}  
-                    arrInfo={ arrAccounts.filter((acct)=>(acct.xbrl.startsWith(X_LIABILITY)))}  />
-                <AccountSelectRow gName={page['RegularOTC']}  
-                    arrInfo={ arrAccounts.filter((acct)=>(acct.xbrl.startsWith(X_INCOME_REGULAR)))}  />
-                <AccountSelectRow gName={page['veulip']}  
-                    arrInfo={ arrAccounts.filter((acct)=>(acct.xbrl.startsWith(X_EQUITY_VAR_UNL)))}  />
-                <AccountSelectRow gName={page['velimp']}  
-                    arrInfo={ arrAccounts.filter((acct)=>(acct.xbrl.startsWith(X_EQUITY_VAR_LIM)))}  />
-                
-                <div className="attrLine" onDragOver={((ev)=>allowDrop(ev))}><div className="FIELD SNAM" id={VAL_ID_TOTAL}>{cents2EU(bigSum)+'  Total'}</div>
-                    <div className="FIELD TRASH" id={VAL_ID_TRASH} onDrop={(ev)=>(removeAcct(ev))}>&#128465;</div>
-                </div>
-
-                <Slider  min='0'  max='99' label={VAL_ID_MAJOR} value={bigSum/10000n}/>
-                <Slider  min='0'  max='99' label={VAL_ID_FIRST} value={bigSum/100n%100n}/>
-                <Slider  min='0'  max='99' label={VAL_ID_SECND} value={bigSum%100n}/>                
-                
-                <div className="attrLine">
-                    <div className="FIELD SYMB">Sender</div>
-                    <input className="FIELD SYMB" id={VAL_ID_SENDR}/>
-                    <div className="FIELD SYMB">Reason</div>
-                    <input className="FIELD SYMB" id={VAL_ID_REASN}/>
-                    <div className="FIELD CNAMF" id={VAL_ID_DIFF}>{txn.balance==''?
-                        (<div className="CNAM key" onClick={onKeep}>KEEP</div>)
-                        :txn.balance}
-                        Sender</div>
-                    </div>
-                        
-                <AccountSelectRow gName=''  />
-
-                <AccountDragRow gName={T_CREDIT} jInfo={txn.credit} />
-                <AccountDragRow gName={T_DEBIT}  jInfo={txn.debit} />
-            </div>            
-
-            <div className="FIELD" key={"Vorlagen"} id={'Overview2'} style= {{ 'display': aPages[2]}} >
-                {jTemplates.map((txnClaim,i)=>(                 
-                    <AccountTemplateRow gName={page['Patterns']} jInfo={txnClaim} index={i} key={i}/>
-                    ))
-                }
+            <div className="FIELD" key={"Einlage"} id={'Overview1'} style= {{ 'display': aPages[1]}} >
+                <BookingRow  key={"EinlageGE"}  
+                                            am1={0} tx1="K2GH" 
+                                            am2={0} tx2="K2EH" 
+                                            am3={0} tx3="COGK" 
+                                            d="Einlage" refe="Komplementäre" sender="Elke u Georg"
+                    />                       
+                <BookingRow  key={"EinlageAL"}  
+                                            am1={0} tx1="K2AL" 
+                                            am2={0} tx2="COGK" 
+                                            d="Einlage" sender="Alexander"
+                    />                       
+                <BookingRow  key={"EinlageKR"}  
+                                            am1={0} tx1="K2KR" 
+                                            am2={0} tx2="COGK" 
+                                            d="Einlage" sender="Kristina"
+                    />                       
+                <BookingRow  key={"EinlageTO"}  
+                                            am1={0} tx1="K2TO" 
+                                            am2={0} tx2="COGK" 
+                                            d="Einlage" sender="Tom"
+                    />                       
+                <BookingRow  key={"EinlageLE"}  
+                                            am1={0} tx1="K2LE" 
+                                            am2={0} tx2="COGK" 
+                                            d="Einlage" sender="Leon"
+                    />                       
+                <BookingRow  key={"Miete"}  
+                                            am1={0} tx1="MIET" 
+                                            am2={0} tx2="COGK" 
+                                            am3={0} tx3="NKHA" 
+                                            d="Miete" refe="Nebenkosten"
+                    />                       
+                <BookingRow  key={"EntnahmeGE"}  
+                                            d="Entnahme" refe="Komplementäre" sender="Elke u Georg"
+                                            am5={0} tx5="K2GH" 
+                                            am6={0} tx6="K2EH" 
+                                            am7={0} tx7="COGK" 
+                    />                       
+                <BookingRow  key={"EntnahmeAL"}  
+                                            d="Entnahme" sender="Alexander"
+                                            am5={0} tx5="K2AL" 
+                                            am6={0} tx6="COGK" 
+                    />                       
+                <BookingRow  key={"EntnahmeKR"}  
+                                            d="Entnahme" sender="Kristina"
+                                            am5={0} tx5="K2KR" 
+                                            am6={0} tx6="COGK" 
+                    />                       
+                <BookingRow  key={"EntnahmeTO"}  
+                                            d="Entnahme" sender="Tom"
+                                            am5={0} tx5="K2TO" 
+                                            am6={0} tx6="COGK" 
+                    />                       
+                <BookingRow  key={"EntnahmeLE"}  
+                                            d="Entnahme" sender="Leon"
+                                            am5={0} tx5="K2LE" 
+                                            am6={0} tx6="COGK" 
+                    />                       
+                <BookingRow  key={"Aufwand"}  
+                                            d="Aufwand" refe="Sofort" sender="Verkäufer"
+                                            am5={0} tx5="AUFW" 
+                                            am6={0} tx6="COGK" 
+                    />                       
+                <BookingRow  key={"Sacheinlage"}  
+                                            am1={0} tx1="K2GH" 
+                                            am2={0} tx2="K2EH" 
+                                            d="Sacheinlage" refe="Elke u Georg" sender="Verkäufer"
+                                            am5={0} tx5="AUFW" 
+                    />                       
+                <BookingRow  key={"Grundabgaben"}  
+                                            d="Grundabgaben" refe="Quartal" sender="Stadt Erlangen"
+                                            am5={0} tx5="NKHA" 
+                                            am6={0} tx6="COGK" 
+                    />                       
+                <BookingRow  key={"Versicherung"}  
+                                            d="Grundabgaben" refe="Jahr" sender="BayernVersicherung"
+                                            am5={0} tx5="NKHA" 
+                                            am6={0} tx6="COGK" 
+                    />                       
+                <BookingRow  key={"Aktien-Kauf"}  
+                                            am1={0} tx1="CDAK" 
+                                            d="INVEST" refe="Stückzahl" sender="WKN"
+                                            am5={0} tx5="COGK" 
+                    />                       
+                <BookingRow  key={"Aktien-Dividende"}  
+                                            am1={0} tx1="EDIV" 
+                                            am2={0} tx2="COGK" 
+                                            am3={0} tx3="KEST" 
+                                            am4={0} tx4="KESO" 
+                                            d="YIELD" refe="Stückzahl" sender="WKN"
+                    />                       
+                <BookingRow  key={"Aktien-Verkauf Gewinn"}  
+                                            am1={0} tx1="FSAL" 
+                                            am2={0} tx2="COGK" 
+                                            am3={0} tx3="KEST" 
+                                            am4={0} tx4="KESO" 
+                                            d="SELL" refe="Stückzahl" sender="WKN"
+                                            am5={0} tx5="CDAK" 
+                    />                       
+                <BookingRow  key={"Aktien-Verkauf Verlust"}  
+                                            am1={0} tx1="VAVA" 
+                                            am2={0} tx2="COGK" 
+                                            d="SELL" refe="Stückzahl" sender="WKN"
+                                            am5={0} tx5="CDAK" 
+                    />                       
+                <BookingRow  key={"Abschreibung Haus"}  
+                                            d="AfA Haus" refe="Jahr" sender="Haus"
+                                            am5={0} tx5="GRSB" 
+                                            am6={0} tx6="ABSC" 
+                    />                       
+                <BookingRow  key={"Abschreibung EBKS"}  
+                                            d="AfA Spülmaschine" refe="Jahr" sender="EBKS"
+                                            am5={0} tx5="EBKS" 
+                                            am6={0} tx6="ABSC" 
+                    />                       
+                <BookingRow  key={"Abschreibung Dach"}  
+                                            d="AfA Dach" refe="Jahr" sender="DACH"
+                                            am5={0} tx5="DACH" 
+                                            am6={0} tx6="ABSC" 
+                    />                       
             </div>
-
-
+ 
             <FooterRow left={page["client"]}  right={page["register"]} prevFunc={prevFunc} nextFunc={nextFunc} miscFunc={handleXLSave}/>
             <FooterRow left={page["reference"]} right={page["author"]} prevFunc={prevFunc} nextFunc={nextFunc} miscFunc={handleXLSave}/>
         </Screen>
     )   
 }
-
 
 
 function showAccount(shrtName) { console.log("SHOW ACCOUNT "+shrtName); window.open("/History?client=HGKG&year=2023&APATTERN="+shrtName+"&SELECTALL=1"); }
@@ -545,7 +322,7 @@ function StatusRow({ am1,tx1, am2, tx2, am3, tx3, d, n, l, click}) {
             <div className="FIELD SEP"> &nbsp;</div>
             <div className="FIELD SEP"> &nbsp;</div>
             <div className="FIELD SYMB"> {d}</div>
-            <div className="FIELD SNAM"> {n}</div>
+            <div className="FIELD NAME"> {n}</div>
             <div className="FIELD">{l}</div>
             {click==null ? (<div className="FIELD SEP"> &nbsp;</div>) : (
             <div className="FIELD"  onClick={(() => click())}>&nbsp;.&nbsp;</div>
@@ -554,41 +331,31 @@ function StatusRow({ am1,tx1, am2, tx2, am3, tx3, d, n, l, click}) {
     )
 }
 
-
-
-
-const VAL_ID_MAJOR = '100EU';
-const VAL_ID_FIRST = 'Euros';
-const VAL_ID_SECND = 'Cents';
-const VAL_ID_TOTAL = 'Total';
-const VAL_ID_DIFF  = 'Diff';
-const VAL_ID_SENDR = 'Sender';
-const VAL_ID_REASN = 'Reason';
-const VAL_ID_TRASH = 'Trash';
-
-const SYM_ACCOUNT_SELECT = '_';
-const SYM_ACCOUNT_DRAG = '_';
-
-function strAccountSelectId(gName,aName) { return  aName+SYM_ACCOUNT_SELECT+gName; }
-function strAccountButtonId(gName,aName) { return  aName+SYM_ACCOUNT_DRAG+gName; }
-function strAccountTemplateId(gName,aName) { return  aName+'T'+gName; }
-
-
-function listAccounts(jAccounts) {
-    var result = [];
-    for (let name in jAccounts)   {
-        var account=jAccounts[name];
-        if(account.xbrl.length>1) {
-            
-            result.push({'name':account.name, 'xbrl':account.xbrl });
-        }
-    }
-    console.log("listAccounts returns "+JSON.stringify(result))
-    return result;
+function BookingRow({ am1,tx1, am2, tx2, am3, tx3, am4, tx4, am5, tx5, am6, tx6, am7, tx7,  d, refe, sender, click}) {
+    return( 
+        <div className="attrLine">
+            <div className="FIELD SNAM"> {d}</div>
+            <div className="FIELD TAG" > {tx1}</div>
+            <div className="key MOAM"> {cents2EU(am1)}</div>
+            <div className="FIELD TAG" > {tx2}</div>
+            <div className="key MOAM"> {cents2EU(am2)}</div>
+            <div className="FIELD TAG" > {tx3}</div>
+            <div className="key MOAM"> {cents2EU(am3)}</div>
+            <div className="FIELD TAG" > {tx4}</div>
+            <div className="key MOAM"> {cents2EU(am4)}</div>
+            <div className="key SNAM"> {sender}</div>
+            <div className="key SNAM"> {refe}</div>
+            <div className="FIELD TAG" > {tx5}</div>
+            <div className="key MOAM"> {cents2EU(am5)}</div>
+            <div className="FIELD TAG" > {tx6}</div>
+            <div className="key MOAM"> {cents2EU(am6)}</div>
+            <div className="FIELD TAG" > {tx7}</div>
+            <div className="key MOAM"> {cents2EU(am7)}</div>
+            <div className="SEP"></div>
+            <div className="key">&nbsp;X&nbsp;</div>
+        </div>
+    )
 }
 
-function list(jInfo,type) {
-    var json = jInfo[type]
-    var keys =  json ? Object.keys(json) : [];
-    return  keys.map((a)=>({'name':a, 'value':json[a]}));
-}
+
+

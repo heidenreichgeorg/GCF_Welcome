@@ -99,8 +99,8 @@ export default function FixedAssets() {
         return (
             <div className="attrLine">
                 <div className="FIELD LNAM">{mRow.p.idnt}</div>
-                <div className="FIELD SNAM">{mRow.p.type}</div>
-                <div className="FIELD SNAM">{mRow.p.date}</div>
+                <div className="FIELD NAME">{mRow.p.type}</div>
+                <div className="FIELD NAME">{mRow.p.date}</div>
                 <div className="FIELD MOAM">{mRow.p.init}</div>
                 <div className="FIELD MOAM">{mRow.p.nmbr}</div>
                 <div className="FIELD MOAM">{mRow.p.rest}</div>

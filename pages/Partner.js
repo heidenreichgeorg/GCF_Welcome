@@ -279,7 +279,7 @@ function PartnerRow(mRow) {
     console.log("PartnerRow mRow="+JSON.stringify(mRow));
     return (
         <div className="attrLine">
-            <div className="FIELD SNAM">{mRow.p.name}</div>
+            <div className="FIELD NAME">{mRow.p.name}</div>
             <div className="FIELD MOAM">{cents2EU(mRow.p.init)}</div>
             <div className="FIELD MOAM">{cents2EU(mRow.p.credit)}</div>
             <div className="FIELD MOAM">{cents2EU(mRow.p.debit)}</div>
@@ -298,7 +298,7 @@ function PartnerTitleRow(mRow) {
     console.log("PartnerTitleRow mRow="+JSON.stringify(mRow));
     return (
         <div className="attrLine">
-            <div className="FIELD SNAM">{mRow.p.name}</div>
+            <div className="FIELD NAME">{mRow.p.name}</div>
             <div className="FIELD TEAM">{cents2EU(mRow.p.init)}</div>
             <div className="FIELD TEAM">{cents2EU(mRow.p.credit)}</div>
             <div className="FIELD TEAM">{cents2EU(mRow.p.debit)}</div>

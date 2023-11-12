@@ -23,9 +23,10 @@ export default function handler(
       const query:JSON = <JSON><unknown> { "client":client, "year":year, "auth":auth  };
       console.log("    SESSION.handler "+JSON.stringify(query));
     
-      if(auth==currentHash())
+      // NO sign-in login authenticat
+      //if(auth==currentHash())
         signIn(jConfig,query,req.socket.remoteAddress,res,startSessionJSON); 
-      else  res.json({ id: '0666', code : "NO VALID AUTH"})
+      //else  res.json({ id: '0666', code : "NO VALID AUTH"})
   }
   else res.json({ id: '0123', code : "NO VALID QUERY"})
 }

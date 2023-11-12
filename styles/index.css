@@ -24,26 +24,27 @@ input[type="radio"]::before {content: "#"; }
 
 .attrRow  {                       width:75rem; padding: 1px; float: left;  min-height: 16px; height: 17px; font-family :inherit; font-size: 11px; font-weight:400; text-align: center;}
 .attrLine { vertical-align: top;  width:75rem; padding: 1px; float: left;  min-height: 16px; height: 17px; font-family :inherit; font-size: 11px; font-weight:400; text-align: center;}
-.attrLine:nth-child(even) { background: #f0f0f0;  border: 1px dotted gray;}
+.attrLine:nth-child(even) { background: #f0f0f0;  padding: 0px; border: 1px dotted gray;}
 
-.key      {  height:14px;  margin: 0px; border-color: rgb(167, 152, 152); border-style: solid; float: left; background-color:transparent; font-family:  inherit; font-size: inherit; font-weight:600; color: #000; }
+.key      {  padding: 1px; height:14px;  margin: 0px; border-color: rgb(167, 152, 152); border-style: solid; float: left; background-color:transparent; font-family:  inherit; font-size: inherit; font-weight:600; color: #000; }
 .box      {  height:40px;  margin: 0px; border-color: gray;               border-style: solid; float: left; background-color:transparent; font-family:  inherit; font-size: inherit; font-weight:600; color: #000; }
 
 .SWITCH  {                   padding: 1px; border: none; font-size: 12px; font-weight:400;  } 
 .BIGCELL {                   padding: 1px;               float: left; color:inherit;min-height: 48px; font-family: inherit; font-size: 11px; font-weight:400; text-align: center; background-color: inherit; } 
 .FIELD    { overflow:hidden; padding: 1px; border: none; float: left;                                 font-family: inherit; font-size: inherit; font-weight:inherit; color: inherit;} 
 
-.SEP      { width: 1rem; text-align: center;  }		
+.SEP      { width: 0.8rem; text-align: center;  }		
 .TRASH    { width: 1rem; text-align: center; font-size:21px; height:17px; vertical-align: top;}		
 .TAG      { width: 2rem; text-align: left;  }		
 .SYMB     { width: 3rem;  text-align: left; }		
+.MOAM     { width:5.2rem; text-align: right; font-family:monospace; }
 .TEAM     { width:5.3rem; text-align: right; }
-.MOAM     { width:5.3rem; text-align: right; font-family:monospace; }
-.TENY     { width: 7rem;  text-align: right; }
-.MONY     { width: 7rem; text-align: right; font-family:monospace; }
+.SNAM     { width:5.8rem; text-align: left; }		
 .C100     { width: 6rem; }
 .R105     { width: 6rem; text-align: right; }
-.SNAM     { width: 7rem; text-align: left;  }
+.TENY     { width: 7rem;  text-align: right; }
+.MONY     { width: 7rem; text-align: right; font-family:monospace; }
+.NAME     { width: 7rem; text-align: left;  }
 .CNAM     { width: 7rem; text-align: center;  }
 .CNAMF    { width:7.3rem; text-align: center;  }
 .IDNT     { width: 8rem; text-align: right; }
