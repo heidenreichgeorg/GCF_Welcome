@@ -1367,7 +1367,7 @@ export function formatTXN(session,reqBody) {
     console.log("0066 compile.js formatTXN("+session.id+") book "+JSON.stringify(reqBody));
 
     if(Object.keys(reqBody).length>2) {
-        if(debug) console.log("compile.js formatTXN("+session.id+") book "+JSON.stringify(reqBody));
+        if(debug) console.log("compile.js ENTER formatTXN("+session.id+") book "+JSON.stringify(reqBody));
 
         var jFlag  = reqBody.flag; if(!jFlag) jFlag=0;
         var jDate  = reqBody.date;

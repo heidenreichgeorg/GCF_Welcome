@@ -3,7 +3,7 @@ import { getSession, storeCarryOver, useSession, REACT_APP_API_HOST } from '../m
 import Screen from '../pages/Screen'
 import FooterRow from '../components/FooterRow'
 import { cents2EU,bigEUMoney }  from '../modules/money';
-import { D_Page } from '../modules/terms.js'
+import { D_Page, D_Schema } from '../modules/terms.js'
 import { book,prepareTXN }  from '../modules/writeModule';
 import { makeStatusData }  from '../modules/App';
 
@@ -42,7 +42,69 @@ export default function Status() {
         storeCarryOver({});
     }, [status])
 
+    function list(side) { 
+        return Object.keys(side).map((acct)=>({'name':acct, 'value':side[acct]}));
+    }
+
+    function buildTransaction(simpleTXN) {
+        let flow = { 'date':simpleTXN.date, 
+                     'sender':simpleTXN.sender,
+                     'refAcct':simpleTXN.refAcct, 
+                     'reason':simpleTXN.reason, 
+                     'refCode':simpleTXN.refCode,
+                     'credit':{}, 'debit':{} };
+
+        var arrCreditInfo=list(simpleTXN.CREDIT);        
+        var arrDebitInfo=list(simpleTXN.DEBIT);
+
+        console.log("KEEP1 "+JSON.stringify(arrCreditInfo));
+        console.log("KEEP2 "+JSON.stringify(arrDebitInfo));
+
+        arrCreditInfo.forEach((acct)=>{flow=prepareTXN(sheet[D_Schema],flow,acct.name,acct.value);});
+        arrDebitInfo.forEach((acct) =>{flow=prepareTXN(sheet[D_Schema],flow,acct.name,acct.value);});
+
+        return flow;
+    }
+
+
+    function bookTemplate(jTXN) {   
+
+
+        jTXN.year=session.year;
+        jTXN.client=session.client;
+
+        jTXN.sessionId = session.id; // won't book otherwise        
+        jTXN.flag='1'; // flag that a pre-claim is being entered
+
+        console.log("bookTemplate build : "+JSON.stringify(jTXN));
+
+
+        book(jTXN,session); 
+
+        //resetSession();
+        // invalidate current session
+
+        console.log("bookTemplate:  booked.");  
+    }
+
+
     
+    function doBook(strKey) {
+        console.log("Book "+strKey);
+        if(form[strKey]) {
+            let txn = form[strKey];
+
+            console.log("Book FORM "+JSON.stringify());
+
+            let jTXN = buildTransaction(txn);
+
+            console.log("Book TXN "+JSON.stringify(jTXN));
+
+            if(!jTXN.balance || jTXN.balance=='')
+                bookTemplate(jTXN);
+        }
+    }
+
 
 
 
@@ -113,6 +175,7 @@ export default function Status() {
         } else console.log("1195 makeXLSButton XLSX NO client");
         return url;
     };
+
       
     let page = sheet[D_Page];
     let sheet_status = makeStatusData(sheet);
@@ -129,92 +192,92 @@ export default function Status() {
         <Screen prevFunc={noFunc} nextFunc={noFunc} tabSelector={pageText}  tabName={tabName}> 
            
             <div className="FIELD" key="Einlage" id={'Overview0'} style= {{ 'display': aPages[0]}} >
-                <BookingRow  strKey="Miete"  
+                <BookingRow  strKey="Miete"   doBook={doBook}
                                              tx1="MIET" 
                                              tx2="COGK" 
                                              tx3="NKHA" 
                                             sender="Vau / Ferguson" refAcct="MIET" refCode="Eifelweg 22"
                     />                       
-                <BookingRow  strKey="Entnahme Kpl"  
+                <BookingRow  strKey="Entnahme Kpl"   doBook={doBook}
                                             sender="Elke u Georg" refAcct="K2GH K2EH" refCode="WITHDRAW"
                                              tx5="K2GH" 
                                              tx6="K2EH" 
                                              tx7="COGK" 
                     />                       
-                <BookingRow  strKey="Entnahme Alex"  
+                <BookingRow  strKey="Entnahme Alex"   doBook={doBook}
                                             sender="Alexander" refAcct="K2AL"  refCode="WITHDRAW"
                                              tx5="K2AL" 
                                              tx6="COGK" 
                     />                       
-                <BookingRow  strKey="Entnahme Kristina"  
+                <BookingRow  strKey="Entnahme Kristina"   doBook={doBook}
                                             sender="Kristina" refAcct="K2KR"  refCode="WITHDRAW"
                                              tx5="K2KR" 
                                              tx6="COGK" 
                     />                       
-                <BookingRow  strKey="Entnahme Tom"  
+                <BookingRow  strKey="Entnahme Tom"   doBook={doBook}
                                             sender="Tom" refAcct="K2TO"  refCode="WITHDRAW"
                                              tx5="K2TO" 
                                              tx6="COGK" 
                     />                       
-                <BookingRow  strKey="Entnahme Leon"  
+                <BookingRow  strKey="Entnahme Leon"   doBook={doBook}
                                             sender="Leon" refAcct="K2LE"  refCode="WITHDRAW"
                                              tx5="K2LE" 
                                              tx6="COGK" 
                     />                       
-                <BookingRow  strKey="Aufwand"  
+                <BookingRow  strKey="Aufwand"   doBook={doBook}
                                             sender="Verkäufer" refAcct="AUFW" refCode="Eifelweg22" 
                                              tx5="AUFW" 
                                              tx6="COGK" 
                     />                       
-                <BookingRow  strKey="Sacheinlage Kpl"  
+                <BookingRow  strKey="Sacheinlage Kpl"   doBook={doBook}
                                              tx1="K2GH" 
                                              tx2="K2EH" 
                                             sender="Verkäufer" refAcct="AUFW" refCode="DEP_IN_KIND" 
                                              tx5="AUFW" 
                     />                       
-                <BookingRow  strKey="Grundabgaben"  
+                <BookingRow  strKey="Grundabgaben"   doBook={doBook}
                                             sender="Stadt Erlangen" refAcct="NKHA" reason="Quartal" refCode="FEE"
                                              tx5="NKHA" 
                                              tx6="COGK" 
                     />                       
-                <BookingRow  strKey="Versicherung"  
+                <BookingRow  strKey="Versicherung"   doBook={doBook}
                                             sender="BayernVersicherung" refAcct="NKHA" reason="Jahr" refCode="FEE"
                                              tx5="NKHA" 
                                              tx6="COGK" 
                     />                       
-                <BookingRow  strKey="Aktien-Kauf"  
+                <BookingRow  strKey="Aktien-Kauf"   doBook={doBook}
                                              tx1="CDAK" 
                                             sender="WKN" refAcct="INVEST" reason="Stückzahl" refCode="Code"
                                              tx5="COGK" 
                     />                       
-                <BookingRow  strKey="Bond-Kauf mit Stückzins"  
+                <BookingRow  strKey="Bond-Kauf mit Stückzins"   doBook={doBook}
                                              tx1="CDAK" 
                                              tx2="FSTF" 
                                             sender="WKN" refAcct="INVEST" reason="Nominal" refCode="Code"
                                              tx5="COGK" 
                     />                       
-                <BookingRow  strKey="Aktien-Dividende bar"  
+                <BookingRow  strKey="Aktien-Dividende bar"   doBook={doBook}
                                              tx1="EDIV" 
                                              tx2="COGK" 
                                              tx3="KEST" 
                                              tx4="KESO" 
                                             sender="WKN" refAcct="EDIV" reason="Stückzahl" refCode="Code"
                     />                       
-                <BookingRow  strKey="Dividende steuerfrei bar"  
+                <BookingRow  strKey="Dividende steuerfrei bar"   doBook={doBook}
                                              tx1="COGK" 
                                             sender="WKN" refAcct="YIELD" reason="Stückzahl" refCode="Code"
                                              tx5="CDAK" 
                     />                       
-                <BookingRow  strKey="Dividende in Aktien steuerfrei"  
+                <BookingRow  strKey="Dividende in Aktien steuerfrei"   doBook={doBook}
                                             sender="WKN" refAcct="INVEST" reason="Stückzahl" refCode="Code"
                     />                       
-                <BookingRow  strKey="Dividende in Aktien steuerpflichtig"  
+                <BookingRow  strKey="Dividende in Aktien steuerpflichtig"  doBook={doBook} 
                                              tx1="EDIV" 
                                              tx2="KEST" 
                                              tx3="KESO" 
                                             sender="WKN" refAcct="INVEST" reason="Stückzahl" refCode="Code"
                     />                       
-                <BookingRow  strKey="Aktien-Verkauf Gewinn"  
+                <BookingRow  strKey="Aktien-Verkauf Gewinn"  doBook={doBook} 
                                              tx1="FSAL" 
                                              tx2="COGK" 
                                              tx3="KEST" 
@@ -222,49 +285,49 @@ export default function Status() {
                                             sender="WKN" refAcct="SELL" reason="Stückzahl" refCode="Code"
                                              tx5="CDAK" 
                     />                       
-                <BookingRow  strKey="Aktien-Verkauf Verlust"  
+                <BookingRow  strKey="Aktien-Verkauf Verlust"   doBook={doBook}
                                              tx1="VAVA" 
                                              tx2="COGK" 
                                             sender="WKN" refAcct="SELL" reason="Stückzahl" refCode="Code"
                                              tx5="CDAK" 
                     />                       
-                <BookingRow  strKey="Abschreibung Haus"  
+                <BookingRow  strKey="Abschreibung Haus"   doBook={doBook}
                                             sender="Abschluss" refAcct="GRSB" reason="Jahr" refCode="Afa Haus"
                                              tx5="GRSB" 
                                              tx6="ABSC" 
                     />                       
-                <BookingRow  strKey="Abschreibung EBKS"  
+                <BookingRow  strKey="Abschreibung EBKS"  doBook={doBook} 
                                             sender="Abschluss" refAcct="EBKS"  reason="Jahr" refCode="AfA Spülmaschine"
                                              tx5="EBKS" 
                                              tx6="ABSC" 
                     />                       
-                <BookingRow  strKey="Abschreibung Dach"  
+                <BookingRow  strKey="Abschreibung Dach"   doBook={doBook}
                                             sender="Abschluss" refAcct="DACH"  reason="Jahr" refCode="AfA Dach" 
                                              tx5="DACH" 
                                              tx6="ABSC" 
                     />                       
-                <BookingRow  strKey="Einlage Kpl"  
+                <BookingRow  strKey="Einlage Kpl"   doBook={doBook}
                                              tx1="K2GH" 
                                              tx2="K2EH" 
                                              tx3="COGK" 
                                             sender="Elke u Georg" refAcct="K2GH K2EH" refCode="DEPOSIT" 
                     />                       
-                <BookingRow  strKey="Einlage Alex"  
+                <BookingRow  strKey="Einlage Alex"   doBook={doBook}
                                              tx1="K2AL" 
                                              tx2="COGK" 
                                             sender="Alexander" refAcct="K2AL" refCode="DEPOSIT" 
                     />                       
-                <BookingRow  strKey="Einlage Kristina"  
+                <BookingRow  strKey="Einlage Kristina"  doBook={doBook} 
                                              tx1="K2KR" 
                                              tx2="COGK" 
                                             sender="Kristina" refAcct="Einlage" refCode="DEPOSIT" 
                     />                       
-                <BookingRow  strKey="Einlage Tom"  
+                <BookingRow  strKey="Einlage Tom"   doBook={doBook}
                                              tx1="K2TO" 
                                              tx2="COGK" 
                                             sender="Tom" refAcct="K2TO" refCode="DEPOSIT" 
                     />                       
-                <BookingRow  strKey="Einlage Leon"  
+                <BookingRow  strKey="Einlage Leon"  doBook={doBook}
                                              tx1="K2LE" 
                                              tx2="COGK" 
                                             sender="Leon" refAcct="K2LE" refCode="DEPOSIT" 
@@ -325,7 +388,7 @@ function StatusRow({ am1,tx1, am2, tx2, am3, tx3, d, n, l, click}) {
 
 
 
-function BookingRow({ strKey, tx1,  tx2, tx3,  tx4, tx5, tx6, tx7, reason, refAcct, sender, refCode}) {
+function BookingRow({ strKey, tx1,  tx2, tx3,  tx4, tx5, tx6, tx7, reason, refAcct, sender, refCode, doBook}) {
 
     // FILL FORM INITIALLY !!  -- no change event if values already exist from previous booking
     if(!form[strKey]) form[strKey]={ 'CREDIT':{},'DEBIT':{} };
@@ -416,7 +479,8 @@ let form={};
 function bufferAmount(strKey,field,value,side) {
     console.log("in "+strKey+ " change amount "+field+" to "+value+" at "+side);    
     let record = form[strKey];
-    record[side][field]=value;
+    if(side=='DEBIT') record[side][field]="-"+value;
+    else record[side][field]=value;
 }
 
 function bufferField(strKey,field,value) {
@@ -425,11 +489,4 @@ function bufferField(strKey,field,value) {
     record[field]=value;
 }
 
-
-function doBook(strKey) {
-    console.log("Book "+strKey);
-    if(form[strKey]) {
-        console.log("Book "+JSON.stringify(form[strKey]))
-    }
-}
 
