@@ -111,10 +111,10 @@ export function makeStatusData(response) {
                     if(account.xbrl.startsWith(jReport.xbrlTanFix.xbrl)) { // accumulate tangible fixed assets
                         iTan = iTan + iClose;
                     }
-                    console.log("makeStatusData Fixed Assets: "+JSON.stringify(account))
+                    if(debug) console.log("makeStatusData Fixed Assets: "+JSON.stringify(account))
                 } else if(account.xbrl.startsWith(jReport.xbrlAcurr.xbrl)) { // accumulate current assets#
                     iCur = iCur + iClose;
-                    console.log("makeStatusData Currency Assets: "+JSON.stringify(account))
+                    if(debug) console.log("makeStatusData Currency Assets: "+JSON.stringify(account))
                 }
             }
             if(xbrl_pre===X_INCOME) {
