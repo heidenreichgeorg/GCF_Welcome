@@ -16,7 +16,7 @@ import { makeStatusData }  from '../modules/App';
 // txn format 
 // { 'date':"", 'sender':"Sender", 'refAcct':"", 'reason':"", 'refCode':"", 'debit':{'name':VALUE}, credit:{ 'name':VALUE}}
 
-// onkeep/buildTransaction will generate the 
+// buildTransaction will generate the 
 // flow format 
 // "sender":SENDER,"reason":REASON,"credit":{"COGK":{"index":10,"value":"100,00"}},"debit":{"K2TO":{"index":33,"value":"100,00"}},"balance":""}
 // this format is for AccountTemplateRow and the external book method
@@ -28,20 +28,7 @@ export default function Status() {
     const [client,setClient] = useState()
     const { session, status } = useSession()
     const [txn,setTxn] = useState({ 'date':"", 'sender':"Sender", 'refAcct':"", 'reason':"", 'refCode':"", 'credit':{},'debit':{}  })
-    const [patterns,setPatterns] = useState([])
 
-    function update() {
-        if(txn) {
-            let bigSum=0n;
-            let cKeys=Object.keys(txn.credit);
-            let dKeys=Object.keys(txn.debit);
-            cKeys.forEach((acct)=>{bigSum+=bigEUMoney(txn.credit[acct]); console.log("+"+txn.credit[acct])})
-            dKeys.forEach((acct)=>{bigSum-=bigEUMoney(txn.debit[acct]); console.log("+"+txn.debit[acct])})
-            txn.balance=cents2EU(bigSum);
-            setTxn(JSON.parse(JSON.stringify(txn))); // render full page
-            console.log("update "+JSON.stringify(txn)+" = "+cents2EU(bigSum));
-        }
-    }
     
     useEffect(() => {
         if(status !== 'success') return;
@@ -56,7 +43,6 @@ export default function Status() {
     }, [status])
 
     
-
 
 
 
@@ -134,7 +120,7 @@ export default function Status() {
 
 
     const tabName = "Overview";
-    let pageText =  ['DashBoard', 'Patterns'].map((name) =>( page[name] ));
+    let pageText =  ['Patterns', 'DashBoard'].map((name) =>( page[name] ));
     let aPages = ['block'];
     for(let p=1;p<pageText.length;p++) aPages[p]='none'; 
 
@@ -142,8 +128,151 @@ export default function Status() {
     return (
         <Screen prevFunc={noFunc} nextFunc={noFunc} tabSelector={pageText}  tabName={tabName}> 
            
-           <div className="FIELD" key={"Status"} id={'Overview0'} style= {{ 'display': aPages[0]}} >
+            <div className="FIELD" key="Einlage" id={'Overview0'} style= {{ 'display': aPages[0]}} >
+                <BookingRow  strKey="Miete"  
+                                             tx1="MIET" 
+                                             tx2="COGK" 
+                                             tx3="NKHA" 
+                                            sender="Vau / Ferguson" refAcct="MIET" refCode="Eifelweg 22"
+                    />                       
+                <BookingRow  strKey="Entnahme Kpl"  
+                                            sender="Elke u Georg" refAcct="K2GH K2EH" refCode="WITHDRAW"
+                                             tx5="K2GH" 
+                                             tx6="K2EH" 
+                                             tx7="COGK" 
+                    />                       
+                <BookingRow  strKey="Entnahme Alex"  
+                                            sender="Alexander" refAcct="K2AL"  refCode="WITHDRAW"
+                                             tx5="K2AL" 
+                                             tx6="COGK" 
+                    />                       
+                <BookingRow  strKey="Entnahme Kristina"  
+                                            sender="Kristina" refAcct="K2KR"  refCode="WITHDRAW"
+                                             tx5="K2KR" 
+                                             tx6="COGK" 
+                    />                       
+                <BookingRow  strKey="Entnahme Tom"  
+                                            sender="Tom" refAcct="K2TO"  refCode="WITHDRAW"
+                                             tx5="K2TO" 
+                                             tx6="COGK" 
+                    />                       
+                <BookingRow  strKey="Entnahme Leon"  
+                                            sender="Leon" refAcct="K2LE"  refCode="WITHDRAW"
+                                             tx5="K2LE" 
+                                             tx6="COGK" 
+                    />                       
+                <BookingRow  strKey="Aufwand"  
+                                            sender="Verkäufer" refAcct="AUFW" refCode="Eifelweg22" 
+                                             tx5="AUFW" 
+                                             tx6="COGK" 
+                    />                       
+                <BookingRow  strKey="Sacheinlage Kpl"  
+                                             tx1="K2GH" 
+                                             tx2="K2EH" 
+                                            sender="Verkäufer" refAcct="AUFW" refCode="DEP_IN_KIND" 
+                                             tx5="AUFW" 
+                    />                       
+                <BookingRow  strKey="Grundabgaben"  
+                                            sender="Stadt Erlangen" refAcct="NKHA" reason="Quartal" refCode="FEE"
+                                             tx5="NKHA" 
+                                             tx6="COGK" 
+                    />                       
+                <BookingRow  strKey="Versicherung"  
+                                            sender="BayernVersicherung" refAcct="NKHA" reason="Jahr" refCode="FEE"
+                                             tx5="NKHA" 
+                                             tx6="COGK" 
+                    />                       
+                <BookingRow  strKey="Aktien-Kauf"  
+                                             tx1="CDAK" 
+                                            sender="WKN" refAcct="INVEST" reason="Stückzahl" refCode="Code"
+                                             tx5="COGK" 
+                    />                       
+                <BookingRow  strKey="Bond-Kauf mit Stückzins"  
+                                             tx1="CDAK" 
+                                             tx2="FSTF" 
+                                            sender="WKN" refAcct="INVEST" reason="Nominal" refCode="Code"
+                                             tx5="COGK" 
+                    />                       
+                <BookingRow  strKey="Aktien-Dividende bar"  
+                                             tx1="EDIV" 
+                                             tx2="COGK" 
+                                             tx3="KEST" 
+                                             tx4="KESO" 
+                                            sender="WKN" refAcct="EDIV" reason="Stückzahl" refCode="Code"
+                    />                       
+                <BookingRow  strKey="Dividende steuerfrei bar"  
+                                             tx1="COGK" 
+                                            sender="WKN" refAcct="YIELD" reason="Stückzahl" refCode="Code"
+                                             tx5="CDAK" 
+                    />                       
+                <BookingRow  strKey="Dividende in Aktien steuerfrei"  
+                                            sender="WKN" refAcct="INVEST" reason="Stückzahl" refCode="Code"
+                    />                       
+                <BookingRow  strKey="Dividende in Aktien steuerpflichtig"  
+                                             tx1="EDIV" 
+                                             tx2="KEST" 
+                                             tx3="KESO" 
+                                            sender="WKN" refAcct="INVEST" reason="Stückzahl" refCode="Code"
+                    />                       
+                <BookingRow  strKey="Aktien-Verkauf Gewinn"  
+                                             tx1="FSAL" 
+                                             tx2="COGK" 
+                                             tx3="KEST" 
+                                             tx4="KESO" 
+                                            sender="WKN" refAcct="SELL" reason="Stückzahl" refCode="Code"
+                                             tx5="CDAK" 
+                    />                       
+                <BookingRow  strKey="Aktien-Verkauf Verlust"  
+                                             tx1="VAVA" 
+                                             tx2="COGK" 
+                                            sender="WKN" refAcct="SELL" reason="Stückzahl" refCode="Code"
+                                             tx5="CDAK" 
+                    />                       
+                <BookingRow  strKey="Abschreibung Haus"  
+                                            sender="Abschluss" refAcct="GRSB" reason="Jahr" refCode="Afa Haus"
+                                             tx5="GRSB" 
+                                             tx6="ABSC" 
+                    />                       
+                <BookingRow  strKey="Abschreibung EBKS"  
+                                            sender="Abschluss" refAcct="EBKS"  reason="Jahr" refCode="AfA Spülmaschine"
+                                             tx5="EBKS" 
+                                             tx6="ABSC" 
+                    />                       
+                <BookingRow  strKey="Abschreibung Dach"  
+                                            sender="Abschluss" refAcct="DACH"  reason="Jahr" refCode="AfA Dach" 
+                                             tx5="DACH" 
+                                             tx6="ABSC" 
+                    />                       
+                <BookingRow  strKey="Einlage Kpl"  
+                                             tx1="K2GH" 
+                                             tx2="K2EH" 
+                                             tx3="COGK" 
+                                            sender="Elke u Georg" refAcct="K2GH K2EH" refCode="DEPOSIT" 
+                    />                       
+                <BookingRow  strKey="Einlage Alex"  
+                                             tx1="K2AL" 
+                                             tx2="COGK" 
+                                            sender="Alexander" refAcct="K2AL" refCode="DEPOSIT" 
+                    />                       
+                <BookingRow  strKey="Einlage Kristina"  
+                                             tx1="K2KR" 
+                                             tx2="COGK" 
+                                            sender="Kristina" refAcct="Einlage" refCode="DEPOSIT" 
+                    />                       
+                <BookingRow  strKey="Einlage Tom"  
+                                             tx1="K2TO" 
+                                             tx2="COGK" 
+                                            sender="Tom" refAcct="K2TO" refCode="DEPOSIT" 
+                    />                       
+                <BookingRow  strKey="Einlage Leon"  
+                                             tx1="K2LE" 
+                                             tx2="COGK" 
+                                            sender="Leon" refAcct="K2LE" refCode="DEPOSIT" 
+                    />                       
+            </div>
 
+
+            <div className="FIELD" key={"Status"} id={'Overview1'} style= {{ 'display': aPages[1]}} >
                 <StatusRow am1={page.Assets} am2={page.Gain}  am3={page.eqliab}/>
                 {
                     report.map((row,l) => (
@@ -157,143 +286,8 @@ export default function Status() {
                 }
             </div>
 
-            <div className="FIELD" key="Einlage" id={'Overview1'} style= {{ 'display': aPages[1]}} >
-                <BookingRow  strKey="Einlage Kpl"  
-                                             tx1="K2GH" 
-                                             tx2="K2EH" 
-                                             tx3="COGK" 
-                                            sender="Elke u Georg" refAcct="K2GH K2EH" reason="DEPOSIT" 
-                    />                       
-                <BookingRow  strKey="Einlage Alex"  
-                                             tx1="K2AL" 
-                                             tx2="COGK" 
-                                            sender="Alexander" refAcct="K2AL" reason="DEPOSIT" 
-                    />                       
-                <BookingRow  strKey="Einlage Kristina"  
-                                             tx1="K2KR" 
-                                             tx2="COGK" 
-                                            sender="Kristina" refAcct="Einlage" reason="DEPOSIT" 
-                    />                       
-                <BookingRow  strKey="Einlage Tom"  
-                                             tx1="K2TO" 
-                                             tx2="COGK" 
-                                            sender="Tom" refAcct="K2TO" reason="DEPOSIT" 
-                    />                       
-                <BookingRow  strKey="Einlage Leon"  
-                                             tx1="K2LE" 
-                                             tx2="COGK" 
-                                            sender="Leon" refAcct="K2LE" reason="DEPOSIT" 
-                    />                       
-                <BookingRow  strKey="Miete"  
-                                             tx1="MIET" 
-                                             tx2="COGK" 
-                                             tx3="NKHA" 
-                                            sender="Vau / Ferguson" refAcct="MIET" reason="Eifelweg 22"
-                    />                       
-                <BookingRow  strKey="Entnahme Kpl"  
-                                            sender="Elke u Georg" refAcct="K2GH K2EH" reason="WITHDRAW"
-                                             tx5="K2GH" 
-                                             tx6="K2EH" 
-                                             tx7="COGK" 
-                    />                       
-                <BookingRow  strKey="Entnahme Alex"  
-                                            sender="Alexander" refAcct="K2AL"  reason="WITHDRAW"
-                                             tx5="K2AL" 
-                                             tx6="COGK" 
-                    />                       
-                <BookingRow  strKey="Entnahme Kristina"  
-                                            sender="Kristina" refAcct="K2KR"  reason="WITHDRAW"
-                                             tx5="K2KR" 
-                                             tx6="COGK" 
-                    />                       
-                <BookingRow  strKey="Entnahme Tom"  
-                                            sender="Tom" refAcct="K2TO"  reason="WITHDRAW"
-                                             tx5="K2TO" 
-                                             tx6="COGK" 
-                    />                       
-                <BookingRow  strKey="Entnahme Leon"  
-                                            sender="Leon" refAcct="K2LE"  reason="WITHDRAW"
-                                             tx5="K2LE" 
-                                             tx6="COGK" 
-                    />                       
-                <BookingRow  strKey="Aufwand"  
-                                            sender="Verkäufer" refAcct="AUFW" reason="Eifelweg22" 
-                                             tx5="AUFW" 
-                                             tx6="COGK" 
-                    />                       
-                <BookingRow  strKey="Sacheinlage Kpl"  
-                                             tx1="K2GH" 
-                                             tx2="K2EH" 
-                                            sender="Verkäufer" refAcct="AUFW" reason="DEP_IN_KIND" 
-                                             tx5="AUFW" 
-                    />                       
-                <BookingRow  strKey="Grundabgaben"  
-                                            sender="Stadt Erlangen" refAcct="NKHA" refe="Quartal" reason="FEE"
-                                             tx5="NKHA" 
-                                             tx6="COGK" 
-                    />                       
-                <BookingRow  strKey="Versicherung"  
-                                            sender="BayernVersicherung" refAcct="NKHA" refe="Jahr" reason="FEE"
-                                             tx5="NKHA" 
-                                             tx6="COGK" 
-                    />                       
-                <BookingRow  strKey="Aktien-Kauf"  
-                                             tx1="CDAK" 
-                                            sender="WKN" refAcct="INVEST" refe="Stückzahl" reason="Code"
-                                             tx5="COGK" 
-                    />                       
-                <BookingRow  strKey="Bond-Kauf mit Stückzins"  
-                                             tx1="CDAK" 
-                                             tx2="FSTF" 
-                                            sender="WKN" refAcct="INVEST" refe="Nominal" reason="Code"
-                                             tx5="COGK" 
-                    />                       
-                <BookingRow  strKey="Aktien-Dividende bar"  
-                                             tx1="EDIV" 
-                                             tx2="COGK" 
-                                             tx3="KEST" 
-                                            am4={0} tx4="KESO" 
-                                            sender="WKN" refAcct="EDIV" refe="Stückzahl" reason="Code"
-                    />                       
-                <BookingRow  strKey="Dividende steuerfrei bar"  
-                                             tx1="COGK" 
-                                            sender="WKN" refAcct="YIELD" refe="Stückzahl" reason="Code"
-                                             tx5="CDAK" 
-                    />                       
-                <BookingRow  strKey="Dividende in Aktien steuerfrei"  
-                                            sender="WKN" refAcct="INVEST" refe="Stückzahl" reason="Code"
-                    />                       
-                <BookingRow  strKey="Aktien-Verkauf Gewinn"  
-                                             tx1="FSAL" 
-                                             tx2="COGK" 
-                                             tx3="KEST" 
-                                             tx4="KESO" 
-                                            sender="WKN" refAcct="SELL" refe="Stückzahl" reason="Code"
-                                             tx5="CDAK" 
-                    />                       
-                <BookingRow  strKey="Aktien-Verkauf Verlust"  
-                                             tx1="VAVA" 
-                                             tx2="COGK" 
-                                            sender="WKN" refAcct="SELL" refe="Stückzahl" reason="Code"
-                                             tx5="CDAK" 
-                    />                       
-                <BookingRow  strKey="Abschreibung Haus"  
-                                            sender="Abschluss" refAcct="GRSB" refe="Jahr" reason="Afa Haus"
-                                             tx5="GRSB" 
-                                             tx6="ABSC" 
-                    />                       
-                <BookingRow  strKey="Abschreibung EBKS"  
-                                            sender="Abschluss" refAcct="EBKS"  refe="Jahr" reason="AfA Spülmaschine"
-                                             tx5="EBKS" 
-                                             tx6="ABSC" 
-                    />                       
-                <BookingRow  strKey="Abschreibung Dach"  
-                                            sender="Abschluss" refAcct="DACH"  refe="Jahr" reason="AfA Dach" 
-                                             tx5="DACH" 
-                                             tx6="ABSC" 
-                    />                       
-            </div>
- 
+
+
             <FooterRow left={page["client"]}  right={page["register"]} prevFunc={prevFunc} nextFunc={nextFunc} miscFunc={handleXLSave}/>
             <FooterRow left={page["reference"]} right={page["author"]} prevFunc={prevFunc} nextFunc={nextFunc} miscFunc={handleXLSave}/>
         </Screen>
@@ -331,32 +325,36 @@ function StatusRow({ am1,tx1, am2, tx2, am3, tx3, d, n, l, click}) {
 
 
 
-function BookingRow({ strKey, tx1,  tx2, tx3,  tx4, tx5, tx6, tx7, refe, refAcct, sender, reason}) {
+function BookingRow({ strKey, tx1,  tx2, tx3,  tx4, tx5, tx6, tx7, reason, refAcct, sender, refCode}) {
 
     // FILL FORM INITIALLY !!  -- no change event if values already exist from previous booking
-    if(!form[strKey]) form[strKey]={};
+    if(!form[strKey]) form[strKey]={ 'CREDIT':{},'DEBIT':{} };
     let record=form[strKey];
     record.sender=sender;
-    record.refe=refe;
-    record.refAcct=refAcct;
     record.reason=reason;
+    record.refAcct=refAcct;
+    record.refCode=refCode;
+
+
 
     return( <div><div className="attrLine"></div>
         <div className="attrLine">
             <div className="FIELD LTXT"> {strKey}</div>
 
-            <div className="FIELD NAME"><input id="dateBooked" type="date" onChange={((e) => buffer(strKey,'date',e.target.value))}/></div>
+            <div className="FIELD NAME">
+                <input id="dateBooked" type="date" defaultValue={record.date} onChange={((e) => bufferField(strKey,'date',e.target.value))}/>
+            </div>
 
             <div className="FIELD SYMB" >Sender</div>
-            <input type ="text" className="key MOAM" value={sender} onChange={((e) => buffer(strKey,'sender',e.target.value))}/>
+            <input type ="text" className="key MOAM" defaultValue={record.sender} onChange={((e) => bufferField(strKey,'sender',e.target.value))}/>
             <div className="FIELD TAG" ></div>
 
             <div className="FIELD SYMB" >Zeitraum</div>
-            <input type ="text" className="key MOAM" value={refe} onChange={((e) => buffer(strKey,'refe',e.target.value))}/>
+            <input type ="text" className="key MOAM" defaultValue={record.reason} onChange={((e) => bufferField(strKey,'reason',e.target.value))}/>
             <div className="FIELD TAG" ></div>
 
             <div className="FIELD SYMB" >Grund</div>
-            <input type ="text" className="key MOAM" value={reason} onChange={((e) => buffer(strKey,'reason',e.target.value))}/>
+            <input type ="text" className="key MOAM" defaultValue={record.refCode} onChange={((e) => bufferField(strKey,'refCode',e.target.value))}/>
             <div className="FIELD TAG" ></div>
         </div>
 
@@ -365,25 +363,25 @@ function BookingRow({ strKey, tx1,  tx2, tx3,  tx4, tx5, tx6, tx7, refe, refAcct
 
         {(tx1) ? ( <div>
             <div className="FIELD TAG" > {tx1}</div>
-            <input type ="number" className="key MOAM" onChange={((e) => buffer(strKey,tx1,e.target.value))}/>
+            <input type ="number" className="key MOAM" onChange={((e) => bufferAmount(strKey,tx1,e.target.value,'CREDIT'))}/>
             <div className="FIELD TAG" ></div>
         </div>):''}
             
         {(tx2) ? ( <div>
             <div className="FIELD TAG" > {tx2}</div>
-            <input type ="number" className="key MOAM" onChange={((e) => buffer(strKey,tx2,e.target.value))}/>
+            <input type ="number" className="key MOAM" onChange={((e) => bufferAmount(strKey,tx2,e.target.value,'CREDIT'))}/>
             <div className="FIELD TAG" ></div>
         </div>):''}
 
         {(tx3) ? ( <div>
             <div className="FIELD TAG" > {tx3}</div>
-            <input type ="number" className="key MOAM" onChange={((e) => buffer(strKey,tx3,e.target.value))}/>
+            <input type ="number" className="key MOAM" onChange={((e) => bufferAmount(strKey,tx3,e.target.value,'CREDIT'))}/>
             <div className="FIELD TAG" ></div>
         </div>):''}
 
         {(tx4) ? ( <div>
             <div className="FIELD TAG" > {tx4}</div>
-            <input type ="number" className="key MOAM" onChange={((e) => buffer(strKey,tx4,e.target.value))}/>
+            <input type ="number" className="key MOAM" onChange={((e) => bufferAmount(strKey,tx4,e.target.value,'CREDIT'))}/>
             <div className="FIELD TAG" ></div>
         </div>):''}
 
@@ -391,19 +389,19 @@ function BookingRow({ strKey, tx1,  tx2, tx3,  tx4, tx5, tx6, tx7, refe, refAcct
             
         {(tx5) ? ( <div>
             <div className="FIELD TAG"> {tx5}</div>
-            <input type ="number" className="key MOAM" onChange={((e) => buffer(strKey,tx5,e.target.value))}/>
+            <input type ="number" className="key MOAM" onChange={((e) => bufferAmount(strKey,tx5,e.target.value,'DEBIT'))}/>
             <div className="FIELD TAG" ></div>
         </div>):''}
 
         {(tx6) ? ( <div>
             <div className="FIELD TAG"> {tx6}</div>
-            <input type ="number" className="key MOAM" onChange={((e) => buffer(strKey,tx6,e.target.value))}/>
+            <input type ="number" className="key MOAM" onChange={((e) => bufferAmount(strKey,tx6,e.target.value,'DEBIT'))}/>
             <div className="FIELD TAG" ></div>
         </div>):''}
 
         {(tx7) ? ( <div>
             <div className="FIELD TAG"> {tx7}</div>
-            <input type ="number" className="key MOAM" onChange={((e) => buffer(strKey,tx7,e.target.value))}/>
+            <input type ="number" className="key MOAM" onChange={((e) => bufferAmount(strKey,tx7,e.target.value,'DEBIT'))}/>
         </div>):''}
 
         <div className="FIELD TAG" ></div>
@@ -412,22 +410,25 @@ function BookingRow({ strKey, tx1,  tx2, tx3,  tx4, tx5, tx6, tx7, refe, refAcct
     </div>)
 }
 
+
 let form={};
+// side = DEBIT or CREDIT
+function bufferAmount(strKey,field,value,side) {
+    console.log("in "+strKey+ " change amount "+field+" to "+value+" at "+side);    
+    let record = form[strKey];
+    record[side][field]=value;
+}
 
-function buffer(strKey,field,value) {
-    console.log("in "+strKey+ " change "+field+" to "+value);
-
-    if(!form[strKey]) form[strKey]={};
+function bufferField(strKey,field,value) {
+    console.log("in "+strKey+ " change field "+field+" to "+value);    
     let record = form[strKey];
     record[field]=value;
 }
 
+
 function doBook(strKey) {
     console.log("Book "+strKey);
-
     if(form[strKey]) {
-
-
         console.log("Book "+JSON.stringify(form[strKey]))
     }
 }
