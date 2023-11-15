@@ -13,13 +13,13 @@ import { makeStatusData }  from '../modules/App';
 
 
 // addDebit,addCredit,makeTxnFormat(jTemplates[index],names,aLen,eLen) will generate the 
-// txn format 
+// matrix format 
 // { 'date':"", 'sender':"Sender", 'refAcct':"", 'reason':"", 'refCode':"", 'debit':{'name':VALUE}, credit:{ 'name':VALUE}}
 
 // buildTransaction will generate the 
 // flow format 
 // "sender":SENDER,"reason":REASON,"credit":{"COGK":{"index":10,"value":"100,00"}},"debit":{"K2TO":{"index":33,"value":"100,00"}},"balance":""}
-// this format is for AccountTemplateRow and the external book method
+// this format is for AccountTemplateRow and setTxnthe external book method
 
 export default function Status() {
     
@@ -27,7 +27,33 @@ export default function Status() {
     const [ year, setYear]   = useState()
     const [client,setClient] = useState()
     const { session, status } = useSession()
-    const [txn,setTxn] = useState({ 'date':"", 'sender':"Sender", 'refAcct':"", 'reason':"", 'refCode':"", 'credit':{},'debit':{}  })
+    const [matrix,setMatrix] = useState({
+        "Miete":{"credit":{"MIET":"0","COGK":"0","NKHA":"0"},"debit":{},"sender":"Vau / Ferguson","refAcct":"MIET","refCode":"Eifelweg 22"},
+        "Entnahme Kpl":{"credit":{},"debit":{"K2GH":"-0","K2EH":"-0","COGK":"-0"},"sender":"Elke u Georg","refAcct":"K2GH K2EH","refCode":"WITHDRAW"},
+        "Entnahme Alex":{"credit":{},"debit":{"K2AL":"-0","COGK":"-0"},"sender":"Alexander","refAcct":"K2AL","refCode":"WITHDRAW"},
+        "Entnahme Kristina":{"credit":{},"debit":{"K2KR":"-0","COGK":"-0"},"sender":"Kristina","refAcct":"K2KR","refCode":"WITHDRAW"},
+        "Entnahme Tom":{"credit":{},"debit":{"K2TO":"-0","COGK":"-0"},"sender":"Tom","refAcct":"K2TO","refCode":"WITHDRAW"},
+        "Entnahme Leon":{"credit":{},"debit":{"K2LE":"-0","COGK":"-0"},"sender":"Leon","refAcct":"K2LE","refCode":"WITHDRAW"},
+        "Aufwand":{"credit":{},"debit":{"AUFW":"-0","COGK":"-0"},"sender":"Verkäufer","refAcct":"AUFW","refCode":"Eifelweg22"},
+        "Sacheinlage Kpl":{"credit":{"K2GH":"0","K2EH":"0"},"debit":{"AUFW":"-0"},"sender":"Verkäufer","refAcct":"AUFW","refCode":"DEP_IN_KIND"},
+        "Grundabgaben":{"credit":{},"debit":{"NKHA":"-0","COGK":"-0"},"sender":"Stadt Erlangen","reason":"Quartal","refAcct":"NKHA","refCode":"FEE"},
+        "Versicherung":{"credit":{},"debit":{"NKHA":"-0","COGK":"-0"},"sender":"BayernVersicherung","reason":"Jahr","refAcct":"NKHA","refCode":"FEE"},
+        "Aktien-Kauf":{"credit":{"CDAK":"0"},"debit":{"COGK":"-0"},"sender":"WKN","reason":"Stückzahl","refAcct":"INVEST","refCode":"Code"},
+        "Bond-Kauf mit Stückzins":{"credit":{"CDAK":"0","FSTF":"0"},"debit":{"COGK":"-0"},"sender":"WKN","reason":"Nominal","refAcct":"INVEST","refCode":"Code"},
+        "Aktien-Dividende bar":{"credit":{"EDIV":"0","COGK":"0","KEST":"0","KESO":"0"},"debit":{},"sender":"WKN","reason":"Stückzahl","refAcct":"EDIV","refCode":"Code"},
+        "Dividende steuerfrei bar":{"credit":{"COGK":"0"},"debit":{"CDAK":"-0"},"sender":"WKN","reason":"Stückzahl","refAcct":"YIELD","refCode":"Code"},
+        "Dividende in Aktien steuerfrei":{"credit":{},"debit":{},"sender":"WKN","reason":"Stückzahl","refAcct":"INVEST","refCode":"Code"},
+        "Dividende in Aktien steuerpflichtig":{"credit":{"EDIV":"0","KEST":"0","KESO":"0"},"debit":{},"sender":"WKN","reason":"Stückzahl","refAcct":"INVEST","refCode":"Code"},
+        "Aktien-Verkauf Gewinn":{"credit":{"FSAL":"0","COGK":"0","KEST":"0","KESO":"0"},"debit":{"CDAK":"-0"},"sender":"WKN","reason":"Stückzahl","refAcct":"SELL","refCode":"Code"},
+        "Aktien-Verkauf Verlust":{"credit":{"VAVA":"0","COGK":"0"},"debit":{"CDAK":"-0"},"sender":"WKN","reason":"Stückzahl","refAcct":"SELL","refCode":"Code"},
+        "Abschreibung Haus":{"credit":{},"debit":{"GRSB":"-0","ABSC":"-0"},"sender":"Abschluss","reason":"Jahr","refAcct":"GRSB","refCode":"Afa Haus"},
+        "Abschreibung EBKS":{"credit":{},"debit":{"EBKS":"-0","ABSC":"-0"},"sender":"Abschluss","reason":"Jahr","refAcct":"EBKS","refCode":"AfA Spülmaschine"},
+        "Abschreibung Dach":{"credit":{},"debit":{"DACH":"-0","ABSC":"-0"},"sender":"Abschluss","reason":"Jahr","refAcct":"DACH","refCode":"AfA Dach"},
+        "Einlage Kpl":{"credit":{"K2GH":"0","K2EH":"0","COGK":"0"},"debit":{},"sender":"Elke u Georg","refAcct":"K2GH K2EH","refCode":"DEPOSIT"},
+        "Einlage Alex":{"credit":{"K2AL":"0","COGK":"0"},"debit":{},"sender":"Alexander","refAcct":"K2AL","refCode":"DEPOSIT"},
+        "Einlage Kristina":{"credit":{"K2KR":"0","COGK":"0"},"debit":{},"sender":"Kristina","refAcct":"Einlage","refCode":"DEPOSIT"},
+        "Einlage Tom":{"credit":{"K2TO":"0","COGK":"0"},"debit":{},"sender":"Tom","refAcct":"K2TO","refCode":"DEPOSIT"},
+        "Einlage Leon":{"credit":{"K2LE":"0","COGK":"0"},"debit":{},"sender":"Leon","refAcct":"K2LE","refCode":"DEPOSIT"}}  )
 
     
     useEffect(() => {
@@ -54,8 +80,8 @@ export default function Status() {
                      'refCode':simpleTXN.refCode,
                      'credit':{}, 'debit':{} };
 
-        var arrCreditInfo=list(simpleTXN.CREDIT);        
-        var arrDebitInfo=list(simpleTXN.DEBIT);
+        var arrCreditInfo=list(simpleTXN.credit);        
+        var arrDebitInfo=list(simpleTXN.debit);
 
         console.log("KEEP1 "+JSON.stringify(arrCreditInfo));
         console.log("KEEP2 "+JSON.stringify(arrDebitInfo));
@@ -67,6 +93,9 @@ export default function Status() {
     }
 
 
+    const BOOK_NOW  = '0';
+    const PRE_CLAIM = '1';
+
     function bookTemplate(jTXN) {   
 
 
@@ -75,6 +104,7 @@ export default function Status() {
 
         jTXN.sessionId = session.id; // won't book otherwise        
         jTXN.flag='1'; // flag that a pre-claim is being entered
+        jTXN.flag=BOOK_NOW;
 
         console.log("bookTemplate build : "+JSON.stringify(jTXN));
 
@@ -91,17 +121,28 @@ export default function Status() {
     
     function doBook(strKey) {
         console.log("Book "+strKey);
-        if(form[strKey]) {
-            let txn = form[strKey];
+        if(matrix[strKey]) {
+            let txn = matrix[strKey];
 
             console.log("Book FORM "+JSON.stringify());
 
             let jTXN = buildTransaction(txn);
 
-            console.log("Book TXN "+JSON.stringify(jTXN));
 
-            if(!jTXN.balance || jTXN.balance=='')
-                bookTemplate(jTXN);
+            if(!jTXN.balance || jTXN.balance=='') {
+
+                if(     jTXN.sender //&& jTXN.sender.length>0
+                     && jTXN.date //&& jTXN.date.length>0
+                     && jTXN.refAcct //&& jTXN.refAcct.length>0
+                     && jTXN.refCode //&& jTXN.refCode.length>0
+                     && jTXN.reason //&& jTXN.reason.length>0
+                     ) {
+                    bookTemplate(jTXN);
+
+                    console.log("doBook() booked "+JSON.stringify(jTXN));
+                }
+                else console.log("doBook() REJECTS "+JSON.stringify(jTXN));
+            }
         }
     }
 
@@ -176,6 +217,84 @@ export default function Status() {
         return url;
     };
 
+    
+    //let form={};
+    // side = debit or credit
+    function bufferAmount(strKey,field,value,side,setMatrix) {
+
+
+        console.log("in "+strKey+ " change amount "+field+" to "+value+" at "+side);    
+        let record = matrix[strKey];
+        if(side=='debit') record[side][field]="-"+value;
+        else record[side][field]=value;
+
+
+        setMatrix(JSON.parse(JSON.stringify(matrix)));
+    }
+
+    function bufferField(strKey,field,value,setMatrix) {
+        console.log("in "+strKey+ " change field "+field+" to "+value);    
+        let record = matrix[strKey];
+        record[field]=value;
+
+        setMatrix(JSON.parse(JSON.stringify(matrix)));
+    }
+
+
+
+    function BookingForm({ strKey, form, doBook, setMatrix}) {
+
+        let arrCredit = Object.keys(form.credit);
+        let arrDebit = Object.keys(form.debit);
+    
+        return( <div><div className="attrLine"></div>
+            <div className="attrLine">
+                <div className="FIELD LTXT"> {strKey}</div>
+    
+                <div className="FIELD NAME">
+                    <input id="dateBooked" type="date" defaultValue={form.date} onChange={((e) => bufferField(strKey,'date',e.target.value,setMatrix))}/>
+                </div>
+    
+                        
+                <div className="FIELD SYMB" >Sender</div>
+                <input type ="text" className="key MOAM" defaultValue={form.sender} onChange={((e) => bufferField(strKey,'sender',e.target.value,setMatrix))}/>
+                <div className="FIELD TAG" ></div>
+    
+                <div className="FIELD SYMB" >Zeitraum</div>
+                <input type ="text" className="key MOAM" defaultValue={form.reason} onChange={((e) => bufferField(strKey,'reason',e.target.value,setMatrix))}/>
+                <div className="FIELD TAG" ></div>
+    
+                <div className="FIELD SYMB" >Grund</div>
+                <input type ="text" className="key MOAM" defaultValue={form.refCode} onChange={((e) => bufferField(strKey,'refCode',e.target.value,setMatrix))}/>
+                <div className="FIELD TAG" ></div>
+                
+            </div>
+            <div className="attrLine">
+      
+                {arrCredit.map((acct)=>(
+                    (<div>
+                        <div className="FIELD TAG" > {acct}</div>
+                        <input type ="number" className="key MOAM" value={form[acct]} onChange={((e) => bufferAmount(strKey,acct,e.target.value,'credit',setMatrix))} />    
+                        <div className="FIELD TAG" ></div>
+                    </div>)
+                ))}
+                AN
+                {arrDebit.map((acct)=>(
+                    (<div>
+                        <div className="FIELD TAG" > {acct}</div>
+                        <input type ="number" className="key MOAM" value={form[acct]} onChange={((e) => bufferAmount(strKey,acct,e.target.value,'debit',setMatrix))} />    
+                        <div className="FIELD TAG" ></div>
+                    </div>)
+                ))}
+                
+                
+                <div className="FIELD TAG" ></div>
+                <button className="key" onClick={(() => doBook(strKey))}>Buchen</button>
+            
+            </div>
+        </div>);
+    }
+    
       
     let page = sheet[D_Page];
     let sheet_status = makeStatusData(sheet);
@@ -191,147 +310,12 @@ export default function Status() {
     return (
         <Screen prevFunc={noFunc} nextFunc={noFunc} tabSelector={pageText}  tabName={tabName}> 
            
-            <div className="FIELD" key="Einlage" id={'Overview0'} style= {{ 'display': aPages[0]}} >
-                <BookingRow  strKey="Miete"   doBook={doBook}
-                                             tx1="MIET" 
-                                             tx2="COGK" 
-                                             tx3="NKHA" 
-                                            sender="Vau / Ferguson" refAcct="MIET" refCode="Eifelweg 22"
-                    />                       
-                <BookingRow  strKey="Entnahme Kpl"   doBook={doBook}
-                                            sender="Elke u Georg" refAcct="K2GH K2EH" refCode="WITHDRAW"
-                                             tx5="K2GH" 
-                                             tx6="K2EH" 
-                                             tx7="COGK" 
-                    />                       
-                <BookingRow  strKey="Entnahme Alex"   doBook={doBook}
-                                            sender="Alexander" refAcct="K2AL"  refCode="WITHDRAW"
-                                             tx5="K2AL" 
-                                             tx6="COGK" 
-                    />                       
-                <BookingRow  strKey="Entnahme Kristina"   doBook={doBook}
-                                            sender="Kristina" refAcct="K2KR"  refCode="WITHDRAW"
-                                             tx5="K2KR" 
-                                             tx6="COGK" 
-                    />                       
-                <BookingRow  strKey="Entnahme Tom"   doBook={doBook}
-                                            sender="Tom" refAcct="K2TO"  refCode="WITHDRAW"
-                                             tx5="K2TO" 
-                                             tx6="COGK" 
-                    />                       
-                <BookingRow  strKey="Entnahme Leon"   doBook={doBook}
-                                            sender="Leon" refAcct="K2LE"  refCode="WITHDRAW"
-                                             tx5="K2LE" 
-                                             tx6="COGK" 
-                    />                       
-                <BookingRow  strKey="Aufwand"   doBook={doBook}
-                                            sender="Verkäufer" refAcct="AUFW" refCode="Eifelweg22" 
-                                             tx5="AUFW" 
-                                             tx6="COGK" 
-                    />                       
-                <BookingRow  strKey="Sacheinlage Kpl"   doBook={doBook}
-                                             tx1="K2GH" 
-                                             tx2="K2EH" 
-                                            sender="Verkäufer" refAcct="AUFW" refCode="DEP_IN_KIND" 
-                                             tx5="AUFW" 
-                    />                       
-                <BookingRow  strKey="Grundabgaben"   doBook={doBook}
-                                            sender="Stadt Erlangen" refAcct="NKHA" reason="Quartal" refCode="FEE"
-                                             tx5="NKHA" 
-                                             tx6="COGK" 
-                    />                       
-                <BookingRow  strKey="Versicherung"   doBook={doBook}
-                                            sender="BayernVersicherung" refAcct="NKHA" reason="Jahr" refCode="FEE"
-                                             tx5="NKHA" 
-                                             tx6="COGK" 
-                    />                       
-                <BookingRow  strKey="Aktien-Kauf"   doBook={doBook}
-                                             tx1="CDAK" 
-                                            sender="WKN" refAcct="INVEST" reason="Stückzahl" refCode="Code"
-                                             tx5="COGK" 
-                    />                       
-                <BookingRow  strKey="Bond-Kauf mit Stückzins"   doBook={doBook}
-                                             tx1="CDAK" 
-                                             tx2="FSTF" 
-                                            sender="WKN" refAcct="INVEST" reason="Nominal" refCode="Code"
-                                             tx5="COGK" 
-                    />                       
-                <BookingRow  strKey="Aktien-Dividende bar"   doBook={doBook}
-                                             tx1="EDIV" 
-                                             tx2="COGK" 
-                                             tx3="KEST" 
-                                             tx4="KESO" 
-                                            sender="WKN" refAcct="EDIV" reason="Stückzahl" refCode="Code"
-                    />                       
-                <BookingRow  strKey="Dividende steuerfrei bar"   doBook={doBook}
-                                             tx1="COGK" 
-                                            sender="WKN" refAcct="YIELD" reason="Stückzahl" refCode="Code"
-                                             tx5="CDAK" 
-                    />                       
-                <BookingRow  strKey="Dividende in Aktien steuerfrei"   doBook={doBook}
-                                            sender="WKN" refAcct="INVEST" reason="Stückzahl" refCode="Code"
-                    />                       
-                <BookingRow  strKey="Dividende in Aktien steuerpflichtig"  doBook={doBook} 
-                                             tx1="EDIV" 
-                                             tx2="KEST" 
-                                             tx3="KESO" 
-                                            sender="WKN" refAcct="INVEST" reason="Stückzahl" refCode="Code"
-                    />                       
-                <BookingRow  strKey="Aktien-Verkauf Gewinn"  doBook={doBook} 
-                                             tx1="FSAL" 
-                                             tx2="COGK" 
-                                             tx3="KEST" 
-                                             tx4="KESO" 
-                                            sender="WKN" refAcct="SELL" reason="Stückzahl" refCode="Code"
-                                             tx5="CDAK" 
-                    />                       
-                <BookingRow  strKey="Aktien-Verkauf Verlust"   doBook={doBook}
-                                             tx1="VAVA" 
-                                             tx2="COGK" 
-                                            sender="WKN" refAcct="SELL" reason="Stückzahl" refCode="Code"
-                                             tx5="CDAK" 
-                    />                       
-                <BookingRow  strKey="Abschreibung Haus"   doBook={doBook}
-                                            sender="Abschluss" refAcct="GRSB" reason="Jahr" refCode="Afa Haus"
-                                             tx5="GRSB" 
-                                             tx6="ABSC" 
-                    />                       
-                <BookingRow  strKey="Abschreibung EBKS"  doBook={doBook} 
-                                            sender="Abschluss" refAcct="EBKS"  reason="Jahr" refCode="AfA Spülmaschine"
-                                             tx5="EBKS" 
-                                             tx6="ABSC" 
-                    />                       
-                <BookingRow  strKey="Abschreibung Dach"   doBook={doBook}
-                                            sender="Abschluss" refAcct="DACH"  reason="Jahr" refCode="AfA Dach" 
-                                             tx5="DACH" 
-                                             tx6="ABSC" 
-                    />                       
-                <BookingRow  strKey="Einlage Kpl"   doBook={doBook}
-                                             tx1="K2GH" 
-                                             tx2="K2EH" 
-                                             tx3="COGK" 
-                                            sender="Elke u Georg" refAcct="K2GH K2EH" refCode="DEPOSIT" 
-                    />                       
-                <BookingRow  strKey="Einlage Alex"   doBook={doBook}
-                                             tx1="K2AL" 
-                                             tx2="COGK" 
-                                            sender="Alexander" refAcct="K2AL" refCode="DEPOSIT" 
-                    />                       
-                <BookingRow  strKey="Einlage Kristina"  doBook={doBook} 
-                                             tx1="K2KR" 
-                                             tx2="COGK" 
-                                            sender="Kristina" refAcct="Einlage" refCode="DEPOSIT" 
-                    />                       
-                <BookingRow  strKey="Einlage Tom"   doBook={doBook}
-                                             tx1="K2TO" 
-                                             tx2="COGK" 
-                                            sender="Tom" refAcct="K2TO" refCode="DEPOSIT" 
-                    />                       
-                <BookingRow  strKey="Einlage Leon"  doBook={doBook}
-                                             tx1="K2LE" 
-                                             tx2="COGK" 
-                                            sender="Leon" refAcct="K2LE" refCode="DEPOSIT" 
-                    />                       
+
+            <div className="FIELD"  id={'Overview0'} style= {{ 'display': aPages[0]}} >
+                <div className="FIELD" >{JSON.stringify(matrix)} </div>
+                {Object.keys(matrix).map((strKey)=>(
+                    <BookingForm  strKey={strKey}  form={matrix[strKey]} doBook={doBook} setMatrix={setMatrix} />
+                ))}
             </div>
 
 
@@ -348,7 +332,6 @@ export default function Status() {
                     ))
                 }
             </div>
-
 
 
             <FooterRow left={page["client"]}  right={page["register"]} prevFunc={prevFunc} nextFunc={nextFunc} miscFunc={handleXLSave}/>
@@ -381,112 +364,6 @@ function StatusRow({ am1,tx1, am2, tx2, am3, tx3, d, n, l, click}) {
             ) }
         </div>
     )
-}
-
-
-
-
-
-
-function BookingRow({ strKey, tx1,  tx2, tx3,  tx4, tx5, tx6, tx7, reason, refAcct, sender, refCode, doBook}) {
-
-    // FILL FORM INITIALLY !!  -- no change event if values already exist from previous booking
-    if(!form[strKey]) form[strKey]={ 'CREDIT':{},'DEBIT':{} };
-    let record=form[strKey];
-    record.sender=sender;
-    record.reason=reason;
-    record.refAcct=refAcct;
-    record.refCode=refCode;
-
-
-
-    return( <div><div className="attrLine"></div>
-        <div className="attrLine">
-            <div className="FIELD LTXT"> {strKey}</div>
-
-            <div className="FIELD NAME">
-                <input id="dateBooked" type="date" defaultValue={record.date} onChange={((e) => bufferField(strKey,'date',e.target.value))}/>
-            </div>
-
-            <div className="FIELD SYMB" >Sender</div>
-            <input type ="text" className="key MOAM" defaultValue={record.sender} onChange={((e) => bufferField(strKey,'sender',e.target.value))}/>
-            <div className="FIELD TAG" ></div>
-
-            <div className="FIELD SYMB" >Zeitraum</div>
-            <input type ="text" className="key MOAM" defaultValue={record.reason} onChange={((e) => bufferField(strKey,'reason',e.target.value))}/>
-            <div className="FIELD TAG" ></div>
-
-            <div className="FIELD SYMB" >Grund</div>
-            <input type ="text" className="key MOAM" defaultValue={record.refCode} onChange={((e) => bufferField(strKey,'refCode',e.target.value))}/>
-            <div className="FIELD TAG" ></div>
-        </div>
-
-
-        <div className="attrLine">
-
-        {(tx1) ? ( <div>
-            <div className="FIELD TAG" > {tx1}</div>
-            <input type ="number" className="key MOAM" onChange={((e) => bufferAmount(strKey,tx1,e.target.value,'CREDIT'))}/>
-            <div className="FIELD TAG" ></div>
-        </div>):''}
-            
-        {(tx2) ? ( <div>
-            <div className="FIELD TAG" > {tx2}</div>
-            <input type ="number" className="key MOAM" onChange={((e) => bufferAmount(strKey,tx2,e.target.value,'CREDIT'))}/>
-            <div className="FIELD TAG" ></div>
-        </div>):''}
-
-        {(tx3) ? ( <div>
-            <div className="FIELD TAG" > {tx3}</div>
-            <input type ="number" className="key MOAM" onChange={((e) => bufferAmount(strKey,tx3,e.target.value,'CREDIT'))}/>
-            <div className="FIELD TAG" ></div>
-        </div>):''}
-
-        {(tx4) ? ( <div>
-            <div className="FIELD TAG" > {tx4}</div>
-            <input type ="number" className="key MOAM" onChange={((e) => bufferAmount(strKey,tx4,e.target.value,'CREDIT'))}/>
-            <div className="FIELD TAG" ></div>
-        </div>):''}
-
-        <div className="FIELD TAG" >AN</div>
-            
-        {(tx5) ? ( <div>
-            <div className="FIELD TAG"> {tx5}</div>
-            <input type ="number" className="key MOAM" onChange={((e) => bufferAmount(strKey,tx5,e.target.value,'DEBIT'))}/>
-            <div className="FIELD TAG" ></div>
-        </div>):''}
-
-        {(tx6) ? ( <div>
-            <div className="FIELD TAG"> {tx6}</div>
-            <input type ="number" className="key MOAM" onChange={((e) => bufferAmount(strKey,tx6,e.target.value,'DEBIT'))}/>
-            <div className="FIELD TAG" ></div>
-        </div>):''}
-
-        {(tx7) ? ( <div>
-            <div className="FIELD TAG"> {tx7}</div>
-            <input type ="number" className="key MOAM" onChange={((e) => bufferAmount(strKey,tx7,e.target.value,'DEBIT'))}/>
-        </div>):''}
-
-        <div className="FIELD TAG" ></div>
-            <button className="key" onClick={(() => doBook(strKey))}>Buchen</button>
-        </div>
-    </div>)
-}
-
-
-let form={};
-// side = DEBIT or CREDIT
-function bufferAmount(strKey,field,value,side) {
-    console.log("in "+strKey+ " change amount "+field+" to "+value+" at "+side);    
-    let record = form[strKey];
-    if(side=='DEBIT') record[side][field]="-"+value;
-    else record[side][field]=value;
-}
-
-function bufferField(strKey,field,value) {
-    console.log("in "+strKey+ " change field "+field+" to "+value);    
-    let record = form[strKey];
-    record[field]=value;
 }
 
 
