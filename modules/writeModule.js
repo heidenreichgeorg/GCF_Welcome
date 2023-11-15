@@ -9,7 +9,7 @@ import { bigEUMoney, cents2EU,cents20EU } from './money'
 import { setSession,strSymbol,timeSymbol } from './session'
 import { compile } from './compile'
 
-const debug=1;
+const debug=null;
 
 const HTMLSPACE=" "; 
 

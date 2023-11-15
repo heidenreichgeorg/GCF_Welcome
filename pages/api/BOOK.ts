@@ -7,8 +7,8 @@
 
 
 
-const debug=1;
-const debugWrite=1;
+const debug=null;
+const debugWrite=null;
 
 import type { NextApiRequest, NextApiResponse } from 'next'
 import  { formatTXN  } from '../../modules/compile'
@@ -32,19 +32,19 @@ export default function handler(
   if(req) {
 
     if(req.query) {       
-      console.log("0060 BOOK.handler query="+JSON.stringify(req.query));
+      if(debug) console.log("0060 BOOK.handler query="+JSON.stringify(req.query));
 
       let bucket = init(process.argv) as String
       let jConfig = { 'bucket':bucket } as any;
     
-      console.log("0062 BOOK.handler config="+jConfig.bucket);
+      if(debug) console.log("0062 BOOK.handler config="+jConfig.bucket);
 
       if(req.body) {       
         reqBody = req.body;
         client =  req.body.client;
         year = req.body.year;
         const query:JSON = <JSON><unknown> { "ext":"JSON", "client":client, "year":year  };
-        console.log("0064 BOOK.handler "+JSON.stringify(query));
+        if(debug) console.log("0064 BOOK.handler "+JSON.stringify(query));
         sessionTime=timeSymbol();
         nextSessionId= strSymbol(sessionTime+client+year+sessionTime);
 
@@ -75,7 +75,7 @@ function bookTransaction(session:any, res:NextApiResponse<any>,jData:any) {
     let sessionId = session.id; 
     let arrTransaction = formatTXN(session,reqBody);
   
-    console.log("0610 app.post BOOK config("+JSON.stringify(jData)+")");
+    if(debug) console.log("0610 app.post BOOK config("+JSON.stringify(jData)+")");
 
     var result="SERVER BOOKED";
     
@@ -86,7 +86,7 @@ function bookTransaction(session:any, res:NextApiResponse<any>,jData:any) {
         
         if(sessionId ) {
 
-          console.log("0612 app.post BOOK jTXN('"+(arrTransaction?JSON.stringify(arrTransaction.join(';')):"---")+"')");
+          if(debug) console.log("0612 app.post BOOK jTXN('"+(arrTransaction?JSON.stringify(arrTransaction.join(';')):"---")+"')");
 
           // modifies session object and stores it under new sessionId
           session = bookSheet(session,arrTransaction,sessionTime,nextSessionId);

@@ -2,7 +2,7 @@
 const debug=null;
 const debugTax=null;
 const debugPreBook=null;
-const debugAssets=1;
+const debugAssets=null;
 const debugRegular=null;
 
 
@@ -384,7 +384,7 @@ export function compile(sessionData) {
                         // GH20220126
                         var xRow=[];
                         var column;
-                        for(column=0;column<row.length;column++) xRow.push(row[column].trim());
+                        for(column=0;column<row.length;column++) { let strCell=row[column]; if(!strCell) strCell=""; xRow.push(strCell.trim()); }
                         result[D_XBRL]=xRow;
                         firstLine=1;
                     }
@@ -408,8 +408,10 @@ export function compile(sessionData) {
                         if(row.length>MINTXN && result[D_Schema].Names){
                             try {
 
-                                if(debugReport) console.log("BOOK "+aLine.join(';'));
-                                console.log();
+                                if(debugReport) {
+                                    console.log("BOOK "+aLine.join(';'));
+                                    console.log();
+                                }
 
 
                                 var gNames = result[D_Schema].Names;
@@ -781,8 +783,13 @@ function unixYear() {
 };
 
 function iAccount(strAccountName,arrAcctNames) {
-    let index=parseInt(arrAcctNames.map((strName,i) => (strAccountName==strName?(""+i):" ")).join('').trim());
-    if(debug) console.log("     iAccount("+strAccountName+") = "+index);
+    let index=0;
+    try {
+        index=parseInt(arrAcctNames.map((strName,i) => (strAccountName==strName?(""+i):" ")).join('').trim());
+        if(debug) console.log("     iAccount("+strAccountName+") = "+index);
+    } catch(e) {
+        console.err("compile.iAccount("+strAccountName+") failed.");
+    }
     return index;
 }
 
@@ -1350,7 +1357,7 @@ function bigAssetValueChange(row,iAssets,aXBRL) {
             var test = row[column];
             if(test && test.length > 0 && Sheets.bigEUMoney(test)!=0n  && aXBRL[column].startsWith(xbrlFixed)) {
                 iValue=Sheets.bigEUMoney(test); 
-                console.log("ASSET ("+aXBRL[column]+") VALUE CHANGE="+iValue)
+                if(debugAssets) console.log("ASSET ("+aXBRL[column]+") VALUE CHANGE="+iValue)
                 run=false;
             }
             column++;
@@ -1427,7 +1434,9 @@ export function formatTXN(session,reqBody) {
         // receiver will append this to sheetCells
     } else console.log("compile.js formatTXN() no TXN ");
 
+    console.log();
     console.log("0068 formatTXN returns "+(bookingForm ? bookingForm.join(';'): "null"));
+    console.log();
 
     return bookingForm;
 
