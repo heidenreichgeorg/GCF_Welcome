@@ -13,7 +13,6 @@ import { makeStatusData }  from '../modules/App';
 
 /* global BigInt */
 
-// addDebit,addCredit,makeTxnFormat(jTemplates[index],names,aLen,eLen) will generate the 
 // matrix format 
 // { 'date':"", 'sender':"Sender", 'refAcct':"", 'reason':"", 'refCode':"", 'debit':{'name':VALUE}, credit:{ 'name':VALUE}}
 
@@ -28,34 +27,34 @@ export default function Status() {
     const [ year, setYear]   = useState()
     const [client,setClient] = useState()
     const { session, status } = useSession()
-    const [displayRecord,setDisplayRecord] = useState({ credit:{}, debit:{}})
+    const [displayRecord,setDisplayRecord] = useState({ creditEQL:{}, credit:{}, debitA:{}, debit:{}})
     const [matrix,setMatrix] = useState({
-        "Miete":{"credit":{"MIET":"0","COGK":"0","NKHA":"0"},"debit":{},"sender":"Vau / Ferguson","refAcct":"MIET","refCode":"Eifelweg 22"},
-        "Entnahme Kpl":{"credit":{},"debit":{"K2GH":"-0","K2EH":"-0","COGK":"-0"},"sender":"Elke u Georg","refAcct":"K2GH K2EH","refCode":"WITHDRAW"},
-        "Entnahme Alex":{"credit":{},"debit":{"K2AL":"-0","COGK":"-0"},"sender":"Alexander","refAcct":"K2AL","refCode":"WITHDRAW"},
-        "Entnahme Kristina":{"credit":{},"debit":{"K2KR":"-0","COGK":"-0"},"sender":"Kristina","refAcct":"K2KR","refCode":"WITHDRAW"},
-        "Entnahme Tom":{"credit":{},"debit":{"K2TO":"-0","COGK":"-0"},"sender":"Tom","refAcct":"K2TO","refCode":"WITHDRAW"},
-        "Entnahme Leon":{"credit":{},"debit":{"K2LE":"-0","COGK":"-0"},"sender":"Leon","refAcct":"K2LE","refCode":"WITHDRAW"},
-        "Aufwand":{"credit":{},"debit":{"AUFW":"-0","COGK":"-0"},"sender":"Verkäufer","refAcct":"AUFW","refCode":"Eifelweg22"},
-        "Sacheinlage Kpl":{"credit":{"K2GH":"0","K2EH":"0"},"debit":{"AUFW":"-0"},"sender":"Verkäufer","refAcct":"AUFW","refCode":"DEP_IN_KIND"},
-        "Grundabgaben":{"credit":{},"debit":{"NKHA":"-0","COGK":"-0"},"sender":"Stadt Erlangen","reason":"Quartal","refAcct":"NKHA","refCode":"FEE"},
-        "Versicherung":{"credit":{},"debit":{"NKHA":"-0","COGK":"-0"},"sender":"BayernVersicherung","reason":"Jahr","refAcct":"NKHA","refCode":"FEE"},
-        "Aktien-Kauf":{"credit":{"CDAK":"0"},"debit":{"COGK":"-0"},"sender":"WKN","reason":"Stückzahl","refAcct":"INVEST","refCode":"Code"},
-        "Bond-Kauf mit Stückzins":{"credit":{"CDAK":"0","FSTF":"0"},"debit":{"COGK":"-0"},"sender":"WKN","reason":"Nominal","refAcct":"INVEST","refCode":"Code"},
-        "Aktien-Dividende bar":{"credit":{"EDIV":"0","COGK":"0","KEST":"0","KESO":"0"},"debit":{},"sender":"WKN","reason":"Stückzahl","refAcct":"EDIV","refCode":"Code"},
-        "Dividende steuerfrei bar":{"credit":{"COGK":"0"},"debit":{"CDAK":"-0"},"sender":"WKN","reason":"Stückzahl","refAcct":"YIELD","refCode":"Code"},
-        "Dividende in Aktien steuerfrei":{"credit":{},"debit":{},"sender":"WKN","reason":"Stückzahl","refAcct":"INVEST","refCode":"Code"},
-        "Dividende in Aktien steuerpflichtig":{"credit":{"EDIV":"0","KEST":"0","KESO":"0"},"debit":{},"sender":"WKN","reason":"Stückzahl","refAcct":"INVEST","refCode":"Code"},
-        "Aktien-Verkauf Gewinn":{"credit":{"FSAL":"0","COGK":"0","KEST":"0","KESO":"0"},"debit":{"CDAK":"-0"},"sender":"WKN","reason":"Stückzahl","refAcct":"SELL","refCode":"Code"},
-        "Aktien-Verkauf Verlust":{"credit":{"VAVA":"0","COGK":"0"},"debit":{"CDAK":"-0"},"sender":"WKN","reason":"Stückzahl","refAcct":"SELL","refCode":"Code"},
-        "Abschreibung Haus":{"credit":{},"debit":{"GRSB":"-0","ABSC":"-0"},"sender":"Abschluss","reason":"Jahr","refAcct":"GRSB","refCode":"Afa Haus"},
-        "Abschreibung EBKS":{"credit":{},"debit":{"EBKS":"-0","ABSC":"-0"},"sender":"Abschluss","reason":"Jahr","refAcct":"EBKS","refCode":"AfA Spülmaschine"},
-        "Abschreibung Dach":{"credit":{},"debit":{"DACH":"-0","ABSC":"-0"},"sender":"Abschluss","reason":"Jahr","refAcct":"DACH","refCode":"AfA Dach"},
-        "Einlage Kpl":{"credit":{"K2GH":"0","K2EH":"0","COGK":"0"},"debit":{},"sender":"Elke u Georg","refAcct":"K2GH K2EH","refCode":"DEPOSIT"},
-        "Einlage Alex":{"credit":{"K2AL":"0","COGK":"0"},"debit":{},"sender":"Alexander","refAcct":"K2AL","refCode":"DEPOSIT"},
-        "Einlage Kristina":{"credit":{"K2KR":"0","COGK":"0"},"debit":{},"sender":"Kristina","refAcct":"Einlage","refCode":"DEPOSIT"},
-        "Einlage Tom":{"credit":{"K2TO":"0","COGK":"0"},"debit":{},"sender":"Tom","refAcct":"K2TO","refCode":"DEPOSIT"},
-        "Einlage Leon":{"credit":{"K2LE":"0","COGK":"0"},"debit":{},"sender":"Leon","refAcct":"K2LE","refCode":"DEPOSIT"}}  )
+        "Miete":{"creditEQL":{},"credit":{"COGK":"0"},"debit":{"MIET":"0","NKHA":"0"},"debitA":{},"sender":"Vau / Ferguson","refAcct":"MIET","refCode":"Eifelweg 22"},
+        "Entnahme Kpl":{"creditEQL":{"K2GH":"-0","K2EH":"-0"},"credit":{},"debit":{},"debitA":{"COGK":"-0"},"sender":"Elke u Georg","refAcct":"K2GH K2EH","refCode":"WITHDRAW"},
+        "Entnahme Alex":{"creditEQL":{"K2AL":"-0"},"credit":{},"debit":{},"debitA":{"COGK":"0"},"sender":"Alexander","refAcct":"K2AL","refCode":"WITHDRAW"},
+        "Entnahme Kristina":{"creditEQL":{"K2KR":"-0"},"credit":{},"debit":{},"debitA":{"COGK":"-0"},"sender":"Kristina","refAcct":"K2KR","refCode":"WITHDRAW"},
+        "Entnahme Tom":{"creditEQL":{"K2TO":"-0"},"credit":{},"debit":{},"debitA":{"COGK":"-0"},"sender":"Tom","refAcct":"K2TO","refCode":"WITHDRAW"},
+        "Entnahme Leon":{"creditEQL":{"K2LE":"-0"},"credit":{},"debit":{},"debitA":{"COGK":"-0"},"sender":"Leon","refAcct":"K2LE","refCode":"WITHDRAW"},
+        "Aufwand":{"creditEQL":{"AUFW":"-0"},"credit":{},"debit":{},"debitA":{"COGK":"-0"},"sender":"Verkäufer","refAcct":"AUFW","refCode":"Eifelweg22"},
+        "Sacheinlage Kpl":{"creditEQL":{"AUFW":"-0"},"credit":{},"debitA":{},"debit":{"K2GH":"0","K2EH":"0"},"sender":"Verkäufer","refAcct":"AUFW","refCode":"DEP_IN_KIND"},
+        "Grundabgaben":{"creditEQL":{"NKHA":"-0"},"credit":{},"debit":{},"debitA":{"COGK":"-0"},"sender":"Stadt Erlangen","reason":"Quartal","refAcct":"NKHA","refCode":"FEE"},
+        "Versicherung":{"creditEQL":{"NKHA":"-0"},"credit":{},"debit":{},"debitA":{"COGK":"-0"},"sender":"BayernVersicherung","reason":"Jahr","refAcct":"NKHA","refCode":"FEE"},
+        "Aktien-Kauf":{"creditEQL":{},"credit":{"CDAK":"0"},"debit":{},"debitA":{"COGK":"-0"},"sender":"WKN","reason":"Stückzahl","refAcct":"INVEST","refCode":"Code"},
+        "Bond-Kauf mit Stückzins":{"creditEQL":{},"credit":{"CDAK":"0","FSTF":"0"},"debit":{},"debitA":{"COGK":"-0"},"sender":"WKN","reason":"Nominal","refAcct":"INVEST","refCode":"Code"},
+        "Aktien-Dividende bar":{"creditEQL":{},"credit":{"COGK":"0","KEST":"0","KESO":"0"},"debit":{"EDIV":"0"},"debitA":{},"sender":"WKN","reason":"Stückzahl","refAcct":"EDIV","refCode":"Code"},
+        "Dividende steuerfrei bar":{"creditEQL":{},"credit":{"COGK":"0"},"debit":{},"debitA":{"CDAK":"-0"},"sender":"WKN","reason":"Stückzahl","refAcct":"YIELD","refCode":"Code"},
+        "Dividende in Aktien steuerfrei":{"creditEQL":{},"credit":{},"debit":{},"debitA":{},"sender":"WKN","reason":"Stückzahl","refAcct":"INVEST","refCode":"Code"},
+        "Dividende in Aktien steuerpflichtig":{"creditEQL":{},"credit":{"KEST":"0","KESO":"0"},"debit":{"EDIV":"0"},"debitA":{},"sender":"WKN","reason":"Stückzahl","refAcct":"INVEST","refCode":"Code"},
+        "Aktien-Verkauf Gewinn":{"creditEQL":{},"credit":{"COGK":"0","KEST":"0","KESO":"0"},"debit":{"FSAL":"0"},"debitA":{"CDAK":"-0"},"sender":"WKN","reason":"Stückzahl","refAcct":"SELL","refCode":"Code"},
+        "Aktien-Verkauf Verlust":{"creditEQL":{},"credit":{"VAVA":"0","COGK":"0"},"debit":{},"debitA":{"CDAK":"-0"},"sender":"WKN","reason":"Stückzahl","refAcct":"SELL","refCode":"Code"},
+        "Abschreibung Haus":{"creditEQL":{"ABSC":"-0"},"credit":{},"debitA":{"GRSB":"-0"},"debit":{},"sender":"Abschluss","reason":"Jahr","refAcct":"GRSB","refCode":"Afa Haus"},
+        "Abschreibung EBKS":{"creditEQL":{"ABSC":"-0"},"credit":{},"debitA":{"EBKS":"-0"},"debit":{},"sender":"Abschluss","reason":"Jahr","refAcct":"EBKS","refCode":"AfA Spülmaschine"},
+        "Abschreibung Dach":{"creditEQL":{"ABSC":"-0"},"credit":{},"debitA":{"DACH":"-0"},"debit":{},"sender":"Abschluss","reason":"Jahr","refAcct":"DACH","refCode":"AfA Dach"},
+        "Einlage Kpl":{"creditEQL":{},"credit":{"COGK":"0"},"debitA":{},"debit":{"K2GH":"0","K2EH":"0"},"sender":"Elke u Georg","refAcct":"K2GH K2EH","refCode":"DEPOSIT"},
+        "Einlage Alex":{"creditEQL":{},"credit":{"COGK":"0"},"debitA":{},"debit":{"K2AL":"0"},"sender":"Alexander","refAcct":"K2AL","refCode":"DEPOSIT"},
+        "Einlage Kristina":{"creditEQL":{},"credit":{"COGK":"0"},"debitA":{},"debit":{"K2KR":"0"},"sender":"Kristina","refAcct":"Einlage","refCode":"DEPOSIT"},
+        "Einlage Tom":{"creditEQL":{},"credit":{"COGK":"0"},"debitA":{},"debit":{"K2TO":"0"},"sender":"Tom","refAcct":"K2TO","refCode":"DEPOSIT"},
+        "Einlage Leon":{"creditEQL":{},"credit":{"COGK":"0"},"debitA":{},"debit":{"K2LE":"0"},"sender":"Leon","refAcct":"K2LE","refCode":"DEPOSIT"}}  )
 
     
     useEffect(() => {
@@ -82,15 +81,13 @@ export default function Status() {
         }
     }
 
-    if(!sheet) return (
-        
+    if(!sheet) return (    
             <div className = "attrLine">
                 <div className="FIELD XFER">Authenticate:...</div>
                 <div className="FIELD"><input key="auth" id="auth" type="edit"></input></div>
                 <div className="FIELD"><div key="go" className="key" onClick={login}>&nbsp;LOGIN &nbsp;</div>
                 </div>
-            </div>
-        
+            </div>        
     );
     
     function noFunc() {  console.log("CLICK NO");  }
@@ -153,13 +150,19 @@ export default function Status() {
                      'refCode':simpleTXN.refCode,
                      'credit':{}, 'debit':{} };
 
+        var arrCreditEQLInfo=list(simpleTXN.creditEQL,-1);        
         var arrCreditInfo=list(simpleTXN.credit,1);        
-        var arrDebitInfo=list(simpleTXN.debit,-1);
+        var arrDebitAInfo=list(simpleTXN.debitA,-1);
+        var arrDebitInfo=list(simpleTXN.debit,1);
 
+        console.log("creditEQL "+JSON.stringify(arrCreditEQLInfo));
         console.log("credit "+JSON.stringify(arrCreditInfo));
+        console.log("debitA "+JSON.stringify(arrDebitAInfo));
         console.log("debit "+JSON.stringify(arrDebitInfo));
 
+        arrCreditEQLInfo.forEach((acct)=>{flow=prepareTXN(sheet[D_Schema],flow,acct.name,acct.value);});
         arrCreditInfo.forEach((acct)=>{flow=prepareTXN(sheet[D_Schema],flow,acct.name,acct.value);});
+        arrDebitAInfo.forEach((acct) =>{flow=prepareTXN(sheet[D_Schema],flow,acct.name,acct.value);});
         arrDebitInfo.forEach((acct) =>{flow=prepareTXN(sheet[D_Schema],flow,acct.name,acct.value);});
 
         return flow;
@@ -192,12 +195,18 @@ export default function Status() {
 
     
     function preBook(strKey) {
-        // make sure new instance triggers full redraw
-        //setMatrix(JSON.parse(JSON.stringify(matrix)));
-        //setCurrentKey(strKey);
-        setDisplayRecord(matrix[strKey])
 
-        console.log("preBook "+strKey)
+        let record = matrix[strKey];
+
+       record.title=strKey;
+       
+        setDisplayRecord(record)
+
+        let jTXN = buildTransaction(record);
+
+        matrix[strKey].balance=jTXN.balance;
+
+        console.log("preBook "+JSON.stringify(jTXN));
     }
     
     function doBook(strKey) {
@@ -232,11 +241,11 @@ export default function Status() {
 
 
     
-    //let form={};
-    // side = debit or credit
+    
+    // side debit or credit   or    debitA or creditEQL
     function bufferAmount(strKey,field,value,side) {
 
-        console.log("ENTER bufferAmount: in "+strKey+ " change amount "+field+" to "+value+" at "+side);    
+       // console.log("ENTER bufferAmount: in "+strKey+ " change amount "+field+" to "+value+" at "+side);    
         let record = matrix[strKey];
         record[side][field]=value;
 
@@ -244,7 +253,7 @@ export default function Status() {
     }
 
     function bufferField(strKey,field,value) {
-        console.log("in "+strKey+ " change field "+field+" to "+value);    
+        // console.log("in "+strKey+ " change field "+field+" to "+value);    
         let record = matrix[strKey];
         record[field]=value;
 
@@ -255,12 +264,14 @@ export default function Status() {
 
     function BookingForm({ strKey, form, preBook}) {
 
+        let arrCreditEQL = Object.keys(form.creditEQL);
         let arrCredit = Object.keys(form.credit);
+        let arrDebitA = Object.keys(form.debitA);
         let arrDebit = Object.keys(form.debit);
     
         return( <div><div className="attrLine"></div>
             <div className="attrLine">
-                <div className="FIELD LTXT"> {strKey}</div>
+                <div className="FIELD L280"> {strKey}</div>
     
                 <div className="FIELD NAME">
                     <input id="dateBooked" type="date" defaultValue={form.date} onChange={((e) => bufferField(strKey,'date',e.target.value))}/>
@@ -269,15 +280,15 @@ export default function Status() {
                         
                 <div className="FIELD SYMB" >Sender</div>
                 <input type ="text" className="key MOAM" defaultValue={form.sender} onChange={((e) => bufferField(strKey,'sender',e.target.value))}/>
-                <div className="FIELD TAG" ></div>
+                <div className="FIELD SEP" ></div>
     
                 <div className="FIELD SYMB" >Zeitraum</div>
                 <input type ="text" className="key MOAM" defaultValue={form.reason} onChange={((e) => bufferField(strKey,'reason',e.target.value))}/>
-                <div className="FIELD TAG" ></div>
+                <div className="FIELD SEP" ></div>
     
                 <div className="FIELD SYMB" >Grund</div>
                 <input type ="text" className="key MOAM" defaultValue={form.refCode} onChange={((e) => bufferField(strKey,'refCode',e.target.value))}/>
-                <div className="FIELD TAG" ></div>
+                <div className="FIELD SEP" ></div>
                 
             </div>
             <div className="attrLine">
@@ -286,15 +297,29 @@ export default function Status() {
                     (<div>
                         <div className="FIELD TAG" > {acct}</div>
                         <input type ="number" className="key MOAM" defaultValue={form.credit[acct]} onChange={((e) => bufferAmount(strKey,acct,e.target.value,'credit'))} />    
-                        <div className="FIELD TAG" ></div>
+                        <div className="FIELD SEP" ></div>
                     </div>)
                 ))}
-                AN
+                {arrDebitA.map((acct)=>(
+                    (<div>
+                        <div className="FIELD TAG" > {acct}</div>
+                        <input type ="number" className="key MOAM" defaultValue={form.debitA[acct]} onChange={((e) => bufferAmount(strKey,acct,e.target.value,'debitA'))} />    
+                        <div className="FIELD SEP" ></div>
+                    </div>)
+                ))}
+                <div className="FIELD TAG" >AN</div>
                 {arrDebit.map((acct)=>(
                     (<div>
                         <div className="FIELD TAG" > {acct}</div>
                         <input type ="number" className="key MOAM" defaultValue={form.debit[acct]} onChange={((e) => bufferAmount(strKey,acct,e.target.value,'debit'))} />    
-                        <div className="FIELD TAG" ></div>
+                        <div className="FIELD SEP" ></div>
+                    </div>)
+                ))}
+                 {arrCreditEQL.map((acct)=>(
+                    (<div>
+                        <div className="FIELD TAG" > {acct}</div>
+                        <input type ="number" className="key MOAM" defaultValue={form.creditEQL[acct]} onChange={((e) => bufferAmount(strKey,acct,e.target.value,'creditEQL'))} />    
+                        <div className="FIELD SEP" ></div>
                     </div>)
                 ))}
                 
@@ -309,12 +334,14 @@ export default function Status() {
     
     function BookingDisplay({ strKey, form, doBook}) {
 
+        let arrCreditEQL = Object.keys(form.creditEQL);
         let arrCredit = Object.keys(form.credit);
+        let arrDebitA = Object.keys(form.debitA);
         let arrDebit = Object.keys(form.debit);
     
         return( <div><div className="attrLine"></div>
             <div className="attrLine">
-                <div className="FIELD LTXT"> {strKey}</div>
+                <div className="FIELD L280"> {form.title}</div>
     
                 <div className="FIELD NAME">
                 <div className="FIELD SYMB" >{form.date}</div>
@@ -322,32 +349,49 @@ export default function Status() {
                         
                 <div className="FIELD SYMB" >Sender</div>
                 <div className="FIELD SYMB" >{form.sender}</div>
-                <div className="FIELD TAG" ></div>
+                <div className="FIELD SEP" ></div>
     
                 <div className="FIELD SYMB" >Zeitraum</div>
                 <div className="FIELD SYMB" >{form.reason}</div>
-                <div className="FIELD TAG" ></div>
+                <div className="FIELD SEP" ></div>
     
                 <div className="FIELD SYMB" >Grund</div>
                 <div className="FIELD SYMB" >{form.refCode}</div>
-                <div className="FIELD TAG" ></div>
+                <div className="FIELD SEP" ></div>
                 
+                <div className="FIELD SYMB" >Balance</div>
+                <div className="FIELD SYMB" >{form.balance}</div>
+                <div className="FIELD SEP" ></div>
             </div>
             <div className="attrLine">
       
                 {arrCredit.map((acct)=>(
                     (<div>
                         <div className="FIELD TAG" > {acct}</div>
-                        <div className="FIELD MOAM" >{form.credit[acct]}</div>
-                        <div className="FIELD TAG" ></div>
+                        <div className="FIELD SYMB" >{form.credit[acct]}</div>
+                        <div className="FIELD SEP" ></div>
                     </div>)
                 ))}
-                AN
+                {arrDebitA.map((acct)=>(
+                    (<div>
+                        <div className="FIELD TAG" > {acct}</div>
+                        <div className="FIELD SYMB" >{form.debitA[acct]}</div>
+                        <div className="FIELD SEP" ></div>
+                    </div>)
+                ))}
+                <div className="FIELD TAG" > AN </div>
                 {arrDebit.map((acct)=>(
                     (<div>
                         <div className="FIELD TAG" > {acct}</div>
-                        <div className="FIELD MOAM" >{form.debit[acct]}</div>
-                        <div className="FIELD TAG" ></div>
+                        <div className="FIELD SYMB" >{form.debit[acct]}</div>
+                        <div className="FIELD SEP" ></div>
+                    </div>)
+                ))}
+                {arrCreditEQL.map((acct)=>(
+                    (<div>
+                        <div className="FIELD TAG" > {acct}</div>
+                        <div className="FIELD SYMB" >{form.creditEQL[acct]}</div>
+                        <div className="FIELD SEP" ></div>
                     </div>)
                 ))}
                                 
