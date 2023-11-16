@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { getSession, storeCarryOver, useSession, REACT_APP_API_HOST } from '../modules/sessionmanager';
 import Screen from '../pages/Screen'
 import FooterRow from '../components/FooterRow'
-import { cents2EU,bigEUMoney }  from '../modules/money';
+import { cents2EU,bigUSMoney }  from '../modules/money';
 import { D_Page, D_Schema } from '../modules/terms.js'
 import { book,prepareTXN }  from '../modules/writeModule';
 import { makeStatusData }  from '../modules/App';
@@ -11,6 +11,7 @@ import { makeStatusData }  from '../modules/App';
 // columns format CSV with these columns 
 // HASH DATE SENDER REFACCT REASON REFCODE GRSB EBKS CDAK COGK FSTF NKFO KEST KESO VAVA - 
 
+/* global BigInt */
 
 // addDebit,addCredit,makeTxnFormat(jTemplates[index],names,aLen,eLen) will generate the 
 // matrix format 
@@ -27,6 +28,7 @@ export default function Status() {
     const [ year, setYear]   = useState()
     const [client,setClient] = useState()
     const { session, status } = useSession()
+    const [displayRecord,setDisplayRecord] = useState({ credit:{}, debit:{}})
     const [matrix,setMatrix] = useState({
         "Miete":{"credit":{"MIET":"0","COGK":"0","NKHA":"0"},"debit":{},"sender":"Vau / Ferguson","refAcct":"MIET","refCode":"Eifelweg 22"},
         "Entnahme Kpl":{"credit":{},"debit":{"K2GH":"-0","K2EH":"-0","COGK":"-0"},"sender":"Elke u Georg","refAcct":"K2GH K2EH","refCode":"WITHDRAW"},
@@ -67,86 +69,6 @@ export default function Status() {
         // reset all stored carryOver sums
         storeCarryOver({});
     }, [status])
-
-    function list(side) { 
-        return Object.keys(side).map((acct)=>({'name':acct, 'value':side[acct]}));
-    }
-
-    function buildTransaction(simpleTXN) {
-        let flow = { 'date':simpleTXN.date, 
-                     'sender':simpleTXN.sender,
-                     'refAcct':simpleTXN.refAcct, 
-                     'reason':simpleTXN.reason, 
-                     'refCode':simpleTXN.refCode,
-                     'credit':{}, 'debit':{} };
-
-        var arrCreditInfo=list(simpleTXN.credit);        
-        var arrDebitInfo=list(simpleTXN.debit);
-
-        console.log("KEEP1 "+JSON.stringify(arrCreditInfo));
-        console.log("KEEP2 "+JSON.stringify(arrDebitInfo));
-
-        arrCreditInfo.forEach((acct)=>{flow=prepareTXN(sheet[D_Schema],flow,acct.name,acct.value);});
-        arrDebitInfo.forEach((acct) =>{flow=prepareTXN(sheet[D_Schema],flow,acct.name,acct.value);});
-
-        return flow;
-    }
-
-
-    const BOOK_NOW  = '0';
-    const PRE_CLAIM = '1';
-
-    function bookTemplate(jTXN) {   
-
-
-        jTXN.year=session.year;
-        jTXN.client=session.client;
-
-        jTXN.sessionId = session.id; // won't book otherwise        
-        jTXN.flag='1'; // flag that a pre-claim is being entered
-        jTXN.flag=BOOK_NOW;
-
-        console.log("bookTemplate build : "+JSON.stringify(jTXN));
-
-
-        book(jTXN,session); 
-
-        //resetSession();
-        // invalidate current session
-
-        console.log("bookTemplate:  booked.");  
-    }
-
-
-    
-    function doBook(strKey) {
-        console.log("Book "+strKey);
-        if(matrix[strKey]) {
-            let txn = matrix[strKey];
-
-            console.log("Book FORM "+JSON.stringify());
-
-            let jTXN = buildTransaction(txn);
-
-
-            if(!jTXN.balance || jTXN.balance=='') {
-
-                if(     jTXN.sender //&& jTXN.sender.length>0
-                     && jTXN.date //&& jTXN.date.length>0
-                     && jTXN.refAcct //&& jTXN.refAcct.length>0
-                     && jTXN.refCode //&& jTXN.refCode.length>0
-                     && jTXN.reason //&& jTXN.reason.length>0
-                     ) {
-                    bookTemplate(jTXN);
-
-                    console.log("doBook() booked "+JSON.stringify(jTXN));
-                }
-                else console.log("doBook() REJECTS "+JSON.stringify(jTXN));
-            }
-        }
-    }
-
-
 
 
     function login() {
@@ -217,32 +139,121 @@ export default function Status() {
         return url;
     };
 
+    /**************************************************************************************** */
+
+    function list(side,factor) { 
+        return Object.keys(side).map((acct)=>({'name':acct, 'value':(side[acct]&&side[acct].length>0 ? cents2EU(bigUSMoney(side[acct],factor)):"0")}));
+    }
+
+    function buildTransaction(simpleTXN) {
+        let flow = { 'date':simpleTXN.date, 
+                     'sender':simpleTXN.sender,
+                     'refAcct':simpleTXN.refAcct, 
+                     'reason':simpleTXN.reason, 
+                     'refCode':simpleTXN.refCode,
+                     'credit':{}, 'debit':{} };
+
+        var arrCreditInfo=list(simpleTXN.credit,1);        
+        var arrDebitInfo=list(simpleTXN.debit,-1);
+
+        console.log("credit "+JSON.stringify(arrCreditInfo));
+        console.log("debit "+JSON.stringify(arrDebitInfo));
+
+        arrCreditInfo.forEach((acct)=>{flow=prepareTXN(sheet[D_Schema],flow,acct.name,acct.value);});
+        arrDebitInfo.forEach((acct) =>{flow=prepareTXN(sheet[D_Schema],flow,acct.name,acct.value);});
+
+        return flow;
+    }
+
+
+    const BOOK_NOW  = '0';
+    const PRE_CLAIM = '1';
+
+    function bookTemplate(jTXN) {   
+
+
+        jTXN.year=session.year;
+        jTXN.client=session.client;
+
+        jTXN.sessionId = session.id; // won't book otherwise        
+        jTXN.flag='1'; // flag that a pre-claim is being entered
+        jTXN.flag=BOOK_NOW;
+
+        console.log("bookTemplate build : "+JSON.stringify(jTXN));
+
+
+        book(jTXN,session); 
+
+        //resetSession();
+        // invalidate current session
+
+        console.log("bookTemplate:  booked.");  
+    }
+
+    
+    function preBook(strKey) {
+        // make sure new instance triggers full redraw
+        //setMatrix(JSON.parse(JSON.stringify(matrix)));
+        //setCurrentKey(strKey);
+        setDisplayRecord(matrix[strKey])
+
+        console.log("preBook "+strKey)
+    }
+    
+    function doBook(strKey) {
+        console.log("Book "+strKey);
+        if(matrix[strKey]) {
+            let txn = matrix[strKey];
+
+            console.log("Book FORM "+JSON.stringify());
+
+            let jTXN = buildTransaction(txn);
+
+
+            if(!jTXN.balance || jTXN.balance=='') {
+
+                if(     jTXN.sender //&& jTXN.sender.length>0
+                     && jTXN.date //&& jTXN.date.length>0
+                     && jTXN.refAcct //&& jTXN.refAcct.length>0
+                     && jTXN.refCode //&& jTXN.refCode.length>0
+                     && jTXN.reason //&& jTXN.reason.length>0
+                     ) {
+                    //bookTemplate(jTXN);
+
+                    console.log("doBook() booked "+JSON.stringify(jTXN));
+                }
+                else console.log("doBook() REJECTS "+JSON.stringify(jTXN));
+
+            } else console.log("doBook() UNBALANCED "+JSON.stringify(jTXN));
+        }
+    }
+
+
+
+
     
     //let form={};
     // side = debit or credit
-    function bufferAmount(strKey,field,value,side,setMatrix) {
+    function bufferAmount(strKey,field,value,side) {
 
-
-        console.log("in "+strKey+ " change amount "+field+" to "+value+" at "+side);    
+        console.log("ENTER bufferAmount: in "+strKey+ " change amount "+field+" to "+value+" at "+side);    
         let record = matrix[strKey];
-        if(side=='debit') record[side][field]="-"+value;
-        else record[side][field]=value;
+        record[side][field]=value;
 
-
-        setMatrix(JSON.parse(JSON.stringify(matrix)));
+        console.log("EXIT bufferAmount: in "+JSON.stringify(record));  
     }
 
-    function bufferField(strKey,field,value,setMatrix) {
+    function bufferField(strKey,field,value) {
         console.log("in "+strKey+ " change field "+field+" to "+value);    
         let record = matrix[strKey];
         record[field]=value;
 
-        setMatrix(JSON.parse(JSON.stringify(matrix)));
+        console.log("EXIT bufferField: in "+JSON.stringify(record));  
     }
 
 
 
-    function BookingForm({ strKey, form, doBook, setMatrix}) {
+    function BookingForm({ strKey, form, preBook}) {
 
         let arrCredit = Object.keys(form.credit);
         let arrDebit = Object.keys(form.debit);
@@ -252,20 +263,20 @@ export default function Status() {
                 <div className="FIELD LTXT"> {strKey}</div>
     
                 <div className="FIELD NAME">
-                    <input id="dateBooked" type="date" defaultValue={form.date} onChange={((e) => bufferField(strKey,'date',e.target.value,setMatrix))}/>
+                    <input id="dateBooked" type="date" defaultValue={form.date} onChange={((e) => bufferField(strKey,'date',e.target.value))}/>
                 </div>
     
                         
                 <div className="FIELD SYMB" >Sender</div>
-                <input type ="text" className="key MOAM" defaultValue={form.sender} onChange={((e) => bufferField(strKey,'sender',e.target.value,setMatrix))}/>
+                <input type ="text" className="key MOAM" defaultValue={form.sender} onChange={((e) => bufferField(strKey,'sender',e.target.value))}/>
                 <div className="FIELD TAG" ></div>
     
                 <div className="FIELD SYMB" >Zeitraum</div>
-                <input type ="text" className="key MOAM" defaultValue={form.reason} onChange={((e) => bufferField(strKey,'reason',e.target.value,setMatrix))}/>
+                <input type ="text" className="key MOAM" defaultValue={form.reason} onChange={((e) => bufferField(strKey,'reason',e.target.value))}/>
                 <div className="FIELD TAG" ></div>
     
                 <div className="FIELD SYMB" >Grund</div>
-                <input type ="text" className="key MOAM" defaultValue={form.refCode} onChange={((e) => bufferField(strKey,'refCode',e.target.value,setMatrix))}/>
+                <input type ="text" className="key MOAM" defaultValue={form.refCode} onChange={((e) => bufferField(strKey,'refCode',e.target.value))}/>
                 <div className="FIELD TAG" ></div>
                 
             </div>
@@ -274,7 +285,7 @@ export default function Status() {
                 {arrCredit.map((acct)=>(
                     (<div>
                         <div className="FIELD TAG" > {acct}</div>
-                        <input type ="number" className="key MOAM" value={form[acct]} onChange={((e) => bufferAmount(strKey,acct,e.target.value,'credit',setMatrix))} />    
+                        <input type ="number" className="key MOAM" defaultValue={form.credit[acct]} onChange={((e) => bufferAmount(strKey,acct,e.target.value,'credit'))} />    
                         <div className="FIELD TAG" ></div>
                     </div>)
                 ))}
@@ -282,19 +293,69 @@ export default function Status() {
                 {arrDebit.map((acct)=>(
                     (<div>
                         <div className="FIELD TAG" > {acct}</div>
-                        <input type ="number" className="key MOAM" value={form[acct]} onChange={((e) => bufferAmount(strKey,acct,e.target.value,'debit',setMatrix))} />    
+                        <input type ="number" className="key MOAM" defaultValue={form.debit[acct]} onChange={((e) => bufferAmount(strKey,acct,e.target.value,'debit'))} />    
                         <div className="FIELD TAG" ></div>
                     </div>)
                 ))}
                 
                 
                 <div className="FIELD TAG" ></div>
-                <button className="key" onClick={(() => doBook(strKey))}>Buchen</button>
+                <button className="key" onClick={(() => preBook(strKey))}>Anzeigen</button>
             
             </div>
         </div>);
     }
     
+    
+    function BookingDisplay({ strKey, form, doBook}) {
+
+        let arrCredit = Object.keys(form.credit);
+        let arrDebit = Object.keys(form.debit);
+    
+        return( <div><div className="attrLine"></div>
+            <div className="attrLine">
+                <div className="FIELD LTXT"> {strKey}</div>
+    
+                <div className="FIELD NAME">
+                <div className="FIELD SYMB" >{form.date}</div>
+                </div>
+                        
+                <div className="FIELD SYMB" >Sender</div>
+                <div className="FIELD SYMB" >{form.sender}</div>
+                <div className="FIELD TAG" ></div>
+    
+                <div className="FIELD SYMB" >Zeitraum</div>
+                <div className="FIELD SYMB" >{form.reason}</div>
+                <div className="FIELD TAG" ></div>
+    
+                <div className="FIELD SYMB" >Grund</div>
+                <div className="FIELD SYMB" >{form.refCode}</div>
+                <div className="FIELD TAG" ></div>
+                
+            </div>
+            <div className="attrLine">
+      
+                {arrCredit.map((acct)=>(
+                    (<div>
+                        <div className="FIELD TAG" > {acct}</div>
+                        <div className="FIELD MOAM" >{form.credit[acct]}</div>
+                        <div className="FIELD TAG" ></div>
+                    </div>)
+                ))}
+                AN
+                {arrDebit.map((acct)=>(
+                    (<div>
+                        <div className="FIELD TAG" > {acct}</div>
+                        <div className="FIELD MOAM" >{form.debit[acct]}</div>
+                        <div className="FIELD TAG" ></div>
+                    </div>)
+                ))}
+                                
+                <div className="FIELD TAG" ></div>
+                <button className="key" onClick={(() => doBook(strKey))}>Buchen</button>            
+            </div>
+        </div>);
+    }
       
     let page = sheet[D_Page];
     let sheet_status = makeStatusData(sheet);
@@ -306,15 +367,17 @@ export default function Status() {
     let aPages = ['block'];
     for(let p=1;p<pageText.length;p++) aPages[p]='none'; 
 
-
+    
     return (
         <Screen prevFunc={noFunc} nextFunc={noFunc} tabSelector={pageText}  tabName={tabName}> 
            
 
-            <div className="FIELD"  id={'Overview0'} style= {{ 'display': aPages[0]}} >
-                <div className="FIELD" >{JSON.stringify(matrix)} </div>
+            <div className="FIELD" key={"Status"} id={'Overview0'} style= {{ 'display': aPages[0]}} > 
+
+                <BookingDisplay  strKey={"Buchen"}  form={displayRecord} doBook={doBook} /> 
+
                 {Object.keys(matrix).map((strKey)=>(
-                    <BookingForm  strKey={strKey}  form={matrix[strKey]} doBook={doBook} setMatrix={setMatrix} />
+                    <BookingForm  strKey={strKey}  form={matrix[strKey]} preBook={preBook} />
                 ))}
             </div>
 

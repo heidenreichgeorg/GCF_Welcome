@@ -23,6 +23,28 @@ function bigMoney(strAdd,factor,money) {
 }
 
 
+export function bigUSMoney(strAdd,factor) {
+    let money = 0n;
+    factor=BigInt(factor);
+    var euros=0n;
+    var cents=0n;
+    if(strAdd && strAdd.length>0) {          
+        var amount = strAdd.split('.');
+        var plain = amount[0].replace(',', '').trim(); 
+        if(plain.startsWith('-')) { factor=-1n * factor; plain=plain.slice(1); }
+        try { euros = BigInt(('0'+plain)); } catch(err) {}
+        if(amount.length>1) { 
+            const digits=amount[1]+"00";
+            const strDigits=digits[0]+digits[1];
+            cents=BigInt(strDigits);
+        }
+    }
+    cents=(euros*100n)+cents;
+    money = money + (factor * cents);
+    return money;
+}
+
+
 export function addEUMoney(strAdd,money) {
         return bigMoney(strAdd,1n,money); }
 
