@@ -45,8 +45,8 @@ export default function Status() {
         "Dividende steuerfrei bar":{"creditEQL":{},"credit":{"COGK":"0"},"debit":{},"debitA":{"CDAK":"-0"},"sender":"WKN","reason":"Stückzahl","refAcct":"YIELD","refCode":"Code"},
         "Dividende in Aktien steuerfrei":{"creditEQL":{},"credit":{},"debit":{},"debitA":{},"sender":"WKN","reason":"Stückzahl","refAcct":"INVEST","refCode":"Code"},
         "Dividende in Aktien steuerpflichtig":{"creditEQL":{},"credit":{"KEST":"0","KESO":"0"},"debit":{"EDIV":"0"},"debitA":{},"sender":"WKN","reason":"Stückzahl","refAcct":"INVEST","refCode":"Code"},
-        "Aktien-Verkauf Gewinn":{"creditEQL":{},"credit":{"COGK":"0","KEST":"0","KESO":"0"},"debit":{"FSAL":"0"},"debitA":{"CDAK":"-0"},"sender":"WKN","reason":"Stückzahl","refAcct":"SELL","refCode":"Code"},
-        "Aktien-Verkauf Verlust":{"creditEQL":{},"credit":{"VAVA":"0","COGK":"0"},"debit":{},"debitA":{"CDAK":"-0"},"sender":"WKN","reason":"Stückzahl","refAcct":"SELL","refCode":"Code"},
+        "Aktien-Verkauf mit Gewinn":{"creditEQL":{},"credit":{"COGK":"0","KEST":"0","KESO":"0"},"debit":{"FSAL":"0"},"debitA":{"CDAK":"-0"},"sender":"WKN","reason":"Stückzahl","refAcct":"SELL","refCode":"Code"},
+        "Aktien-Verkauf mit Verlust":{"creditEQL":{},"credit":{"VAVA":"0","COGK":"0"},"debit":{},"debitA":{"CDAK":"-0"},"sender":"WKN","reason":"Stückzahl","refAcct":"SELL","refCode":"Code"},
         "Abschreibung Haus":{"creditEQL":{"ABSC":"-0"},"credit":{},"debitA":{"GRSB":"-0"},"debit":{},"sender":"Abschluss","reason":"Jahr","refAcct":"GRSB","refCode":"Afa Haus"},
         "Abschreibung EBKS":{"creditEQL":{"ABSC":"-0"},"credit":{},"debitA":{"EBKS":"-0"},"debit":{},"sender":"Abschluss","reason":"Jahr","refAcct":"EBKS","refCode":"AfA Spülmaschine"},
         "Abschreibung Dach":{"creditEQL":{"ABSC":"-0"},"credit":{},"debitA":{"DACH":"-0"},"debit":{},"sender":"Abschluss","reason":"Jahr","refAcct":"DACH","refCode":"AfA Dach"},
@@ -195,19 +195,14 @@ export default function Status() {
 
     
     function preBook(strKey) {
-
         let record = matrix[strKey];
-
-       record.title=strKey;
-       
+        record.title=strKey;
         setDisplayRecord(record)
-
         let jTXN = buildTransaction(record);
-
         matrix[strKey].balance=jTXN.balance;
-
         console.log("preBook "+JSON.stringify(jTXN));
     }
+
     
     function doBook(strKey) {
         console.log("Book "+strKey);
@@ -348,19 +343,19 @@ export default function Status() {
                 </div>
                         
                 <div className="FIELD SYMB" >Sender</div>
-                <div className="FIELD SYMB" >{form.sender}</div>
+                <div className="FIELD TEAM" >{form.sender}</div>
                 <div className="FIELD SEP" ></div>
     
                 <div className="FIELD SYMB" >Zeitraum</div>
-                <div className="FIELD SYMB" >{form.reason}</div>
+                <div className="FIELD TEAM" >{form.reason}</div>
                 <div className="FIELD SEP" ></div>
     
                 <div className="FIELD SYMB" >Grund</div>
-                <div className="FIELD SYMB" >{form.refCode}</div>
+                <div className="FIELD TEAM" >{form.refCode}</div>
                 <div className="FIELD SEP" ></div>
                 
                 <div className="FIELD SYMB" >Balance</div>
-                <div className="FIELD SYMB" >{form.balance}</div>
+                <div className="FIELD TEAM" >{form.balance}</div>
                 <div className="FIELD SEP" ></div>
             </div>
             <div className="attrLine">
@@ -368,14 +363,14 @@ export default function Status() {
                 {arrCredit.map((acct)=>(
                     (<div>
                         <div className="FIELD TAG" > {acct}</div>
-                        <div className="FIELD SYMB" >{form.credit[acct]}</div>
+                        <div className="FIELD MOAM" >{form.credit[acct]}</div>
                         <div className="FIELD SEP" ></div>
                     </div>)
                 ))}
                 {arrDebitA.map((acct)=>(
                     (<div>
                         <div className="FIELD TAG" > {acct}</div>
-                        <div className="FIELD SYMB" >{form.debitA[acct]}</div>
+                        <div className="FIELD MOAM" >{form.debitA[acct]}</div>
                         <div className="FIELD SEP" ></div>
                     </div>)
                 ))}
@@ -383,14 +378,14 @@ export default function Status() {
                 {arrDebit.map((acct)=>(
                     (<div>
                         <div className="FIELD TAG" > {acct}</div>
-                        <div className="FIELD SYMB" >{form.debit[acct]}</div>
+                        <div className="FIELD MOAM" >{form.debit[acct]}</div>
                         <div className="FIELD SEP" ></div>
                     </div>)
                 ))}
                 {arrCreditEQL.map((acct)=>(
                     (<div>
                         <div className="FIELD TAG" > {acct}</div>
-                        <div className="FIELD SYMB" >{form.creditEQL[acct]}</div>
+                        <div className="FIELD MOAM" >{form.creditEQL[acct]}</div>
                         <div className="FIELD SEP" ></div>
                     </div>)
                 ))}
@@ -406,27 +401,18 @@ export default function Status() {
     let report = sheet_status.report;
 
 
-    const tabName = "Overview";
-    let pageText =  ['Patterns', 'DashBoard'].map((name) =>( page[name] ));
+    let tabHeaders = Object.keys(matrix);
+    tabHeaders.unshift('Dashboard');
     let aPages = ['block'];
-    for(let p=1;p<pageText.length;p++) aPages[p]='none'; 
+    for(let p=1;p<tabHeaders.length;p++) aPages[p]='none'; 
 
+    const tabName = "Overview";
     
     return (
-        <Screen prevFunc={noFunc} nextFunc={noFunc} tabSelector={pageText}  tabName={tabName}> 
+        <Screen prevFunc={noFunc} nextFunc={noFunc} tabSelector={tabHeaders}  tabName={tabName}> 
            
 
-            <div className="FIELD" key={"Status"} id={'Overview0'} style= {{ 'display': aPages[0]}} > 
-
-                <BookingDisplay  strKey={"Buchen"}  form={displayRecord} doBook={doBook} /> 
-
-                {Object.keys(matrix).map((strKey)=>(
-                    <BookingForm  strKey={strKey}  form={matrix[strKey]} preBook={preBook} />
-                ))}
-            </div>
-
-
-            <div className="FIELD" key={"Status"} id={'Overview1'} style= {{ 'display': aPages[1]}} >
+            <div className="FIELD" key={"Status"} id={'Overview0'} style= {{ 'display': aPages[0]}} >
                 <StatusRow am1={page.Assets} am2={page.Gain}  am3={page.eqliab}/>
                 {
                     report.map((row,l) => (
@@ -440,6 +426,17 @@ export default function Status() {
                 }
             </div>
 
+
+            {Object.keys(matrix).map((strKey,index)=>( 
+                <div className="FIELD" key={"Status"} id={'Overview'+(index+1)} style= {{ 'display': aPages[index+1]}} > 
+                    <BookingDisplay  strKey={"Buchen"}  form={displayRecord} doBook={doBook} /> 
+                    <BookingForm  strKey={strKey}  form={matrix[strKey]} preBook={preBook} />
+                </div>
+            ))}
+        
+            
+            <div className="attrLine"/>
+            <div className="attrLine"/>
 
             <FooterRow left={page["client"]}  right={page["register"]} prevFunc={prevFunc} nextFunc={nextFunc} miscFunc={handleXLSave}/>
             <FooterRow left={page["reference"]} right={page["author"]} prevFunc={prevFunc} nextFunc={nextFunc} miscFunc={handleXLSave}/>
