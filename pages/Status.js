@@ -197,9 +197,9 @@ export default function Status() {
     function preBook(strKey) {
         let record = matrix[strKey];
         record.title=strKey;
-        setDisplayRecord(record)
         let jTXN = buildTransaction(record);
         matrix[strKey].balance=jTXN.balance;
+        setDisplayRecord(JSON.parse(JSON.stringify(record)));
         console.log("preBook "+JSON.stringify(jTXN));
     }
 
@@ -222,7 +222,7 @@ export default function Status() {
                      && jTXN.refCode //&& jTXN.refCode.length>0
                      && jTXN.reason //&& jTXN.reason.length>0
                      ) {
-                    //bookTemplate(jTXN);
+                    bookTemplate(jTXN);
 
                     console.log("doBook() booked "+JSON.stringify(jTXN));
                 }
@@ -429,8 +429,9 @@ export default function Status() {
 
             {Object.keys(matrix).map((strKey,index)=>( 
                 <div className="FIELD" key={"Status"} id={'Overview'+(index+1)} style= {{ 'display': aPages[index+1]}} > 
-                    <BookingDisplay  strKey={"Buchen"}  form={displayRecord} doBook={doBook} /> 
-                    <BookingForm  strKey={strKey}  form={matrix[strKey]} preBook={preBook} />
+                    <div className="attrLine"/>
+                    <BookingForm    strKey={strKey}  form={matrix[strKey]} preBook={preBook} />
+                    <BookingDisplay strKey={strKey}  form={displayRecord}  doBook={doBook} /> 
                 </div>
             ))}
         
