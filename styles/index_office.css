@@ -1,45 +1,16 @@
-body { 
-  background: radial-gradient(ellipse at center, #443501 0%,#000000 100%);
-	height: 100%;
+body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
   margin: 0;
   font-family: Bahnschrift, monospace, sans-serif; }
 
-.dosBorder{  padding: 14px; border-style: none; border-radius: 10px; border-width: 2px; border-color: #817137;  color: #c9a935; }
-.witBorder{  padding: 14px; border-style: none; border-radius: 10px; border-width: 2px; border-color: #817137;  color: #c9a935; }
+.dosBorder{  padding: 14px; border-style: none; border-radius: 10px; border-width: 2px; border-color: #AEADAE;  background-color: #FFF; color: #0F0F0F; }
+.witBorder{  padding: 14px; border-style: none; border-radius: 10px; border-width: 2px; border-color: #FEFEFE;  background-color: #FFF; color: #0F0F0F; }
 .mTable   { font-family: Bahnschrift,monospace;                             height: 18px;             display:table;    page-break-after: always  }
 
 
-.console  { color:#c9a935; background-color:inherit; font-family :Courier; font-size: 8px; }
+.console  { color:#0F0F8F; background-color:inherit; font-family :Courier; font-size: 8px; }
+.coinSlider { width:75em; background:#f4d4d4;}
 
-
-input {
-    background: linear-gradient(to bottom, #cfc09f 22%,#634f2c 24%, #cfc09f 26%, #cfc09f 27%,#ffecb3 40%,#3a2c0f 78%); 
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    color: #c9a935;
-    font-family: 'Bahnschrift', 'Playfair Display', serif;
-    position: relative;
-	  text-transform: uppercase;	
-	  font-size: 9px;
-	  margin: 0;
-	  font-weight: 400;
-}
-
-input:after {
-    background: none;
-    left: 0;
-	  top: 0;
-    z-index: -1;
-    position: absolute;
-    text-shadow: 
-		-1px 0 1px #c6bb9f, 
-		0 1px 1px #c6bb9f, 
-		5px 5px 10px rgba(0, 0, 0, 0.4),
-		-5px -5px 10px rgba(0, 0, 0, 0.4);
-}
-
-
+input  { color:#0F0F0F; background-color:inherit; font-family :Bahnschrift; font-size: 10px;  width:80px;}
 input[type="radio"] {
   /* Add if not using autoprefixer */
   -webkit-appearance: none;
@@ -50,38 +21,32 @@ input[type="radio"] {
 }
 input[type="radio"]::before {content: "#"; }
 
-input::-webkit-outer-spin-button,
-input::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-}
 
 .attrRow  {                       width:75rem; padding: 1px; float: left;  min-height: 16px; height: 17px; font-family :inherit; font-size: 11px; font-weight:400; text-align: center;}
 .attrLine { vertical-align: top;  width:75rem; padding: 1px; float: left;  min-height: 16px; height: 17px; font-family :inherit; font-size: 11px; font-weight:400; text-align: center;}
+.attrLine:nth-child(even) { background: #f0f0f0;  padding: 0px; border: 1px dotted gray;}
 
-.key      {  padding: 1px; height:14px;  margin: 0px; border-color: #817137; border-style: solid; float: left; background-color:transparent; font-family:  inherit; font-size: inherit; font-weight:600; color: #c9a935; }
-.box      {  height:40px;  margin: 0px;               border-color: #817137; border-style: solid; float: left; background-color:transparent; font-family:  inherit; font-size: inherit; font-weight:600; color: #c9a935; }
+.key      {  padding: 1px; height:14px;  margin: 0px; border-color: rgb(167, 152, 152); border-style: solid; float: left; background-color:transparent; font-family:  inherit; font-size: inherit; font-weight:600; color: #000; }
+.box      {  height:40px;  margin: 0px; border-color: gray;               border-style: solid; float: left; background-color:transparent; font-family:  inherit; font-size: inherit; font-weight:600; color: #000; }
 
 .SWITCH  {                   padding: 1px; border: none; font-size: 12px; font-weight:400;  } 
 .BIGCELL {                   padding: 1px;               float: left; color:inherit;min-height: 48px; font-family: inherit; font-size: 11px; font-weight:400; text-align: center; background-color: inherit; } 
 .FIELD    { overflow:hidden; padding: 1px; border: none; float: left;                                 font-family: inherit; font-size: inherit; font-weight:inherit; color: inherit;} 
 
-.DASH     { width: 0.8rem; text-align: center; border-left-color: #817137; border-left-style: solid; border-left-width: 1px; }		
-.SEP      { width: 0.8rem; text-align: center; }		
+.SEP      { width: 0.8rem; text-align: center;  }		
 .TRASH    { width: 1rem; text-align: center; font-size:21px; height:17px; vertical-align: top;}		
 .TAG      { width: 1.8rem; text-align: left;  }		
 .SYMB     { width: 3rem;  text-align: left; }		
-.DATE     { width: 4rem;  text-align: center; }		
-.MOAM     { width: 5.2rem; text-align: right; font-family:monospace; }
-.TEAM     { width: 5.3rem; text-align: right; }
-.SNAM     { width: 5.8rem; text-align: left; }		
+.MOAM     { width:5.2rem; text-align: right; font-family:monospace; }
+.TEAM     { width:5.3rem; text-align: right; }
+.SNAM     { width:5.8rem; text-align: left; }		
 .C100     { width: 6rem; }
 .R105     { width: 6rem; text-align: right; }
 .TENY     { width: 7rem;  text-align: right; }
 .MONY     { width: 7rem; text-align: right; font-family:monospace; }
 .NAME     { width: 7rem; text-align: left;  }
 .CNAM     { width: 7rem; text-align: center;  }
-.CNAMF    { width: 7.3rem; text-align: center;  }
+.CNAMF    { width:7.3rem; text-align: center;  }
 .IDNT     { width: 8rem; text-align: right; }
 .LNAM     { width: 9rem; text-align: left;}
 .XFER     { width: 9rem; text-align: left;  }

@@ -48,6 +48,11 @@ export default function Status() {
         "Aktien-Verkauf mit Gewinn":{"creditEQL":{},"credit":{"COGK":"0","KEST":"0","KESO":"0"},"debit":{"FSAL":"0"},"debitA":{"CDAK":"0"},"sender":"WKN","reason":"Stückzahl","refAcct":"SELL","refCode":"Code"},
         "Aktien-Verkauf mit Verlust":{"creditEQL":{},"credit":{"VAVA":"0","COGK":"0"},"debit":{},"debitA":{"CDAK":"0"},"sender":"WKN","reason":"Stückzahl","refAcct":"SELL","refCode":"Code"},
         "Ausgleich Aktien-Verluste":{"creditEQL":{"FSAL":"0"},"credit":{},"debit":{},"debitA":{"VAVA":"0"},"sender":"Ausgleich","reason":"Verluste","refAcct":"VAVA","refCode":"VK Aktien"},
+        "Pfandzahlung":{"creditEQL":{},"credit":{"FSTF":"0"},"debit":{},"debitA":{"COGK":"0"},"sender":"","reason":"","refAcct":"NKHA","refCode":"AZ"},
+        "Rückerstattung Pfand":{"creditEQL":{},"credit":{"COGK":"0"},"debit":{},"debitA":{"FSTF":"0"},"sender":"","reason":"","refAcct":"NKHA","refCode":"AZ"},
+        "Forderung Nebenkosten":{"creditEQL":{},"credit":{"NKFO":"0"},"debit":{"NKHA":"0"},"debitA":{},"sender":"Nebenkosten","reason":"Abschluss","refAcct":"NKHA","refCode":"Abrechnung"},
+        "Mieter zahlt Nebenkosten":{"creditEQL":{},"credit":{"COGK":"0"},"debitA":{"NKFO":"0"},"debit":{},"sender":"Ferguson","reason":"Vorjahr","refAcct":"NKHA","refCode":"Nachzahlung"},
+        "Erstattung Nebenkosten":{"creditEQL":{"NKHA":"0"},"credit":{},"debit":{},"debitA":{"COGK":"0"},"sender":"Nebenkosten","reason":"Vorjahr","refAcct":"NKHA","refCode":"Überschuss"},
         "Abschreibung Haus":{"creditEQL":{"ABSC":"0"},"credit":{},"debitA":{"GRSB":"0"},"debit":{},"sender":"Abschluss","reason":"Jahr","refAcct":"GRSB","refCode":"Afa Haus"},
         "Abschreibung EBKS":{"creditEQL":{"ABSC":"0"},"credit":{},"debitA":{"EBKS":"0"},"debit":{},"sender":"Abschluss","reason":"Jahr","refAcct":"EBKS","refCode":"AfA Spülmaschine"},
         "Abschreibung Dach":{"creditEQL":{"ABSC":"0"},"credit":{},"debitA":{"DACH":"0"},"debit":{},"sender":"Abschluss","reason":"Jahr","refAcct":"DACH","refCode":"AfA Dach"},
@@ -270,7 +275,7 @@ export default function Status() {
                 <div className="FIELD L280"> {strKey}</div>
     
                 <div className="FIELD NAME">
-                    <input id="dateBooked" type="date" defaultValue={form.date} onChange={((e) => bufferField(strKey,'date',e.target.value))}/>
+                    <input  className="key SNAM" id="dateBooked" type="date" defaultValue={form.date} onChange={((e) => bufferField(strKey,'date',e.target.value))}/>
                 </div>
     
                         
@@ -340,7 +345,7 @@ export default function Status() {
                 <div className="FIELD L280"> {form.title}</div>
     
                 <div className="FIELD NAME">
-                <div className="FIELD SYMB" >{form.date}</div>
+                <div className="FIELD DATE" >{form.date}</div>
                 </div>
                         
                 <div className="FIELD SYMB" >Sender</div>
@@ -460,7 +465,7 @@ function StatusRow({ am1,tx1, am2, tx2, am3, tx3, d, n, l, click}) {
             <div className="FIELD SEP"> &nbsp;</div>
             <div className="FIELD MOAM"> {cents2EU(am3)}</div>
             <div className="FIELD SYMB" onClick={(e)=>showAccount(tx3)}> {tx3}</div>
-            <div className="FIELD SEP"> &nbsp;</div>
+            <div className="FIELD DASH"> &nbsp;</div>
             <div className="FIELD SEP"> &nbsp;</div>
             <div className="FIELD SYMB"> {d}</div>
             <div className="FIELD NAME"> {n}</div>
