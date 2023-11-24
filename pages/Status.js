@@ -53,6 +53,7 @@ export default function Status() {
         "Forderung Nebenkosten":{"creditEQL":{},"credit":{"NKFO":"0"},"debit":{"NKHA":"0"},"debitA":{},"sender":"Nebenkosten","reason":"Abschluss","refAcct":"NKHA","refCode":"Abrechnung"},
         "Mieter zahlt Nebenkosten":{"creditEQL":{},"credit":{"COGK":"0"},"debitA":{"NKFO":"0"},"debit":{},"sender":"Ferguson","reason":"Vorjahr","refAcct":"NKHA","refCode":"Nachzahlung"},
         "Erstattung Nebenkosten":{"creditEQL":{"NKHA":"0"},"credit":{},"debit":{},"debitA":{"COGK":"0"},"sender":"Nebenkosten","reason":"Vorjahr","refAcct":"NKHA","refCode":"Überschuss"},
+        "nicht abzugsfäh.Aufwand":{"creditEQL":{"K2GH":"0","K2EH":"0","K2AL":"0","K2KR":"0","K2TO":"0"},"credit":{},"debit":{"NKG":"0"},"debitA":{},"sender":"Abschluss","reason":"Jahr","refAcct":"K2LE","refCode":"WITHDRAW"},
         "Abschreibung Haus":{"creditEQL":{"ABSC":"0"},"credit":{},"debitA":{"GRSB":"0"},"debit":{},"sender":"Abschluss","reason":"Jahr","refAcct":"GRSB","refCode":"Afa Haus"},
         "Abschreibung EBKS":{"creditEQL":{"ABSC":"0"},"credit":{},"debitA":{"EBKS":"0"},"debit":{},"sender":"Abschluss","reason":"Jahr","refAcct":"EBKS","refCode":"AfA Spülmaschine"},
         "Abschreibung Dach":{"creditEQL":{"ABSC":"0"},"credit":{},"debitA":{"DACH":"0"},"debit":{},"sender":"Abschluss","reason":"Jahr","refAcct":"DACH","refCode":"AfA Dach"},
@@ -418,7 +419,7 @@ export default function Status() {
         <Screen prevFunc={noFunc} nextFunc={noFunc} tabSelector={tabHeaders}  tabName={tabName}> 
            
 
-            <div className="FIELD" key={"Status"} id={'Overview0'} style= {{ 'display': aPages[0]}} >
+            <div className="FIELD" key={"Dashboard"} id={'Overview0'} style= {{ 'display': aPages[0]}} >
                 <StatusRow am1={page.Assets} am2={page.Gain}  am3={page.eqliab}/>
                 {
                     report.map((row,l) => (
@@ -434,7 +435,7 @@ export default function Status() {
 
 
             {Object.keys(matrix).map((strKey,index)=>( 
-                <div className="FIELD" key={"Status"} id={'Overview'+(index+1)} style= {{ 'display': aPages[index+1]}} > 
+                <div className="FIELD" key={"Form"+index} id={'Overview'+(index+1)} style= {{ 'display': aPages[index+1]}} > 
                     <div className="attrLine"/>
                     <BookingForm    strKey={strKey}  form={matrix[strKey]} preBook={preBook} />
                     <BookingDisplay strKey={strKey}  form={displayRecord}  doBook={doBook} /> 
