@@ -21,13 +21,10 @@ export default function handler(
   sessionTime=timeSymbol();
   nextSessionId= strSymbol(sessionTime+client+year+sessionTime);
 
-  let bucket = init(process.argv) as String
-  let jConfig = { 'bucket':bucket } as any;
+  let jConfig =  init(process.argv) as any; // GH20221003 need to init for each module
 
   if(req && req.query && req.socket) {       
-
-
-    
+  
     client =  req.query.client;
     year = req.query.year;
     const query:JSON = <JSON><unknown> { "ext":"JSON", "client":client, "year":year  };
@@ -39,7 +36,7 @@ export default function handler(
 }
 
 
-function downloadExcel(session:any, res:NextApiResponse<any>) {
+function downloadExcel(session:any, res:NextApiResponse<any>, jData:any) {
   
     console.log("1600 app.post EXCEL");
     if(session) {
@@ -58,7 +55,7 @@ function downloadExcel(session:any, res:NextApiResponse<any>) {
                     console.log("1640 GET /EXCEL "+sheetName+ " for ("+client+","+year+")");
 
                     // may use same time and id because no tBuffer is given
-                    let fileSig = xlsxWrite(session);
+                    let fileSig = xlsxWrite(session,jData.root);
                     try {
                         console.log("1660 GET /EXCEL JSON "+JSON.stringify(fileSig));
 

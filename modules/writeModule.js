@@ -230,13 +230,13 @@ export async function sendFile(sig, response) {  // was fs.exists() GH20230401
 
 
 
-export async function save2Bucket(config,session,client,year,root) {
+export async function save2Bucket(jConfig,session,client,year) {
 
-    if(config) {
+    if(jConfig && jConfig.bucket) {
         console.log("0032 save2Bucket Start saving("+JSON.stringify(Object.keys(session))+") to FB for "+client+","+year);        
 
         // FIREBASE
-        const fbConfig = loadFBConfig(root,config);
+        const fbConfig = loadFBConfig(jConfig.root,jConfig.bucket);
         if(fbConfig) {
             // 20221206
             // session.fireBase = fbConfig.storageBucket;

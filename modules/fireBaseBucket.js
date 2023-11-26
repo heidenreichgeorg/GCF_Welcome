@@ -88,8 +88,14 @@ function accessFirebase(accessMethod,firebaseConfig,client,year,jData,startSessi
       // Signed in 
       const user = userCredential.user;
       if(debug) console.log("\n0028 FB.bucketInit LOGGED IN "+JSON.stringify(user));
+      if(jData) {
+        jData.root=firebaseConfig.root;
+        jData.bucket=firebaseConfig.bucket;
+      }
       url = accessMethod(bpStorage,client,year,jData,startSessionCB,res);
-      if(jData) jData.firebase = url;    
+      if(jData) {
+        jData.firebase = url;    
+      }
     })
     .catch((error) => {
       const errorCode = error.code;
@@ -314,57 +320,6 @@ module.exports['bucketUpload']=bucketUpload;
 
 
 
-/*
-
-    
-function fireWrite(session) {
-  
-  if(session && session.client && session.year) {
-    // Add a new document in collection "sessions"
-    let name = "C"+session.client+"Y0"+session.year;
-
-    markActive(name);
-
-      if(debug) console.log("Firebase fireWrite setDoc"+name);
-
-  } else console.error("Firebase fireWrite SKIP");
-}
-
-
-async function markActive(client) {
-  const datastore = new Datastore();
-  const query = datastore
-    .createQuery("session")
-    .filter('client', '=', client);
-
-  datastore
-  .runQuery(query)
-  .then(results => {
-    const matchingSet = results[0];
-    console.log('Results found:', JSON.stringify(matchingSet[0]));
-
-    let session = matchingSet[0];
-    console.log('Session found:', JSON.stringify(session));
-
-    //let client = session[datastore.client].id;
-    let year  =  session[datastore.year].id;
-    console.log('year found2:', JSON.stringify(session[datastore.year]));
-
-    return parseInt(year,10);
-  })
-  .then((client) => {
-    console.log('Calling markDone with task Key ID', taskKeyId);
-    markDone(taskKeyId); // From the original function in the sample
-    console.log('Updated task');
-  })
-  .catch(err => {
-    console.error('ERROR:', err);
-  });
-}
-
-
-let fbConfig=null;
-*/
 
 
 export function loadFBConfig(dir,config) {
@@ -400,10 +355,10 @@ export function loadFBConfig(dir,config) {
 
 
 
-export function fbDownload(jConfig,client,year,callBack,res,root) {
+export function fbDownload(jConfig,client,year,callBack,res) {
     if(jConfig && jConfig.bucket) {
         // FIREBASE
-        const fbConfig = loadFBConfig(root,jConfig.bucket);
+        const fbConfig = loadFBConfig(jConfig.root,jConfig.bucket);
         if(fbConfig) {        
             accessFirebase(bucketDownload,fbConfig,client,year,jConfig,callBack,res);
             return "fbDownload";

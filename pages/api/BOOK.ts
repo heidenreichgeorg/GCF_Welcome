@@ -12,7 +12,7 @@ const debugWrite=null;
 
 import type { NextApiRequest, NextApiResponse } from 'next'
 import  { formatTXN  } from '../../modules/compile'
-import  { getRoot,init,localhost,setSession,signIn, strSymbol, symbolic, timeSymbol } from '../../modules/session'
+import  { init,localhost,setSession,signIn, strSymbol, symbolic, timeSymbol } from '../../modules/session'
 import  { save2Bucket } from '../../modules/writeModule'
 
 
@@ -34,9 +34,8 @@ export default function handler(
     if(req.query) {       
       if(debug) console.log("0060 BOOK.handler query="+JSON.stringify(req.query));
 
-      let bucket = init(process.argv) as String
-      let jConfig = { 'bucket':bucket } as any;
-    
+      let jConfig =  init(process.argv) as any; // GH20221003 need to init for each module
+          
       if(debug) console.log("0062 BOOK.handler config="+jConfig.bucket);
 
       if(req.body) {       
@@ -94,7 +93,7 @@ function bookTransaction(session:any, res:NextApiResponse<any>,jData:any) {
           
           let serverAddr = localhost();
           // async
-          save2Bucket(jData.bucket,session,client,year,getRoot())
+          save2Bucket(jData,session,client,year)
               .then(result => { 
                 if(res) {          
                     res.json({url:serverAddr+'/LATEST', client, year, 'result':result  })

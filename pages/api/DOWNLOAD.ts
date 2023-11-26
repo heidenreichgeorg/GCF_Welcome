@@ -22,13 +22,10 @@ export default function handler(
   sessionTime=timeSymbol();
   nextSessionId= strSymbol(sessionTime+client+year+sessionTime);
 
-  let bucket = init(process.argv) as String
-  let jConfig = { 'bucket':bucket } as any;
+  let jConfig =  init(process.argv) as any; // GH20221003 need to init for each module
 
   if(req && req.query && req.socket) {       
-
-
-    
+  
     client =  req.query.client;
     year = req.query.year;
     const query:JSON = <JSON><unknown> { "ext":"JSON", "client":client, "year":year  };

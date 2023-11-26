@@ -10,7 +10,6 @@ const CEND = '|';
 
 import * as  XLSX from 'xlsx'
 
-import { getRoot,Slash } from './session'
 
 // EXCEL interface
 
@@ -474,7 +473,7 @@ module.exports['makeXLTabs']=makeXLTabs;
 
 
 
-export function xlsxWrite(session) {
+export function xlsxWrite(session,root) {
 
     let sheetFile = "BOOKING.xlsx"
     let client="client";
@@ -483,7 +482,7 @@ export function xlsxWrite(session) {
     if(session) {
        
         // return 'serverFile':sheetFile
-        sheetFile = getClientDir(session.client) + session.year + session.client + ".xlsx"
+        sheetFile = root + session.year + session.client + ".xlsx"
         if(sheetFile) {
             if(session.sheetName) {
                 client = session.client;
@@ -624,10 +623,6 @@ function makeSum(xSheet,a1Cell,a1From,a1To) {
 }
 
 
-
-function getClientDir(client) {
-    return getRoot()+client+Slash; 
-}
 
 
 

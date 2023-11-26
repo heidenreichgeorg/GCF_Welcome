@@ -4,6 +4,8 @@ import { useRouter } from 'next/router'
 import { ParsedUrlQuery,stringify } from "querystring";
 import { createContext, ReactNode, useContext, useEffect, useState } from "react";
 
+import  { init } from '../modules/session';
+
 type Session = { }
 
 export const REACT_APP_API_HOST="/api"
@@ -61,7 +63,8 @@ export function SessionProvider({ children,  default_value, onLoading, onError }
 
     const router = useRouter()
 
-   
+    let jConfig=init(process.argv);
+
     
     let strSearch = router.asPath.split('?')[1];
     console.log("7001 SessionProvider "+stringify(router.query)+"  host="+REACT_APP_API_HOST+"  query="+strSearch);
@@ -94,6 +97,7 @@ export function SessionProvider({ children,  default_value, onLoading, onError }
             .then(data => data.json())
             .then(data => {
                 let len=0;
+                data.root=jConfig.root;
                 setSession(data);
                 sessionStorage.setItem(SX_SESSION,JSON.stringify(data));
                 console.log("COLD data.sheetCells.length="+data.sheetCells.length);

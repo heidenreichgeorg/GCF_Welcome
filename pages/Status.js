@@ -23,6 +23,7 @@ import { makeStatusData }  from '../modules/App';
 
 export default function Status() {
     
+
     const predefinedTXN = {
     "Miete":{"creditEQL":{},"credit":{"COGK":"0"},"debit":{"MIET":"0","NKHA":"0"},"debitA":{},"sender":"Vau / Ferguson","refAcct":"MIET","refCode":"Eifelweg 22"},
     "Entnahme Kpl":{"creditEQL":{"K2GH":"0","K2EH":"0"},"credit":{},"debit":{},"debitA":{"COGK":"0"},"sender":"Elke u Georg","refAcct":"K2GH K2EH","refCode":"WITHDRAW"},
@@ -98,6 +99,13 @@ export default function Status() {
                 </div>
             </div>        
     );
+
+
+    // load pattern file
+    let patternFile =     session.root + session.year + session.client + "pattern.json";
+    console.log(patternFile);
+    // setMatrix(pattern);
+
     
     function noFunc() {  console.log("CLICK NO");  }
     function prevFunc() {console.log("CLICK PREVIOUS"); window.location.href="/Partner?client="+client+"&year="+year; } 

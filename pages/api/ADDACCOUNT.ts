@@ -1,7 +1,7 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next'
 
-import  { getRoot, init, signIn, Slash, strSymbol, timeSymbol } from '../../modules/session'
+import  { init, signIn, Slash, strSymbol, timeSymbol } from '../../modules/session'
 import  { sendFile, writeFile } from '../../modules/writeModule'
 import { J_ACCT } from '@/modules/terms';
 
@@ -31,12 +31,11 @@ export default function handler(
   if(req && req.query && req.socket) {       
 
 
-    let bucket = init(process.argv) as String
-    let jConfig = { 'bucket':bucket } as any;
-      
+    let jConfig =  init(process.argv) as any; // GH20221003 need to init for each module
+
 
     jConfig.column=req.query.column; 
-    // trick to use config as carrier from client req.query into jData input to the callback
+    // trick to use jConfig as carrier from client req.query into jData input to the callback
     // DOES NOT WORK REPEATEDLY
     
 
@@ -77,7 +76,7 @@ function downloadPlusAcct(session:any, res:NextApiResponse<any>, jData:any) {
                 if(client && year) {
 
                     console.log("1740 GET /ADDACCOUNT "+sheetName+ " for ("+client+","+year+")");
-                    session.serverFile = getRoot()+ session.client + Slash+ "NACT" + session.year + timeSymbol() + ".json"
+                    session.serverFile = jData.root + "NACT" + session.year + timeSymbol() + ".json"
                     writeFile(session);
 
                     try {

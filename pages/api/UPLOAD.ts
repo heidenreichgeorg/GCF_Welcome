@@ -3,13 +3,12 @@ import { networkInterfaces } from 'os';
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next'
 
-import { getRoot,init,localhost,strSymbol,timeSymbol } from '../../modules/session'
+import { init,localhost,strSymbol,timeSymbol } from '../../modules/session'
 import { startSessionDisplay,save2Bucket } from '../../modules/writeModule'
 import { compile } from '../../modules/compile'
 
 const debugUpload = true;
 
-let config:string|null;
 var nets;
 
 export default function handler(
@@ -19,7 +18,7 @@ export default function handler(
     let strTimeSymbol = timeSymbol();
     console.log("\n\n0800 UPLOAD at "+strTimeSymbol);
 
-    let config =  init(/*app,*/ process.argv); // GH20221003 do that per module
+    let jConfig =  init(process.argv) as any; // GH20221003 need to init for each module
 
     nets = networkInterfaces();
 
@@ -71,10 +70,10 @@ export default function handler(
 
             // PERSISTENT FB CLOUD FILE STORAGE
             // SETS SESSION AFTER WRITE
-            save2Bucket(config,sessionData,client,year,getRoot());
+            save2Bucket(jConfig,sessionData,client,year);
 
             
-            // 20221202 what if config==null and no bucket shall be used?
+            // 20221202 what if jConfig.bucket==null and no bucket shall be used?
             // shortcut for OFFLINE start  
             // 20221207 DO NOT call sendDisplay              
             startSessionDisplay(sessionData,null); 

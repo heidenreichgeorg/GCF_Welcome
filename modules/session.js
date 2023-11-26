@@ -7,7 +7,7 @@ import { fbDownload } from './fireBaseBucket.js'
 import { compile } from './compile.js'
 import { PORT } from './terms.js'
 
-const debug=null;
+const debug=2;
 
 export const HTTP_OK = 200;
 export const HTTP_WRONG = 400;
@@ -18,13 +18,13 @@ var nets;
 
 // load JSON file from Firebase storage
 // query = { client:CLIENT, year:YEAR }
-// GH20230816 config from string to {'bucket':bucket }
+// GH20230816 bucket from string to { 'bucket':bucket }
 export function signIn(jConfig,query,remote,res,startSessionCB) {
     
     nets = networkInterfaces();
 
-    let base =  getRoot();
-    console.log("0010  signIn at base "+base+"  for "+JSON.stringify(query));
+    
+    console.log("0010  signIn at root "+jConfig.root+"  for "+JSON.stringify(query));
 
     if(query && query.client && query.client.length>2 ) { // && (query.client == "[a-zA-Z0-9]")) {
 
@@ -40,7 +40,7 @@ export function signIn(jConfig,query,remote,res,startSessionCB) {
             let id=null;
             {
                 console.log ( "0014 signIn READ BUCKET FOR COLD id ="+id);
-                fbDownload(jConfig,client,year,startSessionCB,res,getRoot()); // avoid double response
+                fbDownload(jConfig,client,year,startSessionCB,res); // avoid double response
             }
                         
         } else console.log ( "0027 signIn file no valid year for query="+JSON.stringify(query)+",addr="+remote);
@@ -83,21 +83,6 @@ export function startSessionJSON(session,res) {
 }
 
 
-var SERVEROOT= '/data/sessions/';
-
-export function setRoot(root) {  
-    if(root.slice(-1)==='/' || root.slice(-1)==='\\') {
-        SERVEROOT=root; 
-    } else {
-        SERVEROOT=root+'/';
-    }
-
-    console.log("App.setRoot = "+SERVEROOT);
-}
-
-export function getRoot() {  return SERVEROOT; }
-
-
 export function init(/*app,*/ argv) {
 
     console.log(" ARGV= "+JSON.stringify(argv));
@@ -112,7 +97,8 @@ export function init(/*app,*/ argv) {
 
 
 function processArgv(processArgv) {
-    let config = {};
+    let bucket="fireBaseConfigFile";
+    let root="/data/sessions/";
     processArgv.forEach(function (val, index, array) {
         if(debug>1) console.log("0000 Starting server " + index + ': ' + val);
         let attribute=val.split('=');
@@ -120,12 +106,17 @@ function processArgv(processArgv) {
             //if(debug>1) 
             console.log("0006 Attribute " + index + ': ' + val);
             if(attribute[0].toLowerCase()==='root') {
-                setRoot(attribute[1]); // local fs root
-                console.log("0008A Starting server SET ROOT TO " + getRoot());
+                let rawRoot=attribute[1];
+                if(rawRoot.slice(-1)==='/' || rawRoot.slice(-1)==='\\') {
+                    root=rawRoot; 
+                } else {
+                    root=rawRoot+'/';
+                }
+                console.log("0008A Starting server SET ROOT TO " + root);
             }        
-            else if(attribute[0].toLowerCase()==='config') {
-                config = attribute[1]; // config dir under root
-                console.log("0008B Starting server SET FIREBASE CONFIG " + config);
+            else if(attribute[0].toLowerCase()==='bucket') {
+                bucket = attribute[1]; // bucket configuration file under root
+                console.log("0008B Starting server SET FIREBASE BUCKET " + bucket);
             }        
             else if(attribute[0].toLowerCase()==='auto') {
                 let autoSec = parseInt(attribute[1]); // auto save time-interval
@@ -135,7 +126,7 @@ function processArgv(processArgv) {
         }
     });
 
-    return config;
+    return { 'root':root, 'bucket':bucket };
 }
 
 

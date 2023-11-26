@@ -14,9 +14,8 @@ export default function handler(
 ) {
   console.log("SESSION.handler "+JSON.stringify(req.query));
 
-  let bucket = init(process.argv) as String
-  let jConfig = { 'bucket':bucket } as any;
-
+  let jConfig =  init(process.argv) as any; // GH20221003 need to init for each module
+  
   if(req && req.query && req.socket) {       
       
       const { client, year, auth } = req.query;
