@@ -63,11 +63,9 @@ export function SessionProvider({ children,  default_value, onLoading, onError }
 
     const router = useRouter()
 
-    let jConfig=init(process.argv);
-
     
     let strSearch = router.asPath.split('?')[1];
-    console.log("7001 SessionProvider "+stringify(router.query)+"  host="+REACT_APP_API_HOST+"  query="+strSearch);
+    console.log("7001 SessionProvider "+stringify(router.query)+"  host="+REACT_APP_API_HOST+"  query="+strSearch+" argv="+process.argv);
 
 
     useEffect(() => {      
@@ -96,11 +94,10 @@ export function SessionProvider({ children,  default_value, onLoading, onError }
             {mode:'cors'}) // CORS 20230114
             .then(data => data.json())
             .then(data => {
-                let len=0;
-                data.root=jConfig.root;
+                let len=0;                
                 setSession(data);
                 sessionStorage.setItem(SX_SESSION,JSON.stringify(data));
-                console.log("COLD data.sheetCells.length="+data.sheetCells.length);
+                console.log("COLD data.root="+data.root+"  data.sheetCells.length="+data.sheetCells.length);
                 setStatus('success');
 
                 console.log("7004 SessionProvider COLD SUCCESS");

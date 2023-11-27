@@ -20,7 +20,7 @@ UPLOAD JSON (Admin only)
 
 */
 
-const debug=null;
+const debug=1;
 
 // SETTING THIS WILL VIOLATE PRIVACY AT ADMIN CONSOLE
 const debugReport=null;
@@ -87,11 +87,7 @@ function accessFirebase(accessMethod,firebaseConfig,client,year,jData,startSessi
     .then((userCredential) => {
       // Signed in 
       const user = userCredential.user;
-      if(debug) console.log("\n0028 FB.bucketInit LOGGED IN "+JSON.stringify(user));
-      if(jData) {
-        jData.root=firebaseConfig.root;
-        jData.bucket=firebaseConfig.bucket;
-      }
+      if(debug) console.log("\n0028 FB.bucketInit LOGGED IN FROM "+jData.root+jData.bucket);
       url = accessMethod(bpStorage,client,year,jData,startSessionCB,res);
       if(jData) {
         jData.firebase = url;    
@@ -119,18 +115,20 @@ async function bucketDownload(bpStorage,client,year,jData,startSessionCB,callRes
 
   const strChild = fbS+sClient+fbS+iYear+fbS+MAIN;  
   const fileRef = fbStorage.ref(bpStorage, strChild);
-  if(debug) console.log('Firebase.download fileRef='+JSON.stringify(fileRef));
+  if(debug) console.log('Firebase.download fileRef='+JSON.stringify(fileRef._service.app._options.projectId));
 
   fbStorage.getDownloadURL(fileRef)
   .then(
     
     function(url) {
 
-      if(debug) console.log('Firebase.download fetch '+url)
+      if(debug) console.log('0030 Firebase.download fetch '+url)
 /* UTF-8      
           const decoder = new TextDecoder('UTF-8');
           const toString = (bytes) => { const array = new Uint8Array(bytes);  return decoder.decode(array); }
 */                 
+        if(debug) console.log('0032 Firebase.download jData '+JSON.stringify(jData))
+
         let session = {};
         https.get(url, res => {
           let body = '';
@@ -142,6 +140,9 @@ async function bucketDownload(bpStorage,client,year,jData,startSessionCB,callRes
               if(debugReport) console.dir("Firebase.download body "+body);
               // UTF-8 let buf = toString(body);
               session = JSON.parse(body);
+
+              // GH20231127 jConfig
+              session.root = jData.root;
             }
             catch(err) {
               console.error("Firebase.download ERR "+err.toString());
@@ -288,6 +289,7 @@ async function bucketUpload(bpStorage,client,year,jData,startSessionCB,callRes) 
               
               // 20221127
               startSessionCB(jData,callRes,{});
+              // GH202311 jConfig ??
               }
             }
           );

@@ -20,7 +20,7 @@ export default function handler(
       
       const { client, year, auth } = req.query;
       const query:JSON = <JSON><unknown> { "client":client, "year":year, "auth":auth  };
-      console.log("    SESSION.handler "+JSON.stringify(query));
+      console.log("SESSION.ts handler "+JSON.stringify(query)+" jConfig="+JSON.stringify(jConfig));
     
       // NO sign-in login authenticat
       //if(auth==currentHash())
