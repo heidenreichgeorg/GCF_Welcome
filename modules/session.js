@@ -7,7 +7,7 @@ import { fbDownload } from './fireBaseBucket.js'
 import { compile } from './compile.js'
 import { PORT } from './terms.js'
 
-const debug=2;
+const debug=false;
 
 export const HTTP_OK = 200;
 export const HTTP_WRONG = 400;
@@ -57,7 +57,7 @@ export function signIn(jConfig,query,remote,res,startSessionCB) {
 
 export function startSessionJSON(session,res) {
 
-    if(debug) console.log("0038 startSessionJSON="+JSON.stringify(Object.keys(session))); 
+    if(debug) console.log("0040 startSessionJSON="+JSON.stringify(Object.keys(session))); 
 
     // START A NEW SESSION
     let time = timeSymbol();
@@ -69,17 +69,17 @@ export function startSessionJSON(session,res) {
 
     setSession(session);
 
-    console.log("0040 startSessionJSON("+client+","+year+") SUCCESS sessionId="+sessionId); 
+    console.log("0042 startSessionJSON("+client+","+year+") SUCCESS sessionId="+sessionId); 
 
     // 20221207
     if(res) {
-        console.log("0042 startSessionJSON("+client+","+year+")  res.JSON");         
+        console.log("0046 startSessionJSON("+client+","+year+")  res.JSON");         
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers","Origin, X-Requested-With, Content-Type, Accept, Authorization");
         res.json(session);
-    } else console.log("0041 startSessionJSON("+client+","+year+") NO res object"); 
+    } else console.log("0045 startSessionJSON("+client+","+year+") NO res object"); 
 
-    //console.log("0044 COMPILED PRE-BOOK = "+JSON.stringify(session.generated.Vorgemerkt));
+    //console.log("0048 COMPILED PRE-BOOK = "+JSON.stringify(session.generated.Vorgemerkt));
 }
 
 

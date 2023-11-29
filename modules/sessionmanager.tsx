@@ -4,7 +4,6 @@ import { useRouter } from 'next/router'
 import { ParsedUrlQuery,stringify } from "querystring";
 import { createContext, ReactNode, useContext, useEffect, useState } from "react";
 
-import  { init } from '../modules/session';
 
 type Session = { }
 
@@ -20,10 +19,19 @@ export function useSession() {
 }
 
 export function getSession() {
-    let state = null;
+    let state:JSON = JSON.parse('{}');
     let strSession=sessionStorage.getItem(SX_SESSION);
+    //console.log("getSession = "strSession)
     if(strSession) try { state=JSON.parse(strSession); } catch(err) {}
-    console.log("getSession = "+strSession)
+    var sessionKeys:string[]=Object.keys(state);
+    console.log("7020 getSession = "+sessionKeys);
+    /*
+    sessionKeys.forEach(key=>{ if(key!='session') {
+            let value=state[key];
+            console.log("7022 "+key+" = "+JSON.stringify(value))
+        }
+    })
+    */
     return state;
 }
 
@@ -37,7 +45,7 @@ export function storeCarryOver(jCarryOver:string) {
         try { 
             let strCarryOver = JSON.stringify(jCarryOver);
             localStorage.setItem(LX_CARRYOVER,strCarryOver);
-            console.log("localStorage.setItem('carryOver',"+strCarryOver+")");
+            console.log("7040 localStorage.setItem('carryOver',"+strCarryOver+")");
         }
         catch(e) {}
     }
@@ -48,7 +56,7 @@ export function getCarryOver() {
     let jCarryOver={};
     if(strCarryOver) try { 
         jCarryOver=JSON.parse(strCarryOver);
-        console.log("localStorage.getItem('carryOver')="+JSON.stringify(jCarryOver));
+        console.log("7060 localStorage.getItem('carryOver')="+JSON.stringify(jCarryOver));
     }
     catch(e) {}
     return jCarryOver;
@@ -65,7 +73,7 @@ export function SessionProvider({ children,  default_value, onLoading, onError }
 
     
     let strSearch = router.asPath.split('?')[1];
-    console.log("7001 SessionProvider "+stringify(router.query)+"  host="+REACT_APP_API_HOST+"  query="+strSearch+" argv="+process.argv);
+    console.log("\n7001 SessionProvider "+stringify(router.query)+"  host="+REACT_APP_API_HOST+"  query="+strSearch+" argv="+process.argv);
 
 
     useEffect(() => {      

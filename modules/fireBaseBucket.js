@@ -105,6 +105,19 @@ function accessFirebase(accessMethod,firebaseConfig,client,year,jData,startSessi
 module.exports['accessFirebase']=accessFirebase;
 
 
+
+
+function getFileContents(fileName) {
+  return new Promise((resolve, reject) => {
+    let contents = ""
+    fs.readFile(fileName, (err, data) => {
+      if (err) reject(err);
+      console.log("0030 getFileContents "+JSON.stringify(data));
+      resolve(data.toString())
+    });
+  })
+}
+
 // ONLY FOR BROWSERS gsutil cors set cors.json gs://bookingpapages-a0a7c -
 
 
@@ -112,22 +125,23 @@ async function bucketDownload(bpStorage,client,year,jData,startSessionCB,callRes
   let sClient = client.replace('.','_');
   let iYear = parseInt(year);
 
+  if(debug) console.log('0030 Firebase.download jData '+JSON.stringify(jData))
 
   const strChild = fbS+sClient+fbS+iYear+fbS+MAIN;  
   const fileRef = fbStorage.ref(bpStorage, strChild);
-  if(debug) console.log('Firebase.download fileRef='+JSON.stringify(fileRef._service.app._options.projectId));
+  if(debug) console.log('0030 Firebase.download fileRef='+JSON.stringify(fileRef._service.app._options.projectId));
+
+  
+  let txnPattern = await getFileContents(jData.root+"pattern.txt");
+  if(debug) console.log('0030 Firebase.download read root/pattern.txt; '+txnPattern)
 
   fbStorage.getDownloadURL(fileRef)
   .then(
     
     function(url) {
 
-      if(debug) console.log('0030 Firebase.download fetch '+url)
-/* UTF-8      
-          const decoder = new TextDecoder('UTF-8');
-          const toString = (bytes) => { const array = new Uint8Array(bytes);  return decoder.decode(array); }
-*/                 
-        if(debug) console.log('0032 Firebase.download jData '+JSON.stringify(jData))
+
+      if(debug) console.log('0032 Firebase.download url '+url)
 
         let session = {};
         https.get(url, res => {
@@ -137,20 +151,27 @@ async function bucketDownload(bpStorage,client,year,jData,startSessionCB,callRes
           });
           res.on('end', () => {
             try {
-              if(debugReport) console.dir("Firebase.download body "+body);
-              // UTF-8 let buf = toString(body);
+              if(debugReport) console.dir("0034 Firebase.download body "+body);
+              
+              // build session object
               session = JSON.parse(body);
 
-              // GH20231127 jConfig
-              session.root = jData.root;
+              try {
+                // GH20231127 using jConfig, add local txnPattern data
+                session.txnPattern = JSON.parse(txnPattern);
+                console.log("0036 getFileContents "+JSON.stringify(Object.keys(session)));
+              } catch(err) {
+                console.error("0033 Firebase.download txnPattern="+txnPattern+" ERR "+err.toString());
+              }
+  
             }
             catch(err) {
-              console.error("Firebase.download ERR "+err.toString());
+              console.error("0035 Firebase.download ERR "+err.toString());
             }
 
-            if(debug) console.log("0016 Firebase.download session "+JSON.stringify(Object.keys(session)));
+            if(debug) console.log("0038 Firebase.download session "+JSON.stringify(Object.keys(session)));
 
-            if(debugReport) console.dir("Firebase.download session "+JSON.stringify(session));
+            if(debugReport) console.dir("0039 Firebase.download session "+JSON.stringify(session));
             // AVOID double HEADERS 
             startSessionCB(session,callRes,jData); 
             // 3rd param to startSessionCB JData is from config = 1st arg on calling fireBaseBucket.js

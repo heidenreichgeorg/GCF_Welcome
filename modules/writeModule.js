@@ -233,7 +233,7 @@ export async function sendFile(sig, response) {  // was fs.exists() GH20230401
 export async function save2Bucket(jConfig,session,client,year) {
 
     if(jConfig && jConfig.bucket) {
-        console.log("0032 save2Bucket Start saving("+JSON.stringify(Object.keys(session))+") to FB for "+client+","+year);        
+        console.log("0034 save2Bucket Start saving("+JSON.stringify(Object.keys(session))+") to FB for "+client+","+year);        
 
         // FIREBASE
         const fbConfig = loadFBConfig(jConfig.root,jConfig.bucket);
@@ -245,7 +245,7 @@ export async function save2Bucket(jConfig,session,client,year) {
             accessFirebase(bucketUpload,fbConfig,client,year,session,startSessionDisplay,null);
                 
             if(debug) {
-                console.log("0034 save2Bucket session.sheetcells keys="+JSON.stringify(Object.keys(session.sheetCells).map((i)=>(session.sheetCells[i][0]))));
+                console.log("0036 save2Bucket session.sheetcells keys="+JSON.stringify(Object.keys(session.sheetCells).map((i)=>(session.sheetCells[i][0]))));
             }
 
             return "save2Bucket OK";
