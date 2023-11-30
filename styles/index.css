@@ -4,51 +4,24 @@ body {
   margin: 0;
   font-family: Bahnschrift, monospace, sans-serif; }
 
-.dosBorder{  padding: 14px; border-style: none; border-radius: 10px; border-width: 2px; border-color: #817137;  color: #c9a935; }
+.dosBorder{  padding: 14px; border-style: none; border-radius: 10px; border-width: 2px; border-color: #91740e;  color: #c9a935; }
 .witBorder{  padding: 14px; border-style: none; border-radius: 10px; border-width: 2px; border-color: #817137;  color: #c9a935; }
-.mTable   { font-family: Bahnschrift,monospace;                             height: 18px;             display:table;    page-break-after: always  }
+.mTable   { font-family: Bahnschrift,monospace;                             height: 680px;             display:table;    page-break-after: always  }
 
 
 .console  { color:#c9a935; background-color:inherit; font-family :Courier; font-size: 8px; }
 
 
 input {
-    background: linear-gradient(to bottom, #7c6b48 22%,#645435 24%, #cfc09f 26%, #cfc09f 27%,#ffecb3 40%,#916f2c 78%); 
+    background: linear-gradient( 0deg, #f79f3a 15%,#b19f77 30%, #b4a57d 45%, #c0b59a 60%,#e0d5b2 75%,#f1a649); 
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
-    color: #c9a935;
     font-family: 'Bahnschrift', 'Playfair Display', serif;
-    position: relative;
-	  text-transform: uppercase;	
-	  font-size: 9px;
-	  margin: 0;
-	  font-weight: 400;
-}
-
-input:after {
-    background: none;
-    left: 0;
-	  top: 0;
-    z-index: -1;
-    position: absolute;
-    text-shadow: 
-		-1px 0 1px #c6bb9f, 
-		0 1px 1px #c6bb9f, 
-		5px 5px 10px rgba(0, 0, 0, 0.4),
-		-5px -5px 10px rgba(0, 0, 0, 0.4);
+	  taxt-transform: uppercase;	
 }
 
 
-input[type="radio"] {
-  /* Add if not using autoprefixer */
-  -webkit-appearance: none;
-  appearance: none;
-  font-family:inherit; font-size: 10px; font-weight:400; text-align: center;
-  background-color: #645435;
-  margin: 0;
-}
-input[type="radio"]::before {content: "#"; }
 
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {

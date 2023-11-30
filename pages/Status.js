@@ -284,6 +284,9 @@ export default function Status() {
     
         return( <div><div className="attrLine"></div>
             <div className="attrLine">
+            <div className="FIELD FLEX"> {matrix[strKey].text}</div>
+            </div>
+            <div className="attrLine">
                 <div className="FIELD L280"> {strKey}</div>
     
                 <div className="FIELD NAME">
@@ -448,6 +451,7 @@ export default function Status() {
             {matrix ? Object.keys(matrix).map((strKey,index)=>( 
                 <div className="FIELD" key={"Form"+index} id={'Overview'+(index+1)} style= {{ 'display': aPages[index+1]}} > 
                     <div className="attrLine"/>
+                    
                     <BookingForm    strKey={strKey}  form={matrix[strKey]} preBook={preBook} />
                     <BookingDisplay strKey={strKey}  form={displayRecord}  doBook={doBook} /> 
                 </div>
