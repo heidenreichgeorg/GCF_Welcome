@@ -5,7 +5,7 @@ import * as fs from 'fs';
 import { accessFirebase,bucketUpload,loadFBConfig } from './fireBaseBucket'
 import {  J_ACCT, COLMIN, DOUBLE } from './terms.js'
 import { REACT_APP_API_HOST } from "./sessionmanager"
-import { bigEUMoney, cents2EU,cents20EU } from './money'
+import { bigEUMoney, cents2US, cents2EU, cents20EU } from './money'
 import { setSession,strSymbol,timeSymbol } from './session'
 import { compile } from './compile'
 
@@ -125,7 +125,7 @@ export function prepareTXN(schema,flow, name,amount) {
     var eLen =       schema.eqliab;
 
     let iBalance=0n;
-    if(flow.balance) iBalance=bigEUMoney(flow.balance);
+    if(flow.euBalance) iBalance=bigEUMoney(flow.euBalance);
     var newCredit=flow.credit;
     var newDebit=flow.debit;
 
@@ -144,7 +144,8 @@ export function prepareTXN(schema,flow, name,amount) {
 
     flow.credit=newCredit;
     flow.debit=newDebit;
-    flow.balance=cents2EU(iBalance);
+    flow.euBalance=cents2EU(iBalance);
+    flow.usBalance=cents2US(iBalance);
     
     if(debug) console.dir("prepareTXN "+JSON.stringify(flow));
     return flow;

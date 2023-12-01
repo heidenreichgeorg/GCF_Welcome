@@ -26,7 +26,8 @@ export default function Status() {
 
     const predefinedTXN = {
        /* 
-            "Miete":{"creditEQL":{},"credit":{"COGK":"0"},"debit":{"MIET":"0","NKHA":"0"},"debitA":{},"sender":"Vau / Ferguson","refAcct":"MIET","refCode":"Eifelweg 22"},
+            "Miete":{"creditEQL":{},"credit":{"COGK":"1390"},"debit":{"MIET":"1290","NKHA":"100"},"debitA":{},"sender":"Ferguson","refAcct":"MIET","refCode":"Eifelweg 22"},
+            "Miete":{"creditEQL":{},"credit":{"COGK":"52"},"debit":{"MIET":"52"},"debitA":{},"sender":"Vau","refAcct":"MIET","refCode":"Eifelweg 22"},
             "Entnahme Kpl":{"creditEQL":{"K2GH":"0","K2EH":"0"},"credit":{},"debit":{},"debitA":{"COGK":"0"},"sender":"Elke u Georg","refAcct":"K2GH K2EH","refCode":"WITHDRAW"},
             "Entnahme Alex":{"creditEQL":{"K2AL":"0"},"credit":{},"debit":{},"debitA":{"COGK":"0"},"sender":"Alexander","refAcct":"K2AL","refCode":"WITHDRAW"},
             "Entnahme Kristina":{"creditEQL":{"K2KR":"0"},"credit":{},"debit":{},"debitA":{"COGK":"0"},"sender":"Kristina","refAcct":"K2KR","refCode":"WITHDRAW"},
@@ -211,14 +212,34 @@ export default function Status() {
         console.log("bookTemplate:  booked.");  
     }
 
+    function getLastAccount(form) {
+        let arrCreditEQL = Object.keys(form.creditEQL);
+        let arrCredit = Object.keys(form.credit);
+        let arrDebitA = Object.keys(form.debitA);
+        let arrDebit = Object.keys(form.debit);
+    
+        return (arrCreditEQL.concat( arrCredit.concat( arrDebit.concat( arrDebitA)))).pop();
+
+    }
     
     function preBook(strKey) {
         let record = matrix[strKey];
         record.title=strKey;
+        
+        let autoAcct = getLastAccount(record);
+        
+        
         let jTXN = buildTransaction(record);
-        matrix[strKey].balance=jTXN.balance;
+        console.log("preBook jTXN="+JSON.stringify(jTXN));
+
+        Object.keys(record.debit).forEach((acct)=>{if(acct==autoAcct) record.debit[acct]=jTXN.usBalance})
+        Object.keys(record.debitA).forEach((acct)=>{if(acct==autoAcct) record.debitA[acct]=jTXN.usBalance})
+        Object.keys(record.credit).forEach((acct)=>{if(acct==autoAcct) record.credit[acct]=jTXN.usBalance})
+        Object.keys(record.creditEQL).forEach((acct)=>{if(acct==autoAcct) record.creditEQL[acct]=jTXN.usBalance})
+
+
         setDisplayRecord(JSON.parse(JSON.stringify(record)));
-        console.log("preBook "+JSON.stringify(jTXN));
+        console.log("preBook record="+JSON.stringify(record));
     }
 
     
@@ -232,7 +253,7 @@ export default function Status() {
             let jTXN = buildTransaction(txn);
 
 
-            if(!jTXN.balance || jTXN.balance=='') {
+            if(!jTXN.euBalance || jTXN.euBalance=='') {
 
                 if(     jTXN.sender //&& jTXN.sender.length>0
                      && jTXN.date //&& jTXN.date.length>0
@@ -275,20 +296,33 @@ export default function Status() {
 
 
 
-    function BookingForm({ strKey, form, preBook}) {
+    function BookingForm({ strKey, form, preBook }) {
 
         let arrCreditEQL = Object.keys(form.creditEQL);
         let arrCredit = Object.keys(form.credit);
         let arrDebitA = Object.keys(form.debitA);
         let arrDebit = Object.keys(form.debit);
+
+        let autoAcct = getLastAccount(form);
     
         return( <div><div className="attrLine"></div>
             <div className="attrLine">
-            <div className="FIELD FLEX"> {matrix[strKey].text}</div>
-            </div>
-            <div className="attrLine">
                 <div className="FIELD L280"> {strKey}</div>
+            </div>
+            
+            
+            <div className="attrLine">
+                <div className="FIELD FLEX"> {matrix[strKey].text}</div>
+            </div>
+
+            <div className="attrLine">
+                <div className="FIELD L280"> Der Betrag in {autoAcct} wird berechnet.</div>
+            </div>
+
+            <div className="attrLine">
+                
     
+                <div className="FIELD TAG" >Datum</div>
                 <div className="FIELD NAME">
                     <input  className="key SNAM" id="dateBooked" type="date" defaultValue={form.date} onChange={((e) => bufferField(strKey,'date',e.target.value))}/>
                 </div>
@@ -312,14 +346,14 @@ export default function Status() {
                 {arrCredit.map((acct)=>(
                     (<div>
                         <div className="FIELD TAG" > {acct}</div>
-                        <input type ="number" className="key MOAM" defaultValue={form.credit[acct]} onChange={((e) => bufferAmount(strKey,acct,e.target.value,'credit'))} />    
+                        { acct!=autoAcct ? (<input type ="number" className="key MOAM" defaultValue={form.credit[acct]} onChange={((e) => bufferAmount(strKey,acct,e.target.value,'credit'))} /> ):''}
                         <div className="FIELD SEP" ></div>
                     </div>)
                 ))}
                  {arrCreditEQL.map((acct)=>(
                     (<div>
                         <div className="FIELD TAG" > {acct}</div>
-                        <input type ="number" className="key MOAM" defaultValue={form.creditEQL[acct]} onChange={((e) => bufferAmount(strKey,acct,e.target.value,'creditEQL'))} />    
+                        { acct!=autoAcct ? (<input type ="number" className="key MOAM" defaultValue={form.creditEQL[acct]} onChange={((e) => bufferAmount(strKey,acct,e.target.value,'creditEQL'))} /> ):''} 
                         <div className="FIELD SEP" ></div>
                     </div>)
                 ))}
@@ -327,14 +361,14 @@ export default function Status() {
                 {arrDebit.map((acct)=>(
                     (<div>
                         <div className="FIELD TAG" > {acct}</div>
-                        <input type ="number" className="key MOAM" defaultValue={form.debit[acct]} onChange={((e) => bufferAmount(strKey,acct,e.target.value,'debit'))} />    
+                        { acct!=autoAcct ? (<input type ="number" className="key MOAM" defaultValue={form.debit[acct]} onChange={((e) => bufferAmount(strKey,acct,e.target.value,'debit'))} /> ):''}  
                         <div className="FIELD SEP" ></div>
                     </div>)
                 ))}
                 {arrDebitA.map((acct)=>(
                     (<div>
                         <div className="FIELD TAG" > {acct}</div>
-                        <input type ="number" className="key MOAM" defaultValue={form.debitA[acct]} onChange={((e) => bufferAmount(strKey,acct,e.target.value,'debitA'))} />    
+                        { acct!=autoAcct ? (<input type ="number" className="key MOAM" defaultValue={form.debitA[acct]} onChange={((e) => bufferAmount(strKey,acct,e.target.value,'debitA'))} /> ):''}
                         <div className="FIELD SEP" ></div>
                     </div>)
                 ))}
@@ -354,7 +388,9 @@ export default function Status() {
         let arrCredit = Object.keys(form.credit);
         let arrDebitA = Object.keys(form.debitA);
         let arrDebit = Object.keys(form.debit);
-    
+
+        let autoAcct = getLastAccount(form);
+
         return( <div><div className="attrLine"></div>
             <div className="attrLine">
                 <div className="FIELD L280"> {form.title}</div>
@@ -376,7 +412,7 @@ export default function Status() {
                 <div className="FIELD SEP" ></div>
                 
                 <div className="FIELD SYMB" >Balance</div>
-                <div className="FIELD TEAM" >{form.balance}</div>
+                <div className="FIELD TEAM" >{form.euBalance}</div>
                 <div className="FIELD SEP" ></div>
             </div>
             <div className="attrLine">

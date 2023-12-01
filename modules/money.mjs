@@ -88,3 +88,34 @@ export function cents2EU(amount) {
     return result;
 }
 
+
+export function cents2US(amount) { 
+    let cents=amount; 
+    
+    if(!cents) return "";
+    let result=cents;
+    
+    try {
+        if(typeof(cents)==="string") {
+            cents=BigInt(cents); 
+        } // fixedAssets: some cents are strings with plain int format
+
+        var sign=""; if(cents<0n) { sign="-"; cents= -cents; }
+        var kiloNum = BigInt(cents/100000n);
+
+        var megaNum = BigInt(kiloNum/1000n);
+        var megaStr = (megaNum>0n) ? megaNum.toString()+"," : "";
+
+        var milleNum = kiloNum-(1000n*megaNum); 
+        var milleStr = (megaNum>0n) ? milleNum.toString().padStart(3,'0')+"," : (milleNum>0n) ? milleNum.toString()+"," : "";
+        cents = cents - (kiloNum*100000n);
+
+        var euroNum = BigInt(cents/100n);
+        var euroStr = (milleNum>0n)  ? euroNum.toString().padStart(3,'0') : euroNum.toString();
+        cents = cents - (euroNum*100n);
+
+        result =  sign + megaStr + milleStr + euroStr+"." +(BigInt(cents%100n).toString().padStart(2,'0'));
+    } catch(err) { /*result=typeof(cents);*/ }
+    return result;
+}
+
