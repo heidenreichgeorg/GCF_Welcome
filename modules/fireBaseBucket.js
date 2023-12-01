@@ -137,9 +137,9 @@ async function bucketDownload(bpStorage,client,year,jData,startSessionCB,callRes
 
   
   let txnPattern = null;
-  try { txnPattern = await getFileContents(jData.root+"pattern.txt");
+  try { txnPattern = await getFileContents(jData.root+year+"/txnPattern.txt");
   } catch(e) {}
-  if(debug) console.log('0030 Firebase.download read root/pattern.txt; '+txnPattern)
+  if(debug) console.log('0030 Firebase.download read root/client/year/txnPattern.txt; '+txnPattern)
 
   fbStorage.getDownloadURL(fileRef)
   .then(
@@ -163,7 +163,7 @@ async function bucketDownload(bpStorage,client,year,jData,startSessionCB,callRes
               session = JSON.parse(body);
 
               // GH202311
-              // in case entity/CLIENT/pattern.txt JSON file exists
+              // in case entity/CLIENT/YEAR/txnPattern.txt JSON file exists
               // session.txnPattern will be overwritten with that file
               if(txnPattern) try {
                 // GH20231127 using jConfig, add local txnPattern data

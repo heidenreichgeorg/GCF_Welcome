@@ -208,6 +208,7 @@ export default function Status() {
 
         //resetSession();
         // invalidate current session
+        location.reload(true);
 
         console.log("bookTemplate:  booked.");  
     }
