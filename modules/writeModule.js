@@ -170,10 +170,14 @@ export function book(jTXN,session) {
     .then(data => data.json())
     .then(body => { console.log("BOOK RESULT "+JSON.stringify(body));
     
+
+            location.reload(true);
+/*
             let urlCommand = REACT_APP_API_HOST+"/LATEST?client="+body.client+"&year="+body.year+"&ext=JSON";
             console.log("BOOK RELOAD "+urlCommand);
             fetch(urlCommand, requestOptions) // GH20230226
-            .then(res => {console.log("BOOK REFRESH "+JSON.stringify(res.body))})
+            .then(res => { console.log("BOOK REFRESH "+JSON.stringify(res.body))})
+*/            
         });
 }
 

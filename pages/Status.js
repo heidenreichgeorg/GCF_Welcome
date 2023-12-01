@@ -203,12 +203,7 @@ export default function Status() {
 
         console.log("bookTemplate build : "+JSON.stringify(jTXN));
 
-
-        book(jTXN,session); 
-
-        //resetSession();
-        // invalidate current session
-        location.reload(true);
+        book(jTXN,session); // reloads page
 
         console.log("bookTemplate:  booked.");  
     }
