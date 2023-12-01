@@ -111,9 +111,13 @@ function getFileContents(fileName) {
   return new Promise((resolve, reject) => {
     let contents = ""
     fs.readFile(fileName, (err, data) => {
-      if (err) reject(err);
-      console.log("0030 getFileContents "+JSON.stringify(data));
-      resolve(data.toString())
+      
+      //if(!data) { console.log("0033 getFileContents FILE NOT FOUND ");reject(null);  }
+      if (err) { console.log("0033 getFileContents FAILED "+JSON.stringify(err));reject(null);  }
+
+
+      console.log("0030 getFileContents  "+JSON.stringify(data));
+      resolve(data ? data.toString() : null)
     });
   })
 }
@@ -132,7 +136,9 @@ async function bucketDownload(bpStorage,client,year,jData,startSessionCB,callRes
   if(debug) console.log('0030 Firebase.download fileRef='+JSON.stringify(fileRef._service.app._options.projectId));
 
   
-  let txnPattern = await getFileContents(jData.root+"pattern.txt");
+  let txnPattern = null;
+  try { txnPattern = await getFileContents(jData.root+"pattern.txt");
+  } catch(e) {}
   if(debug) console.log('0030 Firebase.download read root/pattern.txt; '+txnPattern)
 
   fbStorage.getDownloadURL(fileRef)
@@ -156,7 +162,10 @@ async function bucketDownload(bpStorage,client,year,jData,startSessionCB,callRes
               // build session object
               session = JSON.parse(body);
 
-              try {
+              // GH202311
+              // in case entity/CLIENT/pattern.txt JSON file exists
+              // session.txnPattern will be overwritten with that file
+              if(txnPattern) try {
                 // GH20231127 using jConfig, add local txnPattern data
                 session.txnPattern = JSON.parse(txnPattern);
                 console.log("0036 getFileContents "+JSON.stringify(Object.keys(session)));
