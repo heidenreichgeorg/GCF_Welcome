@@ -156,7 +156,7 @@ let de_DE = {
     YearEnd:"Endstand"
 }
 module.exports['de_DE']=de_DE;
-let jTerms={};
+let jLastTransaction={};
 
 
 
@@ -287,7 +287,18 @@ export function compile(sessionData) {
         var numLines=aoaCells.length;
 
         let lastLine = aoaCells[numLines-1];
-        if(debug) console.log("0100 compile.compile() includes "+lastLine[1]+" "+lastLine[3]);
+        let jlastTID = lastLine[0];
+        let client=sessionData.client;
+        let year=sessionData.year;
+        if(year && client) {
+            if(!jLastTransaction[client]) jLastTransaction[client]={ };
+            let jClientTID = jLastTransaction[client];
+            jClientTID[year]=jlastTID;
+            if(debug) console.log("0100 compile.compile() LAST TXN includes "+lastLine[1]+" "+lastLine[3]);
+            console.log("0100 compile.compile() LAST TXN "+jlastTID);
+        } else console.log("0100 compile.compile() LAST TXN "+lastLine[0]);
+
+
 
         if(numLines>J_MINROW) {
 
