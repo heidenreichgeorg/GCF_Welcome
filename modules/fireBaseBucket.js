@@ -12,6 +12,9 @@ storage.rules: Konjunktion: ALLE REGELN WERDEN AUSGEWERTET, EINE EINZIGE SPERRE 
 
 config=PROJECT must use latest root\PROJECT.JSON as firebase  
 
+root/client/bookingpages.json
+root/client/year/txnPattern for typical transactions
+
 CONSOLE Cloud Storage settings -> UID , GID
 https://console.cloud.google.com/welcome?project=bookingpages-a0a7c
 
@@ -116,7 +119,7 @@ function getFileContents(fileName) {
       if (err) { console.log("0033 getFileContents FAILED "+JSON.stringify(err));reject(null);  }
 
 
-      console.log("0030 getFileContents  "+JSON.stringify(data));
+      //if(debug) console.log("0030 getFileContents  "+JSON.stringify(data));
       resolve(data ? data.toString() : null)
     });
   })
@@ -139,7 +142,7 @@ async function bucketDownload(bpStorage,client,year,jData,startSessionCB,callRes
   let txnPattern = null;
   try { txnPattern = await getFileContents(jData.root+year+"/txnPattern.txt");
   } catch(e) {}
-  if(debug) console.log('0030 Firebase.download read root/client/year/txnPattern.txt; '+txnPattern)
+  if(debug>1) console.log('0030 Firebase.download read root/client/year/txnPattern.txt; '+txnPattern)
 
   fbStorage.getDownloadURL(fileRef)
   .then(
