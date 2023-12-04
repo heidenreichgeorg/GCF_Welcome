@@ -311,9 +311,15 @@ export default function Status() {
                 <div className="FIELD FLEX"> {matrix[strKey].text}</div>
             </div>
 
+            
             <div className="attrLine">
-                <div className="FIELD L280"> Der Betrag in {autoAcct} wird berechnet.</div>
+            {(autoAcct && autoAcct.length>0) ? 
+                (<div className="FIELD L280"> Der Betrag in {autoAcct} wird berechnet.</div>)
+                :
+                (<div className="FIELD L280"> Sachbuchung</div>)
+            }
             </div>
+            
 
             <div className="attrLine">
                 
