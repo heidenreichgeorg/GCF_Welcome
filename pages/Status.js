@@ -224,6 +224,10 @@ export default function Status() {
         
         let autoAcct = getLastAccount(record);
         
+        Object.keys(record.debit).forEach((acct)=>{if(acct==autoAcct) record.debit[acct]="0"})
+        Object.keys(record.debitA).forEach((acct)=>{if(acct==autoAcct) record.debitA[acct]="0"})
+        Object.keys(record.credit).forEach((acct)=>{if(acct==autoAcct) record.credit[acct]="0"})
+        Object.keys(record.creditEQL).forEach((acct)=>{if(acct==autoAcct) record.creditEQL[acct]="0"})
         
         let jTXN = buildTransaction(record);
         console.log("preBook jTXN="+JSON.stringify(jTXN));
