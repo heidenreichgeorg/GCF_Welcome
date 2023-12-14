@@ -349,30 +349,30 @@ export default function Status() {
             </div>
             <div className="attrLine">
       
-                {arrCredit.map((acct)=>(
-                    (<div>
+                {arrCredit.map((acct,line)=>(
+                    (<div key={"credit"+line}  >
                         <div className="FIELD TAG" > {acct}</div>
                         { acct!=autoAcct ? (<input type ="number" className="key MOAM" defaultValue={form.credit[acct]} onChange={((e) => bufferAmount(strKey,acct,e.target.value,'credit'))} /> ):''}
                         <div className="FIELD SEP" ></div>
                     </div>)
                 ))}
-                 {arrCreditEQL.map((acct)=>(
-                    (<div>
+                 {arrCreditEQL.map((acct,line)=>(
+                    (<div key={"creditEqL"+line}  >
                         <div className="FIELD TAG" > {acct}</div>
                         { acct!=autoAcct ? (<input type ="number" className="key MOAM" defaultValue={form.creditEQL[acct]} onChange={((e) => bufferAmount(strKey,acct,e.target.value,'creditEQL'))} /> ):''} 
                         <div className="FIELD SEP" ></div>
                     </div>)
                 ))}
                 <div className="FIELD TAG" >AN</div>
-                {arrDebit.map((acct)=>(
-                    (<div>
+                {arrDebit.map((acct,line)=>(
+                    (<div key={"debit"+line}  >
                         <div className="FIELD TAG" > {acct}</div>
                         { acct!=autoAcct ? (<input type ="number" className="key MOAM" defaultValue={form.debit[acct]} onChange={((e) => bufferAmount(strKey,acct,e.target.value,'debit'))} /> ):''}  
                         <div className="FIELD SEP" ></div>
                     </div>)
                 ))}
-                {arrDebitA.map((acct)=>(
-                    (<div>
+                {arrDebitA.map((acct,line)=>(
+                    (<div key={"debitA"+line}  >
                         <div className="FIELD TAG" > {acct}</div>
                         { acct!=autoAcct ? (<input type ="number" className="key MOAM" defaultValue={form.debitA[acct]} onChange={((e) => bufferAmount(strKey,acct,e.target.value,'debitA'))} /> ):''}
                         <div className="FIELD SEP" ></div>
@@ -423,30 +423,30 @@ export default function Status() {
             </div>
             <div className="attrLine">
       
-                {arrCredit.map((acct)=>(
-                    (<div>
+                {arrCredit.map((acct,line)=>(
+                    (<div key={"disp_credit"+line}  >
                         <div className="FIELD TAG" > {acct}</div>
                         <div className="FIELD MOAM" >{form.credit[acct]}</div>
                         <div className="FIELD SEP" ></div>
                     </div>)
                 ))}
-                {arrCreditEQL.map((acct)=>(
-                    (<div>
+                {arrCreditEQL.map((acct,line)=>(
+                    (<div key={"disp_creditEqL"+line}  >
                         <div className="FIELD TAG" > {acct}</div>
                         <div className="FIELD MOAM" >{form.creditEQL[acct]}</div>
                         <div className="FIELD SEP" ></div>
                     </div>)
                 ))}
                 <div className="FIELD TAG" > AN </div>
-                {arrDebit.map((acct)=>(
-                    (<div>
+                {arrDebit.map((acct,line)=>(
+                    (<div key={"disp_debit"+line}  >
                         <div className="FIELD TAG" > {acct}</div>
                         <div className="FIELD MOAM" >{form.debit[acct]}</div>
                         <div className="FIELD SEP" ></div>
                     </div>)
                 ))}
-                {arrDebitA.map((acct)=>(
-                    (<div>
+                {arrDebitA.map((acct,line)=>(
+                    (<div key={"disp_debitA"+line}  >
                         <div className="FIELD TAG" > {acct}</div>
                         <div className="FIELD MOAM" >{form.debitA[acct]}</div>
                         <div className="FIELD SEP" ></div>
@@ -478,13 +478,13 @@ export default function Status() {
             <div className="FIELD" key={"Dashboard"} id={'Overview0'} style= {{ 'display': aPages[0]}} >
                 <StatusRow am1={page.Assets} am2={page.Gain}  am3={page.eqliab}/>
                 {
-                    report.map((row,l) => (
-                        <StatusRow  key={"Status"+l}  
+                    report.map((row,line) => (
+                        <StatusRow  key={"Status"+line}  
                                             am1={row.gLeft} tx1={row.nLeft} 
                                             am2={row.gMidl} tx2={row.nMidl} 
                                             am3={row.gRite} tx3={row.nRite} 
                                             d={row.dTran} n={row.nTran} l={row.lTran}
-                                            click={(l==0)?handleReview:null}/>                       
+                                            click={(line==0)?handleReview:null}/>                       
                     ))
                 }
             </div>
