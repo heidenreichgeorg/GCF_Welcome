@@ -98,12 +98,14 @@ export default function Status() {
     }
 
     if(!sheet) return (    
+        <div className = "mTable">
             <div className = "attrLine">
                 <div className="FIELD XFER">Authenticate:...</div>
                 <div className="FIELD"><input key="auth" id="auth" type="edit"></input></div>
                 <div className="FIELD"><div key="go" className="key" onClick={login}>&nbsp;LOGIN &nbsp;</div>
                 </div>
             </div>        
+        </div>        
     );
 
 

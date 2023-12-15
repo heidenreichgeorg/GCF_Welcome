@@ -129,12 +129,20 @@ export function SessionProvider({ children,  default_value, onLoading, onError }
                 status
             }}
         >
+            
             {onLoading && status === 'loading'
-                ? onLoading
+                ? (
+                
+                    <div className="mTable">
+                        {onLoading}
+                    </div>
+                
+                )
             : onError && status === 'error'
                 ? onError
                 : children
             }
+            
 
         </SessionContext.Provider>
     )
