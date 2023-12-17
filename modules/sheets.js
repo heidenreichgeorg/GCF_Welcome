@@ -1,10 +1,17 @@
-const debug=1;
+const debug=null;
+
+
+// setting this will violate privacy 
+const debugWrite=1;
+
+
+
 
 /* global BigInt */
 import {  symbolic } from './session'
 
-// setting this will violate privacy 
-const debugWrite=1;
+
+
 const CSEP = ';';
 const CEND = '|';
 
@@ -184,7 +191,7 @@ function makeWorkBook(jExcel,sheetName,year,aLen,eLen) {
                         rows = jSheet.length;
                     }
                     try {
-                        if(debugWrite>2) console.dir("JSON2SHEET "+JSON.stringify(jSheet));
+                        if(debugWrite) console.dir("JSON2SHEET tabName:"+tabName+"  jSheet:"+JSON.stringify(jSheet));
 
                         var  xSheet = XLSX.utils.aoa_to_sheet(jSheet,{skipHeader:true });
                         //var  xSheet = XLSX.utils.json_to_sheet(jSheet,{skipHeader:true });
@@ -251,7 +258,7 @@ function makeXLTabs(sheetCells,jAssets,jHistory,jSchema,jPartner,jBalance,jXBRL,
     }
     
     function pushAssetTitle(arr,line){
-        arr.push([line[0],line[1],line[2],line[3],line[4],line[5],line[6]]);
+        arr.push('Asset',[line[0],line[1],line[2],line[3],line[4],line[5],line[6]]);
     }
 
     function pushAsset(arr,line){
@@ -327,7 +334,7 @@ function makeXLTabs(sheetCells,jAssets,jHistory,jSchema,jPartner,jBalance,jXBRL,
 
     // partner tax tab
     var jReport = JSON.parse(JSON.stringify(jPartner));
-    let partner = [];
+    let partnerTable = [];
     let  taxHeaders=[];
     let  taxDetails=[];
 
@@ -337,7 +344,7 @@ function makeXLTabs(sheetCells,jAssets,jHistory,jSchema,jPartner,jBalance,jXBRL,
     let hKeys=Object.keys(taxDetails[0]);
     taxHeaders.push(  hKeys );
     
-    partner.push( { 'count':'count', 
+    partnerTable.push( { 'count':'count', 
                     'name':'name', 
                     'share':'share',
                     'denom':'denom',
@@ -356,16 +363,21 @@ function makeXLTabs(sheetCells,jAssets,jHistory,jSchema,jPartner,jBalance,jXBRL,
                     'close':'close',
                     'next':'next'} );
 
-    Object.keys(jReport).map((id) => (pushNET( partner, jReport[id] )))
+    Object.keys(jReport).map((id) => (pushNET( partnerTable, jReport[id] )))
 
-    partner.push({});
+    partnerTable.push({});
 
     if(debugWrite) taxDetails.map((row) =>(console.dir(JSON.stringify(taxDetails))));
                 
     taxDetails.map((row) => (                
-        Object.keys(row).map((fieldName) => (partner.push({'name':fieldName==='name'?'':fieldName,'amnt':row[fieldName]})))));
+        Object.keys(row).map((fieldName) => (partnerTable.push({'name':fieldName==='name'?'':fieldName,'amnt':row[fieldName]})))));
 
-    partner.map((row) => (excelPartnerT.push(Object.keys(row).map((k) => (row[k])))));
+    partnerTable.map((row) => (excelPartnerT.push(Object.keys(row).map((k) => (row[k])))));
+
+
+
+
+
 
     var numAddrs = 0;
     try {
@@ -484,37 +496,39 @@ export function xlsxWrite(session,root) {
         // return 'serverFile':sheetFile
         sheetFile = root + session.year + session.client + ".xlsx"
         if(sheetFile) {
+            if(debugWrite) console.dir("1542 sheets.xlsxWrite ENTER XLSWRITE for ("+client+","+year+") in file "+sheetFile);
             if(session.sheetName) {
                 client = session.client;
                 year = session.year;
                 let sheetName = session.sheetName;
                 if(client && year) {
-                        if(debugWrite) console.dir("1400 sheets.xlsxWrite ENTER "+sheetName+ " for ("+client+","+year+") in file "+sheetFile);
+                        if(debugWrite) console.dir("1544 sheets.xlsxWrite START "+sheetName+ " for ("+client+","+year+") in file "+sheetFile);
 
-                        if(debugWrite) console.dir("1402 sheets.xlsxWrite session "+sheetName+ " = "+Object.keys(session).join(", "));
+                        if(debugWrite) console.dir("1546 sheets.xlsxWrite session "+sheetName+ " = "+Object.keys(session).join(", "));
 
                         let balance = session.generated;
-                        if(debugWrite) console.dir("1404 sheets.xlsxWrite balance "+sheetName+ " = "+Object.keys(balance).join(", "));
+                        if(debugWrite) console.dir("1548 sheets.xlsxWrite balance "+sheetName+ " = "+Object.keys(balance).join(", "));
 
                         var jAssets = balance.Anlagen; // balance[Compiler.D_FixAss];
-                        if(debugWrite) console.dir("1406 sheets.xlsxWrite jAssets "+sheetName+ " = "+JSON.stringify(jAssets));
+                        if(debugWrite) console.dir("1550 sheets.xlsxWrite jAssets "+sheetName+ " = "+JSON.stringify(jAssets));
                         
                         var strHistory = JSON.stringify(balance.Historie); // balance[Compiler.D_History];
-                        if(debugWrite) console.dir("1408 sheets.xlsxWrite jHistory "+sheetName+ " = "+strHistory);
+                        if(debugWrite) console.dir("1552 sheets.xlsxWrite jHistory "+sheetName+ " = "+strHistory);
 
                         var jSchema = balance.Schema;
-                        if(debugWrite) console.dir("1410 sheets.xlsxWrite jHistory "+sheetName+ " = "+JSON.stringify(jSchema));
+                        if(debugWrite) console.dir("1554 sheets.xlsxWrite jHistory "+sheetName+ " = "+JSON.stringify(jSchema));
 
                         var jPartner = balance.PartnerR;
-                        if(debugWrite) console.dir("1412 sheets.xlsxWrite jPartner "+sheetName+ " = "+JSON.stringify(jPartner));
+                        if(debugWrite) console.dir("1556 sheets.xlsxWrite jPartner "+sheetName+ " = "+JSON.stringify(jPartner));
 
 
                         var jBalance = balance.Bilanz;
-                        if(debug) console.log("1414 sheets.xlsxWrite jBalance "+sheetName+ " = "+JSON.stringify(jBalance));
+                        if(debug) console.log("1558 sheets.xlsxWrite jBalance "+sheetName+ " = "+JSON.stringify(jBalance));
 
                         var jXBRL = balance.XBRL;
-                        if(debug) console.log("1416 sheets.xlsxWrite jXBRL "+sheetName+ " = "+JSON.stringify(jXBRL));
+                        if(debug) console.log("1560 sheets.xlsxWrite jXBRL "+sheetName+ " = "+JSON.stringify(jXBRL));
 
+// 1491 sheets.makeWorkBook SHEET (ADDR) BULDING X-SHEET FAILED Error: aoa_to_sheet expects an array of arrays
 
                         let jExcel = makeXLTabs(                            
                             session.sheetCells,
@@ -535,24 +549,27 @@ export function xlsxWrite(session,root) {
                                                     parseInt(jSchema.assets),
                                                     parseInt(jSchema.eqliab));
 
+                        if(debug) console.log("1562 WORKBOOK OK");
+
                         XLSX.writeFile(workBook, sheetFile);
-                        
-                        if(debugWrite)  console.dir("1409 sheets.xlsxWrite WRITE FILE "+sheetFile);
+                        // https://stackoverflow.com/questions/39825069/node-xlsx-for-write-excel-file
+
+                        if(debugWrite)  console.dir("1564 sheets.xlsxWrite WRITE FILE "+sheetFile);
                         
                     } else {
-                        if(debugWrite) console.dir("1407 sheets.xlsxWrite() NO client / year "+JSON.stringify(session));
+                        if(debugWrite) console.dir("1563 sheets.xlsxWrite() NO client / year "+JSON.stringify(session));
                         console.log("1407 sheets.xlsxWrite() NO client / year "+JSON.stringify(session));
                     }   
                 } else {
-                    if(debugWrite) console.dir("1405 sheets.xlsxWrite() NO sheetName and NOT writing "+JSON.stringify(session));
+                    if(debugWrite) console.dir("1561 sheets.xlsxWrite() NO sheetName and NOT writing "+JSON.stringify(session));
                     console.log("1405 sheets.xlsxWrite() NO sheetName and NOT writing");
                 }
             } else {
-                if(debugWrite) console.dir("1403 sheets.xlsxWrite NO sheetFile and NOT writing "+JSON.stringify(session));
-                console.log("1403 sheets.xlsxWrite NO sheetFile and NOT writing");
+                if(debugWrite) console.dir("1559 sheets.xlsxWrite NO sheetFile and NOT writing "+JSON.stringify(session));
+                console.log("1557 sheets.xlsxWrite NO sheetFile and NOT writing");
             }
         } else {
-            console.log("1401 sheets.xlsxWrite NO SESSION ");
+            console.log("1555 sheets.xlsxWrite NO SESSION ");
         }
 
         // return csv;

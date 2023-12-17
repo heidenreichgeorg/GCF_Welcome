@@ -9,7 +9,7 @@ import { bigEUMoney, cents2US, cents2EU, cents20EU } from './money'
 import { setSession,strSymbol,timeSymbol } from './session'
 import { compile } from './compile'
 
-const debug=null;
+const debug=true;
 
 const HTMLSPACE=" "; 
 
@@ -184,9 +184,7 @@ export function book(jTXN,session) {
 
 export async function writeFile(session) {  //GH20230815
     // write to filePath exists
-    try {
-                
-                
+    try {                
                 var writeStream = fs.createWriteStream(session.serverFile);
                 if(debug) console.log("1670 CREATED "+session.serverFile);
 
@@ -200,35 +198,50 @@ export async function writeFile(session) {  //GH20230815
 
                 writeStream.on('error',function(err){ console.log("1681 writeFile error: "+err.stack); });
 
-                return;
-         
+                return;         
         
     } catch(e) { console.dir("1655 WRONG/MISSING "+session.serverFile); }
 }
 
+
+
+// if file exists on the server, then send it to the download link
 export async function sendFile(sig, response) {  // was fs.exists() GH20230401
     // Check if file specified by the filePath exists
     try {
-        fs.access(sig.serverFile, function (exists) {
-            if (exists) {
+        fs.access(sig.serverFile,  fs.constants.F_OK, (err) => {
+            if (!err) { // 20231217
                 
+                if(debug) console.dir("1662 STARTING TO TRANSFER FILE "+sig.serverFile);
+
                 response.writeHead(200, {
                     "Content-Type": "application/octet-stream",
                     "Content-Disposition": "attachment; filename=" + sig.serverFile
                 });
-                if(debug) console.log("1670 TRANSFER "+sig.serverFile);
-                fs.createReadStream(sig.serverFile).pipe(response);
-                if(debug) console.log("1680 PIPING "+sig.serverFile);
-                fs.close();
-                if(debug) console.log("1690 CLOSING "+sig.serverFile);
+
+                if(debug) console.log("1666 TRANSFER "+sig.serverFile);
+                let rStream = fs.createReadStream(sig.serverFile);
+                
+                if(debug) console.log("1672 PIPING "+sig.serverFile);
+                rStream.pipe(response);
+
+                //if(debug) console.log("1676 CLOSING "+sig.serverFile);
+                //rStream.end();
+                //fs.close();
+
+                if(debug) console.log("1680 CLOSED "+sig.serverFile);
                 return;
             }
-            else console.dir("1665 FILE EXISTS OR WRONG PATH OR MISSING ACCESS "+sig.serverFile);
+            
+            else {
+                console.dir("1665 FILE ERROR "+err+" "+sig.serverFile);
 
-            response.writeHead(400, {
-                "Content-Type": "text/plain"
-            });
-            response.end("ERROR- CANNOT CREATE FILE");
+                response.writeHead(400, {
+                    "Content-Type": "text/plain"
+                });
+                response.end("1984 ERROR- "+ err);
+            }
+
         });
     } catch(e) { console.dir("1655 WRONG/MISSING "+sig.serverFile); }
 }
