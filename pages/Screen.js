@@ -62,8 +62,14 @@ import { useState, useEffect } from "react";
 
 export default function Screen({ children, prevFunc, nextFunc, tabSelector, tabName }) {
 
+    const [ printable, setPrintable ] = useState(false)
     
     let isControl=false;
+    let windowStyle=printable ?  "printerPaper" : "goldScreen" ;
+    console.log("Screen.Screen windowStyle "+windowStyle);
+    let border = document.getElementById('windowBorder');
+    if(border) border.className=windowStyle; 
+
     function setIsControl(pressed) { isControl=pressed; }
 
     const downHandler = ({ key }) => {                  
@@ -100,8 +106,7 @@ export default function Screen({ children, prevFunc, nextFunc, tabSelector, tabN
 
         console.log("Screen select "+target+JSON.stringify(num));
 
-        // eHistory is the tab to be displayed
-        //let eHistory = document.getElementById(target+num.tabNum);
+        // eHistory is the tab to be displayed        
         let eHistory = document.getElementById(target+num);
         var screen=eHistory;
         var style="none";
@@ -110,7 +115,7 @@ export default function Screen({ children, prevFunc, nextFunc, tabSelector, tabN
             screen=document.getElementById(target+'0'); 
             style="block";             
             let border = document.getElementById('windowBorder');
-            if(border) border.className="witBorder"; 
+            if(border) border.className=windowStyle; 
         } 
         
         // switch OFF each tab
@@ -123,7 +128,7 @@ export default function Screen({ children, prevFunc, nextFunc, tabSelector, tabN
         if(eHistory) {
             eHistory.style.display="block";
             let border = document.getElementById('windowBorder');
-            if(border) border.className="dosBorder"; 
+            if(border) border.className=windowStyle; 
         }
     }
      
@@ -152,6 +157,7 @@ export default function Screen({ children, prevFunc, nextFunc, tabSelector, tabN
 
     return (
         <div className="mTable">           
+            <button onClick={() => {setPrintable(!printable)}}>{printable?"Gold":"Printable"}</button>
             <div className="attrLine">                     
                 <select autofocus type="radio" id={tabName} name={tabName} onChange={(e)=>makeSelect(tabName,e.target)}> 
                     {tabSelector.map((row,tabNum) => (

@@ -1,11 +1,32 @@
-body { 
+
+
+.goldScreen{  
+  padding: 14px; 
+  border-style: none; 
+  border-radius: 10px; 
+  border-width: 2px; 
+  border-color: #91740e;  
+  color: #c9a935; 
   background: radial-gradient(ellipse at center, #443501 0%,#000000 100%);
 	height: 100%;
   margin: 0;
-  font-family: Bahnschrift, monospace, sans-serif; }
+  font-family: Bahnschrift, monospace, sans-serif;
+}
 
-.dosBorder{  padding: 14px; border-style: none; border-radius: 10px; border-width: 2px; border-color: #91740e;  color: #c9a935; }
-.witBorder{  padding: 14px; border-style: none; border-radius: 10px; border-width: 2px; border-color: #817137;  color: #c9a935; }
+.printerPaper{   
+  background: #ffffff;
+	height: 100%;
+  margin: 0;
+  font-family: Bahnschrift, monospace, sans-serif;
+  padding: 14px; 
+  border-style: solid; 
+  border-radius: 10px; 
+  border-width: 2px; 
+  border-color: #ffffff;  
+  color: #000000; 
+}
+
+
 .mTable   { font-family: Bahnschrift,monospace;                             height: 680px;             display:table;    page-break-after: always  }
 
 

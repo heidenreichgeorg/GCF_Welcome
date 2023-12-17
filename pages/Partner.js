@@ -30,8 +30,7 @@ export default function Partner() {
 
     const { session, status } = useSession()   
     const [ sheet,  setSheet] = useState(null)
-    const [ showState,toggle] = useState(null)
- 
+
     useEffect(() => {
         if(status !== 'success') return;
         let state=getSession();
@@ -39,7 +38,6 @@ export default function Partner() {
             setSheet(state.generated);
         }
     }, [status])
-
 
 
     if(!sheet) return null; //'Loading...';
@@ -150,8 +148,8 @@ export default function Partner() {
     
     const tabName = 'PartnerContent';
     return (
-        <Screen prevFunc={prevFunc} nextFunc={nextFunc} tabSelector={Object.keys(jReport).map((i)=>(jReport[i].name))} tabName={tabName}>
-            
+        <Screen prevFunc={prevFunc} nextFunc={nextFunc} tabSelector={Object.keys(jReport).map((i)=>(jReport[i].name))} tabName={tabName} >
+
             <div className="attrLine">{page.GainLoss + ' ' + session.year}</div>
 
             {Object.keys(jReport).map((_,partnerNo) => ( 

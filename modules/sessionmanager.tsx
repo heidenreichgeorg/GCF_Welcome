@@ -25,13 +25,7 @@ export function getSession() {
     if(strSession) try { state=JSON.parse(strSession); } catch(err) {}
     var sessionKeys:string[]=Object.keys(state);
     console.log("7020 getSession = "+sessionKeys);
-    /*
-    sessionKeys.forEach(key=>{ if(key!='session') {
-            let value=state[key];
-            console.log("7022 "+key+" = "+JSON.stringify(value))
-        }
-    })
-    */
+    
     return state;
 }
 

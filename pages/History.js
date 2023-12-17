@@ -154,7 +154,7 @@ function purgeCarryOver(jSum) {
  
     
     return (
-        <Screen prevFunc={prevFunc} nextFunc={nextFunc} tabSelector={isOpen ? [] : aPages.map((_,n)=>(1+n)) } tabName={tabName}>
+        <Screen prevFunc={prevFunc} nextFunc={nextFunc} tabSelector={isOpen ? [] : aPages.map((_,n)=>(1+n)) } tabName={tabName} >
 
 
             {isOpen &&             
