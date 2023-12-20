@@ -157,7 +157,7 @@ export default function Screen({ children, prevFunc, nextFunc, tabSelector, tabN
 
     return (
         <div className="mTable">           
-            <button onClick={() => {setPrintable(!printable)}}>{printable?"Gold":"Printable"}</button>
+            <button onClick={() => {setPrintable(!printable)}}>{printable?"Report":"Print"}</button>
             <div className="attrLine">                     
                 <select autofocus type="radio" id={tabName} name={tabName} onChange={(e)=>makeSelect(tabName,e.target)}> 
                     {tabSelector.map((row,tabNum) => (
