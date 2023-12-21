@@ -243,7 +243,7 @@ function SigRow({row,index,client,year,line}) {
     var selectAll = getParam("SELECTALL");
     if(selectAll && selectAll.length<1) selectAll=null;
     if(selectAll 
-        && (index>0 || line>1) // SKIP OPENING GH20230413 was
+        && (index>0 || line>0) // SKIP OPENING GH20230413 was
         ) { 
         
             console.log("ADDING("+id+") "+JSON.stringify(aRow));
