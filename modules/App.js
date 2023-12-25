@@ -390,13 +390,13 @@ export function makeHGBReport(response) {
 
         fillRight(balance,chgb9,page.PartYield,8,1);
         fillRight(balance,chgbA,page.FinSale,9,1);
-        fillRight(balance,chgbB,page.NetInterest,10,1);
-        fillRight(balance,chgbC,page.InterestCost,11,1);
+        fillRight(balance,chgb9+chgbD,'('+page.RegularEQUITY+')',10,2);
+        fillRight(balance,chgbB,page.NetInterest,11,1);
+        fillRight(balance,chgbC,page.InterestCost,12,1);
         
         let fin = chgb9+chgbA+chgbB+chgbC;
-        fillRight(balance,fin,page.FinYield,12,3);
-        fillRight(balance,chgb9+chgbD,'('+page.RegularFIN+')',13,1);
-
+        fillRight(balance,fin,page.FinYield,13,3);
+        
         let gain = regularOTC+fin;
         // Jahresueberschuss
         fillRight(balance,gain,page.closing,14,3);

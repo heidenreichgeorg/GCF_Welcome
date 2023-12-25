@@ -66,7 +66,7 @@ let de_DE = {
     velimp:'Kommanditisten-VK',
     veulip:'Komplementär-VK',
     income:"Gewinn",
-    closing:"Bilanzgewinn",
+    closing:"Einkommen",
     
     thereof:"davon",
     reportYear:"Berichtsjahr",
@@ -119,6 +119,7 @@ let de_DE = {
     OtherRegular:"sonstig.betr.Aufwand",
     RegularOTC:  "Betriebsergebnis",
     RegularFIN:  "Finanzergebnis",
+    RegularEQUITY:"WP-Ergebnis",
     PartYield:   "Beteiligungsergebnis",
     FinSale:     "Wertpapier-VK",
     NetInterest: "Zinseinnahmen",
@@ -254,7 +255,7 @@ function initBalance() {
         xbrlEqLiab :{  level:2, xbrl: "de-gaap-ci_bs.eqLiab", de_DE:'Passiva'}, // see HGBBeginYear.html HGBRegular.html
         xbrlIncome: {  level:1, xbrl: "de-gaap-ci_bs.eqLiab.income", de_DE:'Passiva Gewinn'},
         // see sendBalance(), CloseAndSave.htmlReport.xbrlIncome.closing.split(CSEP);
-        //xbrlNIP:    {  level:1, xbrl: "de-gaap-ci_bs.eqLiab.equity.netIncomePartnerships", de_DE:'Bilanzgewinn'},
+        //xbrlNIP:    {  level:1, xbrl: "de-gaap-ci_bs.eqLiab.equity.netIncomePartnerships", de_DE:'Einkommen'},
         // 20220123 previous row is synthetic, from KernTax for HGBRegular
         
     };

@@ -1,11 +1,11 @@
 import { useEffect, useState, useRef  } from 'react';
 
-import FooterRow from '../components/FooterRow'
-import Screen from '../pages/Screen'
-import { addTXNData, getSelect, getValue, InputRow, setSelect }  from '../modules/App';
-import { book, prettyTXN, prepareTXN }  from '../modules/writeModule';
+import FooterRow from '../components/FooterRow.js'
+import Screen from './Screen.js'
+import { addTXNData, getSelect, getValue, InputRow, setSelect }  from '../modules/App.js';
+import { book, prettyTXN, prepareTXN }  from '../modules/writeModule.js';
 import {CSEP, D_Adressen, D_Balance, D_FixAss, D_Page, D_History, D_Schema,  X_ASS_CASH, X_EQLIAB, X_INCOME, X_LIABILITY } from '../modules/terms.js'
-import { getSession, resetSession, useSession } from '../modules/sessionmanager';
+import { getSession, resetSession, useSession } from '../modules/sessionmanager.js';
 import { cents2EU, bigEUMoney }  from '../modules/money';
 
 export default function Transfer() {

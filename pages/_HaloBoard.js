@@ -3,15 +3,15 @@
 
 
 import { useEffect, useState  } from 'react';
-import Screen from './Screen'
-import { getSession,useSession } from '../modules/sessionmanager';
+import Screen from './Screen.js'
+import { getSession,useSession } from '../modules/sessionmanager.js';
 import { D_FixAss,  D_Balance, D_Page, D_Partner }  from '../modules/terms.js';
-import FooterRow from '../components/FooterRow';
+import FooterRow from '../components/FooterRow.js';
 
-import Halo from '../components/Halo'
+import Halo from '../components/Halo.js'
 
 
-import { makeStatusData }  from '../modules/App';
+import { makeStatusData }  from '../modules/App.js';
 
 
 export default function DashBoard({value}) {

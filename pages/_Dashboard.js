@@ -3,20 +3,20 @@
 
 
 import { useEffect, useState  } from 'react';
-import Screen from './Screen'
-import { getSession,useSession } from '../modules/sessionmanager';
+import Screen from './Screen.js'
+import { getSession,useSession } from '../modules/sessionmanager.js';
 import { D_FixAss,  D_Balance, D_Page, D_Partner, D_Report }  from '../modules/terms.js';
-import FooterRow from '../components/FooterRow';
+import FooterRow from '../components/FooterRow.js';
 
-import BarList from '../components/BarList'
-import Chart from '../components/Chart'
-import Gauge from '../components/Gauge'
-import Halo from '../components/Halo'
-import Relation from '../components/Relation'
-import Slider from '../components/Slider'
+import BarList from '../components/BarList.js'
+import Chart from '../components/Chart.js'
+import Gauge from '../components/Gauge.js'
+import Halo from '../components/Halo.js'
+import Relation from '../components/Relation.js'
+import Slider from '../components/Slider.js'
 
 
-import { makeStatusData }  from '../modules/App';
+import { makeStatusData }  from '../modules/App.js';
 
 
 export default function DashBoard({value}) {
