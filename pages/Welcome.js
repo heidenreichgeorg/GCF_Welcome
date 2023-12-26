@@ -3,6 +3,9 @@ import { J_ACCT } from '../modules/terms.js'
 import { HTTP_OK, HTTP_WRONG, timeSymbol } from '../modules/session.js'
 import { REACT_APP_API_HOST } from '../modules/sessionmanager.tsx';
 
+const CSV_RS = '\n';
+const CSV_FS = ';';
+
 export default function Welcome() {
 
     function dragOverHandler(ev) {

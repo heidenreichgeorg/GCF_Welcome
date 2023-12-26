@@ -30,7 +30,7 @@ export default function Accounts() {
 
     if(!sheet) return null; // 'Loading...';
 
-    function prevFunc() {console.log("CLICK PREVIOUS"); window.location.href="/Transfer?client="+client+"&year="+year; }
+    function prevFunc() {console.log("CLICK PREVIOUS"); window.location.href="/Status?client="+client+"&year="+year; }
     function nextFunc() {  console.log("CLICK NEXT");   window.location.href="/Balance?client="+client+"&year="+year; }
 
     let page = sheet[D_Page];
