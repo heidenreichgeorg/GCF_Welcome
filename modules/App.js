@@ -402,7 +402,7 @@ export function makeHGBReport(response) {
         fillRight(balance,gain,page.closing,14,3);
         fillRight(balance,-chgbF,page.CapTax,15,3); // -- this part needed for 
         let netGain = gain-chgbF;
-        fillRight(balance,netGain,"Netto-Gewinn",16,3);
+        fillRight(balance,netGain,page.NetIncome,16,3);
 
         fillRight(balance,cAvgFix,page.OpAssets,17,1);
         fillRight(balance,cAvgCur,page.AvgCurrent,18,1);

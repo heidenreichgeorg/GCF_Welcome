@@ -14,7 +14,7 @@ import { makeStatusData }  from '../modules/App';
 /* global BigInt */
 
 // matrix format 
-// { 'date':"", 'sender':"Sender", 'refAcct':"", 'reason':"", 'refCode':"", 'debit':{'name':VALUE}, credit:{ 'name':VALUE}}
+// { 'date':"", 'sender':"Sender", 'refAcct':"", 'reason':"", 'refCode':"", 'debit':{'name':VALUE}, credit:{ 'name':VALUE},'txt2':"Absender",'txt3':"Zeit",'txt4':"Objekt"}
 
 // buildTransaction will generate the 
 // flow format 
@@ -26,41 +26,59 @@ export default function Status() {
 
     const predefinedTXN = {
        /* 
-            "Miete":{"creditEQL":{},"credit":{"COGK":"1390"},"debit":{"MIET":"1290","NKHA":"100"},"debitA":{},"sender":"Ferguson","refAcct":"MIET","refCode":"Eifelweg 22"},
-            "Miete":{"creditEQL":{},"credit":{"COGK":"52"},"debit":{"MIET":"52"},"debitA":{},"sender":"Vau","refAcct":"MIET","refCode":"Eifelweg 22"},
-            "Entnahme Kpl":{"creditEQL":{"K2GH":"0","K2EH":"0"},"credit":{},"debit":{},"debitA":{"COGK":"0"},"sender":"Elke u Georg","refAcct":"K2GH K2EH","refCode":"WITHDRAW"},
-            "Entnahme Alex":{"creditEQL":{"K2AL":"0"},"credit":{},"debit":{},"debitA":{"COGK":"0"},"sender":"Alexander","refAcct":"K2AL","refCode":"WITHDRAW"},
-            "Entnahme Kristina":{"creditEQL":{"K2KR":"0"},"credit":{},"debit":{},"debitA":{"COGK":"0"},"sender":"Kristina","refAcct":"K2KR","refCode":"WITHDRAW"},
-            "Entnahme Tom":{"creditEQL":{"K2TO":"0"},"credit":{},"debit":{},"debitA":{"COGK":"0"},"sender":"Tom","refAcct":"K2TO","refCode":"WITHDRAW"},
-            "Entnahme Leon":{"creditEQL":{"K2LE":"0"},"credit":{},"debit":{},"debitA":{"COGK":"0"},"sender":"Leon","refAcct":"K2LE","refCode":"WITHDRAW"},
-            "Aufwand":{"creditEQL":{"AUFW":"0"},"credit":{},"debit":{},"debitA":{"COGK":"0"},"sender":"Verkäufer","refAcct":"AUFW","refCode":"Eifelweg22"},
-            "Sacheinlage Kpl":{"creditEQL":{"AUFW":"0"},"credit":{},"debitA":{},"debit":{"K2GH":"0","K2EH":"0"},"sender":"Verkäufer","refAcct":"AUFW","refCode":"DEP_IN_KIND"},
-            "Grundabgaben":{"creditEQL":{"NKHA":"0"},"credit":{},"debit":{},"debitA":{"COGK":"0"},"sender":"Stadt Erlangen","reason":"Quartal","refAcct":"NKHA","refCode":"FEE"},
-            "Versicherung":{"creditEQL":{"NKHA":"0"},"credit":{},"debit":{},"debitA":{"COGK":"0"},"sender":"BayernVersicherung","reason":"Jahr","refAcct":"NKHA","refCode":"FEE"},
-            "Aktien-Kauf":{"creditEQL":{},"credit":{"CDAK":"0"},"debit":{},"debitA":{"COGK":"0"},"sender":"WKN","reason":"Stückzahl","refAcct":"INVEST","refCode":"Code"},
-            "Bond-Kauf mit Stückzins":{"creditEQL":{},"credit":{"CDAK":"0","FSTF":"0"},"debit":{},"debitA":{"COGK":"0"},"sender":"WKN","reason":"Nominal","refAcct":"INVEST","refCode":"Code"},
-            "Aktien-Dividende bar":{"creditEQL":{},"credit":{"COGK":"0","KEST":"0","KESO":"0"},"debit":{"EDIV":"0"},"debitA":{},"sender":"WKN","reason":"Stückzahl","refAcct":"EDIV","refCode":"Code"},
-            "Dividende steuerfrei bar":{"creditEQL":{},"credit":{"COGK":"0"},"debit":{},"debitA":{"CDAK":"0"},"sender":"WKN","reason":"Stückzahl","refAcct":"YIELD","refCode":"Code"},
-            "Dividende in Aktien steuerfrei":{"creditEQL":{},"credit":{},"debit":{},"debitA":{},"sender":"WKN","reason":"Stückzahl","refAcct":"INVEST","refCode":"Code"},
-            "Dividende in Aktien steuerpflichtig":{"creditEQL":{},"credit":{"KEST":"0","KESO":"0"},"debit":{"EDIV":"0"},"debitA":{},"sender":"WKN","reason":"Stückzahl","refAcct":"INVEST","refCode":"Code"},
-            "Aktien-Verkauf mit Gewinn":{"creditEQL":{},"credit":{"COGK":"0","KEST":"0","KESO":"0"},"debit":{"FSAL":"0"},"debitA":{"CDAK":"0"},"sender":"WKN","reason":"Stückzahl","refAcct":"SELL","refCode":"Code"},
-            "Aktien-Verkauf mit Verlust":{"creditEQL":{},"credit":{"VAVA":"0","COGK":"0"},"debit":{},"debitA":{"CDAK":"0"},"sender":"WKN","reason":"Stückzahl","refAcct":"SELL","refCode":"Code"},
-            "Ausgleich Aktien-Verluste":{"creditEQL":{"FSAL":"0"},"credit":{},"debit":{},"debitA":{"VAVA":"0"},"sender":"Ausgleich","reason":"Verluste","refAcct":"VAVA","refCode":"VK Aktien"},
-            "Pfandzahlung":{"creditEQL":{},"credit":{"FSTF":"0"},"debit":{},"debitA":{"COGK":"0"},"sender":"","reason":"","refAcct":"NKHA","refCode":"AZ"},
-            "Rückerstattung Pfand":{"creditEQL":{},"credit":{"COGK":"0"},"debit":{},"debitA":{"FSTF":"0"},"sender":"","reason":"","refAcct":"NKHA","refCode":"AZ"},
-            "Forderung Nebenkosten":{"creditEQL":{},"credit":{"NKFO":"0"},"debit":{"NKHA":"0"},"debitA":{},"sender":"Nebenkosten","reason":"Abschluss","refAcct":"NKHA","refCode":"Abrechnung"},
-            "Mieter zahlt Nebenkosten":{"creditEQL":{},"credit":{"COGK":"0"},"debitA":{"NKFO":"0"},"debit":{},"sender":"Ferguson","reason":"Vorjahr","refAcct":"NKHA","refCode":"Nachzahlung"},
-            "Erstattung Nebenkosten":{"creditEQL":{"NKHA":"0"},"credit":{},"debit":{},"debitA":{"COGK":"0"},"sender":"Nebenkosten","reason":"Vorjahr","refAcct":"NKHA","refCode":"Überschuss"},
-            "nicht abzugsfäh.Aufwand":{"creditEQL":{"K2GH":"0","K2EH":"0","K2AL":"0","K2KR":"0","K2TO":"0"},"credit":{},"debit":{"NKG":"0"},"debitA":{},"sender":"Abschluss","reason":"Jahr","refAcct":"K2LE","refCode":"WITHDRAW"},
-            "Abschreibung Haus":{"creditEQL":{"ABSC":"0"},"credit":{},"debitA":{"GRSB":"0"},"debit":{},"sender":"Abschluss","reason":"Jahr","refAcct":"GRSB","refCode":"Afa Haus"},
-            "Abschreibung EBKS":{"creditEQL":{"ABSC":"0"},"credit":{},"debitA":{"EBKS":"0"},"debit":{},"sender":"Abschluss","reason":"Jahr","refAcct":"EBKS","refCode":"AfA Spülmaschine"},
-            "Abschreibung Dach":{"creditEQL":{"ABSC":"0"},"credit":{},"debitA":{"DACH":"0"},"debit":{},"sender":"Abschluss","reason":"Jahr","refAcct":"DACH","refCode":"AfA Dach"},
-            "Einlage Kpl":{"creditEQL":{},"credit":{"COGK":"0"},"debitA":{},"debit":{"K2GH":"0","K2EH":"0"},"sender":"Elke u Georg","refAcct":"K2GH K2EH","refCode":"DEPOSIT"},
-            "Einlage Alex":{"creditEQL":{},"credit":{"COGK":"0"},"debitA":{},"debit":{"K2AL":"0"},"sender":"Alexander","refAcct":"K2AL","refCode":"DEPOSIT"},
-            "Einlage Kristina":{"creditEQL":{},"credit":{"COGK":"0"},"debitA":{},"debit":{"K2KR":"0"},"sender":"Kristina","refAcct":"Einlage","refCode":"DEPOSIT"},
-            "Einlage Tom":{"creditEQL":{},"credit":{"COGK":"0"},"debitA":{},"debit":{"K2TO":"0"},"sender":"Tom","refAcct":"K2TO","refCode":"DEPOSIT"},
-            "Einlage Leon":{"creditEQL":{},"credit":{"COGK":"0"},"debitA":{},"debit":{"K2LE":"0"},"sender":"Leon","refAcct":"K2LE","refCode":"DEPOSIT"}
-        */
+    "Miete E22":{"text":"Mieter* überweist Miete mit Nebenkosten auf das Firmenkonto","creditEQL":{},"credit":{"COGK":"1390"},"debit":{"MIET":"1290","NKHA":"100"},"debitA":{},"sender":"Ferguson","refAcct":"MIET","refCode":"Eifelweg 22","txt2":"Mieter","txt3":"M 2023","txt4","Objekt"},
+    "Miete Gar":{"text":"Mieter* überweist Miete auf das Firmenkonto","creditEQL":{},"credit":{"COGK":"52"},"debit":{"MIET":"52"},"debitA":{},"sender":"Vau","refAcct":"MIET","refCode":"Garage"},
+    "Entnahme Kpl":{"text":"Elke u Georg bekommen Geld vom Firmenkonto","creditEQL":{"K2GH":"0","K2EH":"0"},"credit":{},"debit":{},"debitA":{"COGK":"0"},"sender":"Elke u Georg","refAcct":"K2GH K2EH","refCode":"WITHDRAW"},
+    "Entnahme Alex":{"text":"Alex bekommt Geld vom Firmenkonto","creditEQL":{"K2AL":"0"},"credit":{},"debit":{},"debitA":{"COGK":"0"},"sender":"Alexander","refAcct":"K2AL","refCode":"WITHDRAW"},
+    "Entnahme Kristina":{"text":"Tina bekommt Geld vom Firmenkonto","creditEQL":{"K2KR":"0"},"credit":{},"debit":{},"debitA":{"COGK":"0"},"sender":"Kristina","refAcct":"K2KR","refCode":"WITHDRAW"},
+    "Entnahme Tom":{"text":"Tom bekommt Geld vom Firmenkonto","creditEQL":{"K2TO":"0"},"credit":{},"debit":{},"debitA":{"COGK":"0"},"sender":"Tom","refAcct":"K2TO","refCode":"WITHDRAW"},
+    "Entnahme Leon":{"text":"Leon bekommt Geld vom Firmenkonto","creditEQL":{"K2LE":"0"},"credit":{},"debit":{},"debitA":{"COGK":"0"},"sender":"Leon","refAcct":"K2LE","refCode":"WITHDRAW"},
+    "Bildung Rücklage":{"text":"Die Gesellschafter bilden eine Rücklage","creditEQL":{"K2GH":"1000","K2EH":"1000","K2AL":"1000","K2KR":"1000","K2TO":"1000"},"credit":{},"debit":{"REGH":"1000","REEH":"1000","REAL":"1000","REKR":"1000","RETO":"1000"},"debitA":{},"sender":"Rücklage","refAcct":"RExx","refCode":"WITHDRAW"},
+    "Aufwand":{"text":"Kleinerer Aufwand zur Instandhaltung der Mietsache (Ersatzteil,Reparatur,Dienstleistung) wird vom Firmenkonto bezahlt","creditEQL":{"AUFW":"0"},"credit":{},"debit":{},"debitA":{"COGK":"0"},"sender":"Verkäufer","refAcct":"AUFW","refCode":"Eifelweg22"},
+    "Kontogebühren":{"text":"nicht-umlagefähige Gebühren werden vom Firmenkonto bezahlt","creditEQL":{"AUFW":"0"},"credit":{},"debit":{},"debitA":{"COGK":"0"},"sender":"Consorsbank","refAcct":"AUFW","refCode":"Eifelweg22"},
+    "Gebühren Kapitalverkehr":{"text":"Gebühren die sich auf Finanzkapital beziehen, werden vom Firmenkonto bezahlt","creditEQL":{"NKG":"0"},"credit":{},"debit":{},"debitA":{"COGK":"0"},"sender":"Bundesanzeiger-Verlag","refAcct":"NKG","refCode":"Kosten Kap."},
+    "Sacheinlage Komplementäre":{"text":"Mietaufwand wird als Sacheinlage geleistet, z.B. Teile vom Baumarkt","creditEQL":{"AUFW":"0"},"credit":{},"debitA":{},"debit":{"K2GH":"0","K2EH":"0"},"sender":"Verkäufer","refAcct":"AUFW","refCode":"DEP_IN_KIND"},
+    "Grundabgaben":{"text":"Stadt Erlangen zieht Grundabgaben ein","creditEQL":{"NKHA":"0"},"credit":{},"debit":{},"debitA":{"COGK":"0"},"sender":"Stadt Erlangen","reason":"Quartal","refAcct":"NKHA","refCode":"FEE"},
+    "Versicherung":{"text":"Versicherung zieht Beitrag ein","creditEQL":{"NKHA":"0"},"credit":{},"debit":{},"debitA":{"COGK":"0"},"sender":"BayernVersicherung","reason":"Jahr","refAcct":"NKHA","refCode":"FEE"},
+    "IHK-Beitrag":{"text":"IHK-Erlangen bekommt Jahresbeitrag","creditEQL":{"AUFW":"0"},"credit":{},"debit":{},"debitA":{"COGK":"0"},"sender":"IHK Nürnberg","reason":"Quartal","refAcct":"NKHA","refCode":"FEE"},
+    "Aktien-Kauf":{"text":"Aktien mit Kaufkosten werden gekauft und bezahlt; der Kurswert und alle Gebühren werden aktiviert.","creditEQL":{},"credit":{"CDAK":"0"},"debit":{},"debitA":{"COGK":"0"},"sender":"WKN","reason":"Stückzahl","refAcct":"INVEST","refCode":"Code"},
+    "Bond-Kauf mit Stückzins":{"text":"Bonds mit Kaufkosten und Stückzins werden gekauft und bezahlt","creditEQL":{},"credit":{"CDAK":"0","FSTF":"0"},"debit":{},"debitA":{"COGK":"0"},"sender":"WKN","reason":"Nominal","refAcct":"INVEST","refCode":"Code"},
+    "Aktien-Dividende bar":{"text":"Dividende wird versteuert und auf das Firmenkonto überwiesen","creditEQL":{},"credit":{"COGK":"0","KEST":"0","KESO":"0"},"debit":{"EDIV":"0"},"debitA":{},"sender":"WKN","reason":"Stückzahl","refAcct":"YIELD","refCode":"Code"},
+    "Dividende steuerfrei bar":{"text":"steuerfreie Dividende reduziert Anschaffungskosten","creditEQL":{},"credit":{"COGK":"0"},"debit":{},"debitA":{"CDAK":"0"},"sender":"WKN","reason":"Stückzahl","refAcct":"YIELD","refCode":"Code"},
+    "Dividende in Aktien steuerfrei":{"text":"steuerfreie Gratisaktien reduzieren Anschaffungskosten","creditEQL":{},"credit":{},"debit":{},"debitA":{},"sender":"WKN","reason":"Stückzahl","refAcct":"INVEST","refCode":"Code"},
+    "Zins auf Bonds steuerpflichtig":{"text":"Zins auf Festgeld wird versteuert","creditEQL":{},"credit":{"COGK":"0","KEST":"0","KESO":"0"},"debit":{"EZIN":"0"},"debitA":{},"sender":"WKN","reason":"Stückzahl","refAcct":"YIELD","refCode":"Code"},
+    "Bond-Zins verr mit Stückzins":{"text":"Forderung aus Stückzins bei Bondkauf wird mit Zins auf Festgeld verrechnet","creditEQL":{"EZIN":"0"},"credit":{},"debit":{},"debitA":{"FSTF":"0"},"sender":"WKN","reason":"Stückzahl","refAcct":"EZIN","refCode":"Code"},
+    "Dividende in Aktien steuerpflichtig":{"text":"Gratisaktien werden versteuert","creditEQL":{},"credit":{"KEST":"0","KESO":"0"},"debit":{"EDIV":"0"},"debitA":{},"sender":"WKN","reason":"Stückzahl","refAcct":"INVEST","refCode":"Code"},
+    "Aktien-Verkauf mit Gewinn":{"text":"Aktien werden mit Gewinn verkauft","creditEQL":{},"credit":{"COGK":"0","KEST":"0","KESO":"0"},"debit":{"FSAL":"0"},"debitA":{"CDAK":"0"},"sender":"WKN","reason":"Stückzahl","refAcct":"SELL","refCode":"Code"},
+    "Aktien-Verkauf mit Verlust":{"text":"Aktien werden mit Verlust verkauft; der Kurswert abzgl Gebühren geht auf das Firmenkonto","creditEQL":{},"credit":{"VAVA":"0","COGK":"0"},"debit":{},"debitA":{"CDAK":"0"},"sender":"WKN","reason":"Stückzahl","refAcct":"SELL","refCode":"Code"},
+    "Ausgleich Aktien-Verluste":{"text":"Für Aktienverkäufe im selben Jahr gilt: Gewinne tilgen Verluste","creditEQL":{"FSAL":"0"},"credit":{},"debit":{},"debitA":{"VAVA":"0"},"sender":"Ausgleich","reason":"Verluste","refAcct":"VAVA","refCode":"VK Aktien"},
+    "Pfandzahlung":{"text":"Die KG zahlt vom Firmenkonto eine Sicherheit","creditEQL":{},"credit":{"FSTF":"0"},"debit":{},"debitA":{"COGK":"0"},"sender":"","reason":"","refAcct":"NKHA","refCode":"AZ"},
+    "Rückerstattung Pfand":{"text":"Die KG erhält die Sicherheit auf das Firmenkonto zurück","creditEQL":{},"credit":{"COGK":"0"},"debit":{},"debitA":{"FSTF":"0"},"sender":"","reason":"","refAcct":"NKHA","refCode":"AZ"},
+    "Nicht-umlagefähige NK":{"text":"Eröffnung: Nebenkosten werden um nicht-umlagefähige Teile reduziert zB Versicherungsanteil f Garage","creditEQL":{"AUFW":"0"},"credit":{},"debit":{"NKHA":"0"},"debitA":{},"sender":"Ferguson","reason":"Abschluss","refAcct":"NKHA","refCode":"Versicherung Garage"},
+    "Zins auf Kaution":{"text":"Eröffnung: Zins wird auf die Kaution gutgeschrieben","creditEQL":{"AUFW":"0"},"credit":{},"debit":{"NKHA":"0"},"debitA":{},"sender":"Ferguson","reason":"Abschluss","refAcct":"NKHA","refCode":"Zins auf Kaution"},
+    "Forderung Nebenkosten":{"text":"Abschluss: Unbezahlte Nebenkosten werden als Forderung an Mieter* gebucht","creditEQL":{},"credit":{"NKFO":"0"},"debit":{"NKHA":"0"},"debitA":{},"sender":"Nebenkosten","reason":"Abschluss","refAcct":"NKHA","refCode":"Abrechnung"},
+    "Mieter zahlt Nebenkosten":{"text":"Mieter* überweist Nebenkosten auf das Firmenkonto","creditEQL":{},"credit":{"COGK":"0"},"debitA":{"NKFO":"0"},"debit":{},"sender":"Ferguson","reason":"Vorjahr","refAcct":"NKHA","refCode":"Nachzahlung"},
+    "Erstattung Nebenkosten":{"text":"KG erstattet überzahlte Nebenkosten an Mieter*","creditEQL":{"NKHA":"0"},"credit":{},"debit":{},"debitA":{"COGK":"0"},"sender":"Nebenkosten","reason":"Vorjahr","refAcct":"NKHA","refCode":"Überschuss"},
+    "nicht abzugsfäh.Aufwand":{"text":"Abschluss: nicht abzugsfähige Aufwände werden anteilig den Gesellschaftern abgezogen","creditEQL":{"K2GH":"0","K2EH":"0","K2AL":"0","K2KR":"0","K2TO":"0"},"credit":{},"debit":{"NKG":"0"},"debitA":{},"sender":"Abschluss","reason":"Jahr","refAcct":"K2LE","refCode":"WITHDRAW"},
+    "Abschreibung Haus":{"text":"Abschluss: Abschreibung des Hauses im Eifelweg 22 -2%","creditEQL":{"ABSC":"2430"},"credit":{},"debitA":{"GRSB":"0"},"debit":{},      "sender":"Haus",       "reason":"1","refAcct":"YIELD","refCode":"Eifelweg22"},
+    "Abschreibung Dach":{"text":"Abschluss: Abschreibung des Dachs im Eifelweg 22 -4%","creditEQL":{"ABSC":"666.40"},"credit":{},"debitA":{"DACH":"0"},"debit":{},     "sender":"Gebäudeteil","reason":"1","refAcct":"YIELD","refCode":"Dacheindeckung"},
+    "Abschreibung Spülm":{"text":"Abschluss: Abschreibung der Spülmaschine im Eifelweg 22 -10%","creditEQL":{"ABSC":"47"},"credit":{},"debitA":{"EBKS":"0"},"debit":{},"sender":"Gebäudeteil","reason":"1","refAcct":"YIELD","refCode":"Spülmaschine2018"},
+    "Einlage Kpl":{"text":"Elke u Georg zahlen auf Firmenkonto ein","creditEQL":{},"credit":{"COGK":"0"},"debitA":{},"debit":{"K2GH":"0","K2EH":"0"},"sender":"Elke u Georg","refAcct":"K2GH K2EH","refCode":"DEPOSIT"},
+    "Einlage Alex":{"text":"Alex zahlt auf Firmenkonto ein","creditEQL":{},"credit":{"COGK":"0"},"debitA":{},"debit":{"K2AL":"0"},"sender":"Alexander","refAcct":"K2AL","refCode":"DEPOSIT"},
+    "Einlage Kristina":{"text":"Tina zahlt auf Firmenkonto ein","creditEQL":{},"credit":{"COGK":"0"},"debitA":{},"debit":{"K2KR":"0"},"sender":"Kristina","refAcct":"K2KR","refCode":"DEPOSIT"},
+    "Einlage Tom":{"text":"Tom zahlt auf Firmenkonto ein","creditEQL":{},"credit":{"COGK":"0"},"debitA":{},"debit":{"K2TO":"0"},"sender":"Tom","refAcct":"K2TO","refCode":"DEPOSIT"},
+    "Einlage Leon":{"text":"Leon zahlt auf Firmenkonto ein","creditEQL":{},"credit":{"COGK":"0"},"debitA":{},"debit":{"K2LE":"0"},"sender":"Leon","refAcct":"K2LE","refCode":"DEPOSIT"},
+    "Sach-Entnahme Kpl":{"text":"Elke u Georg entnehmen Sache","creditEQL":{"K2GH":"0","K2EH":"0"},"credit":{},"debit":{},"debitA":{"FSTF":"0"},"sender":"Elke u Georg","refAcct":"K2GH K2EH","refCode":"WITHDRAW"},
+    "Sach-Entnahme Alex":{"text":"Alex entnimmt Sache","creditEQL":{"K2AL":"0"},"credit":{},"debit":{},"debitA":{"FSTF":"0"},"sender":"Alexander","refAcct":"K2AL","refCode":"WITHDRAW"},
+    "Sach-Entnahme Kristina":{"text":"Tina entnimmt Sache","creditEQL":{"K2KR":"0"},"credit":{},"debit":{},"debitA":{"FSTF":"0"},"sender":"Kristina","refAcct":"K2KR","refCode":"WITHDRAW"},
+    "Sach-Entnahme Tom":{"text":"Tom entnimmt Sache","creditEQL":{"K2TO":"0"},"credit":{},"debit":{},"debitA":{"FSTF":"0"},"sender":"Tom","refAcct":"K2TO","refCode":"WITHDRAW"},
+    "Sach-Entnahme Leon":{"text":"Leon entnimmt Sache","creditEQL":{"K2LE":"0"},"credit":{},"debit":{},"debitA":{"FSTF":"0"},"sender":"Leon","refAcct":"K2LE","refCode":"WITHDRAW"},
+    "Sicherheit Kpl":{"text":"Elke u Georg stellen Sicherheit gg Dritte","creditEQL":{},"credit":{"FSTF":"0"},"debitA":{},"debit":{"K2GH":"0","K2EH":"0"},"sender":"Ext","refAcct":"K2GH K2EH","refCode":"DEPOSIT"},
+    "Sicherheit Alex":{"text":"Alex stellt Sicherheit bei Drittem","creditEQL":{},"credit":{"FSTF":"0"},"debitA":{},"debit":{"K2AL":"0"},"sender":"Ext","refAcct":"K2AL","refCode":"DEPOSIT"},
+    "Sicherheit Kristina":{"text":"Tina stellt Sicherheit bei Drittem","creditEQL":{},"credit":{"FSTF":"0"},"debitA":{},"debit":{"K2KR":"0"},"sender":"Ext","refAcct":"K2KR","refCode":"DEPOSIT"},
+    "Sicherheit Tom":{"text":"Tom stellt Sicherheit bei Drittem","creditEQL":{},"credit":{"FSTF":"0"},"debitA":{},"debit":{"K2TO":"0"},"sender":"Ext","refAcct":"K2TO","refCode":"DEPOSIT"},
+    "Sicherheit Leon":{"text":"Leon stellt Sicherheit bei Drittem","creditEQL":{},"credit":{"FSTF":"0"},"debitA":{},"debit":{"K2LE":"0"},"sender":"Ext","refAcct":"K2LE","refCode":"DEPOSIT"}   
+            */
         };
             
 
@@ -163,6 +181,7 @@ export default function Status() {
         return Object.keys(side).map((acct)=>({'name':acct, 'value':(side[acct]&&side[acct].length>0 ? cents2EU(bigUSMoney(side[acct],factor)):"0")}));
     }
 
+    // generate FLOW FORMAT for booking
     function buildTransaction(simpleTXN) {
         let flow = { 'date':simpleTXN.date, 
                      'sender':simpleTXN.sender,
@@ -306,7 +325,14 @@ export default function Status() {
         let arrDebit = Object.keys(form.debit);
 
         let autoAcct = getLastAccount(form);
-    
+ 
+        let txt2='Sender'; if(form.txt2) txt2=form.txt2;
+        let txt3='Zeit'; if(form.txt3) txt3=form.txt3;
+        let txt4='Grund'; if(form.txt4) txt4=form.txt4;
+        
+
+        console.log("FORM = "+JSON.stringify(form));
+
         return( <div><div className="attrLine"></div>
             <div className="attrLine">
                 <div className="FIELD L280"> {strKey}</div>
@@ -336,15 +362,15 @@ export default function Status() {
                 </div>
     
                         
-                <div className="FIELD SYMB" >Sender</div>
+                <div className="FIELD SYMB" >{txt2}</div>
                 <input type ="text" className="key MOAM" defaultValue={form.sender} onChange={((e) => bufferField(strKey,'sender',e.target.value))}/>
                 <div className="FIELD SEP" ></div>
     
-                <div className="FIELD SYMB" >Zeitraum</div>
+                <div className="FIELD SYMB" >{txt3}</div>
                 <input type ="text" className="key MOAM" defaultValue={form.reason} onChange={((e) => bufferField(strKey,'reason',e.target.value))}/>
                 <div className="FIELD SEP" ></div>
     
-                <div className="FIELD SYMB" >Grund</div>
+                <div className="FIELD SYMB" >{txt4}</div>
                 <input type ="text" className="key MOAM" defaultValue={form.refCode} onChange={((e) => bufferField(strKey,'refCode',e.target.value))}/>
                 <div className="FIELD SEP" ></div>
                 
@@ -399,6 +425,11 @@ export default function Status() {
 
         let autoAcct = getLastAccount(form);
 
+        let txt2='Sender'; if(form.txt2) txt2=form.txt2;
+        let txt3='Zeit'; if(form.txt3) txt3=form.txt3;
+        let txt4='Grund'; if(form.txt4) txt4=form.txt4;
+
+
         return( <div><div className="attrLine"></div>
             <div className="attrLine">
                 <div className="FIELD L280"> {form.title}</div>
@@ -407,15 +438,15 @@ export default function Status() {
                 <div className="FIELD DATE" >{form.date}</div>
                 </div>
                         
-                <div className="FIELD SYMB" >Sender</div>
+                <div className="FIELD SYMB" >{txt2}</div>
                 <div className="FIELD TEAM" >{form.sender}</div>
                 <div className="FIELD SEP" ></div>
     
-                <div className="FIELD SYMB" >Zeitraum</div>
+                <div className="FIELD SYMB" >{txt3}</div>
                 <div className="FIELD TEAM" >{form.reason}</div>
                 <div className="FIELD SEP" ></div>
     
-                <div className="FIELD SYMB" >Grund</div>
+                <div className="FIELD SYMB" >{txt4}</div>
                 <div className="FIELD TEAM" >{form.refCode}</div>
                 <div className="FIELD SEP" ></div>
                 
