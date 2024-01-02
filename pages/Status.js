@@ -3,7 +3,7 @@ import { getSession, storeCarryOver, useSession, REACT_APP_API_HOST } from '../m
 import Screen from '../pages/Screen'
 import FooterRow from '../components/FooterRow'
 import { cents2EU,bigUSMoney }  from '../modules/money';
-import { D_Balance, D_Page, D_Partner, D_Report, D_Schema, SCREENLINES, X_ASSET_CAPTAX, X_ASSETS, X_EQLIAB } from '../modules/terms.js'
+import { D_Balance, D_Page, D_Partner, D_FixAss, D_Report, D_Schema, SCREENLINES, X_ASSET_CAPTAX, X_ASSETS, X_EQLIAB } from '../modules/terms.js'
 import { book,prepareTXN }  from '../modules/writeModule';
 import { makeStatusData }  from '../modules/App';
 
@@ -506,6 +506,8 @@ export default function Status() {
     */
 
      var jBalance = sheet[D_Balance];
+     var jReport = sheet[D_Report];
+
 
     function makeTax(partner,index) {
         var ifix=0n; // ifix are cents to compensate for rounding when tax is shared among partners
@@ -586,24 +588,34 @@ export default function Status() {
 
 
     // gain/loss page
-    let hgbReport = makeHGBReport(sheet);
+    let hgbReport = makeHGBReport(jBalance,page,jReport);
     tabHeaders.push(page.GainlossHGB); fixPages++;
 
 
     // balances
     let balanceBase=fixPages;
     let pageNames = [ 'init',  'yearEnd','next'];    
-    let arrBalance = pageNames.map((name) =>( makeBalance(sheet,name)  ));
+    let arrBalance = pageNames.map((name) =>( makeBalance(jBalance,jReport,name)  ));
     [page.BalanceOpen,page.BalanceClose,page.BalanceNext].forEach((name) => { 
         tabHeaders.push(name); 
         fixPages++;
     })
 
 
+
+    // fixed assets page
+    let assetsBase=fixPages;
+    var jAssets = sheet[D_FixAss];
+    let iRest=0n;
+    tabHeaders.push(page.fixed); 
+    fixPages++; 
+    
+
+
     // partner pages
     let partnerBase=fixPages;
     Object.keys(jPartnerReport).forEach((p,i)=>{
-        tabHeaders.push(page.Tax+jPartnerReport[i].name); 
+        tabHeaders.push(page.Tax+' '+jPartnerReport[i].name); 
         fixPages++; // partner page
     })
 
@@ -665,6 +677,44 @@ export default function Status() {
                     ))}
                 </div>
             ))}
+
+
+
+            <div className="FIELD"  key={"FixedAssets"}  id={"Overview"+(assetsBase)}  style={{'display':aPages[assetsBase]}} >
+                <div className="FIELD LNAM">&nbsp;</div>
+                <FixedAssetsRow p={ {'idnt':'Name', 'type':'WKN/Typ', 
+                        'date':page.AcquisitionDate,
+                        'init':page.AcquisitionPrice, 
+                        'nmbr':page.AssetNumber, // 'Anzahl',
+                        'rest':page.AssetRemain, //'Zeitwert',
+                        'cost':page.AssetPrice, // 'Stückpreis',
+                        'gain':page.AssetGain  // 'Ertrag'} } />
+                        }} /> 
+
+
+                {Object.keys(jAssets).map(function(key,n) {
+                    var row = jAssets[key];
+                    iRest+=BigInt(row.rest);
+                    return (
+                        <FixedAssetsRow  key={"Fixed0"+n}  p={{idnt:row.idnt,type:row.type,date:row.date,
+                            init:cents2EU(row.orig),
+                            nmbr:row.nmbr,
+                            rest:cents2EU(row.rest),
+                            cost:cents2EU(row.cost),
+                            gain:cents2EU(row.gain)
+                            }} />
+                    )
+                    })
+                }
+
+                <FixedAssetsRow p={{ 'idnt':jReport.xbrlFixed.de_DE, 'type':' ', 'date':session.year+"-12-31",
+                        'init':' ', 
+                        'nmbr':' ',
+                        'rest':cents2EU(iRest),
+                        'current':' ',
+                        'cost':' ' } }
+                />
+            </div>
 
 
 
@@ -740,15 +790,11 @@ function StatusRow({ am1,tx1, am2, tx2, am3, tx3, d, n, l, click}) {
 
 
 
-export function makeHGBReport(response) {
+export function makeHGBReport(jAccounts,page,jReport) {
 
     let balance = []; 
-
-    var jReport = response[D_Report];
     
     console.log("makeReport from response D_Report"+JSON.stringify(Object.keys(jReport)));
-    var jAccounts = response[D_Balance];
-    let page = response[D_Page];
               
     if(page) {           
         var chgb1 = 0n; // Umsatz
@@ -972,15 +1018,12 @@ function HGB275Row({ jArgs, id }) {
 }
 
 
-function makeBalance(response,value) {
+function makeBalance(jAccounts,jReport,value) {
 
-    const sReport = JSON.stringify(response[D_Report]);
-    var jReport = JSON.parse(sReport);
     let balance = new Array();
 
     console.log("makeBalance 001 from response D_Report"+JSON.stringify(Object.keys(jReport)));
 
-    var jAccounts = response[D_Balance];
 
     let ass,eql,gls;
     // add three additional accounts: ASSETS, EQLIAB, GAINLOSS
@@ -1123,6 +1166,22 @@ function BalanceRow({ jArgs, id }) {
     )
 }
 
+
+function FixedAssetsRow(mRow) {
+    console.log("FixedAssetsRow mRow="+JSON.stringify(mRow));
+    return (
+        <div className="attrLine">
+            <div className="FIELD LNAM">{mRow.p.idnt}</div>
+            <div className="FIELD NAME">{mRow.p.type}</div>
+            <div className="FIELD NAME">{mRow.p.date}</div>
+            <div className="FIELD MOAM">{mRow.p.init}</div>
+            <div className="FIELD MOAM">{mRow.p.nmbr}</div>
+            <div className="FIELD MOAM">{mRow.p.rest}</div>
+            <div className="FIELD MOAM">{mRow.p.cost}</div>
+            <div className="FIELD MOAM">{mRow.p.gain}</div>
+        </div>        
+    )
+}
 
 
 function PartnerRow(mRow) {
