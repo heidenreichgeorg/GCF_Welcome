@@ -126,6 +126,7 @@ let de_DE = {
     InterestCost:"Zinskosten",
     IncomeTax:   "Einkommensteuer",
     CapTax:      "Ertragssteuer",
+    Tax:         "Steuern",
     NetIncome:   "Netto-Gewinn",
     PaidTax:     "Steuerforderung",
     FinYield:    "außerordentl.Ergebnis",
