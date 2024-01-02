@@ -240,6 +240,9 @@ export default function Status() {
     }
     
     function preBook(strKey) {
+        
+        console.log("preBook ENTER strKey="+strKey);
+
         let record = matrix[strKey];
         record.title=strKey;
         
@@ -292,7 +295,7 @@ export default function Status() {
         }
     }
 
-
+    
 
 
     
