@@ -3,7 +3,7 @@ import { getSession, storeCarryOver, useSession, REACT_APP_API_HOST } from '../m
 import Screen from '../pages/Screen'
 import FooterRow from '../components/FooterRow'
 import { cents2EU,bigUSMoney }  from '../modules/money';
-import { D_Page, D_Schema } from '../modules/terms.js'
+import { D_Balance, D_Page, D_Partner, D_Schema, X_ASSET_CAPTAX } from '../modules/terms.js'
 import { book,prepareTXN }  from '../modules/writeModule';
 import { makeStatusData }  from '../modules/App';
 
@@ -130,7 +130,7 @@ export default function Status() {
 
     
     function noFunc() {  console.log("CLICK NO");  }
-    function prevFunc() {console.log("CLICK PREVIOUS"); window.location.href="/Partner?client="+client+"&year="+year; } 
+    function prevFunc() {console.log("CLICK PREVIOUS"); window.location.href="/HGB275S2Page?client="+client+"&year="+year; } 
     function nextFunc() {  console.log("CLICK NEXT");   window.location.href="/Accounts?client="+client+"&year="+year; }
 
     function handleXLSave() {
@@ -295,7 +295,7 @@ export default function Status() {
         }
     }
 
-    
+
 
 
     
@@ -495,15 +495,104 @@ export default function Status() {
         </div>);
     }
       
+
+    /*
+     compute Partner capital and tax data
+    */
+
+     var jBalance = sheet[D_Balance];
+
+    function makeTax(partner,index) {
+        var ifix=0n; // ifix are cents to compensate for rounding when tax is shared among partners
+        let igain=BigInt(partner.gain);
+        let ideno=BigInt(partner.denom);               
+        let taxID = partner.taxID;
+        let result= { 'name': partner.name, 'SteuerID':taxID,  };
+
+        let taxPaid = BigInt(partner.tax);
+        var iSum=0n;
+        while(iSum<taxPaid && ifix<20n) {
+            iSum=0n;
+            var cFix=ifix;
+            let taxAccounts = Object.keys(jBalance).filter((name)=>jBalance[name].xbrl==X_ASSET_CAPTAX); // GH20230124
+            taxAccounts.map(function(name) { 
+                    let iPosition = 4n + BigInt(jBalance[name].yearEnd+"0");
+                    if(iSum+cFix>=taxPaid) cFix=0n;
+                    let iShare = cFix+(iPosition*igain/ideno/10n);
+                    if(cFix>0) cFix--;
+                    iSum = iSum + iShare;
+                    result[name] = cents2EU(iShare)})
+            ifix++;
+        } 
+
+        console.log("Partner("+index+") with "+igain+"/"+ideno+" from gain ="+iSum+" % "+taxPaid);
+        return result;
+    }
+
+    function reduceCapital(partner,deficit,index) {
+        var ifix=0n; // ifix are cents to compensate for rounding when capital deficit is shared among partners
+        let igain=BigInt(partner.gain);
+        let ideno=BigInt(partner.denom);               
+
+        let cyLoss =partner.cyLoss;
+        var iSum=0n;
+        while(iSum<cyLoss && ifix<20n) {
+            iSum=0n;
+            var cFix=ifix;
+            let deficitAccounts = Object.keys(jBalance).filter((name)=>jBalance[name].xbrl==X_ASSET_UNPCAP); // GH20230124
+            deficitAccounts.map(function(name) { 
+                    let iPosition = 4n + BigInt(jBalance[name].yearEnd+"0");
+                    if(iSum+cFix>=cyLoss) cFix=0n;
+                    let iShare = cFix+(iPosition*igain/ideno/10n);
+                    if(cFix>0) cFix--;
+                    iSum = iSum + iShare;
+                    deficit[name] = cents2EU(iShare)})
+            ifix++;
+        } 
+
+        console.log("Partner("+index+") with "+igain+"/"+ideno+" from deficit ="+iSum+" % "+cyLoss);
+        return deficit;
+    }
+
+
+
+    var jPartnerReport = JSON.parse(JSON.stringify(sheet[D_Partner]));
+    let  taxDetails=[];
+    Object.keys(jPartnerReport).map((index) => (taxDetails.push(reduceCapital(jPartnerReport[index],makeTax(jPartnerReport[index],index)))));
+    let  taxHeaders=[];
+    let hKeys=Object.keys(taxDetails[0]);
+    taxHeaders.push(  hKeys );
+
+/*
+   build main page
+*/
+
     let page = sheet[D_Page];
     let sheet_status = makeStatusData(sheet);
     let report = sheet_status.report;
 
 
-    let tabHeaders = matrix ? Object.keys(matrix) : [];
-    tabHeaders.unshift('Dashboard');
-    let aPages = ['block'];
-    for(let p=1;p<tabHeaders.length;p++) aPages[p]='none'; 
+    let fixPages=0;
+
+    // portal page
+    let tabHeaders=['Dashboard']; fixPages++;
+
+    // partner pages
+    Object.keys(jPartnerReport).forEach((p,i)=>{
+        tabHeaders.push('Steuer '+jPartnerReport[i].name); 
+        fixPages++; // partner page
+    })
+
+    // form pages
+    if(matrix)  Object.keys(matrix).forEach((form)=>{tabHeaders.push(form)});
+
+
+
+    let aPages = [];
+    aPages[0] = 'block';
+    let numPages = fixPages+tabHeaders.length; 
+    for(let p=1;p<numPages;p++) aPages[p]='none'; 
+
 
     const tabName = "Overview";
     
@@ -511,6 +600,7 @@ export default function Status() {
         <Screen prevFunc={noFunc} nextFunc={noFunc} tabSelector={tabHeaders}  tabName={tabName}> 
            
 
+            
             <div className="FIELD" key={"Dashboard"} id={'Overview0'} style= {{ 'display': aPages[0]}} >
                 <StatusRow am1={page.Assets} am2={page.Gain}  am3={page.eqliab}/>
                 {
@@ -526,8 +616,35 @@ export default function Status() {
             </div>
 
 
+
+
+            {Object.keys(jPartnerReport).map((jPartner,partnerNo) => ( 
+
+                <div className="FIELD" key={"Partner"+partnerNo} id={'Overview'+(1+partnerNo)} style= {{ 'display': aPages[partnerNo+1]}} >
+                        
+                        <div className="attrLine"></div>
+
+                        <PartnerTitleRow p={ {'name':page.Name, 
+                            'init':page.Init, 
+                            'credit':page.Credit,
+                            'debit':page.Debit,
+                            'yearEnd':page.YearEnd,
+                            'netIncomeOTC':page.RegularOTC,
+                            'netIncomeFin':page.RegularFIN,
+                            'close':page.Close,
+                            'tax':page.PaidTax,
+                            'cyLoss':page.SecLosses,
+                            'next':page.NextYear} } />     
+
+                        <PartnerRow p={jPartnerReport[partnerNo]}/>    
+    
+                </div>
+
+            ))}
+
+
             {matrix ? Object.keys(matrix).map((strKey,index)=>( 
-                <div className="FIELD" key={"Form"+index} id={'Overview'+(index+1)} style= {{ 'display': aPages[index+1]}} > 
+                <div className="FIELD" key={"Form"+index} id={'Overview'+(index+fixPages)} style= {{ 'display': aPages[index+fixPages+6]}} > 
                     <div className="attrLine"/>
                     
                     <BookingForm    strKey={strKey}  form={matrix[strKey]} preBook={preBook} />
@@ -571,4 +688,42 @@ function StatusRow({ am1,tx1, am2, tx2, am3, tx3, d, n, l, click}) {
     )
 }
 
+function PartnerRow(mRow) {
+    console.log("PartnerRow mRow="+JSON.stringify(mRow));
+    return (
+        <div className="attrLine">
+            <div className="FIELD NAME">{mRow.p.name}</div>
+            <div className="FIELD MOAM">{cents2EU(mRow.p.init)}</div>
+            <div className="FIELD MOAM">{cents2EU(mRow.p.credit)}</div>
+            <div className="FIELD MOAM">{cents2EU(mRow.p.debit)}</div>
+            <div className="FIELD MOAM">{cents2EU(mRow.p.yearEnd)}</div>
+            <div className="FIELD MONY">{cents2EU(mRow.p.netIncomeOTC)}</div>
+            <div className="FIELD MONY">{cents2EU(mRow.p.netIncomeFin)}</div>
+            <div className="FIELD MOAM">{cents2EU(mRow.p.close)}</div>
+            <div className="FIELD MONY">{cents2EU(mRow.p.tax)}</div>
+            <div className="FIELD MOAM">{cents2EU(mRow.p.cyLoss)}</div>
+            <div className="FIELD MOAM">{cents2EU(mRow.p.next)}</div>
+        </div>
+    )
+}
+
+
+function PartnerTitleRow(mRow) {
+    console.log("PartnerTitleRow mRow="+JSON.stringify(mRow));
+    return (
+        <div className="attrLine">
+            <div className="FIELD NAME">{mRow.p.name}</div>
+            <div className="FIELD TEAM">{cents2EU(mRow.p.init)}</div>
+            <div className="FIELD TEAM">{cents2EU(mRow.p.credit)}</div>
+            <div className="FIELD TEAM">{cents2EU(mRow.p.debit)}</div>
+            <div className="FIELD TEAM">{cents2EU(mRow.p.yearEnd)}</div>
+            <div className="FIELD TENY">{cents2EU(mRow.p.netIncomeOTC)}</div>
+            <div className="FIELD TENY">{cents2EU(mRow.p.netIncomeFin)}</div>
+            <div className="FIELD TEAM">{cents2EU(mRow.p.close)}</div>
+            <div className="FIELD TENY">{cents2EU(mRow.p.tax)}</div>
+            <div className="FIELD TEAM">{cents2EU(mRow.p.cyLoss)}</div>
+            <div className="FIELD TEAM">{cents2EU(mRow.p.next)}</div>
+        </div>
+    )
+}
 

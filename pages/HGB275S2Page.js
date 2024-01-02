@@ -23,7 +23,7 @@ const { session, status } = useSession()
 
     
     function prevFunc() {console.log("CLICK PREVIOUS"); window.location.href="/FixedAssets?client="+session.client+"&year="+session.year; }
-    function nextFunc() {  console.log("CLICK NEXT");   window.location.href="/Partner?client="+session.client+"&year="+session.year; }
+    function nextFunc() {  console.log("CLICK NEXT");   window.location.href="Status?client="+session.client+"&year="+session.year; }
 
     let page = sheet[D_Page];
     

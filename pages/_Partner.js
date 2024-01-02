@@ -19,9 +19,9 @@ for each account in D_Balance with XBRL=de-gaap-ci_bs.ass.currAss.receiv.unpaidC
 
 
 import { useEffect, useState   } from 'react';
-import Screen from '../pages/Screen'
-import FooterRow from '../components/FooterRow'
-import { REACT_APP_API_HOST,getSession,useSession } from '../modules/sessionmanager';
+import Screen from './Screen.js'
+import FooterRow from '../components/FooterRow.js'
+import { REACT_APP_API_HOST,getSession,useSession } from '../modules/sessionmanager.js';
 import { cents2EU } from  '../modules/money'
 import { makeHGBReport } from "../modules/App.js"
 import { X_ASSET_CAPTAX, X_ASSET_UNPCAP, D_Balance, D_Partner, D_Page, SCREENLINES }  from '../modules/terms.js';
@@ -47,7 +47,7 @@ export default function Partner() {
     
     let page = sheet[D_Page];
     
-    var jReport = JSON.parse(JSON.stringify(sheet[D_Partner]));
+    var jPartnerReport = JSON.parse(JSON.stringify(sheet[D_Partner]));
     var jBalance = sheet[D_Balance];
     
     let  taxHeaders=[];
@@ -106,7 +106,7 @@ export default function Partner() {
     }
 
 
-    Object.keys(jReport).map((index) => (taxDetails.push(reduceCapital(jReport[index],makeTax(jReport[index],index)))));
+    Object.keys(jPartnerReport).map((index) => (taxDetails.push(reduceCapital(jPartnerReport[index],makeTax(jPartnerReport[index],index)))));
     
 
     let hKeys=Object.keys(taxDetails[0]);
@@ -114,7 +114,7 @@ export default function Partner() {
     
 
 
-    let jLength = 22; // Object.keys(jReport).length  + 2 + Object.keys(aTax).length;
+    let jLength = 22; // Object.keys(jPartnerReport).length  + 2 + Object.keys(aTax).length;
     let  filler=[];
     for(let p=jLength;p<SCREENLINES;p++) {
         filler.push({});
@@ -148,11 +148,11 @@ export default function Partner() {
     
     const tabName = 'PartnerContent';
     return (
-        <Screen prevFunc={prevFunc} nextFunc={nextFunc} tabSelector={Object.keys(jReport).map((i)=>(jReport[i].name))} tabName={tabName} >
+        <Screen prevFunc={prevFunc} nextFunc={nextFunc} tabSelector={Object.keys(jPartnerReport).map((i)=>(jPartnerReport[i].name))} tabName={tabName} >
 
             <div className="attrLine">{page.GainLoss + ' ' + session.year}</div>
 
-            {Object.keys(jReport).map((_,partnerNo) => ( 
+            {Object.keys(jPartnerReport).map((_,partnerNo) => ( 
 
                 <div  key={"Partner0"+partnerNo}  className="FIELD" id={tabName+partnerNo} style= {(partnerNo==0?{ 'display': 'block'}:{ 'display': 'none'})} >
                     
@@ -164,8 +164,8 @@ export default function Partner() {
                     <FlexRow p={[' ']}/>    
                     <div className="attrLine">{ [''].map(function(){ 
                         initColumns(); 
-                        Object.keys(jReport).map((id)=>(console.log("ADDCOLUMNS "+JSON.stringify(jReport[id])))); 
-                        Object.keys(jReport).map((id)=>(addColumns(jReport[id]))); 
+                        Object.keys(jPartnerReport).map((id)=>(console.log("ADDCOLUMNS "+JSON.stringify(jPartnerReport[id])))); 
+                        Object.keys(jPartnerReport).map((id)=>(addColumns(jPartnerReport[id]))); 
                         return page.AcctHistory + ' ' + session.year})}
                     </div>                        
 
@@ -181,7 +181,7 @@ export default function Partner() {
                             'cyLoss':page.SecLosses,
                             'next':page.NextYear} } />
                                         
-                    <PartnerRow p={jReport[partnerNo]}/>    
+                    <PartnerRow p={jPartnerReport[partnerNo]}/>    
                     
                     <PartnerRow p={jPage}/>    
 
