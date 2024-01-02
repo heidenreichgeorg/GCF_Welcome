@@ -1,0 +1,16 @@
+version: '3.4'
+
+services:
+  app:
+    image: finreport
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    environment:
+      NODE_ENV: production
+    ports:
+      - 3000:3000
+    volumes:
+      - ./entity:/usr/src/app/entity:rw
+volumes:
+  sec:
