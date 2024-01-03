@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { getSession, useSession, REACT_APP_API_HOST,getCarryOver,storeCarryOver } from '../modules/sessionmanager';
 import { symbolic }  from '../modules/session';
 import Screen from '../pages/Screen'
-import FooterRow from '../components/FooterRow'
 import { cents2EU,bigUSMoney,cents20EU,bigEUMoney }  from '../modules/money';
 import { CSEP, D_Account, D_Balance, D_Carry, D_CarryOver, D_Page, D_Partner, D_FixAss, D_History, D_Report, D_Schema, J_ACCT, SCREENLINES, X_ASSET_CAPTAX, X_ASSETS, X_EQLIAB } from '../modules/terms.js'
 import { book,prepareTXN,makeHistory }  from '../modules/writeModule';
@@ -99,9 +98,9 @@ export default function Status() {
     var funcHideReceipt=null;
     var funcCleaReceipt=null;
     var aSelText = {};
-    var aJMoney = {};
-    var aSelSaldo = {};
-    var jPageSum={};
+    var aJMoney  = {};
+    var aSelSaldo= {};
+    var jPageSum = {};
 
     useEffect(() => {
 
@@ -117,11 +116,13 @@ export default function Status() {
             setSheet(state.generated);
             if(state.generated) {
                 // history layout methods                
-                let jColumnHeads={}; 
+                let jInitialHeads={}; 
                 let names=state.generated[D_Schema].Names;
-                names.slice(J_ACCT).forEach(acct => { if(acct.length>2) jColumnHeads[acct]='1'; });
-                setJHeads(jColumnHeads);   
-                resetJSum(jColumnHeads);         
+                names.slice(J_ACCT).forEach(acct => { if(acct.length>2) jInitialHeads[acct]='1'; });
+                console.log("useEffect jinitialHeads="+JSON.stringify(jInitialHeads));
+                setJHeads(jInitialHeads);   
+                resetJSum(jInitialHeads);         
+                console.log("STATUS useEffect jPageSum="+JSON.stringify(jPageSum));
             }
 
         }
@@ -150,11 +151,11 @@ export default function Status() {
         console.log("INIT PAGE#3 "+JSON.stringify(jCarryOver))
         if(jCarryOver && Object.keys(jCarryOver).length>0) {
             jPageSum=jCarryOver;
-            console.log("INIT PAGE#3A "+JSON.stringify(jPageSum))
+            console.log("STATUS PAGE#3A "+JSON.stringify(jPageSum))
         } else  { 
             jPageSum={}; 
             Object.keys(jColumnHeads).forEach(acct=>{jPageSum[acct]="0,00";}); 
-            console.log("INIT PAGE#3B "+JSON.stringify(jPageSum))
+            console.log("STATUS PAGE#3B "+JSON.stringify(jPageSum))
         }
     }
 
@@ -219,6 +220,10 @@ export default function Status() {
     );
 
 
+    console.log("010 STATUS ("+showAccount+") START ");
+
+    // restore transient variable from state variable
+    resetJSum(jHeads);         
 
     
     function noFunc() {  console.log("CLICK NO");  }
@@ -636,8 +641,8 @@ export default function Status() {
      compute Partner capital and tax data
     */
 
-     var jBalance = sheet[D_Balance];
-     var jReport = sheet[D_Report];
+    var jBalance = sheet[D_Balance];
+    var jReport = sheet[D_Report];
 
 
     function makeTax(partner,index) {
@@ -663,7 +668,7 @@ export default function Status() {
             ifix++;
         } 
 
-        console.log("Partner("+index+") with "+igain+"/"+ideno+" from gain ="+iSum+" % "+taxPaid);
+        console.log("makeTax Partner("+index+") with "+igain+"/"+ideno+" from gain ="+iSum+" % "+taxPaid);
         return result;
     }
 
@@ -701,6 +706,8 @@ export default function Status() {
     let hKeys=Object.keys(taxDetails[0]);
     taxHeaders.push(  hKeys );
 
+    console.log("020 STATUS make makeTax "+JSON.stringify(hKeys));
+
 /*
    build main page
 */
@@ -729,6 +736,7 @@ export default function Status() {
         })
     }
     
+    console.log("030 STATUS make history "+JSON.stringify(aSelSaldo));
 
 
 
@@ -746,6 +754,7 @@ export default function Status() {
         tabHeaders.push(name); 
         fixPages++;
     })
+    console.log("040 STATUS make balances "+JSON.stringify(tabHeaders));
 
 
 
@@ -770,6 +779,7 @@ export default function Status() {
     // form pages
     if(matrix)  Object.keys(matrix).forEach((form)=>{tabHeaders.push(form)});
 
+    console.log("060 STATUS make ("+showAccount+") tabHeaders "+JSON.stringify(tabHeaders));
 
 
     let aPages = [];
@@ -781,29 +791,32 @@ export default function Status() {
     
     let jColumnHeads=jHeads; // state variable, do not touch
     let jSum=JSON.parse(JSON.stringify(jPageSum));
-    console.log("UNIFY jSum "+JSON.stringify(jSum));
+    console.log("070 STATUS UNIFY ("+showAccount+") jSum "+JSON.stringify(jSum));
 
     if(showAccount && gSchema) {
         Object.keys(aSelText).forEach(sym => 
             {if(aJMoney[sym])  (gSchema.Names.forEach(acct => { 
                 if(acct.length>2 && jColumnHeads[acct]=='1') {   
-                                            let value=aJMoney[sym][acct]; 
-                                            let carry=jSum[acct];
-                                            if(bigEUMoney(value)!=0n) { 
-                                                try { jColumnHeads[acct]=acct; } catch(e) {}
-                                                
-                                                if(!carry || carry.length==0) {
-                                                    jSum[acct]="0"; jPageSum[acct]="0";
-                                                }
-                                            }
+                    let value=aJMoney[sym][acct]; 
+                    let carry=jSum[acct];
+                    if(bigEUMoney(value)!=0n) { 
+                        try { jColumnHeads[acct]=acct; } catch(e) {}
+                        
+                        // GH 20240103 if(!carry || carry.length==0) {
+                            jSum[acct]="0"; jPageSum[acct]="0";
+                        //}
+                    }
 
-                                            if(carry && carry.length>0) { 
-                                                try { jColumnHeads[acct]=acct; } catch(e) {}
-                                            }
-                  } }))
-            })
-    }
-    console.log("INIT jColumnHeads "+JSON.stringify(jColumnHeads));
+                    if(carry && carry.length>0) { 
+                        try { jColumnHeads[acct]=acct; } catch(e) {}
+                    }
+            } }))
+        })
+        console.log("086 STATUS jColumnHeads "+JSON.stringify(jColumnHeads));
+        console.log("087 STATUS jSum "+JSON.stringify(jSum));
+        console.log("088 STATUS jPageSum "+JSON.stringify(jPageSum));
+        console.log("089 STATUS showAccount "+showAccount);
+     }
 
 
 
@@ -813,12 +826,10 @@ export default function Status() {
            {showAccount &&             
                 (
                 <div className="mTable">                     
-                    <button onClick={() => funcKeepReceipt()}>{D_CarryOver}</button>
-                    <button onClick={() => funcHideReceipt()}>{page.DashBoard}</button>
-                    { TXNReceipt(D_Account, jColumnHeads, jColumnHeads, null, session.year, removeCol) }
+                    { TXNReceipt(D_Account+' '+showAccount, jColumnHeads, jColumnHeads, null, session.year, removeCol) }
                     
                     <TXNReceiptSum text={D_Carry} jAmounts={jPageSum} jColumnHeads={jColumnHeads} id=""/>                   
-                    { console.log("aSelText keys = "+Object.keys(aSelText).join('+')) ||
+                    { console.log("099 aSelText keys = "+Object.keys(aSelText).join('+')) ||
                     Object.keys(aSelText).map((sym,i) => ( (sym && aSelText[sym] && aJMoney[sym] ) ? // && i>1
                                                 
                                                             TXNReceipt(
@@ -830,11 +841,16 @@ export default function Status() {
                                                                     :""
                                                                     )) }
                     <TXNReceiptSum text={page.Sum} jAmounts={jSum} jColumnHeads={jColumnHeads} id="" removeCol={removeCol}/>                                                                                       
+                    <div >
+                    <div className="CNAM key" onClick={() => funcKeepReceipt()}>{D_CarryOver}</div>
+                    <div className="CNAM key" onClick={() => funcHideReceipt()}>{page.DashBoard}</div>
+                    </div>
                 </div>
             )}
 
         {!showAccount &&                                                                     
             (<div>
+                { console.log("100 STATUS show history") }
                 <div className="FIELD" key={"Dashboard"} id={'Overview0'} style= {{ 'display': aPages[0]}} >
                     <StatusRow am1={page.Assets} am2={page.Gain}  am3={page.eqliab}/>
                     {
@@ -853,6 +869,7 @@ export default function Status() {
 
 
                 <div className="FIELD"  key={"HGB"}  id={'Overview1'} style= {{ 'display': aPages[1]}} > 
+                { console.log("110 STATUS show HBG275 S1") }
                     <div className="attrLine">
                         <div className="FIELD LNAM">&nbsp;</div>
                         <div className="FIELD LNAM">{page.GainLoss + ' ' + session.year}</div>
@@ -866,7 +883,8 @@ export default function Status() {
 
 
                 {arrBalance.map((balance,n) => (
-                    <div className="FIELD" key={"Balance0"+n} id={tabName+(balanceBase+n)} style= {{ 'display': aPages[balanceBase+n]}} >
+                <div className="FIELD" key={"Balance0"+n} id={tabName+(balanceBase+n)} style= {{ 'display': aPages[balanceBase+n]}} >
+                        { console.log("120 STATUS showbalance "+n) }
                         <div className="attrLine">{[page.BalanceOpen,page.BalanceClose,page.BalanceNext][n] + ' ' + (parseInt(session.year))}</div>
                         {JSON.parse(balance).map((row,i) => ( 
                             <BalanceRow  key={"Balance"+n+"1"+i} jArgs={row} id={i} />    
@@ -879,6 +897,8 @@ export default function Status() {
 
                 <div className="FIELD"  key={"FixedAssets"}  id={tabName+(assetsBase)}  style={{'display':aPages[assetsBase]}} >
                     <div className="FIELD LNAM">&nbsp;</div>
+                    { console.log("130 STATUS show fixed assets ") }
+
                     <FixedAssetsRow p={ {'idnt':'Name', 'type':'WKN/Typ', 
                             'date':page.AcquisitionDate,
                             'init':page.AcquisitionPrice, 
@@ -918,6 +938,7 @@ export default function Status() {
                 {Object.keys(jPartnerReport).map((jPartner,partnerNo) => ( 
 
                     <div className="FIELD" key={"Partner"+partnerNo} id={tabName+(partnerBase+partnerNo)} style= {{ 'display': aPages[partnerBase+partnerNo]}} >
+                    { console.log("140 STATUS show partner "+partnerNo) }
                             
                             <div className="attrLine"></div>
 
@@ -942,6 +963,7 @@ export default function Status() {
 
                 {matrix ? Object.keys(matrix).map((strKey,index)=>( 
                     <div className="FIELD" key={"Form"+index} id={tabName+(index+fixPages)} style= {{ 'display': aPages[index+fixPages+6]}} > 
+                        { console.log("150 STATUS show txn pattern "+index) }
                         <div className="attrLine"/>
                         
                         <BookingForm    strKey={strKey}  form={matrix[strKey]} preBook={preBook} />
@@ -956,8 +978,7 @@ export default function Status() {
             </div>
             )}
 
-            <FooterRow left={page["client"]}  right={page["register"]} prevFunc={prevFunc} nextFunc={nextFunc} miscFunc={handleXLSave} miscText="Get XLSX"/>
-            <FooterRow left={page["reference"]} right={page["author"]} prevFunc={prevFunc} nextFunc={nextFunc} miscFunc={handleXLSave} miscText="Get XLSX"/>
+            <FooterRow left={page["client"]}  midleft={page["reference"]} midright={page["author"]} right={page["register"]} miscFunc={handleXLSave} miscText="Get XLSX"/>
         </Screen>
     )   
 }
@@ -1010,7 +1031,7 @@ function makeHGBReport(jAccounts,page,jReport) {
 
     let balance = []; 
     
-    console.log("makeReport from response D_Report"+JSON.stringify(Object.keys(jReport)));
+    console.log("makeReport from response D_Report "+JSON.stringify(Object.keys(jReport)));
               
     if(page) {           
         var chgb1 = 0n; // Umsatz
@@ -1105,7 +1126,7 @@ function makeHGBReport(jAccounts,page,jReport) {
             //console.log("GALOS "+JSON.stringify(gls)); 
             jAccounts["xbrlRegular"]=gls;
         }
-        console.log("makeReport from response D_Balance"+JSON.stringify(Object.keys(jAccounts)));
+        console.log("makeReport from response D_Balance "+JSON.stringify(Object.keys(jAccounts)));
 
         
         // build two columns
@@ -1339,7 +1360,6 @@ function makeBalance(jAccounts,jReport,value) {
 
         } else {
             // divider line out
-            console.log('makeBalance unknown '+JSON.stringify(account));
         }
     }
 
@@ -1348,6 +1368,8 @@ function makeBalance(jAccounts,jReport,value) {
         iLeft++;
         iRite++;
     }
+
+    console.log('makeBalance('+value+') EXIT '+JSON.stringify(balance));
 
     return JSON.stringify(balance);
     /*
@@ -1439,3 +1461,21 @@ function PartnerTitleRow(mRow) {
     )
 }
 
+
+
+function FooterRow({left,midleft,midright,right,miscFunc=null,miscText=null}) {
+    return(
+        <div>
+            <div className="attrRow">
+                <div className="FIELD L280">{left}</div>
+                <div className="FIELD L280">{midleft}</div>
+                <div className="FIELD L280">{midright}</div>
+                <div className="FIELD L280">{right}</div>
+            </div>
+           
+            <div className="PAGE">
+                <div className="FIELD IDNT" onClick={(() => {if(miscFunc) return miscFunc(); else return "";})}>{miscText?(<div className="CNAM key">{miscText}</div>): " "}</div>
+            </div>
+        </div>
+    )
+}

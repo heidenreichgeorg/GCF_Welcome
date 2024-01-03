@@ -60,9 +60,11 @@ input[type=number] {
 .key      {  padding: 1px; height:14px;  margin: 0px; border-color: #817137; border-style: solid; float: left; background-color:transparent; font-family:  inherit; font-size: inherit; font-weight:600; color: #c9a935; }
 .box      {  height:40px;  margin: 0px;               border-color: #817137; border-style: solid; float: left; background-color:transparent; font-family:  inherit; font-size: inherit; font-weight:600; color: #c9a935; }
 
-.SWITCH  {                   padding: 1px; border: none; font-size: 12px; font-weight:400;  } 
-.BIGCELL {                   padding: 1px;               float: left; color:inherit;min-height: 48px; font-family: inherit; font-size: 11px; font-weight:400; text-align: center; background-color: inherit; } 
+.SWITCH   {                   padding: 1px; border: none; font-size: 12px; font-weight:400;  } 
+.BIGCELL  {                   padding: 1px;               float: left; color:inherit;min-height: 48px; font-family: inherit; font-size: 11px; font-weight:400; text-align: center; background-color: inherit; } 
 .FIELD    { overflow:hidden; padding: 1px; border: none; float: left;                                 font-family: inherit; font-size: inherit; font-weight:inherit; color: inherit;} 
+
+.PAGE     {  page-break-before: always; } 
 
 .DASH     { width: 0.8rem; text-align: center; border-left-color: #817137; border-left-style: solid; border-left-width: 1px; }		
 .SEP      { width: 0.8rem; text-align: center; }		
