@@ -4,7 +4,7 @@ import { symbolic }  from '../modules/session';
 import Screen from '../pages/Screen'
 import FooterRow from '../components/FooterRow'
 import { cents2EU,bigUSMoney,cents20EU,bigEUMoney }  from '../modules/money';
-import { D_Account, D_Balance, D_Carry, D_CarryOver, D_Page, D_Partner, D_FixAss, D_History, D_Report, D_Schema, J_ACCT, SCREENLINES, X_ASSET_CAPTAX, X_ASSETS, X_EQLIAB } from '../modules/terms.js'
+import { CSEP, D_Account, D_Balance, D_Carry, D_CarryOver, D_Page, D_Partner, D_FixAss, D_History, D_Report, D_Schema, J_ACCT, SCREENLINES, X_ASSET_CAPTAX, X_ASSETS, X_EQLIAB } from '../modules/terms.js'
 import { book,prepareTXN,makeHistory }  from '../modules/writeModule';
 import { makeStatusData }  from '../modules/App';
 
@@ -84,12 +84,12 @@ export default function Status() {
             
 
     const [sheet, setSheet]  = useState()
-    const [ year, setYear]   = useState()
+    const [year, setYear]   = useState()
     const [client,setClient] = useState()
-    const { session, status } = useSession()
-    const [displayRecord,setDisplayRecord] = useState({ creditEQL:{}, credit:{}, debitA:{}, debit:{}})
-    const [matrix,setMatrix] = useState(predefinedTXN )
-    const [isOpen, setIsOpen] = useState(false);
+    const {session, status } = useSession()
+    const [displayRecord, setDisplayRecord] = useState({ creditEQL:{}, credit:{}, debitA:{}, debit:{}})
+    const [matrix, setMatrix] = useState(predefinedTXN )
+    const [showAccount, setShowAccount] = useState(false);
     const [jHeads, setJHeads] = useState({});
 
     const VOID ="-,--";
@@ -134,8 +134,8 @@ export default function Status() {
     function removeCol(name) { console.log("REMOVE "+name); jHeads[name]='0'; setJHeads(JSON.parse(JSON.stringify(jHeads)));  }
     funcCleaReceipt = (() => { storeCarryOver({}); resetJSum(jHeads); });
     funcKeepReceipt = (() => { storeCarryOver(purgeCarryOver(jSum));  });  
-    funcHideReceipt = (() => setIsOpen(false)); 
-    funcShowReceipt = (() => setIsOpen(true));
+    funcHideReceipt = (() => setShowAccount(null)); 
+    funcShowReceipt = ((acct) => setShowAccount(acct));
 
     function purgeCarryOver(jSum) {
         let result={}; 
@@ -158,37 +158,40 @@ export default function Status() {
         }
     }
 
-    
-function computeRow(row,index,client,year,line) {
-
-    if(row) {
-        let aRow = [0n,0n,0n,0n,0n,0n]
-        try { let saRow = row.entry;
-            aRow = saRow.split(CSEP);
-        } catch(err) {  aRow=[""+index+client+year,""+year+index+client] }    
-
-        let tRow =  {};
-        try { let moneyRow = row.jMoney;
-            tRow = moneyRow; //  name-value pairs with sign
-        } catch(err) {}
-
-        let saldo="";
-        if(isNaN(row.saldo)) saldo="0";
-        else saldo = cents20EU(row.saldo); // cents2EU with 0 digit
         
-        let id = symbolic(''+line+aRow.join('')+line+JSON.stringify(tRow));
+    function computeRow(row,index,client,year,line) {
 
-        if(index>0 || line>0) { 
+        if(row) {
+            console.log("computeRow ENTER("+line+") "+JSON.stringify(row));
+
+            let aRow = [0n,0n,0n,0n,0n,0n]
+            try { let saRow = row.entry;
+                aRow = saRow.split(CSEP);
+            } catch(err) {  aRow=[""+index+client+year,""+year+index+client] }    
+
+            let tRow =  {};
+            try { let moneyRow = row.jMoney;
+                tRow = moneyRow; //  name-value pairs with sign
+            } catch(err) {}
+
+            let saldo="";
+            if(isNaN(row.saldo)) saldo="0";
+            else saldo = cents20EU(row.saldo); // cents2EU with 0 digit
             
-                console.log("ADDING("+id+") "+JSON.stringify(aRow));
+            let id = symbolic(''+line+aRow.join('')+line+JSON.stringify(tRow));
 
-            aSelText[id]=aRow;  
-            aJMoney[id]=tRow;
-            aSelSaldo[id]=""+saldo;         
+            if(index>0 || line>0) { 
+                
+                    console.log("computeRow ADDING("+id+") "+JSON.stringify(aRow));
+
+                aSelText[id]=aRow;  
+                aJMoney[id]=tRow;
+                aSelSaldo[id]=""+saldo;         
+            }
         }
     }
-}
 
+    function makeLabel(index,aPattern) { let p= (aPattern && aPattern.length>0) ? aPattern: "p"; return session.client+session.year+p+index }
 
 
     // main functions
@@ -270,15 +273,12 @@ function computeRow(row,index,client,year,line) {
 
     // dashboard portal page
 
-    function showAccount(shrtName) { 
+    function displayAccount(shrtName) { 
+
+        funcShowReceipt(shrtName); 
 
 
-        sHistory.forEach((row,k) => {
-            computeRow( row,1, session.client, session.year, k )
-        })
-
-
-        funcShowReceipt(); 
+        
         console.log("SHOW ACCOUNT "+shrtName); 
         //window.open("/History?client=HGKG&year=2023&APATTERN="+shrtName+"&SELECTALL=1"); 
     }
@@ -287,13 +287,13 @@ function computeRow(row,index,client,year,line) {
         return(
             <div className="attrLine">
                 <div className="FIELD MOAM"> {cents2EU(am1)}</div>
-                <div className="FIELD SYMB" onClick={(e)=>showAccount(tx1)}> {tx1}</div>
+                <div className="FIELD SYMB" onClick={(e)=>displayAccount(tx1)}> {tx1}</div>
                 <div className="FIELD SEP"> &nbsp;</div>
                 <div className="FIELD MOAM"> {cents2EU(am2)}</div>
-                <div className="FIELD SYMB" onClick={(e)=>showAccount(tx2)}> {tx2}</div>
+                <div className="FIELD SYMB" onClick={(e)=>displayAccount(tx2)}> {tx2}</div>
                 <div className="FIELD SEP"> &nbsp;</div>
                 <div className="FIELD MOAM"> {cents2EU(am3)}</div>
-                <div className="FIELD SYMB" onClick={(e)=>showAccount(tx3)}> {tx3}</div>
+                <div className="FIELD SYMB" onClick={(e)=>displayAccount(tx3)}> {tx3}</div>
                 <div className="FIELD DASH"> &nbsp;</div>
                 <div className="FIELD SEP"> &nbsp;</div>
                 <div className="FIELD SYMB"> {d}</div>
@@ -721,8 +721,14 @@ function computeRow(row,index,client,year,line) {
     let eLen = parseInt(sheet[D_Schema].eqliab);
     const gSchema = sheet[D_Schema];    
     var pattern = null; // extra content query pattern 
-    let sHistory=makeHistory(sheet,"COGK",pattern,jHistory,aLen,eLen,gSchema,page,SCREENLINES); // accumulates jSum
+    if(showAccount) {
+        let sHistory=makeHistory(sheet,showAccount,pattern,jHistory,aLen,eLen,gSchema,page,SCREENLINES); // accumulates jSum
 
+        sHistory.forEach((row,k) => {
+            computeRow( row,1, session.client, session.year, k )
+        })
+    }
+    
 
 
 
@@ -774,13 +780,12 @@ function computeRow(row,index,client,year,line) {
 
     
     let jColumnHeads=jHeads; // state variable, do not touch
-
     let jSum=JSON.parse(JSON.stringify(jPageSum));
     console.log("UNIFY jSum "+JSON.stringify(jSum));
 
-    if(isOpen) {
+    if(showAccount && gSchema) {
         Object.keys(aSelText).forEach(sym => 
-            {if(aJMoney[sym])  (names.forEach(acct => { 
+            {if(aJMoney[sym])  (gSchema.Names.forEach(acct => { 
                 if(acct.length>2 && jColumnHeads[acct]=='1') {   
                                             let value=aJMoney[sym][acct]; 
                                             let carry=jSum[acct];
@@ -803,9 +808,9 @@ function computeRow(row,index,client,year,line) {
 
 
     return (
-        <Screen prevFunc={noFunc} nextFunc={noFunc} tabSelector={isOpen ? [page.DashBoard] : tabHeaders}  tabName={tabName}> 
+        <Screen prevFunc={noFunc} nextFunc={noFunc} tabSelector={showAccount ? [] : tabHeaders}  tabName={tabName}> 
            
-           {isOpen &&             
+           {showAccount &&             
                 (
                 <div className="mTable">                     
                     <button onClick={() => funcKeepReceipt()}>{D_CarryOver}</button>
@@ -821,14 +826,14 @@ function computeRow(row,index,client,year,line) {
                                                                 aJMoney[sym],
                                                                 jColumnHeads,
                                                                 jSum,
-                                                                makeLabel(i)) 
+                                                                makeLabel(i,showAccount)) 
                                                                     :""
                                                                     )) }
                     <TXNReceiptSum text={page.Sum} jAmounts={jSum} jColumnHeads={jColumnHeads} id="" removeCol={removeCol}/>                                                                                       
                 </div>
             )}
 
-        {!isOpen &&                                                                     
+        {!showAccount &&                                                                     
             (<div>
                 <div className="FIELD" key={"Dashboard"} id={'Overview0'} style= {{ 'display': aPages[0]}} >
                     <StatusRow am1={page.Assets} am2={page.Gain}  am3={page.eqliab}/>
@@ -1131,7 +1136,7 @@ function makeHGBReport(jAccounts,page,jReport) {
             var cBegin= BigInt(account.init);
             var cClose = BigInt(account.yearEnd);
             var cNext = BigInt(account.next);
-            console.log("EqLiab account ="+JSON.stringify(account));
+            //console.log("EqLiab account ="+JSON.stringify(account));
     
            iLeft = fillLeft(balance,cBegin,cClose,cNext,iName,iLeft);
         }
@@ -1233,7 +1238,7 @@ function makeBalance(jAccounts,jReport,value) {
 
     let balance = new Array();
 
-    console.log("makeBalance 001 from response D_Report"+JSON.stringify(Object.keys(jReport)));
+    // console.log("makeBalance 001 from response D_Report"+JSON.stringify(Object.keys(jReport)));
 
 
     let ass,eql,gls;
@@ -1283,7 +1288,7 @@ function makeBalance(jAccounts,jReport,value) {
 
     for (let tt=0;tt<aTag.length;tt++)   {
         let tag=aTag[tt];
-        console.log("makeBalance 005 Report "+JSON.stringify(jReport[tag]));
+        //console.log("makeBalance 005 Report "+JSON.stringify(jReport[tag]));
         
         var element    =  jReport[tag];
         var level     =  element.level;
@@ -1305,7 +1310,7 @@ function makeBalance(jAccounts,jReport,value) {
             var xbrl = full_xbrl.split('\.');
             var side = xbrl[1];
            
-            console.log('makeBalance side='+side + "  in "+full_xbrl + "= "+dispValue);
+            //console.log('makeBalance side='+side + "  in "+full_xbrl + "= "+dispValue);
 
             if(side=='ass') {
                 if(iLeft<SCREENLINES) {
