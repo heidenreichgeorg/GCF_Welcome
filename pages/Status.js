@@ -777,7 +777,7 @@ export default function Status() {
 
 
     // form pages
-    if(matrix)  Object.keys(matrix).forEach((form)=>{tabHeaders.push(form)});
+    if(matrix)  Object.keys(matrix).forEach((form)=>{tabHeaders.push('* '+form)});
 
     console.log("060 STATUS make ("+showAccount+") tabHeaders "+JSON.stringify(tabHeaders));
 
@@ -819,9 +819,16 @@ export default function Status() {
      }
 
 
+    // extra footer buttons
+    let aFunc=[handleXLSave];
+    let aText=["Get XLSX"];
+    if(showAccount) {
+        aFunc.push(funcKeepReceipt); aText.push(D_CarryOver);
+        aFunc.push(funcHideReceipt); aText.push(page.DashBoard);
+    }
 
     return (
-        <Screen prevFunc={noFunc} nextFunc={noFunc} tabSelector={showAccount ? [] : tabHeaders}  tabName={tabName}> 
+        <Screen tabSelector={showAccount ? [] : tabHeaders} tabName={tabName} aFunc={aFunc} aText={aText}  > 
            
            {showAccount &&             
                 (
@@ -841,10 +848,7 @@ export default function Status() {
                                                                     :""
                                                                     )) }
                     <TXNReceiptSum text={page.Sum} jAmounts={jSum} jColumnHeads={jColumnHeads} id="" removeCol={removeCol}/>                                                                                       
-                    <div >
-                    <div className="CNAM key" onClick={() => funcKeepReceipt()}>{D_CarryOver}</div>
-                    <div className="CNAM key" onClick={() => funcHideReceipt()}>{page.DashBoard}</div>
-                    </div>
+
                 </div>
             )}
 
@@ -978,7 +982,8 @@ export default function Status() {
             </div>
             )}
 
-            <FooterRow left={page["client"]}  midleft={page["reference"]} midright={page["author"]} right={page["register"]} miscFunc={handleXLSave} miscText="Get XLSX"/>
+            <FooterRow left={page.client}  midleft={page.author}  midright={page.register} right={page.reference}/>
+
         </Screen>
     )   
 }
@@ -1461,21 +1466,14 @@ function PartnerTitleRow(mRow) {
     )
 }
 
-
-
-function FooterRow({left,midleft,midright,right,miscFunc=null,miscText=null}) {
+function FooterRow({left,midleft,midright,right}) {
     return(
-        <div>
-            <div className="attrRow">
-                <div className="FIELD L280">{left}</div>
-                <div className="FIELD L280">{midleft}</div>
+            <div className="attrLine">
+                <div className="FIELD XFER">{left},&nbsp;</div>
+                <div className="FIELD XFER">{midleft},&nbsp;</div>
                 <div className="FIELD L280">{midright}</div>
                 <div className="FIELD L280">{right}</div>
             </div>
-           
-            <div className="PAGE">
-                <div className="FIELD IDNT" onClick={(() => {if(miscFunc) return miscFunc(); else return "";})}>{miscText?(<div className="CNAM key">{miscText}</div>): " "}</div>
-            </div>
-        </div>
     )
 }
+
