@@ -87,7 +87,7 @@ export default function DashBoard({value}) {
     
 
     return (
-        <Screen prevFunc={prevFunc} nextFunc={nextFunc} >
+        <Screen  aFunc={[prevFunc, nextFunc]} aText={["PREV","NEXT"]}  >
 
             <div classname="attrLine">
                 <Gauge percent={parseInt((100n*BigInt(fix))/BigInt(ass))} radius={90} strDim={"%fixed"}  color={"#0020FF"}/>

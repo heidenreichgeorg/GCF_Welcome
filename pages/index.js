@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react';
-import { getSession, useSession, REACT_APP_API_HOST,getCarryOver,storeCarryOver } from '../modules/sessionmanager';
-import { symbolic }  from '../modules/session';
-import Screen from '../pages/Screen'
+import { getSession, useSession, REACT_APP_API_HOST,getCarryOver,storeCarryOver } from '../modules/sessionmanager.js';
+import { symbolic }  from '../modules/session.js';
+import Screen from './Screen.js'
 import { cents2EU,bigUSMoney,cents20EU,bigEUMoney }  from '../modules/money';
 import { CSEP, D_Account, D_Balance, D_Carry, D_CarryOver, D_Page, D_Partner, D_FixAss, D_History, D_Report, D_Schema, J_ACCT, SCREENLINES, X_ASSET_CAPTAX, X_ASSETS, X_EQLIAB } from '../modules/terms.js'
-import { book,prepareTXN,makeHistory }  from '../modules/writeModule';
-import { makeStatusData }  from '../modules/App';
+import { book,prepareTXN,makeHistory }  from '../modules/writeModule.js';
+import { makeStatusData }  from '../modules/App.js';
 
 // the ORIGINAL FORMAT from journal sheet is 
 // columns format CSV with these columns 
@@ -20,8 +20,9 @@ import { makeStatusData }  from '../modules/App';
 // flow format 
 // "sender":SENDER,"reason":REASON,"credit":{"COGK":{"index":10,"value":"100,00"}},"debit":{"K2TO":{"index":33,"value":"100,00"}},"balance":""}
 // this format is for AccountTemplateRow and setTxnthe external book method
+export default function index() { return Status() }
 
-export default function Status() {
+function Status() {
     
 
     const predefinedTXN = {

@@ -26,7 +26,7 @@ export default function Balance() {
 
     
     function prevFunc() { console.log("CLICK PREVIOUS"); window.location.href="/Accounts?client="+session.client+"&year="+session.year; }
-    function nextFunc() { console.log("CLICK NEXT");     window.location.href="/FixedAssets?client="+session.client+"&year="+session.year; }
+    function nextFunc() { console.log("CLICK NEXT");     window.location.href="/Dashboard?client="+session.client+"&year="+session.year; }
     
     let page = sheet[D_Page];
     
@@ -41,7 +41,7 @@ export default function Balance() {
 
     const tabName = 'BalanceContent';
     return (
-        <Screen prevFunc={prevFunc} nextFunc={nextFunc} tabSelector={pageText} tabName={tabName}>
+        <Screen  aFunc={[prevFunc, nextFunc]} aText={["PREV","NEXT"]}  tabSelector={pageText} tabName={tabName}>
             {report.map((balance,n) => (
                 <div className="FIELD" key={"Balance0"+n} id={tabName+n} style= {{ 'display': aPages[n]}} >
                     <div className="attrLine">{[page.BalanceOpen,page.BalanceClose,page.BalanceNext][n] + ' ' + (parseInt(session.year))}</div>

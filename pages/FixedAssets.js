@@ -23,8 +23,8 @@ export default function FixedAssets() {
     if(!sheet) return null; //'Loading...';
 
     
-    function prevFunc() {console.log("CLICK PREVIOUS"); window.location.href="/Balance?client="+session.client+"&year="+session.year; }
-    function nextFunc() {  console.log("CLICK NEXT");   window.location.href="/HGB275S2Page?client="+session.client+"&year="+session.year; }
+    function prevFunc() {console.log("CLICK PREVIOUS"); window.location.href="/DashBoard?client="+session.client+"&year="+session.year; }
+    function nextFunc() {  console.log("CLICK NEXT");   window.location.href="/HaloBoard?client="+session.client+"&year="+session.year; }
 
     let page = sheet[D_Page];
     var jReport = sheet[D_Report];
@@ -44,7 +44,7 @@ export default function FixedAssets() {
     var iRest = 0n;
 
     return (
-        <Screen prevFunc={prevFunc} nextFunc={nextFunc} tabSelector={aPages} >
+        <Screen  aFunc={[prevFunc, nextFunc]} aText={["PREV","NEXT"]} tabSelector={aPages} >
             
             <div className="FIELD" id={"faPageContent1"} style= {{ 'display': 'block' }} >
             <FixedAssetsRow p={ {'idnt':'Name', 'type':'WKN/Typ', 

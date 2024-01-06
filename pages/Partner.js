@@ -42,8 +42,8 @@ export default function Partner() {
 
     if(!sheet) return null; //'Loading...';
 
-    function prevFunc() {console.log("CLICK PREVIOUS"); window.location.href="/HGB275S2Page?client="+session.client+"&year="+session.year; }
-    function nextFunc() {  console.log("CLICK NEXT");   window.location.href="/Status?client="+session.client+"&year="+session.year; }
+    function prevFunc() {console.log("CLICK PREVIOUS"); window.location.href="/Operations?client="+session.client+"&year="+session.year; }
+    function nextFunc() {  console.log("CLICK NEXT");   window.location.href="/Transfer?client="+session.client+"&year="+session.year; }
     
     let page = sheet[D_Page];
     
@@ -148,7 +148,7 @@ export default function Partner() {
     
     const tabName = 'PartnerContent';
     return (
-        <Screen prevFunc={prevFunc} nextFunc={nextFunc} tabSelector={Object.keys(jPartnerReport).map((i)=>(jPartnerReport[i].name))} tabName={tabName} >
+        <Screen  aFunc={[prevFunc, nextFunc]} aText={["PREV","NEXT"]} tabSelector={Object.keys(jPartnerReport).map((i)=>(jPartnerReport[i].name))} tabName={tabName} >
 
             <div className="attrLine">{page.GainLoss + ' ' + session.year}</div>
 

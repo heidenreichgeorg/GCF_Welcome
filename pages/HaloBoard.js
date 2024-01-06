@@ -81,7 +81,7 @@ export default function DashBoard({value}) {
     let ycenter=120;
 
     return (
-        <Screen prevFunc={prevFunc} nextFunc={nextFunc} >
+        <Screen  aFunc={[prevFunc, nextFunc]} aText={["PREV","NEXT"]} >
             <div classname="attrLine">
             <svg viewBox="0 0 230 250" height="720" width="760" background-color="#000000">
                 <defs>

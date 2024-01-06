@@ -248,7 +248,7 @@ export function sendDisplay(session,res) {
 
         let localHost = localhost();
         
-        let url = localHost.addr + ":" + PORT + "/Status?client="+client+"&year="+year;
+        let url = localHost.addr + ":" + PORT + "/index?client="+client+"&year="+year;
 
         const clientHead = "Login";
 

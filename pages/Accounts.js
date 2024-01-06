@@ -30,7 +30,7 @@ export default function Accounts() {
 
     if(!sheet) return null; // 'Loading...';
 
-    function prevFunc() {console.log("CLICK PREVIOUS"); window.location.href="/Status?client="+client+"&year="+year; }
+    function prevFunc() {console.log("CLICK PREVIOUS"); window.location.href="/Transfer?client="+client+"&year="+year; }
     function nextFunc() {  console.log("CLICK NEXT");   window.location.href="/Balance?client="+client+"&year="+year; }
 
     let page = sheet[D_Page];
@@ -87,7 +87,7 @@ export default function Accounts() {
 
 
     return (
-        <Screen prevFunc={prevFunc} nextFunc={nextFunc} tabSelector={pageText} tabName={tabName}>
+        <Screen  aFunc={[prevFunc, nextFunc]} aText={["PREV","NEXT"]}  tabSelector={pageText} tabName={tabName}>
             { aStands.map((report,n)=>
                 <div className="FIELD" key={"Accounts0"+n} id={tabName+n} style= {{ 'display': aPages[n]}} >
                     <div className="attrLine">{[

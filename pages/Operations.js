@@ -40,7 +40,7 @@ export default function Operations() {
     }
 
   
-    function prevFunc() {console.log("CLICK PREVIOUS"); window.location.href="/HGB275S2Page?client="+client+"&year="+year; }
+    function prevFunc() {console.log("CLICK PREVIOUS"); window.location.href="/History?client="+client+"&year="+year; }
     function nextFunc() {  console.log("CLICK NEXT");   window.location.href="/Partner?client="+client+"&year="+year; }
       
     let page = sheet[D_Page];
@@ -111,7 +111,7 @@ export default function Operations() {
 
     const aNums = [0];
     return (
-            <Screen prevFunc={prevFunc} nextFunc={nextFunc} tabSelector={aNums} >            
+            <Screen  aFunc={[prevFunc, nextFunc]} aText={["PREV","NEXT"]}  tabSelector={aNums} >            
             {
                 report.map((row,l) => (
                     <StatusRow  key={"Operations0"+l} 
