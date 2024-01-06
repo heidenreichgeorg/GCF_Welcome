@@ -232,7 +232,7 @@ export default function Partner() {
             .catch((err) => console.error("1127 handleJSONSave ERR "+err));
             
         } catch(err) { console.log("1117 GET /JSON handleJSONSave:"+err);}
-        console.log("1140 Status.handleJSONSave EXIT");
+        console.log("1140 Partner.handleJSONSave EXIT");
     }
 
     
