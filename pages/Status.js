@@ -201,7 +201,7 @@ export default function Status() {
         console.log("PARAMS "+JSON.stringify(params));
         let cAuth=document.getElementById('auth');
         if(cAuth) {
-            let url = "/index?client="+params.get("client")+"&year="+params.get("year")+"&auth="+cAuth.value;
+            let url = "/Status?client="+params.get("client")+"&year="+params.get("year")+"&auth="+cAuth.value;
             console.log("OPEN "+url);
             window.open(url);
         }
