@@ -1,4 +1,4 @@
-import  index  from 'Status';
+import Status from 'Status';
 
 export default function index() {
 

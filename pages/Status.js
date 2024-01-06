@@ -9,7 +9,7 @@ import { makeStatusData }  from '../modules/App';
 
 // the ORIGINAL FORMAT from journal sheet is 
 // columns format CSV with these columns 
-// HASH DATE SENDER REFACCT REASON REFCODE GRSB EBKS CDAK COGK FSTF NKFO KEST KESO VAVA - 
+// HASH DATE SENDER REFACCT REASON REFCODE GRSB EBKS CDAK COGK FSTF NKFO KEST KESO VAVA - MIET AUFW NKG EZIN AZIN FSAL - NKHA KAUT D586 
 
 /* global BigInt */
 
@@ -19,8 +19,8 @@ import { makeStatusData }  from '../modules/App';
 // buildTransaction will generate the 
 // flow format 
 // "sender":SENDER,"reason":REASON,"credit":{"COGK":{"index":10,"value":"100,00"}},"debit":{"K2TO":{"index":33,"value":"100,00"}},"balance":""}
-// this format is for AccountTemplateRow and setTxnthe external book method
-export default function index() {
+// this format is for AccountTemplateRow and setTxn - the external book method
+export default function Status() {
     
 
     const predefinedTXN = {
