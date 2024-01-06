@@ -176,7 +176,7 @@ export default function Screen({ children, tabSelector, tabName,
             <div className="attrLine">
                 <div className="FIELD" onClick={() => {setPrintable(!printable)}}><div className="CNAM key">{printable?"Report":"Print"}</div></div>
                 {aFunc.map((miscFunc,i) => (
-                    <div className="FIELD" onClick={(() => {if(miscFunc) return miscFunc(); else return "";})}>{aText[i]?(<div className="CNAM key">{aText[i]}</div>): " "}</div>
+                    <div key={i} className="FIELD" onClick={(() => {if(miscFunc) return miscFunc(); else return "";})}>{aText[i]?(<div className="CNAM key">{aText[i]}</div>): " "}</div>
                 ))}
 
             </div>
