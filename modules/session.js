@@ -97,8 +97,8 @@ export function init(/*app,*/ argv) {
 
 
 function processArgv(processArgv) {
-    let bucket="fireBaseConfigFile";
-    let root="/data/sessions/";
+    let bucket="";
+    let root="";
     processArgv.forEach(function (val, index, array) {
         if(debug>1) console.log("0000 Starting server " + index + ': ' + val);
         let attribute=val.split('=');

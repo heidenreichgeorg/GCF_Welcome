@@ -359,7 +359,7 @@ module.exports['bucketUpload']=bucketUpload;
 
 export function loadFBConfig(dir,config) {
     var fbConfig=null;
-    if(config) {
+    if(dir && dir.length>0 && config && config.length>0) {
         
         let fileName = dir+config+".json";
         // mount volume in docker-compose.yml
@@ -368,7 +368,7 @@ export function loadFBConfig(dir,config) {
         //   volumes:      
         //    sec:
         
-        if(fileName) {
+        
             console.log("0050 loadFBConfig from "+fileName);
             try {
               let configStr = fs.readFileSync(fileName, 'utf8');
@@ -380,18 +380,27 @@ export function loadFBConfig(dir,config) {
               } else console.log("0057 READ SEC FILE  - EMPTY");
           } catch(err) { console.dir("0055 FAILED READING CONFIG "+fileName); }
            if(!fbConfig) console.log("0059 loadFBConfig CWD="+process.cwd()+" ROOT="+dir+" NO/INVALID CONFIG FILE "+fileName);
-        } else {
-            console.log("0053 loadFBConfig NO DIR "+dir);
-            return null;
-        }
-    } else console.log("0051 loadFBConfig NO CONFIG ");
+       
+    } else {
+      fbConfig={
+        'projectId':process.env.projectId,
+        'authDomain':process.env.authDomain,
+        'storageBucket':process.env.storageBucket,
+        'apiKey':process.env.apiKey,
+        'appId':process.env.appId,
+        'messagingSenderId':process.env.messagingSenderId,
+        'usermail':process.env.usermail,
+        'userpassword':process.env.userpassword
+      }
+      console.log("0051 loadFBConfig NO CONFIG ");
+    }
     return fbConfig;
 } 
 
 
 
 export function fbDownload(jConfig,client,year,callBack,res) {
-    if(jConfig && jConfig.bucket) {
+    if(jConfig) {
         // FIREBASE
         const fbConfig = loadFBConfig(jConfig.root,jConfig.bucket);
         if(fbConfig) {        
@@ -401,7 +410,12 @@ export function fbDownload(jConfig,client,year,callBack,res) {
             console.log("0033 server.fbDownload NO FIREBASE CONFIG")
             return null;
         }
-    } else console.log("0031 server.fbDownload NO CONFIG FROM SERVER")
+    } else {
+      fbConfig={
+
+      }
+      console.log("0031 server.fbDownload NO CONFIG FROM SERVER")
+    }
     
     return null;
     

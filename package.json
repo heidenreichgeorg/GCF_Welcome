@@ -3,9 +3,11 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev . root=C:/workspace/GCF_Welcome/entity/HGKG bucket=bookingpages",
+    "file_dev": "next dev . root=C:/workspace/GCF_Welcome/entity/HGKG bucket=bookingpages",
+    "dev": "next dev .",
     "build": "next build",
-    "start": "next start . root=./entity/HGKG bucket=bookingpages",
+    "file_start": "next start . root=./entity/HGKG bucket=bookingpages",
+    "start": "next start .",
     "lint": "next lint"
   },
   "browser": {
