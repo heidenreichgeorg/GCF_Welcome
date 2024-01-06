@@ -300,7 +300,7 @@ export default function Status() {
                 <div className="FIELD SYMB" onClick={(e)=>displayAccount(tx3)}> {tx3}</div>
                 <div className="FIELD DASH"> &nbsp;</div>
                 <div className="FIELD SEP"> &nbsp;</div>
-                <div className="FIELD SYMB"> {d}</div>
+                <div className="FIELD DATE"> {d}</div>
                 <div className="FIELD NAME"> {n}</div>
                 <div className="FIELD">{l}</div>
                 {click==null ? (<div className="FIELD SEP"> &nbsp;</div>) : (
