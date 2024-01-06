@@ -60,7 +60,9 @@ import { useState, useEffect } from "react";
 
 // overall Screen frame for the React-based booking UI 
 
-export default function Screen({ children, prevFunc, nextFunc, tabSelector, tabName }) {
+export default function Screen({ children, tabSelector, tabName,
+                                 aFunc, aText,
+                 }) {
 
     const [ printable, setPrintable ] = useState(false)
     
@@ -156,21 +158,32 @@ export default function Screen({ children, prevFunc, nextFunc, tabSelector, tabN
     
 
     return (
-        <div className="mTable">           
-            <button onClick={() => {setPrintable(!printable)}}>{printable?"Report":"Print"}</button>
-            <div className="attrLine">                     
-                <select autoFocus type="radio" id={tabName} name={tabName} onChange={(e)=>makeSelect(tabName,e.target)}> 
-                    {tabSelector.map((row,tabNum) => (
-                        <option  id={"Screen0"+tabNum}  key={"Screen0"+tabNum}  value={row} >{row}</option>
-                        // onClick={makeTab(tabName,tabNum,"")}
-                    ))}
-                </select>
+        <div>
+            <div className="mTable">           
+                <div className="attrLine">                     
+                    <select autoFocus type="radio" id={tabName} name={tabName} onChange={(e)=>makeSelect(tabName,e.target)}> 
+                        {tabSelector.map((row,tabNum) => (
+                            <option  id={"Screen0"+tabNum}  key={"Screen0"+tabNum}  value={row} >{row}</option>
+                            // onClick={makeTab(tabName,tabNum,"")}
+                        ))}
+                    </select>
+                </div>
+                <div>              
+                    {children}                
+                </div>            
+            </div>        
+            <div className="PAGE attrLine"></div>
+            <div className="attrLine">
+                <div className="FIELD" onClick={() => {setPrintable(!printable)}}><div className="CNAM key">{printable?"Report":"Print"}</div></div>
+                {aFunc.map((miscFunc,i) => (
+                    <div className="FIELD" onClick={(() => {if(miscFunc) return miscFunc(); else return "";})}>{aText[i]?(<div className="CNAM key">{aText[i]}</div>): " "}</div>
+                ))}
+
             </div>
-            <div>              
-                {children}                
-            </div>
+            <div className="attrLine"></div>
         </div>
     )
+
 }
 
 

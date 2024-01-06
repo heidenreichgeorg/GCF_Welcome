@@ -74,7 +74,8 @@ export function SessionProvider({ children,  default_value, onLoading, onError }
 
         setStatus('loading')
         let browserItem = sessionStorage.getItem(SX_SESSION);
-        if(browserItem!=null && browserItem.length>256) {
+        /*if(browserItem!=null && browserItem.length>256) GH20240104
+        {
             try {
                 let len=0;
                 let data = JSON.parse(browserItem);
@@ -89,7 +90,7 @@ export function SessionProvider({ children,  default_value, onLoading, onError }
                 setStatus('error')
                 console.log("7003 SessionProvider WARM ERROR");
             }
-        } else { 
+        } else { GH20240104 */
 
             // PUT REAL IP ADDR or DNS NAME OF BACKEND INTO .env file
             fetch(`${REACT_APP_API_HOST}/SESSION?${strSearch}`,  
@@ -109,7 +110,7 @@ export function SessionProvider({ children,  default_value, onLoading, onError }
                 setStatus('error')
                 console.log("7005 SessionProvider COLD ERROR");
             })
-        }
+        // 20240104 }
     
     }, [])
 

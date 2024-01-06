@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
-import { getSession, storeCarryOver, useSession, REACT_APP_API_HOST } from '../modules/sessionmanager';
+import { getSession, useSession, REACT_APP_API_HOST,getCarryOver,storeCarryOver } from '../modules/sessionmanager';
+import { symbolic }  from '../modules/session';
 import Screen from '../pages/Screen'
-import FooterRow from '../components/FooterRow'
-import { cents2EU,bigUSMoney }  from '../modules/money';
-import { D_Balance, D_Page, D_Partner, D_Report, D_Schema, SCREENLINES, X_ASSET_CAPTAX, X_ASSETS, X_EQLIAB } from '../modules/terms.js'
-import { book,prepareTXN }  from '../modules/writeModule';
+import { cents2EU,bigUSMoney,cents20EU,bigEUMoney }  from '../modules/money';
+import { CSEP, D_Account, D_Balance, D_Carry, D_CarryOver, D_Page, D_Partner, D_FixAss, D_History, D_Report, D_Schema, J_ACCT, SCREENLINES, X_ASSET_CAPTAX, X_ASSETS, X_EQLIAB } from '../modules/terms.js'
+import { book,prepareTXN,makeHistory }  from '../modules/writeModule';
 import { makeStatusData }  from '../modules/App';
 
 // the ORIGINAL FORMAT from journal sheet is 
@@ -83,14 +83,30 @@ export default function Status() {
             
 
     const [sheet, setSheet]  = useState()
-    const [ year, setYear]   = useState()
+    const [year, setYear]   = useState()
     const [client,setClient] = useState()
-    const { session, status } = useSession()
-    const [displayRecord,setDisplayRecord] = useState({ creditEQL:{}, credit:{}, debitA:{}, debit:{}})
-    const [matrix,setMatrix] = useState(predefinedTXN )
+    const {session, status } = useSession()
+    const [displayRecord, setDisplayRecord] = useState({ creditEQL:{}, credit:{}, debitA:{}, debit:{}})
+    const [matrix, setMatrix] = useState(predefinedTXN )
+    const [showAccount, setShowAccount] = useState(false);
+    const [jHeads, setJHeads] = useState({});
 
-    
+    const VOID ="-,--";
+
+    var funcShowReceipt=null;
+    var funcKeepReceipt=null;
+    var funcHideReceipt=null;
+    var funcCleaReceipt=null;
+    var aSelText = {};
+    var aJMoney  = {};
+    var aSelSaldo= {};
+    var jPageSum = {};
+
     useEffect(() => {
+
+        aSelText = {};
+        aJMoney = {};
+
         if(status !== 'success') return;
         setYear(session.year);
         setClient(session.client);
@@ -98,11 +114,88 @@ export default function Status() {
         let state=getSession();
         if(state && Object.keys(state).length>5) {
             setSheet(state.generated);
+            if(state.generated) {
+                // history layout methods                
+                let jInitialHeads={}; 
+                let names=state.generated[D_Schema].Names;
+                names.slice(J_ACCT).forEach(acct => { if(acct.length>2) jInitialHeads[acct]='1'; });
+                console.log("useEffect jinitialHeads="+JSON.stringify(jInitialHeads));
+                setJHeads(jInitialHeads);   
+                resetJSum(jInitialHeads);         
+                console.log("STATUS useEffect jPageSum="+JSON.stringify(jPageSum));
+            }
+
         }
         // reset all stored carryOver sums
         storeCarryOver({});
     }, [status])
 
+
+    // TXNReceipt history layout methods
+    function removeCol(name) { console.log("REMOVE "+name); jHeads[name]='0'; setJHeads(JSON.parse(JSON.stringify(jHeads)));  }
+    funcCleaReceipt = (() => { storeCarryOver({}); resetJSum(jHeads); });
+    funcKeepReceipt = (() => { storeCarryOver(purgeCarryOver(jSum));  });  
+    funcHideReceipt = (() => setShowAccount(null)); 
+    funcShowReceipt = ((acct) => setShowAccount(acct));
+
+    function purgeCarryOver(jSum) {
+        let result={}; 
+        Object.keys(jSum).forEach(name => {if(bigEUMoney(jSum[name])!=0n) 
+            result[name]=jSum[name];});
+        return result;
+    }
+    
+
+    function resetJSum(jColumnHeads) { 
+        let jCarryOver=getCarryOver();
+        console.log("INIT PAGE#3 "+JSON.stringify(jCarryOver))
+        if(jCarryOver && Object.keys(jCarryOver).length>0) {
+            jPageSum=jCarryOver;
+            console.log("STATUS PAGE#3A "+JSON.stringify(jPageSum))
+        } else  { 
+            jPageSum={}; 
+            Object.keys(jColumnHeads).forEach(acct=>{jPageSum[acct]="0,00";}); 
+            console.log("STATUS PAGE#3B "+JSON.stringify(jPageSum))
+        }
+    }
+
+        
+    function computeRow(row,index,client,year,line) {
+
+        if(row) {
+            console.log("computeRow ENTER("+line+") "+JSON.stringify(row));
+
+            let aRow = [0n,0n,0n,0n,0n,0n]
+            try { let saRow = row.entry;
+                aRow = saRow.split(CSEP);
+            } catch(err) {  aRow=[""+index+client+year,""+year+index+client] }    
+
+            let tRow =  {};
+            try { let moneyRow = row.jMoney;
+                tRow = moneyRow; //  name-value pairs with sign
+            } catch(err) {}
+
+            let saldo="";
+            if(isNaN(row.saldo)) saldo="0";
+            else saldo = cents20EU(row.saldo); // cents2EU with 0 digit
+            
+            let id = symbolic(''+line+aRow.join('')+line+JSON.stringify(tRow));
+
+            if(index>0 || line>0) { 
+                
+                    console.log("computeRow ADDING("+id+") "+JSON.stringify(aRow));
+
+                aSelText[id]=aRow;  
+                aJMoney[id]=tRow;
+                aSelSaldo[id]=""+saldo;         
+            }
+        }
+    }
+
+    function makeLabel(index,aPattern) { let p= (aPattern && aPattern.length>0) ? aPattern: "p"; return session.client+session.year+p+index }
+
+
+    // main functions
 
     function login() {
         let params = new URLSearchParams(window.location.search);
@@ -127,12 +220,18 @@ export default function Status() {
     );
 
 
+    console.log("010 STATUS ("+showAccount+") START ");
+
+    // restore transient variable from state variable
+    resetJSum(jHeads);         
 
     
     function noFunc() {  console.log("CLICK NO");  }
     function prevFunc() {console.log("CLICK PREVIOUS"); window.location.href="/HGB275S2Page?client="+client+"&year="+year; } 
     function nextFunc() {  console.log("CLICK NEXT");   window.location.href="/Accounts?client="+client+"&year="+year; }
 
+
+    
     function handleXLSave() {
         
         const rqHeaders = {  'Accept': 'application/octet-stream',
@@ -177,6 +276,43 @@ export default function Status() {
 
     /**************************************************************************************** */
 
+    // dashboard portal page
+
+    function displayAccount(shrtName) { 
+
+        funcShowReceipt(shrtName); 
+
+
+        
+        console.log("SHOW ACCOUNT "+shrtName); 
+        //window.open("/History?client=HGKG&year=2023&APATTERN="+shrtName+"&SELECTALL=1"); 
+    }
+    
+    function StatusRow({ am1,tx1, am2, tx2, am3, tx3, d, n, l, click}) {
+        return(
+            <div className="attrLine">
+                <div className="FIELD MOAM"> {cents2EU(am1)}</div>
+                <div className="FIELD SYMB" onClick={(e)=>displayAccount(tx1)}> {tx1}</div>
+                <div className="FIELD SEP"> &nbsp;</div>
+                <div className="FIELD MOAM"> {cents2EU(am2)}</div>
+                <div className="FIELD SYMB" onClick={(e)=>displayAccount(tx2)}> {tx2}</div>
+                <div className="FIELD SEP"> &nbsp;</div>
+                <div className="FIELD MOAM"> {cents2EU(am3)}</div>
+                <div className="FIELD SYMB" onClick={(e)=>displayAccount(tx3)}> {tx3}</div>
+                <div className="FIELD DASH"> &nbsp;</div>
+                <div className="FIELD SEP"> &nbsp;</div>
+                <div className="FIELD SYMB"> {d}</div>
+                <div className="FIELD NAME"> {n}</div>
+                <div className="FIELD">{l}</div>
+                {click==null ? (<div className="FIELD SEP"> &nbsp;</div>) : (
+                <div className="FIELD"  onClick={(() => click())}>&nbsp;.&nbsp;</div>
+                ) }
+            </div>
+        )
+    }
+    
+    /**************************************************************************************** */
+    
     function list(side,factor) { 
         return Object.keys(side).map((acct)=>({'name':acct, 'value':(side[acct]&&side[acct].length>0 ? cents2EU(bigUSMoney(side[acct],factor)):"0")}));
     }
@@ -505,7 +641,9 @@ export default function Status() {
      compute Partner capital and tax data
     */
 
-     var jBalance = sheet[D_Balance];
+    var jBalance = sheet[D_Balance];
+    var jReport = sheet[D_Report];
+
 
     function makeTax(partner,index) {
         var ifix=0n; // ifix are cents to compensate for rounding when tax is shared among partners
@@ -530,7 +668,7 @@ export default function Status() {
             ifix++;
         } 
 
-        console.log("Partner("+index+") with "+igain+"/"+ideno+" from gain ="+iSum+" % "+taxPaid);
+        console.log("makeTax Partner("+index+") with "+igain+"/"+ideno+" from gain ="+iSum+" % "+taxPaid);
         return result;
     }
 
@@ -568,160 +706,337 @@ export default function Status() {
     let hKeys=Object.keys(taxDetails[0]);
     taxHeaders.push(  hKeys );
 
+    console.log("020 STATUS make makeTax "+JSON.stringify(hKeys));
+
 /*
    build main page
 */
-
-    let page = sheet[D_Page];
-    let sheet_status = makeStatusData(sheet);
-    let report = sheet_status.report;
-
-
     let fixPages=0;
 
-    // portal page
-    let tabHeaders=['Dashboard']; fixPages++;
+
+    // dashboard page
+    let page = sheet[D_Page];
+    let sheet_status = makeStatusData(sheet);
+    let statusReport = sheet_status.report;
+    let tabHeaders=[page.DashBoard]; fixPages++;
+
+
+
+    // history page
+    const jHistory  = sheet[D_History];
+    let aLen = parseInt(sheet[D_Schema].assets);
+    let eLen = parseInt(sheet[D_Schema].eqliab);
+    const gSchema = sheet[D_Schema];    
+    var pattern = null; // extra content query pattern 
+    if(showAccount) {
+        let sHistory=makeHistory(sheet,showAccount,pattern,jHistory,aLen,eLen,gSchema,page,SCREENLINES); // accumulates jSum
+
+        sHistory.forEach((row,k) => {
+            computeRow( row,1, session.client, session.year, k )
+        })
+    }
+    
+    console.log("030 STATUS make history "+JSON.stringify(aSelSaldo));
+
+
 
 
     // gain/loss page
-    let hgbReport = makeHGBReport(sheet);
+    let hgbReport = makeHGBReport(jBalance,page,jReport);
     tabHeaders.push(page.GainlossHGB); fixPages++;
+
+
+    // balances
+    let balanceBase=fixPages;
+    let pageNames = [ 'init',  'yearEnd','next'];    
+    let arrBalance = pageNames.map((name) =>( makeBalance(jBalance,jReport,name)  ));
+    [page.BalanceOpen,page.BalanceClose,page.BalanceNext].forEach((name) => { 
+        tabHeaders.push(name); 
+        fixPages++;
+    })
+    console.log("040 STATUS make balances "+JSON.stringify(tabHeaders));
+
+
+
+    // fixed assets page
+    let assetsBase=fixPages;
+    var jAssets = sheet[D_FixAss];
+    let iRest=0n;
+    tabHeaders.push(page.fixed); 
+    fixPages++; 
+    
+
 
     // partner pages
     let partnerBase=fixPages;
     Object.keys(jPartnerReport).forEach((p,i)=>{
-        tabHeaders.push(page.Tax+jPartnerReport[i].name); 
+        tabHeaders.push(page.Tax+' '+jPartnerReport[i].name); 
         fixPages++; // partner page
     })
 
 
 
     // form pages
-    if(matrix)  Object.keys(matrix).forEach((form)=>{tabHeaders.push(form)});
+    if(matrix)  Object.keys(matrix).forEach((form)=>{tabHeaders.push('* '+form)});
 
+    console.log("060 STATUS make ("+showAccount+") tabHeaders "+JSON.stringify(tabHeaders));
 
 
     let aPages = [];
     aPages[0] = 'block';
     let numPages = fixPages+tabHeaders.length; 
     for(let p=1;p<numPages;p++) aPages[p]='none'; 
-
-
     const tabName = "Overview";
+
     
-    return (
-        <Screen prevFunc={noFunc} nextFunc={noFunc} tabSelector={tabHeaders}  tabName={tabName}> 
-           
+    let jColumnHeads=jHeads; // state variable, do not touch
+    let jSum=JSON.parse(JSON.stringify(jPageSum));
+    console.log("070 STATUS UNIFY ("+showAccount+") jSum "+JSON.stringify(jSum));
 
-            
-            <div className="FIELD" key={"Dashboard"} id={'Overview0'} style= {{ 'display': aPages[0]}} >
-                <StatusRow am1={page.Assets} am2={page.Gain}  am3={page.eqliab}/>
-                {
-                    report.map((row,line) => (
-                        <StatusRow  key={"Status"+line}  
-                                            am1={row.gLeft} tx1={row.nLeft} 
-                                            am2={row.gMidl} tx2={row.nMidl} 
-                                            am3={row.gRite} tx3={row.nRite} 
-                                            d={row.dTran} n={row.nTran} l={row.lTran}
-                                            click={(line==0)?handleReview:null}/>                       
-                    ))
-                }
-            </div>
-
-
-
-            <div className="FIELD"  key={"HGB"}  id={'Overview1'} style= {{ 'display': aPages[1]}} > 
-                <div className="attrLine">
-                    <div className="FIELD LNAM">&nbsp;</div>
-                    <div className="FIELD LNAM">{page.GainLoss + ' ' + session.year}</div>
-                </div>
-                {hgbReport.map((row,i) => (
-                    <HGB275Row  key={"HGB1"+i}  jArgs={row}  id={"Args"+i} />    
-                ))}
-            </div>
-
-
-
-            {Object.keys(jPartnerReport).map((jPartner,partnerNo) => ( 
-
-                <div className="FIELD" key={"Partner"+partnerNo} id={'Overview'+(partnerBase+partnerNo)} style= {{ 'display': aPages[partnerBase+partnerNo]}} >
+    if(showAccount && gSchema) {
+        Object.keys(aSelText).forEach(sym => 
+            {if(aJMoney[sym])  (gSchema.Names.forEach(acct => { 
+                if(acct.length>2 && jColumnHeads[acct]=='1') {   
+                    let value=aJMoney[sym][acct]; 
+                    let carry=jSum[acct];
+                    if(bigEUMoney(value)!=0n) { 
+                        try { jColumnHeads[acct]=acct; } catch(e) {}
                         
-                        <div className="attrLine"></div>
+                        // GH 20240103 if(!carry || carry.length==0) {
+                            jSum[acct]="0"; jPageSum[acct]="0";
+                        //}
+                    }
 
-                        <PartnerTitleRow p={ {'name':page.Name, 
-                            'init':page.Init, 
-                            'credit':page.Credit,
-                            'debit':page.Debit,
-                            'yearEnd':page.YearEnd,
-                            'netIncomeOTC':page.RegularOTC,
-                            'netIncomeFin':page.RegularFIN,
-                            'close':page.Close,
-                            'tax':page.PaidTax,
-                            'cyLoss':page.SecLosses,
-                            'next':page.NextYear} } />     
-
-                        <PartnerRow p={jPartnerReport[partnerNo]}/>    
-    
-                </div>
-
-            ))}
+                    if(carry && carry.length>0) { 
+                        try { jColumnHeads[acct]=acct; } catch(e) {}
+                    }
+            } }))
+        })
+        console.log("086 STATUS jColumnHeads "+JSON.stringify(jColumnHeads));
+        console.log("087 STATUS jSum "+JSON.stringify(jSum));
+        console.log("088 STATUS jPageSum "+JSON.stringify(jPageSum));
+        console.log("089 STATUS showAccount "+showAccount);
+     }
 
 
-            {matrix ? Object.keys(matrix).map((strKey,index)=>( 
-                <div className="FIELD" key={"Form"+index} id={'Overview'+(index+fixPages)} style= {{ 'display': aPages[index+fixPages+6]}} > 
-                    <div className="attrLine"/>
+    // extra footer buttons
+    let aFunc=[handleXLSave];
+    let aText=["Get XLSX"];
+    if(showAccount) {
+        aFunc.push(funcKeepReceipt); aText.push(D_CarryOver);
+        aFunc.push(funcHideReceipt); aText.push(page.DashBoard);
+    }
+
+    return (
+        <Screen tabSelector={showAccount ? [] : tabHeaders} tabName={tabName} aFunc={aFunc} aText={aText}  > 
+           
+           {showAccount &&             
+                (
+                <div className="mTable">                     
+                    { TXNReceipt(D_Account+' '+showAccount, jColumnHeads, jColumnHeads, null, session.year, removeCol) }
                     
-                    <BookingForm    strKey={strKey}  form={matrix[strKey]} preBook={preBook} />
-                    <BookingDisplay strKey={strKey}  form={displayRecord}  doBook={doBook} /> 
-                </div>
-            )) : ""}
-        
-            
-            <div className="attrLine"/>
-            <div className="attrLine"/>
+                    <TXNReceiptSum text={D_Carry} jAmounts={jPageSum} jColumnHeads={jColumnHeads} id=""/>                   
+                    { console.log("099 aSelText keys = "+Object.keys(aSelText).join('+')) ||
+                    Object.keys(aSelText).map((sym,i) => ( (sym && aSelText[sym] && aJMoney[sym] ) ? // && i>1
+                                                
+                                                            TXNReceipt(
+                                                                aSelText[sym].join(' '),
+                                                                aJMoney[sym],
+                                                                jColumnHeads,
+                                                                jSum,
+                                                                makeLabel(i,showAccount)) 
+                                                                    :""
+                                                                    )) }
+                    <TXNReceiptSum text={page.Sum} jAmounts={jSum} jColumnHeads={jColumnHeads} id="" removeCol={removeCol}/>                                                                                       
 
-            <FooterRow left={page["client"]}  right={page["register"]} prevFunc={prevFunc} nextFunc={nextFunc} miscFunc={handleXLSave} miscText="Get XLSX"/>
-            <FooterRow left={page["reference"]} right={page["author"]} prevFunc={prevFunc} nextFunc={nextFunc} miscFunc={handleXLSave} miscText="Get XLSX"/>
+                </div>
+            )}
+
+        {!showAccount &&                                                                     
+            (<div>
+                { console.log("100 STATUS show history") }
+                <div className="FIELD" key={"Dashboard"} id={'Overview0'} style= {{ 'display': aPages[0]}} >
+                    <StatusRow am1={page.Assets} am2={page.Gain}  am3={page.eqliab}/>
+                    {
+                        statusReport.map((row,line) => (
+                            <StatusRow  key={"Status"+line}  
+                                                am1={row.gLeft} tx1={row.nLeft} 
+                                                am2={row.gMidl} tx2={row.nMidl} 
+                                                am3={row.gRite} tx3={row.nRite} 
+                                                d={row.dTran} n={row.nTran} l={row.lTran}
+                                                click={(line==0)?handleReview:null}/>                       
+                        ))
+                    }
+                </div>
+
+
+
+
+                <div className="FIELD"  key={"HGB"}  id={'Overview1'} style= {{ 'display': aPages[1]}} > 
+                { console.log("110 STATUS show HBG275 S1") }
+                    <div className="attrLine">
+                        <div className="FIELD LNAM">&nbsp;</div>
+                        <div className="FIELD LNAM">{page.GainLoss + ' ' + session.year}</div>
+                    </div>
+                    {hgbReport.map((row,i) => (
+                        <HGB275Row  key={"HGB1"+i}  jArgs={row}  id={"Args"+i} />    
+                    ))}
+                </div>
+
+
+
+
+                {arrBalance.map((balance,n) => (
+                <div className="FIELD" key={"Balance0"+n} id={tabName+(balanceBase+n)} style= {{ 'display': aPages[balanceBase+n]}} >
+                        { console.log("120 STATUS showbalance "+n) }
+                        <div className="attrLine">{[page.BalanceOpen,page.BalanceClose,page.BalanceNext][n] + ' ' + (parseInt(session.year))}</div>
+                        {JSON.parse(balance).map((row,i) => ( 
+                            <BalanceRow  key={"Balance"+n+"1"+i} jArgs={row} id={i} />    
+                            
+                        ))}
+                    </div>
+                ))}
+
+
+
+                <div className="FIELD"  key={"FixedAssets"}  id={tabName+(assetsBase)}  style={{'display':aPages[assetsBase]}} >
+                    <div className="FIELD LNAM">&nbsp;</div>
+                    { console.log("130 STATUS show fixed assets ") }
+
+                    <FixedAssetsRow p={ {'idnt':'Name', 'type':'WKN/Typ', 
+                            'date':page.AcquisitionDate,
+                            'init':page.AcquisitionPrice, 
+                            'nmbr':page.AssetNumber, // 'Anzahl',
+                            'rest':page.AssetRemain, //'Zeitwert',
+                            'cost':page.AssetPrice, // 'Stückpreis',
+                            'gain':page.AssetGain  // 'Ertrag'} } />
+                            }} /> 
+
+
+                    {Object.keys(jAssets).map(function(key,n) {
+                        var row = jAssets[key];
+                        iRest+=BigInt(row.rest);
+                        return (
+                            <FixedAssetsRow  key={"Fixed0"+n}  p={{idnt:row.idnt,type:row.type,date:row.date,
+                                init:cents2EU(row.orig),
+                                nmbr:row.nmbr,
+                                rest:cents2EU(row.rest),
+                                cost:cents2EU(row.cost),
+                                gain:cents2EU(row.gain)
+                                }} />
+                        )
+                        })
+                    }
+
+                    <FixedAssetsRow p={{ 'idnt':jReport.xbrlFixed.de_DE, 'type':' ', 'date':session.year+"-12-31",
+                            'init':' ', 
+                            'nmbr':' ',
+                            'rest':cents2EU(iRest),
+                            'current':' ',
+                            'cost':' ' } }
+                    />
+                </div>
+
+
+
+                {Object.keys(jPartnerReport).map((jPartner,partnerNo) => ( 
+
+                    <div className="FIELD" key={"Partner"+partnerNo} id={tabName+(partnerBase+partnerNo)} style= {{ 'display': aPages[partnerBase+partnerNo]}} >
+                    { console.log("140 STATUS show partner "+partnerNo) }
+                            
+                            <div className="attrLine"></div>
+
+                            <PartnerTitleRow p={ {'name':page.Name, 
+                                'init':page.Init, 
+                                'credit':page.Credit,
+                                'debit':page.Debit,
+                                'yearEnd':page.YearEnd,
+                                'netIncomeOTC':page.RegularOTC,
+                                'netIncomeFin':page.RegularFIN,
+                                'close':page.Close,
+                                'tax':page.PaidTax,
+                                'cyLoss':page.SecLosses,
+                                'next':page.NextYear} } />     
+
+                            <PartnerRow p={jPartnerReport[partnerNo]}/>    
+        
+                    </div>
+
+                ))}
+
+
+                {matrix ? Object.keys(matrix).map((strKey,index)=>( 
+                    <div className="FIELD" key={"Form"+index} id={tabName+(index+fixPages)} style= {{ 'display': aPages[index+fixPages+6]}} > 
+                        { console.log("150 STATUS show txn pattern "+index) }
+                        <div className="attrLine"/>
+                        
+                        <BookingForm    strKey={strKey}  form={matrix[strKey]} preBook={preBook} />
+                        <BookingDisplay strKey={strKey}  form={displayRecord}  doBook={doBook} /> 
+                    </div>
+                )) : ""}
+            
+                
+                <div className="attrLine"/>
+                <div className="attrLine"/>
+
+            </div>
+            )}
+
+            <FooterRow left={page.client}  midleft={page.author}  midright={page.register} right={page.reference}/>
+
         </Screen>
     )   
 }
 
 
-function showAccount(shrtName) { console.log("SHOW ACCOUNT "+shrtName); window.open("/History?client=HGKG&year=2023&APATTERN="+shrtName+"&SELECTALL=1"); }
+function TXNReceipt(text,jAmounts,jColumnHeads,jSum,id,removeCol) {
+    
+    Object.keys(jAmounts).forEach(acct=>{
+        let value = jAmounts[acct];        
+        if(jSum && value && value.length>2) {   
+            console.log("TXNReceipt "+acct+" add "+value);        
+            if(jSum[acct]) {
+                jSum[acct] = cents20EU(bigEUMoney(jSum[acct]) + bigEUMoney(value));
+            }
+        }
+    })
+    if(jSum) console.log("TXNReceipt jSum "+JSON.stringify(jSum));
+    
 
-function StatusRow({ am1,tx1, am2, tx2, am3, tx3, d, n, l, click}) {
-    return(
+    return( // FIELD
+        <div>
+            <div className="attrLine"> <div className="FIELD"></div></div>
+            <div className="attrLine"> <div className="FIELD">{text} {id}</div></div>
+            <HistoryRow jValues={jAmounts} jColumnHeads={jColumnHeads} removeCol={removeCol}/>
+        </div>
+        
+)}      
+function TXNReceiptSum(args) {
+    return TXNReceipt(args.text,args.jAmounts,args.jColumnHeads,null,args.id,args.removeCol);
+}
+function nop() {}
+
+
+function HistoryRow(args) { 
+    let amounts =[]; let cols=[];  let count=0;
+    let off = args.removeCol ? args.removeCol : nop;
+    Object.keys(args.jColumnHeads).forEach(c=>
+        {if(args.jColumnHeads[c] && args.jColumnHeads[c].length>1 && count++<12 ) { cols.push(c); amounts.push(args.jValues[c]?args.jValues[c]:"-,--")}});
+    return (
         <div className="attrLine">
-            <div className="FIELD MOAM"> {cents2EU(am1)}</div>
-            <div className="FIELD SYMB" onClick={(e)=>showAccount(tx1)}> {tx1}</div>
-            <div className="FIELD SEP"> &nbsp;</div>
-            <div className="FIELD MOAM"> {cents2EU(am2)}</div>
-            <div className="FIELD SYMB" onClick={(e)=>showAccount(tx2)}> {tx2}</div>
-            <div className="FIELD SEP"> &nbsp;</div>
-            <div className="FIELD MOAM"> {cents2EU(am3)}</div>
-            <div className="FIELD SYMB" onClick={(e)=>showAccount(tx3)}> {tx3}</div>
-            <div className="FIELD DASH"> &nbsp;</div>
-            <div className="FIELD SEP"> &nbsp;</div>
-            <div className="FIELD SYMB"> {d}</div>
-            <div className="FIELD NAME"> {n}</div>
-            <div className="FIELD">{l}</div>
-            {click==null ? (<div className="FIELD SEP"> &nbsp;</div>) : (
-            <div className="FIELD"  onClick={(() => click())}>&nbsp;.&nbsp;</div>
-            ) }
+            { amounts.map((value,i)=>(
+                <div className="FIELD MOAM" key={'sel'+i} onClick={()=>{off(cols[i])}}>{value}</div>
+            )) }
         </div>
     )
+    
 }
 
-
-export function makeHGBReport(response) {
+function makeHGBReport(jAccounts,page,jReport) {
 
     let balance = []; 
-
-    var jReport = response[D_Report];
     
-    console.log("makeReport from response D_Report"+JSON.stringify(Object.keys(jReport)));
-    var jAccounts = response[D_Balance];
-    let page = response[D_Page];
+    console.log("makeReport from response D_Report "+JSON.stringify(Object.keys(jReport)));
               
     if(page) {           
         var chgb1 = 0n; // Umsatz
@@ -816,7 +1131,7 @@ export function makeHGBReport(response) {
             //console.log("GALOS "+JSON.stringify(gls)); 
             jAccounts["xbrlRegular"]=gls;
         }
-        console.log("makeReport from response D_Balance"+JSON.stringify(Object.keys(jAccounts)));
+        console.log("makeReport from response D_Balance "+JSON.stringify(Object.keys(jAccounts)));
 
         
         // build two columns
@@ -847,7 +1162,7 @@ export function makeHGBReport(response) {
             var cBegin= BigInt(account.init);
             var cClose = BigInt(account.yearEnd);
             var cNext = BigInt(account.next);
-            console.log("EqLiab account ="+JSON.stringify(account));
+            //console.log("EqLiab account ="+JSON.stringify(account));
     
            iLeft = fillLeft(balance,cBegin,cClose,cNext,iName,iLeft);
         }
@@ -944,6 +1259,174 @@ function HGB275Row({ jArgs, id }) {
     )
 }
 
+
+function makeBalance(jAccounts,jReport,value) {
+
+    let balance = new Array();
+
+    // console.log("makeBalance 001 from response D_Report"+JSON.stringify(Object.keys(jReport)));
+
+
+    let ass,eql,gls;
+    // add three additional accounts: ASSETS, EQLIAB, GAINLOSS
+    if(jReport["xbrlAssets"].account) { 
+        ass = jReport["xbrlAssets"].account; 
+        //console.log("ASSET "+JSON.stringify(ass)); 
+        jAccounts["xbrlAssets"]=ass;
+    }
+    if(jReport["xbrlEqLiab"].account) { 
+        eql = jReport["xbrlEqLiab"].account; 
+        //console.log("EQLIB "+JSON.stringify(eql)); 
+        jAccounts["xbrlEqLiab"]=eql;
+    }
+    if(jReport["xbrlRegular"].account) { 
+        gls = jReport["xbrlRegular"].account; 
+        //console.log("GALOS "+JSON.stringify(gls)); 
+        jAccounts["xbrlRegular"]=gls;
+    }
+    //console.log("makeBalance from response D_Balance"+JSON.stringify(Object.keys(jAccounts)));
+
+    
+    // build three columns
+    let aLeft={};
+    let aRite={};
+
+    for (let name in jAccounts)   {
+        var account=jAccounts[name];
+        if(account.xbrl.length>1) {
+            var xbrl = account.xbrl.split('\.').reverse();
+            var xbrl_pre = xbrl.pop()+ "."+ xbrl.pop();
+            if(xbrl_pre===X_ASSETS) aLeft[name]=account;            
+            if(xbrl_pre===X_EQLIAB) aRite[name]=account;
+        }
+    }
+    
+    var iEqLiab=0n;
+    var income=0n;
+
+    
+ 
+    var iRite=3;
+    var iLeft=3;
+    balance.push({  });
+    const aTag = Object.keys(jReport);
+    balance.push({ 'tw1':jReport.xbrlAssets.de_DE,/* 'am1': (""+aTag),*/ 'tx1':jReport.xbrlEqLiab.de_DE });
+
+    for (let tt=0;tt<aTag.length;tt++)   {
+        let tag=aTag[tt];
+        //console.log("makeBalance 005 Report "+JSON.stringify(jReport[tag]));
+        
+        var element    =  jReport[tag];
+        var level     =  element.level;
+        var account  = element.account;
+        var dispValue = account[value]; // account.yearEnd;
+        var iName    =    account.name;
+        var full_xbrl  =  account.xbrl;
+
+        if(dispValue && iName && full_xbrl) {
+            // collect compute total right side amount
+            if(full_xbrl==='de-gaap-ci_bs.eqLiab') { iEqLiab=BigInt(dispValue);  }
+            if(full_xbrl==='de-gaap-ci_is.netIncome.regular') { income=BigInt(dispValue); }
+            if(full_xbrl==='de-gaap-ci_bs.eqLiab.income') { 
+                let bIncome=(income+iEqLiab); 
+                //console.log("INCOME = "+bIncome);
+                dispValue=bIncome;
+            }
+
+            var xbrl = full_xbrl.split('\.');
+            var side = xbrl[1];
+           
+            //console.log('makeBalance side='+side + "  in "+full_xbrl + "= "+dispValue);
+
+            if(side=='ass') {
+                if(iLeft<SCREENLINES) {
+                    if(!balance[iLeft]) balance[iLeft]={};
+                    balance[iLeft].tw1=iName;
+                    let cValue=cents2EU(dispValue);
+                    if(level==1) { balance[iLeft].am1=cValue; }
+                    if(level==2) { balance[iLeft].am2=cValue; }
+                    if(level==3) { balance[iLeft].am3=cValue; }
+                    if(level==4) { balance[iLeft].am4=cValue; }
+                    iLeft++;
+                }
+            } else {
+                if(iRite<SCREENLINES) {
+                    if(!balance[iRite]) balance[iRite]={};
+                    let cValue=cents2EU(dispValue);
+                    balance[iRite].tx1=iName;
+                    if(level==1) { balance[iRite].an1=cValue; }
+                    if(level==2) { balance[iRite].an2=cValue; }
+                    if(level==3) { balance[iRite].an3=cValue; }
+                    if(level==4) { balance[iRite].an4=cValue; }
+                    iRite++;
+                }
+            }
+
+
+        } else {
+            // divider line out
+        }
+    }
+
+    while(iRite<=SCREENLINES && iLeft<=SCREENLINES) {
+        balance.push({  });
+        iLeft++;
+        iRite++;
+    }
+
+    console.log('makeBalance('+value+') EXIT '+JSON.stringify(balance));
+
+    return JSON.stringify(balance);
+    /*
+    return [ 
+        { tw1:'Gebäude    ',   am3:' 7,35' },
+        { tw1:'Grundstücke',   am3:'10,00' },
+        { tw1:'Sachanlagen',   am2:'17,35',  tx1:'Stammkapital',  an2:'17,35' },
+        { tw1:'Aktien',        am3:'80,55',  },
+        { tw1:'Münzen',        am3:'17,00',  },
+        { tw1:'Finanzanlagen', am2:'97,55',  tx1:'Kredite', an2:'97,55' },
+        { tw1:'Aktiva',       am1:'114,90',  tx1:'Passiva',an1:'114,90' }
+        ]
+      */  
+}
+
+function BalanceRow({ jArgs, id }) {
+    if(jArgs)
+    return(
+        <div className={"attrLine"} >
+            <div className="FIELD LNAM"> {jArgs.tw1}</div>
+            <div className="FIELD MOAM"> {jArgs.am4}</div>
+            <div className="FIELD MOAM"> {jArgs.am3}</div>
+            <div className="FIELD MOAM"> {jArgs.am2}</div>
+            <div className="FIELD MOAM"> {jArgs.am1}</div>
+            <div className="FIELD SEP">|&nbsp;</div>
+            <div className="FIELD LNAM"> {jArgs.tx1}</div>
+            <div className="FIELD MOAM"> {jArgs.an4}</div>
+            <div className="FIELD MOAM"> {jArgs.an3}</div>
+            <div className="FIELD MOAM"> {jArgs.an2}</div>
+            <div className="FIELD MOAM"> {jArgs.an1}</div>
+        </div>
+    )
+}
+
+
+function FixedAssetsRow(mRow) {
+    console.log("FixedAssetsRow mRow="+JSON.stringify(mRow));
+    return (
+        <div className="attrLine">
+            <div className="FIELD LNAM">{mRow.p.idnt}</div>
+            <div className="FIELD NAME">{mRow.p.type}</div>
+            <div className="FIELD NAME">{mRow.p.date}</div>
+            <div className="FIELD MOAM">{mRow.p.init}</div>
+            <div className="FIELD MOAM">{mRow.p.nmbr}</div>
+            <div className="FIELD MOAM">{mRow.p.rest}</div>
+            <div className="FIELD MOAM">{mRow.p.cost}</div>
+            <div className="FIELD MOAM">{mRow.p.gain}</div>
+        </div>        
+    )
+}
+
+
 function PartnerRow(mRow) {
     console.log("PartnerRow mRow="+JSON.stringify(mRow));
     return (
@@ -980,6 +1463,17 @@ function PartnerTitleRow(mRow) {
             <div className="FIELD TEAM">{cents2EU(mRow.p.cyLoss)}</div>
             <div className="FIELD TEAM">{cents2EU(mRow.p.next)}</div>
         </div>
+    )
+}
+
+function FooterRow({left,midleft,midright,right}) {
+    return(
+            <div className="attrLine">
+                <div className="FIELD XFER">{left},&nbsp;</div>
+                <div className="FIELD XFER">{midleft},&nbsp;</div>
+                <div className="FIELD L280">{midright}</div>
+                <div className="FIELD L280">{right}</div>
+            </div>
     )
 }
 

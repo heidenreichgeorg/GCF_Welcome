@@ -60,9 +60,11 @@ input[type=number] {
 .key      {  padding: 1px; height:14px;  margin: 0px; border-color: #817137; border-style: solid; float: left; background-color:transparent; font-family:  inherit; font-size: inherit; font-weight:600; color: #c9a935; }
 .box      {  height:40px;  margin: 0px;               border-color: #817137; border-style: solid; float: left; background-color:transparent; font-family:  inherit; font-size: inherit; font-weight:600; color: #c9a935; }
 
-.SWITCH  {                   padding: 1px; border: none; font-size: 12px; font-weight:400;  } 
-.BIGCELL {                   padding: 1px;               float: left; color:inherit;min-height: 48px; font-family: inherit; font-size: 11px; font-weight:400; text-align: center; background-color: inherit; } 
+.SWITCH   {                   padding: 1px; border: none; font-size: 12px; font-weight:400;  } 
+.BIGCELL  {                   padding: 1px;               float: left; color:inherit;min-height: 48px; font-family: inherit; font-size: 11px; font-weight:400; text-align: center; background-color: inherit; } 
 .FIELD    { overflow:hidden; padding: 1px; border: none; float: left;                                 font-family: inherit; font-size: inherit; font-weight:inherit; color: inherit;} 
+
+.PAGE     {  break-before: always;  page-break-before: always; display: block; } 
 
 .DASH     { width: 0.8rem; text-align: center; border-left-color: #817137; border-left-style: solid; border-left-width: 1px; }		
 .SEP      { width: 0.8rem; text-align: center; }		
@@ -86,15 +88,3 @@ input[type=number] {
 .L280     { width:12rem; text-align: left;} 
 .LTXT     { width:14rem; text-align: left;}
 .FLEX     { width:49rem; text-align: left;} 
-
-
-#wrapper {position: relative;  margin: auto; }
-#meter { width: 100%; height: 100%;  transform: rotateX(180deg); }
-.circle {fill: none; }
-.outline, #mask {stroke: #F1F1F1;  stroke-width: 65; }
-.range {stroke-width: 60; }
-#slider, #lbl {position: absolute; }
-#slider { cursor: pointer;  left: 0;  margin: auto;  right: 0;  top: 58%;  width: 94%; }
-#lbl {  background-color: #4B4C51; border-radius: 2px; color: white; font-family: 'courier new'; font-size: 15pt; font-weight: bold; padding: 4px 4px 2px 4px; right: -48px; top: 57%; }
-#meter_needle { height: 40%; left: 0; margin: auto; position: absolute; right: 0; top: 10%;  transform-origin: bottom center;  /*orientation fix*/  transform: rotate(270deg); }
-.caption {color:#223377;}
