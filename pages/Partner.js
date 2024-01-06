@@ -21,7 +21,7 @@ for each account in D_Balance with XBRL=de-gaap-ci_bs.ass.currAss.receiv.unpaidC
 import { useEffect, useState   } from 'react';
 import Screen from './Screen.js'
 import FooterRow from '../components/FooterRow.js'
-import { REACT_APP_API_HOST,getSession,useSession } from '../modules/sessionmanager.js';
+import { REACT_APP_API_HOST,getSession,useSession } from '../modules/sessionmanager';
 import { cents2EU } from  '../modules/money'
 import { makeHGBReport } from "../modules/App.js"
 import { X_ASSET_CAPTAX, X_ASSET_UNPCAP, D_Balance, D_Partner, D_Page, SCREENLINES }  from '../modules/terms.js';

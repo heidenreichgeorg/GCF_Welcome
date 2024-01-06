@@ -4,7 +4,7 @@
 
 import { useEffect, useState  } from 'react';
 import Screen from './Screen.js'
-import { getSession,useSession } from '../modules/sessionmanager.js';
+import { getSession,useSession } from '../modules/sessionmanager';
 import { D_FixAss,  D_Balance, D_Page, D_Partner }  from '../modules/terms.js';
 import FooterRow from '../components/FooterRow.js';
 

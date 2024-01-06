@@ -12,7 +12,7 @@ import { addTXNData, FieldRow, InputRow }  from '../modules/App.js';
 import { cents2EU, bigEUMoney }  from '../modules/money';
 import { book, prepareTXN } from '../modules/writeModule.js';
 import { D_Balance, D_FixAss, D_Page, D_Report, D_Schema, SCREENLINES, X_ASSETS, X_EQUITY, X_EQLIAB, X_INCOME, X_INCOME_REGULAR } from '../modules/terms.js'
-import { getSession,resetSession,useSession } from '../modules/sessionmanager.js';
+import { getSession,resetSession,useSession } from '../modules/sessionmanager';
 
 export default function Operations() {
     

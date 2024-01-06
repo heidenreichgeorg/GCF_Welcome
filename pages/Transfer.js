@@ -5,7 +5,7 @@ import Screen from './Screen.js'
 import { addTXNData, getSelect, getValue, InputRow, setSelect }  from '../modules/App.js';
 import { book, prettyTXN, prepareTXN }  from '../modules/writeModule.js';
 import {CSEP, D_Adressen, D_Balance, D_FixAss, D_Page, D_History, D_Schema,  X_ASS_CASH, X_EQLIAB, X_INCOME, X_LIABILITY } from '../modules/terms.js'
-import { getSession, resetSession, useSession } from '../modules/sessionmanager.js';
+import { getSession, resetSession, useSession } from '../modules/sessionmanager';
 import { cents2EU, bigEUMoney }  from '../modules/money';
 
 export default function Transfer() {
