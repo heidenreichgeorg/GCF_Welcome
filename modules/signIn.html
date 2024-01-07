@@ -62,9 +62,9 @@ function signIn() {
         console.log("signIn with U="+user+"  Y="+year+ " C="+client);
         console.log("signIn with U="+user+"  Y="+year+ " C="+client);
         let hash = currentHash(client,year);
-        let url="/Status?client="+client+"&year="+year+"&auth="+hash;
+        let url="https://gcf-welcome-heidenreichgeorg.vercel.app/Status?client="+client+"&year="+year+"&auth="+hash;
         document.getElementById('url').value=hash;
-        alert("Login with "+url);
+        alert(url);
     }
     
 }
