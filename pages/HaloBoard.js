@@ -4,7 +4,7 @@
 
 import { useEffect, useState  } from 'react';
 import Screen from './Screen.js'
-import { getSession,useSession } from '../modules/sessionmanager.js';
+import { getSession,useSession } from '../modules/sessionmanager';
 import { D_FixAss,  D_Balance, D_Page, D_Partner }  from '../modules/terms.js';
 import FooterRow from '../components/FooterRow.js';
 
@@ -81,7 +81,7 @@ export default function DashBoard({value}) {
     let ycenter=120;
 
     return (
-        <Screen prevFunc={prevFunc} nextFunc={nextFunc} >
+        <Screen  aFunc={[prevFunc, nextFunc]} aText={["PREV","NEXT"]} >
             <div classname="attrLine">
             <svg viewBox="0 0 230 250" height="720" width="760" background-color="#000000">
                 <defs>

@@ -5,7 +5,7 @@ import Screen from './Screen.js'
 import { addTXNData, getSelect, getValue, InputRow, setSelect }  from '../modules/App.js';
 import { book, prettyTXN, prepareTXN }  from '../modules/writeModule.js';
 import {CSEP, D_Adressen, D_Balance, D_FixAss, D_Page, D_History, D_Schema,  X_ASS_CASH, X_EQLIAB, X_INCOME, X_LIABILITY } from '../modules/terms.js'
-import { getSession, resetSession, useSession } from '../modules/sessionmanager.js';
+import { getSession, resetSession, useSession } from '../modules/sessionmanager';
 import { cents2EU, bigEUMoney }  from '../modules/money';
 
 export default function Transfer() {
@@ -112,7 +112,7 @@ export default function Transfer() {
 
     if(!sheet) return null; // 'Loading...';
 
-    function prevFunc() {console.log("CLICK PREVIOUS"); window.location.href="/Status?client="+session.client+"&year="+session.year; }
+    function prevFunc() {console.log("CLICK PREVIOUS"); window.location.href="/Partner?client="+session.client+"&year="+session.year; }
     function nextFunc() {  console.log("CLICK NEXT");   window.location.href="/Accounts?client="+session.client+"&year="+session.year; }
 
     let page = sheet[D_Page];
@@ -190,7 +190,7 @@ export default function Transfer() {
 
     const tabName = 'TXNContent';
     return (
-        <Screen prevFunc={prevFunc} nextFunc={nextFunc} tabSelector={aNums} tabName={tabName}>
+        <Screen  aFunc={[prevFunc, nextFunc]} aText={["PREV","NEXT"]}  tabSelector={aNums} tabName={tabName}>
             <CreditorRow/> 
             <div className="attrLine">
                 <div className="FIELD XFER">{page.Expenses}</div>

@@ -1,28 +1,26 @@
 
 
 .goldScreen{  
+  background: radial-gradient(ellipse at center, #443501 0%,#000000 100%);
+	height: 100%;
+	width: 80rem;
+  margin: 0;
+  font-family: Bahnschrift, monospace, sans-serif;
   padding: 14px; 
   border-style: none; 
   border-radius: 10px; 
   border-width: 2px; 
   border-color: #91740e;  
   color: #c9a935; 
-  background: radial-gradient(ellipse at center, #443501 0%,#000000 100%);
-	height: 100%;
-  margin: 0;
-  font-family: Bahnschrift, monospace, sans-serif;
 }
 
 .printerPaper{   
   background: #ffffff;
 	height: 100%;
-  margin: 0;
+	width: 80rem;
   font-family: Bahnschrift, monospace, sans-serif;
   padding: 14px; 
-  border-style: solid; 
-  border-radius: 10px; 
-  border-width: 2px; 
-  border-color: #ffffff;  
+  border:none;
   color: #000000; 
 }
 
@@ -30,7 +28,7 @@
 .mTable   { font-family: Bahnschrift,monospace;                             height: 680px;             display:table;    page-break-after: always  }
 
 
-.console  { color:#c9a935; background-color:inherit; font-family :Courier; font-size: 8px; }
+.console  { color:#c9a935; background-color:inherit; font-family :Courier; font-size: 0.9em; }
 
 
 input {
@@ -39,9 +37,7 @@ input {
     background-clip: text;
     -webkit-text-fill-color: transparent;
     font-family: 'Bahnschrift', 'Playfair Display', serif;
-	  taxt-transform: uppercase;	
 }
-
 
 
 input::-webkit-outer-spin-button,
@@ -54,31 +50,31 @@ input[type=number] {
   -moz-appearance:textfield;
 }
 
-.attrRow  {                       width:75rem; padding: 1px; float: left;  min-height: 16px; height: 17px; font-family :inherit; font-size: 11px; font-weight:400; text-align: center;}
-.attrLine { vertical-align: top;  width:75rem; padding: 1px; float: left;  min-height: 16px; height: 17px; font-family :inherit; font-size: 11px; font-weight:400; text-align: center;}
+.attrRow  {                       width:75rem; padding: 1px; float: left;  min-height: 16px; height: 17px; font-family :inherit; font-size: 0.7em; font-weight:400; text-align: center;}
+.attrLine { vertical-align: top;  width:75rem; padding: 1px; float: left;  min-height: 16px; height: 17px; font-family :inherit; font-size: 0.7em; font-weight:400; text-align: center;}
 
 .key      {  padding: 1px; height:14px;  margin: 0px; border-color: #817137; border-style: solid; float: left; background-color:transparent; font-family:  inherit; font-size: inherit; font-weight:600; color: #c9a935; }
 .box      {  height:40px;  margin: 0px;               border-color: #817137; border-style: solid; float: left; background-color:transparent; font-family:  inherit; font-size: inherit; font-weight:600; color: #c9a935; }
 
-.SWITCH   {                   padding: 1px; border: none; font-size: 12px; font-weight:400;  } 
-.BIGCELL  {                   padding: 1px;               float: left; color:inherit;min-height: 48px; font-family: inherit; font-size: 11px; font-weight:400; text-align: center; background-color: inherit; } 
+.SWITCH   {                   padding: 1px; border: none; font-size: 1em; font-weight:400;  } 
+.BIGCELL  {                   padding: 1px;               float: left; color:inherit;min-height: 48px; font-family: inherit; font-size: 0.8em; font-weight:400; text-align: center; background-color: inherit; } 
 .FIELD    { overflow:hidden; padding: 1px; border: none; float: left;                                 font-family: inherit; font-size: inherit; font-weight:inherit; color: inherit;} 
 
 .PAGE     {  break-before: always;  page-break-before: always; display: block; } 
 
 .DASH     { width: 0.8rem; text-align: center; border-left-color: #817137; border-left-style: solid; border-left-width: 1px; }		
 .SEP      { width: 0.8rem; text-align: center; }		
-.TRASH    { width: 1rem; text-align: center; font-size:21px; height:17px; vertical-align: top;}		
+.TRASH    { width: 1rem; text-align: center; font-size:2em; height:17px; vertical-align: top;}		
 .TAG      { width: 1.8rem; text-align: left;  }		
 .SYMB     { width: 3rem;  text-align: left; }		
 .DATE     { width: 4rem;  text-align: center; }		
-.MOAM     { width: 5.2rem; text-align: right; font-family:monospace; }
+.MOAM     { width: 5.2rem; text-align: right; font-family:monospace; font-size:1.3em;}
 .TEAM     { width: 5.3rem; text-align: right; }
 .SNAM     { width: 5.8rem; text-align: left; }		
 .C100     { width: 6rem; }
 .R105     { width: 6rem; text-align: right; }
 .TENY     { width: 7rem;  text-align: right; }
-.MONY     { width: 7rem; text-align: right; font-family:monospace; }
+.MONY     { width: 7rem; text-align: right; font-family:monospace; font-size:1.3em; }
 .NAME     { width: 7rem; text-align: left;  }
 .CNAM     { width: 7rem; text-align: center;  }
 .CNAMF    { width: 7.3rem; text-align: center;  }

@@ -21,7 +21,7 @@ for each account in D_Balance with XBRL=de-gaap-ci_bs.ass.currAss.receiv.unpaidC
 import { useEffect, useState   } from 'react';
 import Screen from './Screen.js'
 import FooterRow from '../components/FooterRow.js'
-import { REACT_APP_API_HOST,getSession,useSession } from '../modules/sessionmanager.js';
+import { REACT_APP_API_HOST,getSession,useSession } from '../modules/sessionmanager';
 import { cents2EU } from  '../modules/money'
 import { makeHGBReport } from "../modules/App.js"
 import { X_ASSET_CAPTAX, X_ASSET_UNPCAP, D_Balance, D_Partner, D_Page, SCREENLINES }  from '../modules/terms.js';
@@ -42,8 +42,8 @@ export default function Partner() {
 
     if(!sheet) return null; //'Loading...';
 
-    function prevFunc() {console.log("CLICK PREVIOUS"); window.location.href="/HGB275S2Page?client="+session.client+"&year="+session.year; }
-    function nextFunc() {  console.log("CLICK NEXT");   window.location.href="/Status?client="+session.client+"&year="+session.year; }
+    function prevFunc() {console.log("CLICK PREVIOUS"); window.location.href="/Operations?client="+session.client+"&year="+session.year; }
+    function nextFunc() {  console.log("CLICK NEXT");   window.location.href="/Transfer?client="+session.client+"&year="+session.year; }
     
     let page = sheet[D_Page];
     
@@ -148,7 +148,7 @@ export default function Partner() {
     
     const tabName = 'PartnerContent';
     return (
-        <Screen prevFunc={prevFunc} nextFunc={nextFunc} tabSelector={Object.keys(jPartnerReport).map((i)=>(jPartnerReport[i].name))} tabName={tabName} >
+        <Screen  aFunc={[prevFunc, nextFunc]} aText={["PREV","NEXT"]} tabSelector={Object.keys(jPartnerReport).map((i)=>(jPartnerReport[i].name))} tabName={tabName} >
 
             <div className="attrLine">{page.GainLoss + ' ' + session.year}</div>
 
@@ -232,7 +232,7 @@ export default function Partner() {
             .catch((err) => console.error("1127 handleJSONSave ERR "+err));
             
         } catch(err) { console.log("1117 GET /JSON handleJSONSave:"+err);}
-        console.log("1140 Status.handleJSONSave EXIT");
+        console.log("1140 Partner.handleJSONSave EXIT");
     }
 
     

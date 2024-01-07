@@ -22,8 +22,8 @@ const { session, status } = useSession()
     if(!sheet) return null; //'Loading...';
 
     
-    function prevFunc() {console.log("CLICK PREVIOUS"); window.location.href="/FixedAssets?client="+session.client+"&year="+session.year; }
-    function nextFunc() {  console.log("CLICK NEXT");   window.location.href="Status?client="+session.client+"&year="+session.year; }
+    function prevFunc() {console.log("CLICK PREVIOUS"); window.location.href="/HaloBoard?client="+session.client+"&year="+session.year; }
+    function nextFunc() {  console.log("CLICK NEXT");   window.location.href="/History?client="+session.client+"&year="+session.year; }
 
     let page = sheet[D_Page];
     
@@ -36,7 +36,7 @@ const { session, status } = useSession()
 
     const tabName = 'HGBContent';
     return (
-        <Screen prevFunc={prevFunc} nextFunc={nextFunc} tabSelector={aPages}  tabName={tabName}>
+        <Screen  aFunc={[prevFunc, nextFunc]} aText={["PREV","NEXT"]} tabSelector={aPages}  tabName={tabName}>
             {report.map((balance,n) => ( 
                 <div className="attrLine"  key={"HGB0"+n}  id={tabName+n} style= {{ 'display': aPages[n]}} > 
                     <div className="FIELD">

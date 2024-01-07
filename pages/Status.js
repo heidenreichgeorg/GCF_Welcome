@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { getSession, useSession, REACT_APP_API_HOST,getCarryOver,storeCarryOver } from '../modules/sessionmanager';
 import { symbolic }  from '../modules/session';
-import Screen from '../pages/Screen'
+import Screen from './Screen'
 import { cents2EU,bigUSMoney,cents20EU,bigEUMoney }  from '../modules/money';
 import { CSEP, D_Account, D_Balance, D_Carry, D_CarryOver, D_Page, D_Partner, D_FixAss, D_History, D_Report, D_Schema, J_ACCT, SCREENLINES, X_ASSET_CAPTAX, X_ASSETS, X_EQLIAB } from '../modules/terms.js'
 import { book,prepareTXN,makeHistory }  from '../modules/writeModule';
@@ -9,7 +9,7 @@ import { makeStatusData }  from '../modules/App';
 
 // the ORIGINAL FORMAT from journal sheet is 
 // columns format CSV with these columns 
-// HASH DATE SENDER REFACCT REASON REFCODE GRSB EBKS CDAK COGK FSTF NKFO KEST KESO VAVA - 
+// HASH DATE SENDER REFACCT REASON REFCODE GRSB EBKS CDAK COGK FSTF NKFO KEST KESO VAVA - MIET AUFW NKG EZIN AZIN FSAL - NKHA KAUT D586 
 
 /* global BigInt */
 
@@ -19,8 +19,7 @@ import { makeStatusData }  from '../modules/App';
 // buildTransaction will generate the 
 // flow format 
 // "sender":SENDER,"reason":REASON,"credit":{"COGK":{"index":10,"value":"100,00"}},"debit":{"K2TO":{"index":33,"value":"100,00"}},"balance":""}
-// this format is for AccountTemplateRow and setTxnthe external book method
-
+// this format is for AccountTemplateRow and setTxn - the external book method
 export default function Status() {
     
 
@@ -301,7 +300,7 @@ export default function Status() {
                 <div className="FIELD SYMB" onClick={(e)=>displayAccount(tx3)}> {tx3}</div>
                 <div className="FIELD DASH"> &nbsp;</div>
                 <div className="FIELD SEP"> &nbsp;</div>
-                <div className="FIELD SYMB"> {d}</div>
+                <div className="FIELD DATE"> {d}</div>
                 <div className="FIELD NAME"> {n}</div>
                 <div className="FIELD">{l}</div>
                 {click==null ? (<div className="FIELD SEP"> &nbsp;</div>) : (
