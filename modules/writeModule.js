@@ -6,7 +6,8 @@ import { accessFirebase,bucketUpload,loadFBConfig } from './fireBaseBucket'
 import {  J_ACCT, COLMIN, DOUBLE } from './terms.js'
 import { REACT_APP_API_HOST } from "./sessionmanager"
 import { bigEUMoney, cents2US, cents2EU, cents20EU } from './money'
-import { setSession,strSymbol,timeSymbol } from './serverSession'
+import { strSymbol,timeSymbol } from './login'
+import { setSession } from './serverSession'
 import { compile } from './compile'
 
 const debug=true;

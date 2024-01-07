@@ -1,6 +1,6 @@
-
+import { timeSymbol } from '../modules/login'
 import { J_ACCT } from '../modules/terms.js'
-import { HTTP_OK, HTTP_WRONG, timeSymbol } from '../modules/serverSession'
+import { HTTP_OK, HTTP_WRONG } from '../modules/serverSession'
 import { REACT_APP_API_HOST } from '../modules/sessionmanager';
 
 const CSV_RS = '\n';
