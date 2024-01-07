@@ -7,9 +7,8 @@ import { D_Account, D_Carry, D_CarryOff, D_CarryOver, D_History, D_Page, D_Recei
 import Screen from '../pages/Screen'
 import FooterRow from '../components/FooterRow'
 import { cents20EU }  from '../modules/money';
-import { symbolic }  from '../modules/session';
 import { getParam }  from '../modules/App';
-import { CSEP,makeHistory }  from '../modules/writeModule';
+import { CSEP,makeHistory,symbolic }  from '../modules/writeModule';
 import { getSession,getCarryOver,storeCarryOver, useSession } from '../modules/sessionmanager';
 import { bigEUMoney } from '../modules/money.mjs';
 

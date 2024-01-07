@@ -1,10 +1,9 @@
 import { useEffect, useState } from 'react';
 import { getSession, useSession, REACT_APP_API_HOST,getCarryOver,storeCarryOver } from '../modules/sessionmanager';
-import { symbolic }  from '../modules/session';
 import Screen from './Screen'
 import { cents2EU,bigUSMoney,cents20EU,bigEUMoney }  from '../modules/money';
 import { CSEP, D_Account, D_Balance, D_Carry, D_CarryOver, D_Page, D_Partner, D_FixAss, D_History, D_Report, D_Schema, J_ACCT, SCREENLINES, X_ASSET_CAPTAX, X_ASSETS, X_EQLIAB } from '../modules/terms.js'
-import { book,prepareTXN,makeHistory }  from '../modules/writeModule';
+import { book,prepareTXN,makeHistory,symbolic }  from '../modules/writeModule';
 import { makeStatusData }  from '../modules/App';
 
 // the ORIGINAL FORMAT from journal sheet is 
