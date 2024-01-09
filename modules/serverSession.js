@@ -106,7 +106,7 @@ function processArgv(processArgv) {
             }        
             else if(attribute[0].toLowerCase()==='auto') {
                 let autoSec = parseInt(attribute[1]); // auto save time-interval
-                autoSave = autoSec * 1000;
+                let autoSave = autoSec * 1000;
                 console.log("0008C Starting server SET autoSave " + autoSec+ " [sec.]");
             }        
         }

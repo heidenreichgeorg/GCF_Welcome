@@ -251,7 +251,7 @@ export async function sendFile(sig, response) {  // was fs.exists() GH20230401
 
 export async function save2Bucket(jConfig,session,client,year) {
 
-    if(jConfig && jConfig.bucket) {
+    if(jConfig) {
         console.log("0034 save2Bucket Start saving("+JSON.stringify(Object.keys(session))+") to FB for "+client+","+year);        
 
         // FIREBASE
