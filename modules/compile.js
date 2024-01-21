@@ -214,7 +214,7 @@ var autoSave=36000000; // seconds, defaults to ten-hourly-save
 // XBRL
 function initBalance() {
 
-    var balance = [];
+    var balance = {}; // GH20240121 was []
 
     balance[D_Balance]={};
     balance[D_History]={};
@@ -238,6 +238,7 @@ function initBalance() {
         xbrlAcurr:  {  level:2, xbrl: "de-gaap-ci_bs.ass.currAss", de_DE:'Umlaufvermögen'},
         xbrlAssets :{  level:1, xbrl: "de-gaap-ci_bs.ass", de_DE:'Aktiva'},
         divider:    {  level:0, xbrl: "", de_DE:''},
+        xbrlLadva:  {  level:3, xbrl: "de-gaap-ci_bs.eqLiab.liab.advPaym", de_DE:'Anzahlungen'},
         xbrlLother: {  level:3, xbrl: "de-gaap-ci_bs.eqLiab.liab.other", de_DE:'Sonstige Verb.'},
         xbrlLloan:  {  level:3, xbrl: "de-gaap-ci_bs.eqLiab.liab.bank", de_DE:'Darlehen'},
         xbrlLshare: {  level:3, xbrl: "de-gaap-ci_bs.eqLiab.liab.shareholders", de_DE:'Gesell.Darlehen'},

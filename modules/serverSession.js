@@ -54,6 +54,7 @@ export function signIn(jConfig,query,remote,res,startSessionCB) {
 }
 
 
+
 export function startSessionJSON(session,res) {
 
     if(debug) console.log("0040 startSessionJSON="+JSON.stringify(Object.keys(session))); 
@@ -67,7 +68,7 @@ export function startSessionJSON(session,res) {
         console.log("0046 startSessionJSON("+newSession.client+","+newSession.year);         
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers","Origin, X-Requested-With, Content-Type, Accept, Authorization");
-        res.json(session);
+        res.json(newSession); // GH20240121 was session
     } else console.log("0045 startSessionJSON("+newSession.client+","+newSession.year+") NO res object"); 
 
 }
@@ -148,7 +149,8 @@ export function createSession(session) {
 
     let time = timeSymbol();
     let id = strSymbol(time+client+year+time);
-/*
+
+
     // START A NEW SESSION
     let result = {
         'client':client,
@@ -161,12 +163,12 @@ export function createSession(session) {
         'txnPattern':txnPattern,
         'generated': generated,
     }    
-*/
-    let result = session;
-    session.id=id;
+
+//    let result = session;
+//    session.id=id;
 
     // 20240107 WHY WORK WITH OLD SESSION INSTANCE ??
-    session.generated= generated;
+//    session.generated= generated;
 
     setSession(result);
 
