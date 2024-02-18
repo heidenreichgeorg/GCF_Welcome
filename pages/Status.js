@@ -349,27 +349,37 @@ export default function Status() {
 //  account changes overview
 
     
-    function AccountHistoryRow({ am1,tx1, am2, am3, am4, tx2, am5, am6, am7, am8 }) {
+    function AccountHistoryRow({ am1, tx1, am2, am3, am4, tx2, am5, am6, am7, am8, am9, amA, showAssets, showEqLiab }) {
         return(
             <div className="attrLine">
-                <div className="FIELD MOAM"> {cents2EU(am1)}</div>
-                <div className="FIELD SYMB" onClick={(e)=>displayAccount(tx1)}> {tx1}</div>
-                <div className="FIELD SEP">+&nbsp;</div>
-                <div className="FIELD MOAM"> {cents2EU(am2)}</div>
-                <div className="FIELD SEP">-&nbsp;</div>
-                <div className="FIELD MOAM"> {cents2EU(am3)}</div>
-                <div className="FIELD SEP">=&nbsp;</div>
-                <div className="FIELD MOAM"> {cents2EU(am4)}</div>
-                <div className="FIELD SEP"> &nbsp;</div>
+                { showAssets ? 
+                (<div>
+                    <div className="FIELD MOAM"> {cents2EU(am1)}</div>
+                    <div className="FIELD SYMB" onClick={(e)=>displayAccount(tx1)}> {tx1}</div>
+                    <div className="FIELD SEP">+&nbsp;</div>
+                    <div className="FIELD MOAM"> {cents2EU(am2)}</div>
+                    <div className="FIELD SEP">-&nbsp;</div>
+                    <div className="FIELD MOAM"> {cents2EU(am3)}</div>
+                    <div className="FIELD SEP">=&nbsp;</div>
+                    <div className="FIELD MOAM"> {cents2EU(am4)}</div>
+                    <div className="FIELD SEP"> &nbsp;</div>
+                </div>):"" }
                 <div className="FIELD SEP">|&nbsp;</div>
-                <div className="FIELD MOAM"> {cents2EU(am5)}</div>
-                <div className="FIELD SYMB" onClick={(e)=>displayAccount(tx2)}> {tx2}</div>
-                <div className="FIELD SEP">+&nbsp;</div>
-                <div className="FIELD MOAM"> {cents2EU(am6)}</div>
-                <div className="FIELD SEP">-&nbsp;</div>
-                <div className="FIELD MOAM"> {cents2EU(am7)}</div>
-                <div className="FIELD SEP">=&nbsp;</div>
-                <div className="FIELD MOAM"> {cents2EU(am8)}</div>
+                { showEqLiab ? 
+                (<div>
+                    <div className="FIELD MOAM"> {cents2EU(am5)}</div>
+                    <div className="FIELD SYMB" onClick={(e)=>displayAccount(tx2)}> {tx2}</div>
+                    <div className="FIELD SEP">+&nbsp;</div>
+                    <div className="FIELD MOAM"> {cents2EU(am6)}</div>
+                    <div className="FIELD SEP">-&nbsp;</div>
+                    <div className="FIELD MOAM"> {cents2EU(am7)}</div>
+                    <div className="FIELD SEP">+&nbsp;</div>
+                    <div className="FIELD MOAM"> {cents2EU(am8)}</div>
+                    <div className="FIELD SEP">-&nbsp;</div>
+                    <div className="FIELD MOAM"> {cents2EU(am9)}</div>
+                    <div className="FIELD SEP">=&nbsp;</div>
+                    <div className="FIELD MOAM"> {cents2EU(amA)}</div>
+                </div>):"" }
             </div>
         )
     }
@@ -812,9 +822,11 @@ export default function Status() {
     let tabHeaders=[page.DashBoard]; fixPages++;
 
 
-    // account history page
-    tabHeaders.push(page.AccountHistory); fixPages++;
+    // account history page for assets
+    tabHeaders.push(page.AccountHistoryAssets); fixPages++;
 
+    // account history page for equity/liability
+    tabHeaders.push(page.AccountHistoryEqLiab); fixPages++;
 
     // income used page
     tabHeaders.push(page.IncomeUsed); fixPages++;
@@ -955,6 +967,8 @@ export default function Status() {
             (<div>
                 { console.log("102 STATUS show history") }
                 <div className="FIELD" key={"Dashboard"} id={'Overview0'} style= {{ 'display': aPages[0]}} >
+                    <div className="FIELD LNAM">&nbsp;</div>
+                    <div className="attrLine">{page.Closing}&nbsp;{parseInt(session.year)}</div>
                     <StatusRow am1={page.Assets} am2={page.Gain}  am3={page.eqliab}/>
                     {
                         statusReport.map((row,line) => (
@@ -969,36 +983,70 @@ export default function Status() {
                 </div>
 
 
-                { console.log("104 ACCOUNTHISTORY show results") }
+                { console.log("104 ACCOUNTHISTORY show results ASSETS") }
                 <div className="FIELD" key={"AccountHistory"} id={'Overview1'} style= {{ 'display': aPages[1]}} >
                     
-                <AccountHistoryRow  key={"AcctHistory"}  
-                                                am1={page.Init} tx1={page.Name} am2={page.Credit} am3={page.Debit} am4={page.YearEnd} 
-                                                am5={page.Init} tx2={page.Name} am6={page.Credit} am7={page.Debit} am8={page.YearEnd} 
-                                               />                       
-                    
-                    
-                    {
-                        statusReport.map((row,line) => (
-                            <AccountHistoryRow  key={"Status"+line}  
-                                                am1={row.oLeft} tx1={row.nLeft} 
-                                                am2={row.pLeft} 
-                                                am3={row.mLeft} 
-                                                am4={row.gLeft} 
+                    <div className="FIELD LNAM">&nbsp;</div>
+                    <div className="attrLine">{page.AccountHistoryAssets}&nbsp;{parseInt(session.year)}</div>
 
-                                                am5={row.oRite} tx2={row.nRite} 
-                                                am6={row.pRite} 
-                                                am7={row.mRite} 
-                                                am8={row.gRite} 
-                                               />                       
-                        ))
-                    }
+                    <AccountHistoryRow  key={"AcctHistoryAssets"}  
+                                                    am1={page.Init} tx1={page.Name} am2={page.Credit} am3={page.Debit} am4={page.YearEnd} 
+                                                    showAssets={true}
+                                                />                       
+                        
+                        
+                        {
+                            statusReport.map((row,line) => (
+                                <AccountHistoryRow  key={"AcctHistoryAssets"+line}  
+                                                    am1={row.oLeft} tx1={row.nLeft} 
+                                                    am2={row.pLeft} 
+                                                    am3={row.mLeft} 
+                                                    am4={row.gLeft} 
+                                                    showAssets={true}
+                                                />                       
+                            ))
+                        }
+                </div>
+
+
+                { console.log("106 ACCOUNTHISTORY show results EQLIAB") }
+                <div className="FIELD" key={"AccountHistoryEqLiab"} id={'Overview2'} style= {{ 'display': aPages[2]}} >
+
+                    <div className="FIELD LNAM">&nbsp;</div>
+                    <div className="attrLine">{page.AccountHistoryEqLiab}&nbsp;{parseInt(session.year)}</div>
+                        
+                    <AccountHistoryRow  key={"AcctHistoryEqLiab"}  
+                                                    showEqLiab={true}
+                                                    am5={page.Init} tx2={page.Name} am6={page.Credit} am7={page.Debit} am8={page.income} am9={page.taxPaid} amA={page.YearEnd} 
+                                                />                       
+                        
+                        
+                        {
+                            statusReport.map((row,line) => (
+                                <AccountHistoryRow  key={"AcctHistoryEqLiab"+line}  
+                                                    showEqLiab={true}
+
+
+                                                    am5={row.oRite} tx2={row.nRite} 
+                                                    am6={row.pRite} 
+                                                    am7={row.mRite} 
+                                                    am8={row.uRite} 
+                                                    am9={row.xRite} 
+                                                    amA={row.yRite} 
+                                                />                       
+                            ))
+                        }
                 </div>
 
 
 
-                { console.log("106 INCOMEUSED show results") }
-                <div className="FIELD" key={"IncomeUsed"} id={'Overview2'} style= {{ 'display': aPages[2]}} >
+                { console.log("108 INCOMEUSED show results") }
+                <div className="FIELD" key={"IncomeUsed"} id={'Overview3'} style= {{ 'display': aPages[3]}} >
+
+                    <div className="FIELD LNAM">&nbsp;</div>
+                    <div className="attrLine">{page.IncomeUsed}&nbsp;{parseInt(session.year)}</div>
+
+
                     <IncomeUsedRow am1={page.Assets} am2={page.Gain}  am3={page.eqliab} am4={page.eq_income} am5={page.eq_tax} am6={page.eq_next}/>
                     {
                         statusReport.map((row,line) => (
@@ -1015,7 +1063,7 @@ export default function Status() {
                 </div>
 
 
-                <div className="FIELD"  key={"HGB"}  id={'Overview3'} style= {{ 'display': aPages[3]}} > 
+                <div className="FIELD"  key={"HGB"}  id={'Overview4'} style= {{ 'display': aPages[4]}} > 
                 { console.log("110 STATUS show HBG275 S1") }
                     <div className="attrLine">
                         <div className="FIELD LNAM">&nbsp;</div>
@@ -1032,6 +1080,7 @@ export default function Status() {
                 {arrBalance.map((balance,n) => (
                 <div className="FIELD" key={"Balance0"+n} id={tabName+(balanceBase+n)} style= {{ 'display': aPages[balanceBase+n]}} >
                         { console.log("120 STATUS showbalance "+n) }
+                        <div className="FIELD LNAM">&nbsp;</div>
                         <div className="attrLine">{[page.BalanceOpen,page.BalanceClose,page.BalanceNext][n] + ' ' + (parseInt(session.year))}</div>
                         {JSON.parse(balance).map((row,i) => ( 
                             <BalanceRow  key={"Balance"+n+"1"+i} jArgs={row} id={i} />    
@@ -1043,7 +1092,11 @@ export default function Status() {
 
 
                 <div className="FIELD"  key={"FixedAssets"}  id={tabName+(assetsBase)}  style={{'display':aPages[assetsBase]}} >
+
                     <div className="FIELD LNAM">&nbsp;</div>
+                    <div className="attrLine">{page.fixed}&nbsp;{parseInt(session.year)}</div>
+
+
                     { console.log("130 STATUS show fixed assets ") }
 
                     <FixedAssetsRow p={ {'idnt':'Name', 'type':'WKN/Typ', 
@@ -1088,6 +1141,7 @@ export default function Status() {
                     { console.log("140 STATUS show partner "+partnerNo) }
                             
                             <div className="attrLine"></div>
+                            <div className="attrLine">{page.Tax}&nbsp;{parseInt(session.year)}</div>
 
                             <PartnerTitleRow p={ {'name':page.Name, 
                                 'init':page.Init, 
