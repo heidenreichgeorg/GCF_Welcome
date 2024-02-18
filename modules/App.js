@@ -93,10 +93,11 @@ export function makeStatusData(response) {
 
     if(debug) console.log(JSON.stringify(response));
     
-    // build three columns
+    // build four columns
     let aLeft={};
     let aMidl={};
     let aRite={};
+    let aInco={};
 
     for (let name in jAccounts)   {
         var account=jAccounts[name];
@@ -119,6 +120,8 @@ export function makeStatusData(response) {
             }
             if(xbrl_pre===X_INCOME) {
                 aMidl[name]=account;
+                //var iGaLs = BigInt(account.init)+BigInt(account.debit)+BigInt(account.credit); 
+                
             }
             if(xbrl_pre===X_EQLIAB) {
                 aRite[name]=account;
@@ -185,11 +188,17 @@ export function makeStatusData(response) {
     for (let name in aRite)   {
         var account=aRite[name];
         var yearEnd = account.yearEnd;
+        var income=account.income;
+        var tax = account.tax;
+        var year=account.next;
         var iName = account.name;
 
         if(iRite<SCREENLINES) {
             statusData[iRite].iRite = iRite; 
             statusData[iRite].gRite = yearEnd;
+            statusData[iRite].uRite = income;  // 20240218 convey eq income, too
+            statusData[iRite].xRite = tax;     // 20240218 convey eq tax, too
+            statusData[iRite].yRite = year;    // 20240218 convey eq next year, too
             statusData[iRite].nRite = iName;
             statusData[iRite].tRite = !(account.xbrl==X_EQLIAB)?(account.xbrl.startsWith(X_EQUITY))?'E':'L':'';
             iRite++;

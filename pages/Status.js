@@ -270,10 +270,46 @@ export default function Status() {
             } else console.log("1197 makeXLSButton XLSX client("+client+"), NO year");
         } else console.log("1195 makeXLSButton XLSX NO client");
         return url;
-    };
+    }
 
     /**************************************************************************************** */
 
+
+    function handleJSONSave() {
+        console.log("1110 Partner.handleJSONSave sessionId = "+session.id);
+        const rqOptions = { method: 'GET', headers: {  'Accept': 'application/json'}, mode:'cors'};
+        try {
+            
+            fetch(`${REACT_APP_API_HOST}/DOWNLOAD?client=${session.client}&year=${session.year}`, rqOptions)
+            .then((response) => response.blob())
+            .then((blob) => URL.createObjectURL(blob))
+            .then((url) => console.log("1120 handleJSONSave URL= "+ makeJSONButton(url)))
+            .catch((err) => console.error("1127 handleJSONSave ERR "+err));
+            
+        } catch(err) { console.log("1117 GET /JSON handleJSONSave:"+err);}
+        console.log("1140 Partner.handleJSONSave EXIT");
+    }
+
+    
+    function makeJSONButton(url) { 
+
+        console.log("1196 makeJSONButton XLSX "+url);
+        
+        let a = document.createElement('a');
+        a.href = url
+        a.download = "main.json";
+        a.style.display = 'block'; // was none
+        a.className = "key";
+        a.innerHTML = "Download";
+        document.body.appendChild(a); 
+        console.log("1198 downloadButton make button");
+        
+        return url;
+    };
+
+
+
+    /**************************************************************************************** */
     // dashboard portal page
 
     function displayAccount(shrtName) { 
@@ -309,6 +345,42 @@ export default function Status() {
         )
     }
     
+ /**************************************************************************************** */
+    //  income used overview
+
+    function displayAccount(shrtName) { 
+
+        funcShowReceipt(shrtName); 
+
+
+        
+        console.log("SHOW ACCOUNT "+shrtName); 
+        //window.open("/History?client=HGKG&year=2023&APATTERN="+shrtName+"&SELECTALL=1"); 
+    }
+    
+    function IncomeUsedRow({ am1,tx1, am2, tx2, am3, tx3, am4, am5, am6}) {
+        return(
+            <div className="attrLine">
+                <div className="FIELD MOAM"> {cents2EU(am1)}</div>
+                <div className="FIELD SYMB" onClick={(e)=>displayAccount(tx1)}> {tx1}</div>
+                <div className="FIELD SEP"> &nbsp;</div>
+                <div className="FIELD MOAM"> {cents2EU(am2)}</div>
+                <div className="FIELD SYMB" onClick={(e)=>displayAccount(tx2)}> {tx2}</div>
+                <div className="FIELD SEP"> &nbsp;</div>
+                <div className="FIELD MOAM"> {cents2EU(am3)}</div>
+                <div className="FIELD SYMB" onClick={(e)=>displayAccount(tx3)}> {tx3}</div>
+                <div className="FIELD SEP"> &nbsp;</div>
+                <div className="FIELD MOAM"> {cents2EU(am4)}</div>
+                <div className="FIELD SYMB" onClick={(e)=>displayAccount(tx3)}> {tx3}</div>
+                <div className="FIELD MOAM"> {cents2EU(am5)}</div>
+                <div className="FIELD SYMB" onClick={(e)=>displayAccount(tx3)}> {tx3}</div>
+                <div className="FIELD MOAM"> {cents2EU(am6)}</div>
+                <div className="FIELD SEP"> &nbsp;</div>
+            </div>
+        )
+    }
+    
+
     /**************************************************************************************** */
     
     function list(side,factor) { 
@@ -719,6 +791,10 @@ export default function Status() {
     let tabHeaders=[page.DashBoard]; fixPages++;
 
 
+    // income used page
+    tabHeaders.push(page.IncomeUsed); fixPages++;
+
+
 
     // history page
     const jHistory  = sheet[D_History];
@@ -818,8 +894,8 @@ export default function Status() {
 
 
     // extra footer buttons
-    let aFunc=[handleXLSave];
-    let aText=["Get XLSX"];
+    let aFunc=[handleXLSave,handleJSONSave];
+    let aText=["Get XLSX","Get JSON"];
     if(showAccount) {
         aFunc.push(funcKeepReceipt); aText.push(D_CarryOver);
         aFunc.push(funcHideReceipt); aText.push(page.DashBoard);
@@ -868,9 +944,26 @@ export default function Status() {
                 </div>
 
 
+                { console.log("100 INCOMEUSED show results") }
+                <div className="FIELD" key={"IncomeUsed"} id={'Overview1'} style= {{ 'display': aPages[1]}} >
+                    <IncomeUsedRow am1={page.Assets} am2={page.Gain}  am3={page.eqliab} am4={page.eq_income} am5={page.eq_tax} am6={page.eq_next}/>
+                    {
+                        statusReport.map((row,line) => (
+                            <IncomeUsedRow  key={"Status"+line}  
+                                                am1={row.gLeft} tx1={row.nLeft} 
+                                                am2={row.gMidl} tx2={row.nMidl} 
+                                                am3={row.gRite} tx3={row.nRite} 
+                                                am4={row.uRite} // 20230218 income used
+                                                am5={row.xRite} // 20230218 tax paid
+                                                am6={row.yRite} // 20230218 next year
+                                               />                       
+                        ))
+                    }
+                </div>
 
 
-                <div className="FIELD"  key={"HGB"}  id={'Overview1'} style= {{ 'display': aPages[1]}} > 
+
+                <div className="FIELD"  key={"HGB"}  id={'Overview2'} style= {{ 'display': aPages[2]}} > 
                 { console.log("110 STATUS show HBG275 S1") }
                     <div className="attrLine">
                         <div className="FIELD LNAM">&nbsp;</div>

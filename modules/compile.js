@@ -58,6 +58,9 @@ let de_DE = {
     rec:'Forderungen',
     curr:'Umlaufvermögen',
     eqliab:'Passiva',
+    eq_income:'st. Ergebnis',
+    eq_tax:'Steueranteil',
+    eq_next:'Folgejahr',
     equity:'Eigenkapital',
     liab:'Fremdkapital',
     liabother:'Sonstige Verb.',
@@ -81,6 +84,7 @@ let de_DE = {
     AssetList:"Anlagespiegel",
     BalanceOpen:"Eröffnungsbilanz",
     DashBoard:"Übersicht",
+    IncomeUsed:"Ergebnisverwendung",
     GainlossHGB:"Ergebnis HGB275A2",
     BalanceClose:"Bilanz mit Gewinn",
     BalanceNext:"Bilanz Folgejahr",
@@ -1021,6 +1025,7 @@ function sendBalance(balance) {
             p.close =  ""+(iYearEnd + iIncome);
             p.cyLoss = ""+iSecLoss; 
             p.next=varcap.next;
+            varcap.tax = ""+(iTaxPaid); // 20230218
 
 
             if(debugReport) console.log('compile sendBalance  '+JSON.stringify(p) + "\n ==>> MODIFY K2xx "+JSON.stringify(varcap));
