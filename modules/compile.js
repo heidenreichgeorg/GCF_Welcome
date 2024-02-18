@@ -84,6 +84,7 @@ let de_DE = {
     AssetList:"Anlagespiegel",
     BalanceOpen:"Eröffnungsbilanz",
     DashBoard:"Übersicht",
+    AccountHistory:"Kontenverlauf",
     IncomeUsed:"Ergebnisverwendung",
     GainlossHGB:"Ergebnis HGB275A2",
     BalanceClose:"Bilanz mit Gewinn",

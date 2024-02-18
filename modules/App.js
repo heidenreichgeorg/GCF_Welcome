@@ -152,13 +152,16 @@ export function makeStatusData(response) {
 
     for (let name in aLeft)   {
         var account=aLeft[name];
+        var beginYear = account.init;
+        var credit = account.credit;
+        var debit = account.debit;
         var yearEnd = account.yearEnd;
         var iName = account.name;
 
         if(debug) console.log("STATUS.JS STATUSDATA LEFT "+iLeft+" "+name+"="+yearEnd);
 
         if(iLeft<SCREENLINES) {
-            statusData[iLeft]={"iLeft":iLeft, "gLeft":yearEnd,"nLeft":iName, "tLeft":(account.xbrl!=X_ASSETS)?"A":""};
+            statusData[iLeft]={ "oLeft" :beginYear, "iLeft":iLeft, "pLeft":credit, "mLeft":debit, "gLeft":yearEnd,"nLeft":iName, "tLeft":(account.xbrl!=X_ASSETS)?"A":""};
         }
         iLeft++;
     }
@@ -187,7 +190,10 @@ export function makeStatusData(response) {
 
     for (let name in aRite)   {
         var account=aRite[name];
+        var beginYear = account.init;
         var yearEnd = account.yearEnd;
+        var credit=account.credit;
+        var debit=account.debit;
         var income=account.income;
         var tax = account.tax;
         var year=account.next;
@@ -196,9 +202,12 @@ export function makeStatusData(response) {
         if(iRite<SCREENLINES) {
             statusData[iRite].iRite = iRite; 
             statusData[iRite].gRite = yearEnd;
-            statusData[iRite].uRite = income;  // 20240218 convey eq income, too
-            statusData[iRite].xRite = tax;     // 20240218 convey eq tax, too
-            statusData[iRite].yRite = year;    // 20240218 convey eq next year, too
+            statusData[iRite].oRite = beginYear; // 20240218 convey eq init, too
+            statusData[iRite].pRite = credit;    // 20240218 convey eq credit, too
+            statusData[iRite].mRite = debit;     // 20240218 convey eq debit, too
+            statusData[iRite].uRite = income;    // 20240218 convey eq income, too
+            statusData[iRite].xRite = tax;       // 20240218 convey eq tax, too
+            statusData[iRite].yRite = year;      // 20240218 convey eq next year, too
             statusData[iRite].nRite = iName;
             statusData[iRite].tRite = !(account.xbrl==X_EQLIAB)?(account.xbrl.startsWith(X_EQUITY))?'E':'L':'';
             iRite++;
