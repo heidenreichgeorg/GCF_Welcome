@@ -1090,7 +1090,7 @@ export default function Status() {
                                                 am3={row.eqLiab.yearEnd} tx3={row.eqLiab.name} 
                                                 am4={row.eqLiab.income} // 20230218 income used
                                                 am5={row.eqLiab.tax} // 20230218 tax paid
-                                                am6={row.eqLiab.init} // 20230218 next year
+                                                am6={row.eqLiab.next} // 20230218 next year
                                                />                       
                         ))
                     }
