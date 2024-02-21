@@ -144,77 +144,49 @@ export function makeStatusData(response) {
     if(maxCom>maxRow) maxRow=maxCom;
     if(maxCor>maxRow) maxRow=maxCor;
 
-    let statusData = []; for(let i=0;i<=maxRow && i<=SCREENLINES;i++) statusData[i]={};
+    let statusData = []; for(let i=0;i<=maxRow && i<=SCREENLINES;i++) statusData[i]={ 'assets':{}, 'gals':{}, 'eqLiab':{} };
     if(maxRow>SCREENLINES) maxRow=SCREENLINES; // 20221201
     
-    let iLeft=0;
-    
 
+    
+    let iLeft=0;
     for (let name in aLeft)   {
         var account=aLeft[name];
-        var beginYear = account.init;
-        var credit = account.credit;
-        var debit = account.debit;
-        var yearEnd = account.yearEnd;
-        var iName = account.name;
-
         if(debug) console.log("STATUS.JS STATUSDATA LEFT "+iLeft+" "+name+"="+yearEnd);
-
         if(iLeft<SCREENLINES) {
-            statusData[iLeft]={ "oLeft" :beginYear, "iLeft":iLeft, "pLeft":credit, "mLeft":debit, "gLeft":yearEnd,"nLeft":iName, "tLeft":(account.xbrl!=X_ASSETS)?"A":""};
+            statusData[iLeft]={};
+            statusData[iLeft].assets=account;
         }
         iLeft++;
     }
-    for (let i=iLeft;i<maxRow && i<SCREENLINES;i++) { statusData[i]={"iLeft":0, "gLeft":null, "nLeft": " " }; }
+    for (let i=iLeft;i<maxRow && i<SCREENLINES;i++) {
+        statusData[i]={};
+        statusData[i].assets={};
+     }; 
+
 
 
     let iMidl=0;
-    
-
     for (let name in aMidl)   {
         var account=aMidl[name];
-        var yearEnd = account.yearEnd;
-        var iName = account.name;
-
-        statusData[iMidl].iMidl = iMidl; 
-        statusData[iMidl].gMidl = yearEnd;
-        statusData[iMidl].nMidl = iName;
-        statusData[iMidl].tMidl = (account.xbrl!=X_INCOME_REGULAR)?'G':'';
+        statusData[iMidl].gals=account;
         iMidl++;
     }
-    for (let i=iMidl;i<maxRow && i<SCREENLINES;i++) {  statusData[i].iMidl=0; statusData[i].gMidl=null; statusData[i].nMidl=' '; }
+    for (let i=iMidl;i<maxRow && i<SCREENLINES;i++) {  statusData[i].gals={}; }
 
 
-    let iRite=0;
-    
 
+    let iRite=0;    
     for (let name in aRite)   {
-        var account=aRite[name];
-        var beginYear = account.init;
-        var yearEnd = account.yearEnd;
-        var credit=account.credit;
-        var debit=account.debit;
-        var income=account.income;
-        var tax = account.tax;
-        var year=account.next;
-        var iName = account.name;
-
-        if(iRite<SCREENLINES) {
-            statusData[iRite].iRite = iRite; 
-            statusData[iRite].gRite = yearEnd;
-            statusData[iRite].oRite = beginYear; // 20240218 convey eq init, too
-            statusData[iRite].pRite = credit;    // 20240218 convey eq credit, too
-            statusData[iRite].mRite = debit;     // 20240218 convey eq debit, too
-            statusData[iRite].uRite = income;    // 20240218 convey eq income, too
-            statusData[iRite].xRite = tax;       // 20240218 convey eq tax, too
-            statusData[iRite].yRite = year;      // 20240218 convey eq next year, too
-            statusData[iRite].nRite = iName;
-            statusData[iRite].tRite = !(account.xbrl==X_EQLIAB)?(account.xbrl.startsWith(X_EQUITY))?'E':'L':'';
+        var account=aRite[name];        
+        if(iRite<SCREENLINES) {           
+            statusData[iRite].eqLiab=account;
             iRite++;
-        }
-        
+        }        
     }
-    for (let i=iRite;i<maxRow && i<SCREENLINES;i++) { statusData[i].iRite=0; statusData[i].gRite=null; statusData[i].nRite=' '; }
+    for (let i=iRite;i<maxRow && i<SCREENLINES;i++) { statusData[i].eqLiab={}; }
+
+
 
     // build fourth column with recent transactions
     if(jHistory && gSchema.Names && gSchema.Names.length>0) {
