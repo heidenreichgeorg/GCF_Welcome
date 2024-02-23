@@ -56,11 +56,14 @@ export function makeStatusData(response) {
 
     const page = response[D_Page];
     
+    let iDebit=0n;
+    let iCredit=0n;
     let iFixed=0n;
     let iEquity=0n;
     let iTan=0n;
     let iLia=0n;
     let iCur=0n;
+    let iTax=0n;
 
     let ass="{close:0}";
     let eql="{close:0}";
@@ -109,6 +112,7 @@ export function makeStatusData(response) {
                 let iClose=BigInt(account.init)+BigInt(account.debit)+BigInt(account.credit); ;
                 if(account.xbrl.startsWith(jReport.xbrlFixed.xbrl)) { // accumulate fixed assets
                     iFixed = iFixed + iClose;
+
                     if(account.xbrl.startsWith(jReport.xbrlTanFix.xbrl)) { // accumulate tangible fixed assets
                         iTan = iTan + iClose;
                     }
@@ -116,15 +120,21 @@ export function makeStatusData(response) {
                 } else if(account.xbrl.startsWith(jReport.xbrlAcurr.xbrl)) { // accumulate current assets#
                     iCur = iCur + iClose;
                     if(debug) console.log("makeStatusData Currency Assets: "+JSON.stringify(account))
+
+                    if(account.xbrl.startsWith(jReport.xbrlPaidTax.xbrl)) { // accumulate paid tax#
+                        iTax = iTax + iClose;
+                    }
                 }
             }
             if(xbrl_pre===X_INCOME) {
                 aMidl[name]=account;
-                //var iGaLs = BigInt(account.init)+BigInt(account.debit)+BigInt(account.credit); 
+                var iGaLs = BigInt(account.init)+BigInt(account.debit)+BigInt(account.credit); 
                 
             }
             if(xbrl_pre===X_EQLIAB) {
                 aRite[name]=account;
+                iDebit=iDebit+BigInt(account.debit);
+                iCredit=iCredit+BigInt(account.credit);
                 var iClose = BigInt(account.init)+BigInt(account.debit)+BigInt(account.credit); 
                 if(account.xbrl.startsWith(jReport.xbrlEquity.xbrl)) { // accumulate equity
                     iEquity = iEquity + iClose;
@@ -148,6 +158,12 @@ export function makeStatusData(response) {
     if(maxRow>SCREENLINES) maxRow=SCREENLINES; // 20221201
     
 
+    // synthetic EqLiab sum account
+    eql.income=iGaLs;
+    eql.tax=iTax;
+    eql.credit=iCredit;
+    eql.debit=iDebit;
+    
     
     let iLeft=0;
     for (let name in aLeft)   {

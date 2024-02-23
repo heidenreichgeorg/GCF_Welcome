@@ -422,7 +422,7 @@ export default function Status() {
    
     
     
-    function ClosingRow({ am1,tx1, am2, tx2, am3, tx3, am4, tx4}) {
+    function ClosingRow({ am1,tx1, am2, tx2, am3, tx3, am4, tx4, am5, tx5, am6, tx6}) {
         return(
             <div className="attrLine">
                 <div className="FIELD MOAM"> {cents2EU(am1)}</div>
@@ -431,13 +431,20 @@ export default function Status() {
                 <div className="FIELD MOAM"> {cents2EU(am2)}</div>
                 <div className="FIELD SYMB" onClick={(e)=>displayAccount(tx2)}> {tx2}</div>
                 <div className="FIELD SEP"> &nbsp;</div>
+                <div className="FIELD SEP"> &nbsp;</div>
+                <div className="FIELD SEP"> &nbsp;|</div>
+                <div className="FIELD SEP"> &nbsp;</div>
                 <div className="FIELD MOAM"> {cents2EU(am3)}</div>
                 <div className="FIELD SYMB" onClick={(e)=>displayAccount(tx3)}> {tx3}</div>
                 <div className="FIELD SEP"> &nbsp;</div>
-                <div className="FIELD SEP"> &nbsp;</div>
-                <div className="FIELD SEP"> &nbsp;</div>
                 <div className="FIELD MOAM"> {cents2EU(am4)}</div>
                 <div className="FIELD SYMB" onClick={(e)=>displayAccount(tx4)}> {tx4}</div>
+                <div className="FIELD SEP"> &nbsp;</div>
+                <div className="FIELD MOAM"> {cents2EU(am5)}</div>
+                <div className="FIELD SYMB" onClick={(e)=>displayAccount(tx5)}> {tx5}</div>
+                <div className="FIELD SEP"> &nbsp;</div>
+                <div className="FIELD MOAM"> {cents2EU(am6)}</div>
+                <div className="FIELD SYMB" onClick={(e)=>displayAccount(tx6)}> {tx6}</div>
                 <div className="FIELD SEP"> &nbsp;</div>
             </div>
         )
@@ -1051,7 +1058,7 @@ export default function Status() {
                         
                     <AccountHistoryRow  key={"AcctHistoryEqLiab"}  
                                                     showEqLiab={true}
-                                                    am5={page.Init} tx2={page.Name} am6={page.Credit} am7={page.Debit} am8={page.income} am9={page.taxPaid} amA={page.YearEnd} 
+                                                    am5={page.Init} tx2={page.Name} am6={page.Credit} am7={page.Debit} am8={page.income} am9={page.Tax} amA={page.NextYear} 
                                                 />                       
                         
                         
@@ -1086,7 +1093,7 @@ export default function Status() {
                         statusReport.map((row,line) => (
                             <IncomeUsedRow  key={"Status"+line}  
                                                 am1={row.assets.yearEnd} tx1={row.assets.name} 
-                                                am2={row.gals.yearEnd} tx2={row.gals.name} 
+                                                am2={row.gals.yearEnd}   tx2={row.gals.name} 
                                                 am3={row.eqLiab.yearEnd} tx3={row.eqLiab.name} 
                                                 am4={row.eqLiab.income} // 20230218 income used
                                                 am5={row.eqLiab.tax} // 20230218 tax paid
@@ -1105,14 +1112,16 @@ export default function Status() {
                     <div className="attrLine">{page.Closing}&nbsp;{parseInt(session.year)}</div>
 
 
-                    <ClosingRow  am1={page.Assets}  am2={page.Closing}  am3={page.Next}  am4={page.Init} />
+                    <ClosingRow  am1={page.Assets}  am2={page.Init}  am3={page.YearEnd}  am4={page.income}  am5={page.Tax}  am6={page.Next}    /> 
                     {
                         statusReport.map((row,line) => (
                             <ClosingRow  key={"Status"+line}  
-                                                am1={row.assets.yearEnd} tx1={row.assets.name} 
-                                                am2={row.gals.yearEnd} tx2={row.gals.name} 
-                                                am3={row.eqLiab.yearEnd} tx3={row.eqLiab.name} 
-                                                am4={row.eqLiab.income} tx4={row.eqLiab.init}
+                                                am1={row.assets.init}     tx1={row.assets.name} 
+                                                am2={row.eqLiab.init}     tx2={row.eqLiab.name} 
+                                                am3={row.eqLiab.yearEnd}  tx3={row.eqLiab.name}  
+                                                am4={row.eqLiab.income}   tx4={row.eqLiab.name}
+                                                am5={row.eqLiab.tax}      tx5={row.eqLiab.name} 
+                                                am6={row.eqLiab.next}     tx6={row.eqLiab.name}
                                                />                       
                         ))
                     }
