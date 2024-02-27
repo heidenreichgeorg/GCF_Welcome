@@ -96,6 +96,7 @@ export default function Status() {
     var funcHideReceipt=null;
     var funcCleaReceipt=null;
     var aSelText = {};
+    var aReason  = {};
     var aJMoney  = {};
     var aSelSaldo= {};
     var jPageSum = {};
@@ -103,8 +104,9 @@ export default function Status() {
     useEffect(() => {
 
         aSelText = {};
+        aReason  = {};
         aJMoney = {};
-
+        
         if(status !== 'success') return;
         setYear(session.year);
         setClient(session.client);
@@ -154,7 +156,8 @@ export default function Status() {
                 
                     console.log("computeRow ADDING("+id+") "+JSON.stringify(aRow));
     
-                aSelText[id]=aRow;  
+                aSelText[id]=aRow; 
+                aReason[id]=row.entry;
                 aJMoney[id]=tRow;
                 aSelSaldo[id]=""+saldo;         
             }
@@ -992,7 +995,7 @@ export default function Status() {
                     Object.keys(aSelText).map((sym,i) => ( (sym && aSelText[sym] && aJMoney[sym] ) ? // && i>1
                                                 
                                                             TXNReceipt(
-                                                                aSelText[sym].join(' '),
+                                                                aReason[sym],
                                                                 aJMoney[sym],
                                                                 jColumnHeads,
                                                                 jSum,
@@ -1267,9 +1270,9 @@ function TXNReceipt(text,jAmounts,jColumnHeads,jSum,id,removeCol) {
     
 
     return( // FIELD
-        <div>
+        <div id="TXNReceipt">
             <div className="attrLine"> <div className="FIELD"></div></div>
-            <div className="attrLine"> <div className="FIELD">{text} {id}</div></div>
+            <div className="attrLine"> <div className="FIELD"> {id}&nbsp;&nbsp;{text}</div></div>
             <HistoryRow jValues={jAmounts} jColumnHeads={jColumnHeads} removeCol={removeCol}/>
         </div>
         
