@@ -585,7 +585,7 @@ export default function Status() {
         let record = matrix[strKey];
         record[side][field]=value;
 
-        console.log("EXIT bufferAmount: in "+JSON.stringify(record));  
+        console.log("EXIT bufferAmount("+field+"="+value+"): in "+JSON.stringify(record));  
     }
 
     function bufferField(strKey,field,value) {
@@ -688,10 +688,11 @@ export default function Status() {
                     </div>)
                 ))}
                 
-                
-                <div className="FIELD TAG" ></div>
-                <button className="key" onClick={(() => preBook(strKey))}>Anzeigen</button>
-            
+            </div>    
+            <div className="attrLine">
+                <div className="FIELD MOAM" >
+                    <button className="key" onClick={(() => preBook(strKey))}> {page.Display}</button>
+                </div>
             </div>
         </div>);
     }
@@ -767,8 +768,13 @@ export default function Status() {
                     </div>)
                 ))}
                                 
-                <div className="FIELD TAG" ></div>
-                <button className="key" onClick={(() => doBook(strKey))}>Buchen</button>            
+            </div>
+
+
+            <div className="attrLine">
+                <div className="FIELD MOAM" >
+                    <button className="key" onClick={(() => doBook(strKey))}>&nbsp;{page.Book}&nbsp;</button>            
+                </div>
             </div>
         </div>);
     }
