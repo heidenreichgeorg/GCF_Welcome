@@ -2,8 +2,8 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 
 
-
-import  { currentHash, init, signIn, startSessionJSON } from '../../modules/session'
+import { currentHash } from '../../modules/login'
+import {  init, signIn, startSessionJSON } from '../../modules/serverSession'
 
 
 let config = null;
@@ -23,7 +23,7 @@ export default function handler(
       console.log("SESSION.ts handler "+JSON.stringify(query)+" jConfig="+JSON.stringify(jConfig));
     
       // NO sign-in login authenticat
-      if(auth==currentHash())
+      if(auth==currentHash(client,year))
         signIn(jConfig,query,req.socket.remoteAddress,res,startSessionJSON); 
       else  res.json({ id: '0666', code : "NO VALID AUTH"})
   }

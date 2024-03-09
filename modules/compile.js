@@ -2,7 +2,7 @@
 const debug=null;
 const debugTax=null;
 const debugPreBook=null;
-const debugAssets=null;
+const debugAssets=1;
 const debugRegular=null;
 
 
@@ -58,6 +58,9 @@ let de_DE = {
     rec:'Forderungen',
     curr:'Umlaufvermögen',
     eqliab:'Passiva',
+    eq_income:'st. Ergebnis',
+    eq_tax:'Steueranteil',
+    eq_next:'Folgejahr',
     equity:'Eigenkapital',
     liab:'Fremdkapital',
     liabother:'Sonstige Verb.',
@@ -81,6 +84,10 @@ let de_DE = {
     AssetList:"Anlagespiegel",
     BalanceOpen:"Eröffnungsbilanz",
     DashBoard:"Übersicht",
+    AccountHistory:"Kontenverlauf",
+    AccountHistoryAssets:"Verlauf Vermögen",
+    AccountHistoryEqLiab:"Verlauf Kapital",
+    IncomeUsed:"Ergebnisverwendung",
     GainlossHGB:"Ergebnis HGB275A2",
     BalanceClose:"Bilanz mit Gewinn",
     BalanceNext:"Bilanz Folgejahr",
@@ -142,6 +149,7 @@ let de_DE = {
     Book: "Buchen",
     Closing:"Abschluss",
     Diagram:"Diagramm",
+    Display:"Anzeigen",
     Transfer:"Überweisung",
     Transaction:"Buchung",
 
@@ -523,7 +531,13 @@ export function compile(sessionData) {
                                         var iNum = parseInt(result[D_FixAss][idnt].nmbr);
                                         var nmbr = iNum-iSel;
                                         var irest = BigInt(result[D_FixAss][idnt].rest);
-                                        var iremn = irest+iamnt;
+
+
+                                        // GH20240301
+                                        // REDUCE CURRENT COST FOR REMAINING PIECES OF THAT ASSET
+                                        // was var iremn = irest+iamnt;
+                                        var iremn = orig * BigInt(nmbr);
+
 
                                         // reduce cost basis for price per piece
                                         //var icost =bigCost(idnt,nmbr,orig);
@@ -537,6 +551,9 @@ export function compile(sessionData) {
                                         orig= ((orig*BigInt(nmbr)*10n)+4n)/BigInt(iNum*10);
 
 
+                                        // GH20230923
+                                        // REDUCE CURRENT COST FOR REMAINING PIECES OF THAT ASSET
+
                                         // OPEN
                                         // MUST VERIFY existing identifier
                                         result[D_FixAss][idnt]={"date":date, 
@@ -548,7 +565,7 @@ export function compile(sessionData) {
                                                                 "cost":""+icost,
                                                                 "gain":"0" }; // GH20230303
                                         if(debugAssets) console.log(
-                                                    "0374 SELL "+type+" "+iSel+" (worth "+cents2EU(iamnt)+
+                                                    "0374 SELL "+type+" "+iSel+" (giving "+cents2EU(iamnt)+
                                                     ") from "+iNum+" of Asset "+idnt+" resulting in "+
                                                     nmbr+" worth "+cents2EU(iremn) + " at "+cents2EU(icost)+" each");
                                     }
@@ -1021,6 +1038,7 @@ function sendBalance(balance) {
             p.close =  ""+(iYearEnd + iIncome);
             p.cyLoss = ""+iSecLoss; 
             p.next=varcap.next;
+            varcap.tax = ""+(iTaxPaid); // 20230218
 
 
             if(debugReport) console.log('compile sendBalance  '+JSON.stringify(p) + "\n ==>> MODIFY K2xx "+JSON.stringify(varcap));

@@ -1,11 +1,10 @@
 import { useEffect, useState } from 'react';
 import { getSession, useSession, REACT_APP_API_HOST,getCarryOver,storeCarryOver } from '../modules/sessionmanager';
-import { symbolic }  from '../modules/session';
 import Screen from './Screen'
 import { cents2EU,bigUSMoney,cents20EU,bigEUMoney }  from '../modules/money';
-import { CSEP, D_Account, D_Balance, D_Carry, D_CarryOver, D_Page, D_Partner, D_FixAss, D_History, D_Report, D_Schema, J_ACCT, SCREENLINES, X_ASSET_CAPTAX, X_ASSETS, X_EQLIAB } from '../modules/terms.js'
-import { book,prepareTXN,makeHistory }  from '../modules/writeModule';
-import { makeStatusData }  from '../modules/App';
+import { D_Account, D_Balance, D_Carry, D_CarryOver, D_Page, D_Partner, D_FixAss, D_History, D_Report, D_Schema, J_ACCT, SCREENLINES, X_ASSET_CAPTAX } from '../modules/terms.js'
+import { book,prepareTXN,makeHistory,symbolic }  from '../modules/writeModule';
+import { makeStatusData,makeHGBReport,makeBalance}  from '../modules/App';
 
 // the ORIGINAL FORMAT from journal sheet is 
 // columns format CSV with these columns 
@@ -97,6 +96,7 @@ export default function Status() {
     var funcHideReceipt=null;
     var funcCleaReceipt=null;
     var aSelText = {};
+    var aReason  = {};
     var aJMoney  = {};
     var aSelSaldo= {};
     var jPageSum = {};
@@ -104,8 +104,9 @@ export default function Status() {
     useEffect(() => {
 
         aSelText = {};
+        aReason  = {};
         aJMoney = {};
-
+        
         if(status !== 'success') return;
         setYear(session.year);
         setClient(session.client);
@@ -128,6 +129,41 @@ export default function Status() {
         // reset all stored carryOver sums
         storeCarryOver({});
     }, [status])
+
+
+    function computeRow(row,index,client,year,line) {
+
+        if(row) {
+            console.log("computeRow ENTER("+line+") "+JSON.stringify(row));
+    
+            let aRow = [0n,0n,0n,0n,0n,0n]
+            try { let saRow = row.entry;
+                aRow = saRow.split(CSEP);
+            } catch(err) {  aRow=[""+index+client+year,""+year+index+client] }    
+    
+            let tRow =  {};
+            try { let moneyRow = row.jMoney;
+                tRow = moneyRow; //  name-value pairs with sign
+            } catch(err) {}
+    
+            let saldo="";
+            if(isNaN(row.saldo)) saldo="0";
+            else saldo = cents20EU(row.saldo); // cents2EU with 0 digit
+            
+            let id = symbolic(''+line+aRow.join('')+line+JSON.stringify(tRow));
+    
+            if(index>0 || line>0) { 
+                
+                    console.log("computeRow ADDING("+id+") "+JSON.stringify(aRow));
+    
+                aSelText[id]=aRow; 
+                aReason[id]=row.entry;
+                aJMoney[id]=tRow;
+                aSelSaldo[id]=""+saldo;         
+            }
+        }
+    }
+    
 
 
     // TXNReceipt history layout methods
@@ -159,37 +195,6 @@ export default function Status() {
     }
 
         
-    function computeRow(row,index,client,year,line) {
-
-        if(row) {
-            console.log("computeRow ENTER("+line+") "+JSON.stringify(row));
-
-            let aRow = [0n,0n,0n,0n,0n,0n]
-            try { let saRow = row.entry;
-                aRow = saRow.split(CSEP);
-            } catch(err) {  aRow=[""+index+client+year,""+year+index+client] }    
-
-            let tRow =  {};
-            try { let moneyRow = row.jMoney;
-                tRow = moneyRow; //  name-value pairs with sign
-            } catch(err) {}
-
-            let saldo="";
-            if(isNaN(row.saldo)) saldo="0";
-            else saldo = cents20EU(row.saldo); // cents2EU with 0 digit
-            
-            let id = symbolic(''+line+aRow.join('')+line+JSON.stringify(tRow));
-
-            if(index>0 || line>0) { 
-                
-                    console.log("computeRow ADDING("+id+") "+JSON.stringify(aRow));
-
-                aSelText[id]=aRow;  
-                aJMoney[id]=tRow;
-                aSelSaldo[id]=""+saldo;         
-            }
-        }
-    }
 
     function makeLabel(index,aPattern) { let p= (aPattern && aPattern.length>0) ? aPattern: "p"; return session.client+session.year+p+index }
 
@@ -271,10 +276,46 @@ export default function Status() {
             } else console.log("1197 makeXLSButton XLSX client("+client+"), NO year");
         } else console.log("1195 makeXLSButton XLSX NO client");
         return url;
-    };
+    }
 
     /**************************************************************************************** */
 
+
+    function handleJSONSave() {
+        console.log("1110 Partner.handleJSONSave sessionId = "+session.id);
+        const rqOptions = { method: 'GET', headers: {  'Accept': 'application/json'}, mode:'cors'};
+        try {
+            
+            fetch(`${REACT_APP_API_HOST}/DOWNLOAD?client=${session.client}&year=${session.year}`, rqOptions)
+            .then((response) => response.blob())
+            .then((blob) => URL.createObjectURL(blob))
+            .then((url) => console.log("1120 handleJSONSave URL= "+ makeJSONButton(url)))
+            .catch((err) => console.error("1127 handleJSONSave ERR "+err));
+            
+        } catch(err) { console.log("1117 GET /JSON handleJSONSave:"+err);}
+        console.log("1140 Partner.handleJSONSave EXIT");
+    }
+
+    
+    function makeJSONButton(url) { 
+
+        console.log("1196 makeJSONButton XLSX "+url);
+        
+        let a = document.createElement('a');
+        a.href = url
+        a.download = "main.json";
+        a.style.display = 'block'; // was none
+        a.className = "key";
+        a.innerHTML = "Download";
+        document.body.appendChild(a); 
+        console.log("1198 downloadButton make button");
+        
+        return url;
+    };
+
+
+
+    /**************************************************************************************** */
     // dashboard portal page
 
     function displayAccount(shrtName) { 
@@ -306,6 +347,108 @@ export default function Status() {
                 {click==null ? (<div className="FIELD SEP"> &nbsp;</div>) : (
                 <div className="FIELD"  onClick={(() => click())}>&nbsp;.&nbsp;</div>
                 ) }
+            </div>
+        )
+    }
+    
+ /**************************************************************************************** */
+//  account changes overview
+
+    
+    function AccountHistoryRow({ am1, tx1, am2, am3, am4, tx2, am5, am6, am7, am8, am9, amA, showAssets, showEqLiab }) {
+        return(
+            <div className="attrLine">
+                { showAssets ? 
+                (<div>
+                    <div className="FIELD MOAM"> {cents2EU(am1)}</div>
+                    <div className="FIELD SYMB" onClick={(e)=>displayAccount(tx1)}> {tx1}</div>
+                    <div className="FIELD SEP">+&nbsp;</div>
+                    <div className="FIELD MOAM"> {cents2EU(am2)}</div>
+                    <div className="FIELD SEP">-&nbsp;</div>
+                    <div className="FIELD MOAM"> {cents2EU(am3)}</div>
+                    <div className="FIELD SEP">=&nbsp;</div>
+                    <div className="FIELD MOAM"> {cents2EU(am4)}</div>
+                    <div className="FIELD SEP"> &nbsp;</div>
+                </div>):"" }
+                <div className="FIELD SEP">|&nbsp;</div>
+                { showEqLiab ? 
+                (<div>
+                    <div className="FIELD MOAM"> {cents2EU(am5)}</div>
+                    <div className="FIELD SYMB" onClick={(e)=>displayAccount(tx2)}> {tx2}</div>
+                    <div className="FIELD SEP">+&nbsp;</div>
+                    <div className="FIELD MOAM"> {cents2EU(am6)}</div>
+                    <div className="FIELD SEP">-&nbsp;</div>
+                    <div className="FIELD MOAM"> {cents2EU(am7)}</div>
+                    <div className="FIELD SEP">+&nbsp;</div>
+                    <div className="FIELD MOAM"> {cents2EU(am8)}</div>
+                    <div className="FIELD SEP">-&nbsp;</div>
+                    <div className="FIELD MOAM"> {cents2EU(am9)}</div>
+                    <div className="FIELD SEP">=&nbsp;</div>
+                    <div className="FIELD MOAM"> {cents2EU(amA)}</div>
+                </div>):"" }
+            </div>
+        )
+    }
+    
+
+ /**************************************************************************************** */
+    //  income used overview
+   
+    
+    
+    function IncomeUsedRow({ am1,tx1, am2, tx2, am3, tx3, am4, am5, am6}) {
+        return(
+            <div className="attrLine">
+                <div className="FIELD MOAM"> {cents2EU(am1)}</div>
+                <div className="FIELD SYMB" onClick={(e)=>displayAccount(tx1)}> {tx1}</div>
+                <div className="FIELD SEP"> &nbsp;</div>
+                <div className="FIELD MOAM"> {cents2EU(am2)}</div>
+                <div className="FIELD SYMB" onClick={(e)=>displayAccount(tx2)}> {tx2}</div>
+                <div className="FIELD SEP"> &nbsp;</div>
+                <div className="FIELD MOAM"> {cents2EU(am3)}</div>
+                <div className="FIELD SYMB" onClick={(e)=>displayAccount(tx3)}> {tx3}</div>
+                <div className="FIELD SEP"> &nbsp;</div>
+                <div className="FIELD MOAM"> {cents2EU(am4)}</div>
+                <div className="FIELD SYMB" onClick={(e)=>displayAccount(tx3)}> {tx3}</div>
+                <div className="FIELD MOAM"> {cents2EU(am5)}</div>
+                <div className="FIELD SYMB" onClick={(e)=>displayAccount(tx3)}> {tx3}</div>
+                <div className="FIELD MOAM"> {cents2EU(am6)}</div>
+                <div className="FIELD SEP"> &nbsp;</div>
+            </div>
+        )
+    }
+    
+    
+
+ /**************************************************************************************** */
+    //  closing overview
+   
+    
+    
+    function ClosingRow({ am1,tx1, am2, tx2, am3, tx3, am4, tx4, am5, tx5, am6, tx6}) {
+        return(
+            <div className="attrLine">
+                <div className="FIELD MOAM"> {cents2EU(am1)}</div>
+                <div className="FIELD SYMB" onClick={(e)=>displayAccount(tx1)}> {tx1}</div>
+                <div className="FIELD SEP"> &nbsp;</div>
+                <div className="FIELD MOAM"> {cents2EU(am2)}</div>
+                <div className="FIELD SYMB" onClick={(e)=>displayAccount(tx2)}> {tx2}</div>
+                <div className="FIELD SEP"> &nbsp;</div>
+                <div className="FIELD SEP"> &nbsp;</div>
+                <div className="FIELD SEP"> &nbsp;|</div>
+                <div className="FIELD SEP"> &nbsp;</div>
+                <div className="FIELD MOAM"> {cents2EU(am3)}</div>
+                <div className="FIELD SYMB" onClick={(e)=>displayAccount(tx3)}> {tx3}</div>
+                <div className="FIELD SEP"> &nbsp;</div>
+                <div className="FIELD MOAM"> {cents2EU(am4)}</div>
+                <div className="FIELD SYMB" onClick={(e)=>displayAccount(tx4)}> {tx4}</div>
+                <div className="FIELD SEP"> &nbsp;</div>
+                <div className="FIELD MOAM"> {cents2EU(am5)}</div>
+                <div className="FIELD SYMB" onClick={(e)=>displayAccount(tx5)}> {tx5}</div>
+                <div className="FIELD SEP"> &nbsp;</div>
+                <div className="FIELD MOAM"> {cents2EU(am6)}</div>
+                <div className="FIELD SYMB" onClick={(e)=>displayAccount(tx6)}> {tx6}</div>
+                <div className="FIELD SEP"> &nbsp;</div>
             </div>
         )
     }
@@ -442,7 +585,7 @@ export default function Status() {
         let record = matrix[strKey];
         record[side][field]=value;
 
-        console.log("EXIT bufferAmount: in "+JSON.stringify(record));  
+        console.log("EXIT bufferAmount("+field+"="+value+"): in "+JSON.stringify(record));  
     }
 
     function bufferField(strKey,field,value) {
@@ -545,10 +688,11 @@ export default function Status() {
                     </div>)
                 ))}
                 
-                
-                <div className="FIELD TAG" ></div>
-                <button className="key" onClick={(() => preBook(strKey))}>Anzeigen</button>
-            
+            </div>    
+            <div className="attrLine">
+                <div className="FIELD MOAM" >
+                    <button className="key" onClick={(() => preBook(strKey))}> {page.Display}</button>
+                </div>
             </div>
         </div>);
     }
@@ -624,8 +768,13 @@ export default function Status() {
                     </div>)
                 ))}
                                 
-                <div className="FIELD TAG" ></div>
-                <button className="key" onClick={(() => doBook(strKey))}>Buchen</button>            
+            </div>
+
+
+            <div className="attrLine">
+                <div className="FIELD MOAM" >
+                    <button className="key" onClick={(() => doBook(strKey))}>&nbsp;{page.Book}&nbsp;</button>            
+                </div>
             </div>
         </div>);
     }
@@ -720,6 +869,19 @@ export default function Status() {
     let tabHeaders=[page.DashBoard]; fixPages++;
 
 
+    // account history page for assets
+    tabHeaders.push(page.AccountHistoryAssets); fixPages++;
+
+    // account history page for equity/liability
+    tabHeaders.push(page.AccountHistoryEqLiab); fixPages++;
+
+    // income used page
+    tabHeaders.push(page.IncomeUsed); fixPages++;
+
+    // closing Overview page
+    tabHeaders.push(page.Closing); fixPages++;
+
+    
 
     // history page
     const jHistory  = sheet[D_History];
@@ -819,8 +981,8 @@ export default function Status() {
 
 
     // extra footer buttons
-    let aFunc=[handleXLSave];
-    let aText=["Get XLSX"];
+    let aFunc=[handleXLSave,handleJSONSave];
+    let aText=["Get XLSX","Get JSON"];
     if(showAccount) {
         aFunc.push(funcKeepReceipt); aText.push(D_CarryOver);
         aFunc.push(funcHideReceipt); aText.push(page.DashBoard);
@@ -839,7 +1001,7 @@ export default function Status() {
                     Object.keys(aSelText).map((sym,i) => ( (sym && aSelText[sym] && aJMoney[sym] ) ? // && i>1
                                                 
                                                             TXNReceipt(
-                                                                aSelText[sym].join(' '),
+                                                                aReason[sym],
                                                                 aJMoney[sym],
                                                                 jColumnHeads,
                                                                 jSum,
@@ -855,13 +1017,15 @@ export default function Status() {
             (<div>
                 { console.log("100 STATUS show history") }
                 <div className="FIELD" key={"Dashboard"} id={'Overview0'} style= {{ 'display': aPages[0]}} >
+                    <div className="FIELD LNAM">&nbsp;</div>
+                    <div className="attrLine">{page.Closing}&nbsp;{parseInt(session.year)}</div>
                     <StatusRow am1={page.Assets} am2={page.Gain}  am3={page.eqliab}/>
                     {
                         statusReport.map((row,line) => (
                             <StatusRow  key={"Status"+line}  
-                                                am1={row.gLeft} tx1={row.nLeft} 
-                                                am2={row.gMidl} tx2={row.nMidl} 
-                                                am3={row.gRite} tx3={row.nRite} 
+                                                am1={row.assets.yearEnd} tx1={row.assets.name} 
+                                                am2={row.gals.yearEnd} tx2={row.gals.name} 
+                                                am3={row.eqLiab.yearEnd} tx3={row.eqLiab.name} 
                                                 d={row.dTran} n={row.nTran} l={row.lTran}
                                                 click={(line==0)?handleReview:null}/>                       
                         ))
@@ -869,9 +1033,112 @@ export default function Status() {
                 </div>
 
 
+                { console.log("102 ACCOUNTHISTORY show results ASSETS") }
+                <div className="FIELD" key={"AccountHistory"} id={'Overview1'} style= {{ 'display': aPages[1]}} >
+                    
+                    <div className="FIELD LNAM">&nbsp;</div>
+                    <div className="attrLine">{page.AccountHistoryAssets}&nbsp;{parseInt(session.year)}</div>
+
+                    <AccountHistoryRow  key={"AcctHistoryAssets"}  
+                                                    am1={page.Init} tx1={page.Name} am2={page.Credit} am3={page.Debit} am4={page.YearEnd} 
+                                                    showAssets={true}
+                                                />                       
+                        
+                        
+                        {
+                            statusReport.map((row,line) => (
+                                <AccountHistoryRow  key={"AcctHistoryAssets"+line}  
+                                                    am1={row.assets.init} tx1={row.assets.name} 
+                                                    am2={row.assets.credit} 
+                                                    am3={row.assets.debit} 
+                                                    am4={row.assets.yearEnd} 
+                                                    showAssets={true}
+                                                />                       
+                            ))
+                        }
+                </div>
 
 
-                <div className="FIELD"  key={"HGB"}  id={'Overview1'} style= {{ 'display': aPages[1]}} > 
+                { console.log("104 ACCOUNTHISTORY show results EQLIAB") }
+                <div className="FIELD" key={"AccountHistoryEqLiab"} id={'Overview2'} style= {{ 'display': aPages[2]}} >
+
+                    <div className="FIELD LNAM">&nbsp;</div>
+                    <div className="attrLine">{page.AccountHistoryEqLiab}&nbsp;{parseInt(session.year)}</div>
+                        
+                    <AccountHistoryRow  key={"AcctHistoryEqLiab"}  
+                                                    showEqLiab={true}
+                                                    am5={page.Init} tx2={page.Name} am6={page.Credit} am7={page.Debit} am8={page.income} am9={page.Tax} amA={page.NextYear} 
+                                                />                       
+                        
+                        
+                        {
+                            statusReport.map((row,line) => (
+                                <AccountHistoryRow  key={"AcctHistoryEqLiab"+line}  
+                                                    showEqLiab={true}
+
+
+                                                    am5={row.eqLiab.init} tx2={row.eqLiab.name} 
+                                                    am6={row.eqLiab.credit} 
+                                                    am7={row.eqLiab.debit} 
+                                                    am8={row.eqLiab.income} 
+                                                    am9={row.eqLiab.tax} 
+                                                    amA={row.eqLiab.next} 
+                                                />                       
+                            ))
+                        }
+                </div>
+
+
+
+                { console.log("106 INCOMEUSED show results") }
+                <div className="FIELD" key={"IncomeUsed"} id={'Overview3'} style= {{ 'display': aPages[3]}} >
+
+                    <div className="FIELD LNAM">&nbsp;</div>
+                    <div className="attrLine">{page.IncomeUsed}&nbsp;{parseInt(session.year)}</div>
+
+
+                    <IncomeUsedRow am1={page.Assets} am2={page.Gain}  am3={page.eqliab} am4={page.eq_income} am5={page.eq_tax} am6={page.eq_next}/>
+                    {
+                        statusReport.map((row,line) => (
+                            <IncomeUsedRow  key={"Status"+line}  
+                                                am1={row.assets.yearEnd} tx1={row.assets.name} 
+                                                am2={row.gals.yearEnd}   tx2={row.gals.name} 
+                                                am3={row.eqLiab.yearEnd} tx3={row.eqLiab.name} 
+                                                am4={row.eqLiab.income} // 20230218 income used
+                                                am5={row.eqLiab.tax} // 20230218 tax paid
+                                                am6={row.eqLiab.next} // 20230218 next year
+                                               />                       
+                        ))
+                    }
+                </div>
+
+
+
+                { console.log("108 OVERVIEW show results") }
+                <div className="FIELD" key={"Closing"} id={'Overview4'} style= {{ 'display': aPages[4]}} >
+
+                    <div className="FIELD LNAM">&nbsp;</div>
+                    <div className="attrLine">{page.Closing}&nbsp;{parseInt(session.year)}</div>
+
+
+                    <ClosingRow  am1={page.Assets}  am2={page.Init}  am3={page.YearEnd}  am4={page.income}  am5={page.Tax}  am6={page.Next}    /> 
+                    {
+                        statusReport.map((row,line) => (
+                            <ClosingRow  key={"Status"+line}  
+                                                am1={row.assets.init}     tx1={row.assets.name} 
+                                                am2={row.eqLiab.init}     tx2={row.eqLiab.name} 
+                                                am3={row.eqLiab.yearEnd}  tx3={row.eqLiab.name}  
+                                                am4={row.eqLiab.income}   tx4={row.eqLiab.name}
+                                                am5={row.eqLiab.tax}      tx5={row.eqLiab.name} 
+                                                am6={row.eqLiab.next}     tx6={row.eqLiab.name}
+                                               />                       
+                        ))
+                    }
+                </div>
+
+
+
+                <div className="FIELD"  key={"HGB"}  id={'Overview5'} style= {{ 'display': aPages[5]}} > 
                 { console.log("110 STATUS show HBG275 S1") }
                     <div className="attrLine">
                         <div className="FIELD LNAM">&nbsp;</div>
@@ -888,6 +1155,7 @@ export default function Status() {
                 {arrBalance.map((balance,n) => (
                 <div className="FIELD" key={"Balance0"+n} id={tabName+(balanceBase+n)} style= {{ 'display': aPages[balanceBase+n]}} >
                         { console.log("120 STATUS showbalance "+n) }
+                        <div className="FIELD LNAM">&nbsp;</div>
                         <div className="attrLine">{[page.BalanceOpen,page.BalanceClose,page.BalanceNext][n] + ' ' + (parseInt(session.year))}</div>
                         {JSON.parse(balance).map((row,i) => ( 
                             <BalanceRow  key={"Balance"+n+"1"+i} jArgs={row} id={i} />    
@@ -899,7 +1167,11 @@ export default function Status() {
 
 
                 <div className="FIELD"  key={"FixedAssets"}  id={tabName+(assetsBase)}  style={{'display':aPages[assetsBase]}} >
+
                     <div className="FIELD LNAM">&nbsp;</div>
+                    <div className="attrLine">{page.fixed}&nbsp;{parseInt(session.year)}</div>
+
+
                     { console.log("130 STATUS show fixed assets ") }
 
                     <FixedAssetsRow p={ {'idnt':'Name', 'type':'WKN/Typ', 
@@ -944,6 +1216,7 @@ export default function Status() {
                     { console.log("140 STATUS show partner "+partnerNo) }
                             
                             <div className="attrLine"></div>
+                            <div className="attrLine">{page.Tax}&nbsp;{parseInt(session.year)}</div>
 
                             <PartnerTitleRow p={ {'name':page.Name, 
                                 'init':page.Init, 
@@ -1003,9 +1276,9 @@ function TXNReceipt(text,jAmounts,jColumnHeads,jSum,id,removeCol) {
     
 
     return( // FIELD
-        <div>
+        <div id="TXNReceipt">
             <div className="attrLine"> <div className="FIELD"></div></div>
-            <div className="attrLine"> <div className="FIELD">{text} {id}</div></div>
+            <div className="attrLine"> <div className="FIELD"> {id}&nbsp;&nbsp;{text}</div></div>
             <HistoryRow jValues={jAmounts} jColumnHeads={jColumnHeads} removeCol={removeCol}/>
         </div>
         
@@ -1031,217 +1304,6 @@ function HistoryRow(args) {
     
 }
 
-function makeHGBReport(jAccounts,page,jReport) {
-
-    let balance = []; 
-    
-    console.log("makeReport from response D_Report "+JSON.stringify(Object.keys(jReport)));
-              
-    if(page) {           
-        var chgb1 = 0n; // Umsatz
-        var chgb5 = 0n; // MAT+RHB+Leistungen direkter Aufwand
-        // Bruttoergebnis
-
-        var chgb7 = 0n; // Abschreibungen Sachanlagen
-        var chgb8 = 0n; // sonstige betr. Aufwand
-        // Ergebnis
-
-        var chgb9 = 0n; // Ertrag aus Beteiligungen
-        var chgbA = 0n; // Wertpapierertrag
-        var chgbB = 0n; // Zinseinnahmen
-        var chgbC = 0n; // Zinsaufwand
-        var chgbD = 0n; // Finanzergebnis
-        var chgbE = 0n; // gezahlte Steuern v Einkommen und Ertrag
-        var chgbF = 0n; // Steuerforderung d Gesellschafter
-        // Jahresueberschuss
-
-        var cAvgFix = 0n; // betriebsnotwendiges Vermoegen
-        var cAvgCur = 0n; // mittleres Umlaufvermoegen
-        var cReceiv = 0n; // Forderungen
-
-
-
-        for (let name in jAccounts)   {
-            var account=jAccounts[name];
-            var init = account.init;
-            var yearEnd = account.yearEnd;
-            var iName = account.name;
-            var full_xbrl = account.xbrl;
-
-
-
-            if(yearEnd && iName && full_xbrl) {
-                
-                if(full_xbrl.startsWith('de-gaap-ci_bs.ass.fixAss'))  { cAvgFix = cAvgFix +(BigInt(init)+BigInt(yearEnd))/2n; console.log("BNV  "+name+"="+cAvgFix); }  
-                if(full_xbrl.startsWith('de-gaap-ci_bs.ass.currAss')) { cAvgCur+=(BigInt(init)+BigInt(yearEnd))/2n; console.log("DUV  "+name+"="+cAvgCur); }
-                if(full_xbrl.startsWith('de-gaap-ci_bs.ass.currAss.receiv')) { cReceiv-=BigInt(yearEnd);                     console.log("FOR  "+name+"="+cReceiv); }
-                if(full_xbrl.startsWith('de-gaap-ci_bs.ass.currAss.receiv.other.otherTaxRec')) { chgbF+=BigInt(yearEnd); console.log("TAX  "+name+"("+yearEnd+")="+chgbF);  } // 20220521 keep tax claims separately
-
-                // MIET / rent was 'de-gaap-ci_is.netIncome.regular.operatingTC.yearEndTradingProfit'
-                if(full_xbrl.startsWith('de-gaap-ci_is.netIncome.regular.operatingTC.grossTradingProfit')) { chgb1+=BigInt(yearEnd); }
-                if(full_xbrl.startsWith('de-gaap-ci_is.netIncome.regular.operatingTC.otherCost.fixingLandBuildings')) { chgb5+=BigInt(yearEnd); }
-
-                if(full_xbrl.startsWith('de-gaap-ci_is.netIncome.regular.operatingTC.deprAmort.fixAss.tan')) { chgb7+=BigInt(yearEnd); }
-                if(full_xbrl.startsWith('de-gaap-ci_is.netIncome.regular.operatingTC.otherCost.otherOrdinary')) { chgb8+=BigInt(yearEnd); }
-                
-                // EZIN = de-gaap-ci_is.netIncome.regular.fin.netInterest.income
-                if(full_xbrl.startsWith('de-gaap-ci_is.netIncome.regular.fin.netParticipation')) { chgb9+=BigInt(yearEnd); }
-                if(full_xbrl.startsWith('de-gaap-ci_is.netIncome.regular.fin.sale')) { chgbA+=BigInt(yearEnd);chgbD+=BigInt(yearEnd);  }
-                if(full_xbrl.startsWith('de-gaap-ci_bs.ass.currAss.receiv.unpaidC')) { chgbA-=BigInt(yearEnd); }
-                if(full_xbrl.startsWith('de-gaap-ci_is.netIncome.regular.fin.netInterest')) { chgbB+=BigInt(yearEnd);  console.log("EZIN = "+yearEnd+ " from "+JSON.stringify(account)); }
-                if(full_xbrl.startsWith('de-gaap-ci_is.netIncome.regular.fin.expenses')) { chgbC+=BigInt(yearEnd); }
-                if(full_xbrl.startsWith('de-gaap-ci_is.is.netIncome.tax')) { chgbE-=BigInt(yearEnd); }
-
-               // console.log("READ xbrl="+full_xbrl+" "+chgb5+" "+chgb7+" "+chgb8+" "+chgbA+" "+chgbB+" "+chgbC+" "+chgbD+" "+chgbE+" "+chgbF);
-               
-            }
-
-        }
-
-        let grossYield = chgb5+chgb1;
-    //                    cursor=printFormat(cursor,[' ',page.Revenue,cents2EU(chgb1)]);
-    //                    cursor=printFormat(cursor,[' ',page.DirectCost,cents2EU(chgb5)]);
-    //                    cursor=printFormat(cursor,['Gross Yield',' ',page.yearEndYield,cents2EU(grossYield)]);
-
-
-        let regularOTC = grossYield+chgb7+chgb8;
-    //                    cursor=printFormat(cursor,[' ',page.Depreciation,cents2EU(chgb7)]);
-    //                    cursor=printFormat(cursor,[' ',page.OtherRegular,cents2EU(chgb8)]);
-    //                    cursor=printFormat(cursor,['EBITDA',' ',page.RegularOTC,cents2EU(regularOTC)]);
-
-
-
-
-
-        let ass,eql,gls;
-        // add three additional accounts: ASSETS, EQLIAB, GAINLOSS
-        if(jReport["xbrlAssets"].account) { 
-            ass = jReport["xbrlAssets"].account; 
-            //console.log("ASSET "+JSON.stringify(ass)); 
-            jAccounts["xbrlAssets"]=ass;
-        }
-        if(jReport["xbrlEqLiab"].account) { 
-            eql = jReport["xbrlEqLiab"].account; 
-            //console.log("EQLIB "+JSON.stringify(eql)); 
-            jAccounts["xbrlEqLiab"]=eql;
-        }
-        if(jReport["xbrlRegular"].account) { 
-            gls = jReport["xbrlRegular"].account; 
-            //console.log("GALOS "+JSON.stringify(gls)); 
-            jAccounts["xbrlRegular"]=gls;
-        }
-        console.log("makeReport from response D_Balance "+JSON.stringify(Object.keys(jAccounts)));
-
-        
-        // build two columns
-        let aLeft={};
-        let aRite={};
-
-        for (let name in jAccounts)   {
-            var account=jAccounts[name];
-            if(account.xbrl.length>1) {
-                var xbrl = account.xbrl.split('\.').reverse();
-                var xbrl_pre = xbrl.pop()+ "."+ xbrl.pop();
-                if(xbrl_pre===X_ASSETS) aLeft[name]=account;            
-                if(xbrl_pre===X_EQLIAB) aRite[name]=account;
-            }
-        }
-
-    
-        var iRite=2;
-        var iLeft=1;
-        //balance.push({  });
-        balance.push({ 'tw1':jReport.xbrlEqLiab.de_DE, 'am3':page.Init, 'am2':page.Close, 'am1':page.Next });
-
- 
-        for (let name in aRite)   {
-            var account=aRite[name];
-
-            var iName = account.name;
-            var cBegin= BigInt(account.init);
-            var cClose = BigInt(account.yearEnd);
-            var cNext = BigInt(account.next);
-            //console.log("EqLiab account ="+JSON.stringify(account));
-    
-           iLeft = fillLeft(balance,cBegin,cClose,cNext,iName,iLeft);
-        }
-
-        fillRight(balance,chgb1,page.Revenue,0,1);
-        fillRight(balance,chgb5,page.OpCost,1,1);
-        fillRight(balance,grossYield,page.GrossYield,2,2);
-        // Bruttoergebnis
-
-        fillRight(balance,chgb7,page.Depreciation,4,1); 
-        fillRight(balance,chgb8,page.OtherOTC,5,1);
-        fillRight(balance,chgb7+chgb8,page.OtherRegular,6,2);
-        fillRight(balance,regularOTC,page.RegularOTC,7,3);
-        // Ergebnis
-
-        fillRight(balance,chgb9,page.PartYield,8,1);
-        fillRight(balance,chgbA,page.FinSale,9,1);
-        fillRight(balance,chgb9+chgbD,'('+page.RegularEQUITY+')',10,2);
-        fillRight(balance,chgbB,page.NetInterest,11,1);
-        fillRight(balance,chgbC,page.InterestCost,12,1);
-        
-        let fin = chgb9+chgbA+chgbB+chgbC;
-        fillRight(balance,fin,page.FinYield,13,3);
-        
-        let gain = regularOTC+fin;
-        // Jahresueberschuss
-        fillRight(balance,gain,page.closing,14,3);
-        fillRight(balance,-chgbF,page.CapTax,15,3); // -- this part needed for 
-        let netGain = gain-chgbF;
-        fillRight(balance,netGain,page.NetIncome,16,3);
-
-        fillRight(balance,cAvgFix,page.OpAssets,17,1);
-        fillRight(balance,cAvgCur,page.AvgCurrent,18,1);
-        fillRight(balance,cReceiv,page.rec,19,1);
-        let opCap = cAvgFix+cAvgCur+cReceiv;
-        fillRight(balance,opCap,page.OpCapital,21,3);
-        let performanceBP = 1n;
-        if(opCap>0n) performanceBP = (10000n*netGain) / opCap;
-        iRite=fillRight(balance,performanceBP,page.CapMargin,22,3);
-        
-        }
-    while(iRite<=SCREENLINES-1 && iLeft<=SCREENLINES-1) {
-        balance.push({  });
-        iLeft++;
-        iRite++;
-    }
-
-    return balance;
-}
-
-function fillLeft(balance,dispValue1,dispValue2,dispValue3,iName,iLeft) {
-    if(iLeft<SCREENLINES) {
-        if(!balance[iLeft]) balance[iLeft]={};
-        balance[iLeft].tw1=iName;
-        let cValue1=cents2EU(dispValue1);
-        let cValue2=cents2EU(dispValue2);
-        let cValue3=cents2EU(dispValue3);
-        balance[iLeft].am3=cValue1; 
-        balance[iLeft].am2=cValue2; 
-        balance[iLeft].am1=cValue3; 
-        
-        iLeft++;
-    }
-    return iLeft;
-}
-
-
-function fillRight(balance,cValue,iName,iRite,level) {
-    if(iRite<SCREENLINES) {
-        if(!balance[iRite]) balance[iRite]={};
-        balance[iRite].tx1=iName;
-        let dispValue=cents2EU(cValue);
-        if(level==3) { balance[iRite].an1=dispValue; }
-        if(level==2) { balance[iRite].an2=dispValue; }
-        if(level==1) { balance[iRite].an3=dispValue; }
-        iRite++;
-    }
-    return iRite;
-}
-
 
 function HGB275Row({ jArgs, id }) {
     return(
@@ -1258,136 +1320,6 @@ function HGB275Row({ jArgs, id }) {
     )
 }
 
-
-function makeBalance(jAccounts,jReport,value) {
-
-    let balance = new Array();
-
-    // console.log("makeBalance 001 from response D_Report"+JSON.stringify(Object.keys(jReport)));
-
-
-    let ass,eql,gls;
-    // add three additional accounts: ASSETS, EQLIAB, GAINLOSS
-    if(jReport["xbrlAssets"].account) { 
-        ass = jReport["xbrlAssets"].account; 
-        //console.log("ASSET "+JSON.stringify(ass)); 
-        jAccounts["xbrlAssets"]=ass;
-    }
-    if(jReport["xbrlEqLiab"].account) { 
-        eql = jReport["xbrlEqLiab"].account; 
-        //console.log("EQLIB "+JSON.stringify(eql)); 
-        jAccounts["xbrlEqLiab"]=eql;
-    }
-    if(jReport["xbrlRegular"].account) { 
-        gls = jReport["xbrlRegular"].account; 
-        //console.log("GALOS "+JSON.stringify(gls)); 
-        jAccounts["xbrlRegular"]=gls;
-    }
-    //console.log("makeBalance from response D_Balance"+JSON.stringify(Object.keys(jAccounts)));
-
-    
-    // build three columns
-    let aLeft={};
-    let aRite={};
-
-    for (let name in jAccounts)   {
-        var account=jAccounts[name];
-        if(account.xbrl.length>1) {
-            var xbrl = account.xbrl.split('\.').reverse();
-            var xbrl_pre = xbrl.pop()+ "."+ xbrl.pop();
-            if(xbrl_pre===X_ASSETS) aLeft[name]=account;            
-            if(xbrl_pre===X_EQLIAB) aRite[name]=account;
-        }
-    }
-    
-    var iEqLiab=0n;
-    var income=0n;
-
-    
- 
-    var iRite=3;
-    var iLeft=3;
-    balance.push({  });
-    const aTag = Object.keys(jReport);
-    balance.push({ 'tw1':jReport.xbrlAssets.de_DE,/* 'am1': (""+aTag),*/ 'tx1':jReport.xbrlEqLiab.de_DE });
-
-    for (let tt=0;tt<aTag.length;tt++)   {
-        let tag=aTag[tt];
-        //console.log("makeBalance 005 Report "+JSON.stringify(jReport[tag]));
-        
-        var element    =  jReport[tag];
-        var level     =  element.level;
-        var account  = element.account;
-        var dispValue = account[value]; // account.yearEnd;
-        var iName    =    account.name;
-        var full_xbrl  =  account.xbrl;
-
-        if(dispValue && iName && full_xbrl) {
-            // collect compute total right side amount
-            if(full_xbrl==='de-gaap-ci_bs.eqLiab') { iEqLiab=BigInt(dispValue);  }
-            if(full_xbrl==='de-gaap-ci_is.netIncome.regular') { income=BigInt(dispValue); }
-            if(full_xbrl==='de-gaap-ci_bs.eqLiab.income') { 
-                let bIncome=(income+iEqLiab); 
-                //console.log("INCOME = "+bIncome);
-                dispValue=bIncome;
-            }
-
-            var xbrl = full_xbrl.split('\.');
-            var side = xbrl[1];
-           
-            //console.log('makeBalance side='+side + "  in "+full_xbrl + "= "+dispValue);
-
-            if(side=='ass') {
-                if(iLeft<SCREENLINES) {
-                    if(!balance[iLeft]) balance[iLeft]={};
-                    balance[iLeft].tw1=iName;
-                    let cValue=cents2EU(dispValue);
-                    if(level==1) { balance[iLeft].am1=cValue; }
-                    if(level==2) { balance[iLeft].am2=cValue; }
-                    if(level==3) { balance[iLeft].am3=cValue; }
-                    if(level==4) { balance[iLeft].am4=cValue; }
-                    iLeft++;
-                }
-            } else {
-                if(iRite<SCREENLINES) {
-                    if(!balance[iRite]) balance[iRite]={};
-                    let cValue=cents2EU(dispValue);
-                    balance[iRite].tx1=iName;
-                    if(level==1) { balance[iRite].an1=cValue; }
-                    if(level==2) { balance[iRite].an2=cValue; }
-                    if(level==3) { balance[iRite].an3=cValue; }
-                    if(level==4) { balance[iRite].an4=cValue; }
-                    iRite++;
-                }
-            }
-
-
-        } else {
-            // divider line out
-        }
-    }
-
-    while(iRite<=SCREENLINES && iLeft<=SCREENLINES) {
-        balance.push({  });
-        iLeft++;
-        iRite++;
-    }
-
-    console.log('makeBalance('+value+') EXIT '+JSON.stringify(balance));
-
-    return JSON.stringify(balance);
-    /*
-    return [ 
-        { tw1:'Gebäude    ',   am3:' 7,35' },
-        { tw1:'Grundstücke',   am3:'10,00' },
-        { tw1:'Sachanlagen',   am2:'17,35',  tx1:'Stammkapital',  an2:'17,35' },
-        { tw1:'Aktien',        am3:'80,55',  },
-        { tw1:'Münzen',        am3:'17,00',  },
-        { tw1:'Finanzanlagen', am2:'97,55',  tx1:'Kredite', an2:'97,55' },
-        { tw1:'Aktiva',       am1:'114,90',  tx1:'Passiva',an1:'114,90' }
-        ]
-      */  
-}
 
 function BalanceRow({ jArgs, id }) {
     if(jArgs)

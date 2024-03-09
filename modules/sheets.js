@@ -8,7 +8,7 @@ const debugWrite=null;
 
 
 /* global BigInt */
-import {  symbolic } from './session'
+import {  symbolic } from './writeModule'
 
 const Compiler=require("./compile.js");
 
