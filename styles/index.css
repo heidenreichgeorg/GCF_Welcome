@@ -68,13 +68,13 @@ input[type=number] {
 .TAG      { width: 1.8rem; text-align: left;  }		
 .SYMB     { width: 3rem;  text-align: left; }		
 .DATE     { width: 4rem;  text-align: center; }		
-.MOAM     { width: 5.2rem; text-align: right; font-family:monospace; font-size:1.3em;}
+.MOAM     { width: 5.2rem; text-align: right; font-family:monospace; font-size:9pt; }
 .TEAM     { width: 5.3rem; text-align: right; }
 .SNAM     { width: 5.8rem; text-align: left; }		
 .C100     { width: 6rem; }
 .R105     { width: 6rem; text-align: right; }
 .TENY     { width: 7rem;  text-align: right; }
-.MONY     { width: 7rem; text-align: right; font-family:monospace; font-size:1.3em; }
+.MONY     { width: 7rem; text-align: right; font-family:monospace; font-size:9pt; }
 .NAME     { width: 7rem; text-align: left;  }
 .CNAM     { width: 7rem; text-align: center;  }
 .CNAMF    { width: 7.3rem; text-align: center;  }
