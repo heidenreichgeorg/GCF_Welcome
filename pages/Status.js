@@ -596,6 +596,9 @@ export default function Status() {
         console.log("EXIT bufferField: in "+JSON.stringify(record));  
     }
 
+    const TXT2 = 'Sender'
+    const TXT3 = 'Referenz'
+    const TXT4 = 'Grund'
 
 
     function BookingForm({ strKey, form, preBook }) {
@@ -607,9 +610,9 @@ export default function Status() {
 
         let autoAcct = getLastAccount(form);
  
-        let txt2='Sender'; if(form.txt2) txt2=form.txt2;
-        let txt3='Zeit'; if(form.txt3) txt3=form.txt3;
-        let txt4='Grund'; if(form.txt4) txt4=form.txt4;
+        let txt2=TXT2; if(form.txt2) txt2=form.txt2;
+        let txt3=TXT3; if(form.txt3) txt3=form.txt3;
+        let txt4=TXT4; if(form.txt4) txt4=form.txt4;
         
 
         console.log("FORM = "+JSON.stringify(form));
@@ -705,11 +708,9 @@ export default function Status() {
         let arrDebitA = Object.keys(form.debitA);
         let arrDebit = Object.keys(form.debit);
 
-        let autoAcct = getLastAccount(form);
-
-        let txt2='Sender'; if(form.txt2) txt2=form.txt2;
-        let txt3='Zeit'; if(form.txt3) txt3=form.txt3;
-        let txt4='Grund'; if(form.txt4) txt4=form.txt4;
+        let txt2=TXT2; if(form.txt2) txt2=form.txt2;
+        let txt3=TXT3; if(form.txt3) txt3=form.txt3;
+        let txt4=TXT4; if(form.txt4) txt4=form.txt4;
 
 
         return( <div><div className="attrLine"></div>
