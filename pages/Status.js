@@ -1276,6 +1276,16 @@ function TXNReceipt(text,jAmounts,jColumnHeads,jSum,id,removeCol) {
     if(jSum) console.log("TXNReceipt jSum "+JSON.stringify(jSum));
     
 
+
+    
+
+
+/*
+
+  draggable="true" onDragStart="dragValue(event,'+content+')"
+'function dragValue(ev,value) { ev.dataTransfer.setData("text/plain", value); }\n'+
+
+*/
     return( // FIELD
         <div id="TXNReceipt">
             <div className="attrLine"> <div className="FIELD"></div></div>
@@ -1289,6 +1299,14 @@ function TXNReceiptSum(args) {
 }
 function nop() {}
 
+
+
+/*
+
+  draggable="true" onDragStart="dragValue(event,'+content+')"
+'function dragValue(ev,value) { ev.dataTransfer.setData("text/plain", value); }\n'+
+
+*/
 
 function HistoryRow(args) { 
     let amounts =[]; let cols=[];  let count=0;
