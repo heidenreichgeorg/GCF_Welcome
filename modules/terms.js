@@ -19,6 +19,9 @@ export const  D_Account="Konto"
 export const  T_DEBIT="HABEN";
 export const  T_CREDIT="SOLL";
 
+export const  T_OPEN="Eröffnung";
+export const  T_CLOSE="Abschluss";
+
 
 export const  X_ASSETS = 'de-gaap-ci_bs.ass';
 export const  X_ASS_FIX ='de-gaap-ci_bs.ass.fixAss';
@@ -54,5 +57,5 @@ export const  PORT = 81;
 
 export const  SCREENLINES=23;
 
-
-
+export const YEARBEGIN='01.01.';
+export const YEAREND='31.12.';

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { getSession, useSession, REACT_APP_API_HOST,getCarryOver,storeCarryOver } from '../modules/sessionmanager';
 import Screen from './Screen'
 import { cents2EU,bigUSMoney,cents20EU,bigEUMoney }  from '../modules/money';
-import { D_Account, D_Balance, D_Carry, D_CarryOver, D_Page, D_Partner, D_FixAss, D_History, D_Report, D_Schema, J_ACCT, SCREENLINES, X_ASSET_CAPTAX } from '../modules/terms.js'
+import { CSEP, D_Account, D_Balance, D_Carry, D_CarryOver, D_Page, D_Partner, D_FixAss, D_History, D_Report, D_Schema, J_ACCT, SCREENLINES, T_OPEN, T_CLOSE, X_ASSET_CAPTAX , YEARBEGIN, YEAREND } from '../modules/terms.js'
 import { book,prepareTXN,makeHistory,symbolic }  from '../modules/writeModule';
 import { makeStatusData,makeHGBReport,makeBalance}  from '../modules/App';
 
@@ -138,7 +138,7 @@ export default function Status() {
     
             let aRow = [0n,0n,0n,0n,0n,0n]
             try { let saRow = row.entry;
-                aRow = saRow.split(CSEP);
+                aRow = saRow.split(CSEP); // 20240616 ?? was split()
             } catch(err) {  aRow=[""+index+client+year,""+year+index+client] }    
     
             let tRow =  {};
@@ -989,27 +989,31 @@ export default function Status() {
         aFunc.push(funcHideReceipt); aText.push(page.DashBoard);
     }
 
+    let record=[];
+
     return (
         <Screen tabSelector={showAccount ? [] : tabHeaders} tabName={tabName} aFunc={aFunc} aText={aText}  > 
            
            {showAccount &&             
                 (
                 <div className="mTable">                     
-                    { TXNReceipt(D_Account+' '+showAccount, jColumnHeads, jColumnHeads, null, session.year, removeCol) }
+                    { TXNReceipt ('',D_Account+' '+showAccount, 'Verlauf', jColumnHeads, jColumnHeads, null, session.year, removeCol) }
                     
-                    <TXNReceiptSum text={D_Carry} jAmounts={jPageSum} jColumnHeads={jColumnHeads} id=""/>                   
+                    <TXNReceiptSum date={YEARBEGIN} text={D_Carry} sender={T_OPEN} jAmounts={jPageSum} jColumnHeads={jColumnHeads} id=""/>                   
                     { console.log("099 aSelText keys = "+Object.keys(aSelText).join('+')) ||
-                    Object.keys(aSelText).map((sym,i) => ( (sym && aSelText[sym] && aJMoney[sym] ) ? // && i>1
+                    Object.keys(aSelText).map((sym,i) => ( (sym && aSelText[sym] && aJMoney[sym] && (record=aReason[sym].split(CSEP))) ? // && i>1
                                                 
                                                             TXNReceipt(
-                                                                aReason[sym],
+                                                                record[0], // Date
+                                                                record[1], // Sender
+                                                                aJMoney[sym][showAccount], // Amount
                                                                 aJMoney[sym],
                                                                 jColumnHeads,
                                                                 jSum,
                                                                 makeLabel(i,showAccount)) 
                                                                     :""
                                                                     )) }
-                    <TXNReceiptSum text={page.Sum} jAmounts={jSum} jColumnHeads={jColumnHeads} id="" removeCol={removeCol}/>                                                                                       
+                    <TXNReceiptSum date={YEAREND} text={page.Sum} sender={T_CLOSE} jAmounts={jSum} jColumnHeads={jColumnHeads} id="" removeCol={removeCol}/>                                                                                       
 
                 </div>
             )}
@@ -1262,7 +1266,7 @@ export default function Status() {
 }
 
 
-function TXNReceipt(text,jAmounts,jColumnHeads,jSum,id,removeCol) {
+function TXNReceipt(date,sender,amount,jAmounts,jColumnHeads,jSum,id,removeCol) {
     
     Object.keys(jAmounts).forEach(acct=>{
         let value = jAmounts[acct];        
@@ -1288,15 +1292,26 @@ function TXNReceipt(text,jAmounts,jColumnHeads,jSum,id,removeCol) {
 */
     return( // FIELD
         <div id="TXNReceipt">
-            <div className="attrLine"> <div className="FIELD"></div></div>
-            <div className="attrLine"> <div className="FIELD"> {id}&nbsp;&nbsp;{text}</div></div>
+            <div className="attrLine"> <div className="FIELD"></div></div>             
+            <TransactionRow id={id} date={date} sender={sender} text={amount}/>
             <HistoryRow jValues={jAmounts} jColumnHeads={jColumnHeads} removeCol={removeCol}/>
         </div>
         
 )}      
 function TXNReceiptSum(args) {
-    return TXNReceipt(args.text,args.jAmounts,args.jColumnHeads,null,args.id,args.removeCol);
+    return TXNReceipt(args.date,args.text,args.sender,args.jAmounts,args.jColumnHeads,null,args.id,args.removeCol);
 }
+
+function TransactionRow(args) {
+    return(
+         <div className="attrLine"> 
+                <div  className="FIELD R105"  >{args.id}</div>
+                <div className="FIELD R105" draggable="true">{args.date}</div>
+                <div className="FIELD R105" draggable="true">{args.sender}</div>
+                <div className="FIELD R105" draggable="true">{args.text}</div>            
+        </div>
+)}
+
 function nop() {}
 
 

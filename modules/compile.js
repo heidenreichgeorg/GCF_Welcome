@@ -27,6 +27,7 @@ const J_MINROW=7;
 const Buffer = require('buffer' );
 
 
+
 const Account = require('./account');
 
 const Sheets = require('./sheets'); // setting root attribute
@@ -171,10 +172,15 @@ let jLastTransaction={};
 
 
 
+
+
 // main response object
 // SCHEMA-part
 // must also repeat under terms.js !!!!
 const COLMIN=2;
+
+const YEAREND='31.12.';
+
 const D_Schema = "Schema"; // includes .Names .total .assets .eqliab  N1.author N2.residence  I1.iban I2.register I3.taxnumber  K1.reportYear K2.client
 const D_XBRL   = "XBRL";
 const D_SteuerID = "SteuerID";
@@ -1130,7 +1136,7 @@ function sendBalance(balance) {
 
         if(gReport.xbrlRegular.account.yearEnd) {
             var closeIncome = { 'credit':{}, 'debit':{}  };
-            closeIncome['date']='31.12.'+year;
+            closeIncome['date']=YEAREND+year;
             closeIncome['sender']='System';
             closeIncome['refAcct']=de_DE['GainLoss'];
             closeIncome['reason']=de_DE['Closing'];
