@@ -95,6 +95,7 @@ export default function Status() {
     var funcKeepReceipt=null;
     var funcHideReceipt=null;
     var funcCleaReceipt=null;
+    var funcDownloadReceipt=null;
     var aSelText = {};
     var aReason  = {};
     var aJMoney  = {};
@@ -171,7 +172,14 @@ export default function Status() {
     funcCleaReceipt = (() => { storeCarryOver({}); resetJSum(jHeads); });
     funcKeepReceipt = (() => { storeCarryOver(purgeCarryOver(jSum));  });  
     funcHideReceipt = (() => setShowAccount(null)); 
+    funcDownloadReceipt=((acct) => downloadAccountFile(acct)); 
     funcShowReceipt = ((acct) => setShowAccount(acct));
+
+
+    function downloadAccountFile(acct) {
+        console.log("Status.downloadAccountFile "+acct)
+    }
+
 
     function purgeCarryOver(jSum) {
         let result={}; 
@@ -987,6 +995,7 @@ export default function Status() {
     if(showAccount) {
         aFunc.push(funcKeepReceipt); aText.push(D_CarryOver);
         aFunc.push(funcHideReceipt); aText.push(page.DashBoard);
+        aFunc.push(()=>funcDownloadReceipt(showAccount)); aText.push(page.GeneratedAccountFile);
     }
 
     let record=[];
@@ -1284,12 +1293,6 @@ function TXNReceipt(date,sender,amount,jAmounts,jColumnHeads,jSum,id,removeCol) 
     
 
 
-/*
-
-  draggable="true" onDragStart="dragValue(event,'+content+')"
-'function dragValue(ev,value) { ev.dataTransfer.setData("text/plain", value); }\n'+
-
-*/
     return( // FIELD
         <div id="TXNReceipt">
             <div className="attrLine"> <div className="FIELD"></div></div>             
@@ -1298,17 +1301,23 @@ function TXNReceipt(date,sender,amount,jAmounts,jColumnHeads,jSum,id,removeCol) 
         </div>
         
 )}      
+
+
 function TXNReceiptSum(args) {
     return TXNReceipt(args.date,args.text,args.sender,args.jAmounts,args.jColumnHeads,null,args.id,args.removeCol);
 }
+
+
+function dragCopy(ev,value) { /* ev.dataTransfer.setData("text/plain", value); */ }
+
 
 function TransactionRow(args) {
     return(
          <div className="attrLine"> 
                 <div  className="FIELD R105"  >{args.id}</div>
-                <div className="FIELD R105" draggable="true">{args.date}</div>
-                <div className="FIELD R105" draggable="true">{args.sender}</div>
-                <div className="FIELD R105" draggable="true">{args.text}</div>            
+                <div className="FIELD R105" draggable="true" onDrag={dragCopy}>{args.date}</div>
+                <div className="FIELD R105" draggable="true" onDrag={dragCopy}>{args.sender}</div>
+                <div className="FIELD R105" draggable="true" onDrag={dragCopy}>{args.text}</div>            
         </div>
 )}
 
@@ -1316,12 +1325,6 @@ function nop() {}
 
 
 
-/*
-
-  draggable="true" onDragStart="dragValue(event,'+content+')"
-'function dragValue(ev,value) { ev.dataTransfer.setData("text/plain", value); }\n'+
-
-*/
 
 function HistoryRow(args) { 
     let amounts =[]; let cols=[];  let count=0;

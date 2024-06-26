@@ -85,6 +85,7 @@ let de_DE = {
     AssetList:"Anlagespiegel",
     BalanceOpen:"Eröffnungsbilanz",
     DashBoard:"Übersicht",
+    GeneratedAccountFile:"Kontoverlauf",
     AccountHistory:"Kontenverlauf",
     AccountHistoryAssets:"Verlauf Vermögen",
     AccountHistoryEqLiab:"Verlauf Kapital",
