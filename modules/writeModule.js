@@ -365,3 +365,52 @@ export function symbolic(pat) {
     //console.log("SYMBOLIC "+pat.substring(0,9)+"="+res.)
     return res.toString();
 }
+
+
+
+export function handleAccountReport(strAccount,aSelText,aJMoney) {    
+
+    let record=[];
+
+    console.log("handleAccountReport  "+strAccount);
+
+
+    let jObject = Object.keys(aSelText).map((sym,i) => ( (sym && aSelText[sym] && aJMoney[sym] && (record=aReason[sym].split(CSEP))) ? // && i>1
+                                                
+        console.log(strAccount+": "+
+            record[0]+ // Date
+            record[1]+ // Sender
+            aJMoney[sym][strAccount]+ // Amount
+            aJMoney[sym]+
+            jColumnHeads+
+            jSum
+            ):"")
+    ) 
+
+
+
+// upper part belongs to Status.js
+
+
+    const blob = new Blob([JSON.stringify(jObject, null, 2)], {
+        type: "application/json",
+    });
+    let url = URL.createObjectURL(blob);
+
+    console.log("0740 handleAccountReport "+url);
+
+    let a = document.createElement('a');
+    a.setAttribute("id", "btnArchive");
+    a.href = url;
+    a.download = "ARCHIVE_"+strAccount+".HTML";
+    a.style.display = 'none'; // was block
+    a.className = "FIELD MOAM";
+    a.innerHTML = "Downloading...";
+
+    // ?? from kindyNaut replaceChild(a,"btnArchive");
+
+    a.click();
+
+
+    return url;
+}

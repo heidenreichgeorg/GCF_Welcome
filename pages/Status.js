@@ -3,7 +3,7 @@ import { getSession, useSession, REACT_APP_API_HOST,getCarryOver,storeCarryOver 
 import Screen from './Screen'
 import { cents2EU,bigUSMoney,cents20EU,bigEUMoney }  from '../modules/money';
 import { CSEP, D_Account, D_Balance, D_Carry, D_CarryOver, D_Page, D_Partner, D_FixAss, D_History, D_Report, D_Schema, J_ACCT, SCREENLINES, T_OPEN, T_CLOSE, X_ASSET_CAPTAX , YEARBEGIN, YEAREND } from '../modules/terms.js'
-import { book,prepareTXN,makeHistory,symbolic }  from '../modules/writeModule';
+import { book,handleAccountReport,prepareTXN,makeHistory,symbolic }  from '../modules/writeModule';
 import { makeStatusData,makeHGBReport,makeBalance}  from '../modules/App';
 
 // the ORIGINAL FORMAT from journal sheet is 
@@ -95,7 +95,7 @@ export default function Status() {
     var funcKeepReceipt=null;
     var funcHideReceipt=null;
     var funcCleaReceipt=null;
-    var funcDownloadReceipt=null;
+    var funcDownloadReceipt=handleAccountReport;
     var aSelText = {};
     var aReason  = {};
     var aJMoney  = {};
@@ -172,13 +172,10 @@ export default function Status() {
     funcCleaReceipt = (() => { storeCarryOver({}); resetJSum(jHeads); });
     funcKeepReceipt = (() => { storeCarryOver(purgeCarryOver(jSum));  });  
     funcHideReceipt = (() => setShowAccount(null)); 
-    funcDownloadReceipt=((acct) => downloadAccountFile(acct)); 
+    funcDownloadReceipt=handleAccountReport;
     funcShowReceipt = ((acct) => setShowAccount(acct));
 
 
-    function downloadAccountFile(acct) {
-        console.log("Status.downloadAccountFile "+acct)
-    }
 
 
     function purgeCarryOver(jSum) {
@@ -995,7 +992,7 @@ export default function Status() {
     if(showAccount) {
         aFunc.push(funcKeepReceipt); aText.push(D_CarryOver);
         aFunc.push(funcHideReceipt); aText.push(page.DashBoard);
-        aFunc.push(()=>funcDownloadReceipt(showAccount)); aText.push(page.GeneratedAccountFile);
+        aFunc.push(()=>funcDownloadReceipt(showAccount,aSelText,aJMoney)); aText.push(page.GeneratedAccountFile);
     }
 
     let record=[];
