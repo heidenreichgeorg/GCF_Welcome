@@ -95,7 +95,22 @@ export default function Status() {
     var funcKeepReceipt=null;
     var funcHideReceipt=null;
     var funcCleaReceipt=null;
-    var funcDownloadReceipt=handleAccountReport;
+    var funcDownloadReceipt=(strAccount,aSelText,aJMoney,aReason)=>{
+        let record=[];
+        console.log("funcDownloadReceipt "+strAccount);
+        handleAccountReport(
+            strAccount,
+             Object.keys(aSelText).map((sym,i) => ( (sym && aSelText[sym] && aJMoney[sym] && (record=aReason[sym].split(CSEP))) ? // && i>1
+                                                
+                i+CSEP+
+                record[0]+CSEP+ // Date
+                record[1]+CSEP+ // Sender
+                aJMoney[sym][strAccount]+CSEP // Amount                        
+        :""))
+    ) 
+
+       
+    }
     var aSelText = {};
     var aReason  = {};
     var aJMoney  = {};
@@ -172,7 +187,7 @@ export default function Status() {
     funcCleaReceipt = (() => { storeCarryOver({}); resetJSum(jHeads); });
     funcKeepReceipt = (() => { storeCarryOver(purgeCarryOver(jSum));  });  
     funcHideReceipt = (() => setShowAccount(null)); 
-    funcDownloadReceipt=handleAccountReport;
+    
     funcShowReceipt = ((acct) => setShowAccount(acct));
 
 
@@ -992,7 +1007,7 @@ export default function Status() {
     if(showAccount) {
         aFunc.push(funcKeepReceipt); aText.push(D_CarryOver);
         aFunc.push(funcHideReceipt); aText.push(page.DashBoard);
-        aFunc.push(()=>funcDownloadReceipt(showAccount,aSelText,aJMoney)); aText.push(page.GeneratedAccountFile);
+        aFunc.push(()=>funcDownloadReceipt(showAccount,aSelText,aJMoney,aReason)); aText.push(page.GeneratedAccountFile);
     }
 
     let record=[];
