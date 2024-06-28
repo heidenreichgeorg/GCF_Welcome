@@ -368,33 +368,36 @@ export function symbolic(pat) {
 
 
 
-export function handleAccountReport(strAccount,aSelText,aJMoney) {    
-
-    let record=[];
-
-    console.log("handleAccountReport  "+strAccount);
+export function handleAccountReport(strAccount,aHistory) {    
 
 
-    let jObject = Object.keys(aSelText).map((sym,i) => ( (sym && aSelText[sym] && aJMoney[sym] && (record=aReason[sym].split(CSEP))) ? // && i>1
-                                                
-        console.log(strAccount+": "+
-            record[0]+ // Date
-            record[1]+ // Sender
-            aJMoney[sym][strAccount]+ // Amount
-            aJMoney[sym]+
-            jColumnHeads+
-            jSum
-            ):"")
-    ) 
+    let page = [];
+    
+    aHistory.forEach(line => {
+        if(line.length>3) {
+            let aField=line.split(CSEP);
+            let plus=aField[3];
+            let minus='';
+            if(plus[0]==='-') {minus=plus.substring(1);plus=''}
+            page.push(
+                "<div class='mfield'>"+aField[0]+'</div>'+
+                "<div class='tfield'>"+aField[1]+'</div>'+
+                "<div class='tfield'>"+aField[2]+'</div>'+
+                "<div class='mfield'>"+plus+'</div>'+
+                "<div class='mfield'>"+minus+'</div>'
+                )
+        }}
+    )
 
+    const HEADER = "<body><div class='mTable'><style>\n"+
+        ".mTable { font-family: Bahnschrift,monospace; height: 680px; display:table;    page-break-after: always  }\n"+
+        ".tLine  { vertical-align: top; width:75rem; padding: 1px; float: left; min-height: 16px; height: 17px; font-size: 0.7em; font-weight:400; }\n"+
+        ".mfield  { overflow:hidden; padding: 1px; border: none; float: left; width: 5.2rem; text-align: right;}\n"+
+        ".tfield  { overflow:hidden; padding: 1px; border: none; float: left; width: 6.2rem; text-align: left;}\n"+
+        "</style><div class='tLine'>"
+    const TRAILER = "</div></div></body>";
 
-
-// upper part belongs to Status.js
-
-
-    const blob = new Blob([JSON.stringify(jObject, null, 2)], {
-        type: "application/json",
-    });
+    const blob = new Blob([HEADER+page.join('</div><div class="tLine">')+TRAILER], {type: "application/json",});
     let url = URL.createObjectURL(blob);
 
     console.log("0740 handleAccountReport "+url);
@@ -406,8 +409,6 @@ export function handleAccountReport(strAccount,aSelText,aJMoney) {
     a.style.display = 'none'; // was block
     a.className = "FIELD MOAM";
     a.innerHTML = "Downloading...";
-
-    // ?? from kindyNaut replaceChild(a,"btnArchive");
 
     a.click();
 
