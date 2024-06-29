@@ -105,12 +105,12 @@ export default function Status() {
                 i+CSEP+
                 record[0]+CSEP+ // Date
                 record[1]+CSEP+ // Sender
-                aJMoney[sym][strAccount]+CSEP // Amount                        
-        :""))
-    ) 
-
-       
+                aJMoney[sym][strAccount]+CSEP // Amount    
+                
+            :"")),
+            client,year)
     }
+
     var aSelText = {};
     var aReason  = {};
     var aJMoney  = {};
@@ -1320,16 +1320,14 @@ function TXNReceiptSum(args) {
 }
 
 
-function dragCopy(ev,value) { /* ev.dataTransfer.setData("text/plain", value); */ }
-
 
 function TransactionRow(args) {
     return(
          <div className="attrLine"> 
                 <div  className="FIELD R105"  >{args.id}</div>
-                <div className="FIELD R105" draggable="true" onDrag={dragCopy}>{args.date}</div>
-                <div className="FIELD R105" draggable="true" onDrag={dragCopy}>{args.sender}</div>
-                <div className="FIELD R105" draggable="true" onDrag={dragCopy}>{args.text}</div>            
+                <div className="FIELD R105" draggable="true">{args.date}</div>
+                <div className="FIELD R105" draggable="true">{args.sender}</div>
+                <div className="FIELD R105" draggable="true">{args.text}</div>            
         </div>
 )}
 

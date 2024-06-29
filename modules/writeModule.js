@@ -368,10 +368,15 @@ export function symbolic(pat) {
 
 
 
-export function handleAccountReport(strAccount,aHistory) {    
 
 
-    let page = [];
+export function handleAccountReport(strAccount,aHistory,company,year) {    
+
+
+    let page = ["<div class='mfield'></div><div class='tfield'></div>",
+        "<div class='mfield'>"+company+'</div>'+"<div class='tfield'>"+year+'</div>'+"<div class='tfield'>"+strAccount+'</div>',
+        "<div class='mfield'></div><div class='tfield'></div>"
+    ];
     
     aHistory.forEach(line => {
         if(line.length>3) {
@@ -380,20 +385,21 @@ export function handleAccountReport(strAccount,aHistory) {
             let minus='';
             if(plus[0]==='-') {minus=plus.substring(1);plus=''}
             page.push(
-                "<div class='mfield'>"+aField[0]+'</div>'+
-                "<div class='tfield'>"+aField[1]+'</div>'+
-                "<div class='tfield'>"+aField[2]+'</div>'+
-                "<div class='mfield'>"+plus+'</div>'+
-                "<div class='mfield'>"+minus+'</div>'
+                "<div class='tfield' draggable='true' onDrag={dragCopy}>"+aField[0]+'</div>'+
+                "<div class='tfield' draggable='true' onDrag={dragCopy}>"+aField[1]+'</div>'+
+                "<div class='tfield' draggable='true' onDrag={dragCopy}>"+aField[2]+'</div>'+
+                "<div class='mfield' draggable='true' onDrag={dragCopy}>"+plus+'</div>'+
+                "<div class='mfield' draggable='true' onDrag={dragCopy}>"+minus+'</div>'
                 )
         }}
     )
 
-    const HEADER = "<body><div class='mTable'><style>\n"+
+    const HEADER = "<body><script>function dragCopy(ev,value) {  ev.dataTransfer.setData('text/plain', value);  }</script>\n"+
+        "<div class='mTable'><style>\n"+
         ".mTable { font-family: Bahnschrift,monospace; height: 680px; display:table;    page-break-after: always  }\n"+
-        ".tLine  { vertical-align: top; width:75rem; padding: 1px; float: left; min-height: 16px; height: 17px; font-size: 0.7em; font-weight:400; }\n"+
-        ".mfield  { overflow:hidden; padding: 1px; border: none; float: left; width: 5.2rem; text-align: right;}\n"+
-        ".tfield  { overflow:hidden; padding: 1px; border: none; float: left; width: 6.2rem; text-align: left;}\n"+
+        ".tLine  { vertical-align: top; width:75rem; padding: 1px; float: left; min-height: 22px; height: 23px; font-size: 0.8em; font-weight:400; }\n"+
+        ".mfield  { overflow:hidden; padding: 1px; border: none; float: left; width: 6rem; text-align: right;}\n"+
+        ".tfield  { overflow:hidden; padding: 1px; border: none; float: left; width: 7rem; text-align: left;}\n"+
         "</style><div class='tLine'>"
     const TRAILER = "</div></div></body>";
 
