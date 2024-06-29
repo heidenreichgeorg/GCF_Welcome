@@ -370,54 +370,17 @@ export function symbolic(pat) {
 
 
 
-export function handleAccountReport(strAccount,aHistory,company,year) {    
-
-
-    let page = ["<div class='mfield'></div><div class='tfield'></div>",
-        "<div class='mfield'>"+company+'</div>'+"<div class='tfield'>"+year+'</div>'+"<div class='tfield'>"+strAccount+'</div>',
-        "<div class='mfield'></div><div class='tfield'></div>"
-    ];
-    
-    aHistory.forEach(line => {
-        if(line.length>3) {
-            let aField=line.split(CSEP);
-            let plus=aField[3];
-            let minus='';
-            if(plus[0]==='-') {minus=plus.substring(1);plus=''}
-            page.push(
-                "<div class='tfield' draggable='true' onDrag={dragCopy}>"+aField[0]+'</div>'+
-                "<div class='tfield' draggable='true' onDrag={dragCopy}>"+aField[1]+'</div>'+
-                "<div class='tfield' draggable='true' onDrag={dragCopy}>"+aField[2]+'</div>'+
-                "<div class='mfield' draggable='true' onDrag={dragCopy}>"+plus+'</div>'+
-                "<div class='mfield' draggable='true' onDrag={dragCopy}>"+minus+'</div>'
-                )
-        }}
-    )
-
-    const HEADER = "<body><script>function dragCopy(ev,value) {  ev.dataTransfer.setData('text/plain', value);  }</script>\n"+
-        "<div class='mTable'><style>\n"+
-        ".mTable { font-family: Bahnschrift,monospace; height: 680px; display:table;    page-break-after: always  }\n"+
-        ".tLine  { vertical-align: top; width:75rem; padding: 1px; float: left; min-height: 22px; height: 23px; font-size: 0.8em; font-weight:400; }\n"+
-        ".mfield  { overflow:hidden; padding: 1px; border: none; float: left; width: 6rem; text-align: right;}\n"+
-        ".tfield  { overflow:hidden; padding: 1px; border: none; float: left; width: 7rem; text-align: left;}\n"+
-        "</style><div class='tLine'>"
-    const TRAILER = "</div></div></body>";
-
-    const blob = new Blob([HEADER+page.join('</div><div class="tLine">')+TRAILER], {type: "application/json",});
+export function downloadText(strTitle,strText) {        
+    const blob = new Blob([strText], {type: "application/json",});
     let url = URL.createObjectURL(blob);
-
-    console.log("0740 handleAccountReport "+url);
-
+    console.log("0740 downloadText "+url);
     let a = document.createElement('a');
     a.setAttribute("id", "btnArchive");
     a.href = url;
-    a.download = "ARCHIVE_"+strAccount+".HTML";
+    a.download = "ARCHIVE_"+strTitle+".HTML";
     a.style.display = 'none'; // was block
     a.className = "FIELD MOAM";
     a.innerHTML = "Downloading...";
-
     a.click();
-
-
     return url;
 }

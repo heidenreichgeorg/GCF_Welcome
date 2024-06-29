@@ -3,7 +3,7 @@ import { getSession, useSession, REACT_APP_API_HOST,getCarryOver,storeCarryOver 
 import Screen from './Screen'
 import { cents2EU,bigUSMoney,cents20EU,bigEUMoney }  from '../modules/money';
 import { CSEP, D_Account, D_Balance, D_Carry, D_CarryOver, D_Page, D_Partner, D_FixAss, D_History, D_Report, D_Schema, J_ACCT, SCREENLINES, T_OPEN, T_CLOSE, X_ASSET_CAPTAX , YEARBEGIN, YEAREND } from '../modules/terms.js'
-import { book,handleAccountReport,prepareTXN,makeHistory,symbolic }  from '../modules/writeModule';
+import { book,downloadText,prepareTXN,makeHistory,symbolic }  from '../modules/writeModule';
 import { makeStatusData,makeHGBReport,makeBalance}  from '../modules/App';
 
 // the ORIGINAL FORMAT from journal sheet is 
@@ -95,7 +95,63 @@ export default function Status() {
     var funcKeepReceipt=null;
     var funcHideReceipt=null;
     var funcCleaReceipt=null;
-    var funcDownloadReceipt=(strAccount,aSelText,aJMoney,aReason)=>{
+
+
+
+
+
+    // GENERATE HTML FILE FOR DOWNLOAD
+
+    function handleAccountReport(strAccount,aHistory,company,year,title,register) {    
+
+
+        let page = ["<div class='mfield'></div><div class='tfield'></div>",
+            "<div class='mfield'></div><div class='tfield'>"+company+'</div>'+"<div class='tfield'>"+year+"</div><div class='tfield'>"+title+" "+strAccount+'</div>',
+            "<div class='mfield'></div><div class='tfield'></div>"
+        ];
+        
+        aHistory.forEach(line => {
+            if(line.length>3) {
+                let aField=line.split(CSEP);
+                let plus=aField[3];
+                let minus='';
+                if(plus[0]==='-') {minus=plus.substring(1);plus=''}
+                page.push(
+                    "<div class='sep'></div><div class='kfield'>"+aField[0]+"</div><div class='sep'></div>"+
+                    "<div class='tfield' draggable='true' onDragStart='dragCopy(event)'>"+aField[1]+'</div>'+
+                    "<div class='tfield' draggable='true' onDragStart='dragCopy(event)'>"+aField[2]+'</div>'+
+                    "<div class='mfield' draggable='true' onDragStart='dragCopy(event)'>"+plus+'</div>'+
+                    "<div class='mfield' draggable='true' onDragStart='dragCopy(event)'>"+minus+'</div>'
+                    )
+            }}
+        )
+    
+        page.push("<div class='mfield'></div><div class='tfield'></div>")
+        page.push("<div class='mfield'></div><div class='tfield'>"+register+'</div>')
+        page.push("<div class='mfield'></div><div class='tfield'></div>")
+        
+
+
+        // kField was height:14px; margin: 0px; color: #c9a935; 
+    
+        const HEADER = "<body><script>\n"+
+                "function dragCopy(event) { let value=event.target.innerText;  console.log('dragCopy '+value); event.dataTransfer.setData('text/plain', value); }\n"+
+            "</script>\n"+
+            "<div class='mTable'><style>\n"+
+            ".mTable { font-family: Bahnschrift,monospace; height: 680px; display:table;    page-break-after: always  }\n"+
+            ".tLine  { vertical-align: top; width:75rem; padding: 1px; float: left; min-height: 22px; height: 23px; font-size: 0.8em; font-weight:400; }\n"+
+            ".sep { overflow:hidden; padding: 1px; border: none; float: left; width: 1rem; text-align: center;}\n"+
+            ".kfield { padding: 1px;  border-color: #555555; border-style: solid; float: left;  width: 2rem; background-color:transparent; font-weight:600; text-align: center;}\n"+
+            ".mfield { overflow:hidden; padding: 1px; border: none; float: left; width: 6rem; text-align: right;}\n"+
+            ".tfield { overflow:hidden; padding: 1px; border: none; float: left; width: 7rem; text-align: left;}\n"+
+            "</style><div class='tLine'>"
+        const TRAILER = "</div></div></body>";
+    
+        return downloadText(strAccount,HEADER+page.join('</div><div class="tLine">')+TRAILER);
+    }
+    
+
+    var funcDownloadReceipt=(strAccount,aSelText,aJMoney,aReason,register)=>{
         let record=[];
         console.log("funcDownloadReceipt "+strAccount);
         handleAccountReport(
@@ -108,7 +164,7 @@ export default function Status() {
                 aJMoney[sym][strAccount]+CSEP // Amount    
                 
             :"")),
-            client,year)
+            client,year,page.AccountHistory,register)
     }
 
     var aSelText = {};
@@ -1007,7 +1063,7 @@ export default function Status() {
     if(showAccount) {
         aFunc.push(funcKeepReceipt); aText.push(D_CarryOver);
         aFunc.push(funcHideReceipt); aText.push(page.DashBoard);
-        aFunc.push(()=>funcDownloadReceipt(showAccount,aSelText,aJMoney,aReason)); aText.push(page.GeneratedAccountFile);
+        aFunc.push(()=>funcDownloadReceipt(showAccount,aSelText,aJMoney,aReason,page.register)); aText.push(page.AccountHistory);
     }
 
     let record=[];
@@ -1018,7 +1074,7 @@ export default function Status() {
            {showAccount &&             
                 (
                 <div className="mTable">                     
-                    { TXNReceipt ('',D_Account+' '+showAccount, 'Verlauf', jColumnHeads, jColumnHeads, null, session.year, removeCol) }
+                    { TXNReceipt ('',D_Account+' '+showAccount, page.AccountHistory, jColumnHeads, jColumnHeads, null, session.year, removeCol) }
                     
                     <TXNReceiptSum date={YEARBEGIN} text={D_Carry} sender={T_OPEN} jAmounts={jPageSum} jColumnHeads={jColumnHeads} id=""/>                   
                     { console.log("099 aSelText keys = "+Object.keys(aSelText).join('+')) ||
