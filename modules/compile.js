@@ -1362,7 +1362,10 @@ function makePage(balance) {
 
             page['header'] = de_DE['reportYear'] + HTMLSPACE + (""+reportYear); // de_DE:
             page['client'] = client;
-            page['register'] = register+HTMLSPACE+taxnumber;
+            page.residence = residence;
+            page.register = register;
+            page.taxnumber = taxnumber;
+            page['register_tax'] = register+HTMLSPACE+taxnumber;
             page['reference'] = iban+HTMLSPACE+reportYear;
             page['author'] = author+HTMLSPACE+residence;
             page['footer'] = iban+HTMLSPACE+residence;

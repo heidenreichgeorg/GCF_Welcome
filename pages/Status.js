@@ -102,24 +102,27 @@ export default function Status() {
 
     // GENERATE HTML FILE FOR DOWNLOAD
 
-    function handleAccountReport(strAccount,aHistory,company,year,title,register) {    
+    function handleAccountReport(strAccount,aHistory,company,year,title,register,tax) {    
 
+        //let leftCol = ['',strAccount,'',company,'',year,'',tax]
 
-        let page = ["<div class='mfield'></div><div class='tfield'></div>",
-            "<div class='mfield'></div><div class='tfield'>"+company+'</div>'+"<div class='tfield'>"+year+"</div><div class='tfield'>"+title+" "+strAccount+'</div>',
-            "<div class='kfield' onclick='next()'> &darr; </div><div class='tfield'></div>"
+        let page = ["<div class='mfield'></div><div class='mfield'></div><div class='tfield'></div>",
+            "<div class='mfield'></div><div class='tfield'>"+title+"</div><div class='mfield'>"+year+"</div><div class='tfield'></div>",
+            "<div class='mfield'></div><div class='kfield' onclick='next()'> &darr; </div><div class='tfield'></div>"
         ];
         
         let id=0;
         aHistory.forEach(line => {
             if(line.length>3) {
                 id++;
+                let strLeft="&nbsp;";
+                //if(leftCol.length>id && leftCol[id] && leftCol[id].length>0) strLeft=leftCol[id]
                 let aField=line.split(CSEP);
                 let plus=aField[3];
                 let minus='';
                 if(plus[0]==='-') {minus=plus.substring(1);plus=''}
                 page.push(
-                    "<div class='sep'></div><div class='tfield' id='"+id+"'>"+aField[0]+"</div><div class='sep'></div>"+
+                    "<div class='mfield'>"+strLeft+"</div><div class='sep'></div><div class='tfield' id='"+id+"'>"+aField[0]+"</div><div class='sep'></div>"+
                     "<div class='tfield' draggable='true' onDragStart='dragCopy(event)'>"+aField[1]+'</div>'+
                     "<div class='tfield' draggable='true' onDragStart='dragCopy(event)'>"+aField[2]+'</div>'+
                     "<div class='mfield' draggable='true' onDragStart='dragCopy(event)'>"+plus+'</div>'+
@@ -129,8 +132,7 @@ export default function Status() {
         )
     
         page.push("<div class='mfield'></div><div class='tfield'></div>")
-        page.push("<div class='mfield'></div><div class='tfield'>"+register+'</div>')
-        page.push("<div class='mfield'></div><div class='tfield'></div>")
+        page.push("<div class='mfield'></div><div class='tfield'>"+company+"</div><div class='tfield'>"+tax+"</div><div class='tfield'>"+register+"</div><div class='tfield'></div>")
         
 window.getElementById
 
@@ -147,11 +149,11 @@ window.getElementById
             "<div class='mTable' onload='init()'><style>\n"+
             ".mTable { font-family: Bahnschrift,monospace; height: 680px; display:table;    page-break-after: always  }\n"+
             ".tLine  { vertical-align: top; width:75rem; padding: 1px; float: left; min-height: 22px; height: 23px; font-size: 0.8em; font-weight:400; }\n"+
-            ".hLine  { vertical-align: top; width:75rem; padding: 1px; float: left; min-height: 25px; height: 26px; font-size: 1em; font-weight:600; }\n"+
+            ".hLine  { vertical-align: top; width:75rem; padding: 1px; float: left; min-height: 25px; height: 26px; font-size: 1em; font-weight:600; border-bottom: 1px solid #aaa;}\n"+
             ".sep { overflow:hidden; padding: 1px; border: none; float: left; width: 1rem; text-align: center;}\n"+
             ".kfield { padding: 1px;  border-color: #555555; border-style: solid; float: left;  width: 2rem; background-color:transparent; font-weight:600; text-align: center;}\n"+
             ".mfield { overflow:hidden; padding: 1px; border: none; float: left; width: 6rem; text-align: right;}\n"+
-            ".tfield { overflow:hidden; padding: 1px; border: none; float: left; width: 7rem; text-align: left;}\n"+
+            ".tfield { overflow:hidden; padding: 1px; border: none; float: left; width: 9rem; text-align: left;}\n"+
             "</style><div class='tLine'>"
         const TRAILER = "</div></div></body>";
     
@@ -159,7 +161,7 @@ window.getElementById
     }
     
 
-    var funcDownloadReceipt=(strAccount,aSelText,aJMoney,aReason,register)=>{
+    var funcDownloadReceipt=(strAccount,aSelText,aJMoney,aReason,register,tax)=>{
         let record=[];
         console.log("funcDownloadReceipt "+strAccount);
         handleAccountReport(
@@ -172,7 +174,7 @@ window.getElementById
                 aJMoney[sym][strAccount]+CSEP // Amount    
                 
             :"")),
-            client,year,page.AccountHistory,register)
+            client,year,page.AccountHistory,register,tax)
     }
 
     var aSelText = {};
@@ -1071,7 +1073,7 @@ window.getElementById
     if(showAccount) {
         aFunc.push(funcKeepReceipt); aText.push(D_CarryOver);
         aFunc.push(funcHideReceipt); aText.push(page.DashBoard);
-        aFunc.push(()=>funcDownloadReceipt(showAccount,aSelText,aJMoney,aReason,page.register)); aText.push(page.AccountHistory);
+        aFunc.push(()=>funcDownloadReceipt(showAccount,aSelText,aJMoney,aReason,page.register,page.taxnumber,page.residence)); aText.push(page.AccountHistory);
     }
 
     let record=[];
@@ -1344,7 +1346,7 @@ window.getElementById
             </div>
             )}
 
-            <FooterRow left={page.client}  midleft={page.author}  midright={page.register} right={page.reference}/>
+            <FooterRow left={page.client}  midleft={page.author}  midright={page.register_tax} right={page.reference}/>
 
         </Screen>
     )   
