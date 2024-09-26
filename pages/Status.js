@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { getSession, useSession, REACT_APP_API_HOST,getCarryOver,storeCarryOver } from '../modules/sessionmanager';
 import Screen from './Screen'
 import { cents2EU,bigUSMoney,cents20EU,bigEUMoney }  from '../modules/money';
-import { CSEP, D_Account, D_Balance, D_Carry, D_CarryOver, D_Page, D_Partner, D_FixAss, D_History, D_Report, D_Schema, J_ACCT, SCREENLINES, T_OPEN, T_CLOSE, X_ASSET_CAPTAX , YEARBEGIN, YEAREND } from '../modules/terms.js'
+import { CSEP, D_Account, D_Balance, D_Carry, D_CarryOver, D_Page, D_Partner, D_FixAss, D_History, D_Report, D_Schema, J_ACCT, SCREENLINES, T_OPEN, T_CLOSE, X_ASSET_CAPTAX , X_ASSET_UNPCAP, YEARBEGIN, YEAREND } from '../modules/terms.js'
 import { book,downloadText,prepareTXN,makeHistory,symbolic }  from '../modules/writeModule';
 import { makeStatusData,makeHGBReport,makeBalance}  from '../modules/App';
 
