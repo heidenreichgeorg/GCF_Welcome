@@ -6,7 +6,8 @@ import { accessFirebase,bucketUpload,loadFBConfig } from './fireBaseBucket'
 import {  J_ACCT, COLMIN, DOUBLE } from './terms.js'
 import { REACT_APP_API_HOST } from "./sessionmanager"
 import { bigEUMoney, cents2US, cents2EU, cents20EU } from './money'
-import { setSession,strSymbol,timeSymbol } from './session'
+import { strSymbol,timeSymbol } from './login'
+import { setSession } from './serverSession'
 import { compile } from './compile'
 
 const debug=true;
@@ -250,7 +251,7 @@ export async function sendFile(sig, response) {  // was fs.exists() GH20230401
 
 export async function save2Bucket(jConfig,session,client,year) {
 
-    if(jConfig && jConfig.bucket) {
+    if(jConfig) {
         console.log("0034 save2Bucket Start saving("+JSON.stringify(Object.keys(session))+") to FB for "+client+","+year);        
 
         // FIREBASE
@@ -346,3 +347,21 @@ export function makeHistory(sheet,aPattern,lPattern,jHistory,aLen,eLen,gSchema,p
     }
     return arrHistory;
 }  
+
+export function symbolic(pat) {   
+    const alpha=['5','7','11','13','17','19','23','29','31','37','39','41','43','47','51','53','57','59','61','67','71','73','79','81','83','87','89'];
+    var res = 0n;
+    if(pat && pat.length>2) {
+        let tap = pat.split().reverse().join();
+        var sequence = tap+pat+tap+pat+tap+pat+tap;
+        let len=sequence.length;
+        for(let p=0;p<len && p<20;p++) {            
+            let a = sequence.charCodeAt(p);
+            let z = sequence.charCodeAt(len-1-p)
+            let iNext = BigInt(alpha[(a+z)%26]);
+            res = (7n * res + iNext);  
+        }
+    }
+    //console.log("SYMBOLIC "+pat.substring(0,9)+"="+res.)
+    return res.toString();
+}

@@ -1,0 +1,106 @@
+<html>
+<script>
+
+const copyURL="gcf-welcome.vercel.app";
+const securityBranch="gcf-welcome-git-security-heidenreichgeorg.vercel.app";
+
+function timeSymbol() { 
+    var u = new Date(Date.now()); 
+    return ''+ u.getUTCFullYear()+
+      ('0' + (1+u.getUTCMonth())).slice(-2) +
+      ('0' + u.getUTCDate()).slice(-2) + 
+      ('0' + u.getUTCHours()).slice(-2) +
+      ('0' + u.getUTCMinutes()).slice(-2) +
+      ('0' + u.getUTCSeconds()).slice(-2) +
+      (u.getUTCMilliseconds() / 1000).toFixed(3).slice(2, 5);
+}
+function strSymbol(pat) {
+    let cypher = "abcdefghhijklmnopqratuvweyzobcdofghhajklmneopqritovwuyz";
+    let base=cypher.length;
+    var res = 0;
+    var out = [];
+    if(!pat) pat = timeSymbol();
+    {
+        let factor = 23;
+        var sequence = ' '+pat+pat+pat;
+        for(let p=0;p<sequence.length && p<80;p++) {
+            res = ((res*factor + sequence.charCodeAt(p)) & 0x1FFFFFFF);
+            let index = res % base;
+            out.push(cypher.charAt(index))
+        }
+    }
+    return out.join('');
+}
+function currentHash(client,year) {
+    let strTime=(timeSymbol().slice(4,10)).slice(-6);
+    let token=strSymbol(strTime+client+year+strTime).slice(-6);
+    console.log("LOGIN with "+token);
+    return token;
+}
+function signIn() {
+    console.log("signIn ENTER");
+    
+    var base = document.getElementById('base').value;
+    var user = document.getElementById('user').value;
+    var year = document.getElementById('year').value;
+    
+    console.log("signIn with U="+user+"  Y="+year);
+
+    if (user == "") {
+        alert("User name must be filled out");
+        document.getElementById('user').style.border = "solid 1px red";
+    } else {
+          document.getElementById('user').style.border = "solid 1px #a9a9a9";
+    }
+    if (year == "") {
+        alert("Year must be filled out");
+        document.getElementById('year').style.border = "solid 1px red";
+    } else {
+         document.getElementById('year').style.border = "solid 1px #a9a9a9";
+    }
+
+    let client=userMap[user];
+    if (!client || client == "") {
+        alert("Invalid client");
+    } else {
+        console.log("signIn with U="+user+"  Y="+year+ " C="+client);
+        let hash = currentHash(client,year);
+        let url="https://"+base+"/Status?client="+client+"&year="+year+"&auth="+hash;
+        let page=document.getElementById("page");
+
+        let anchor = '<a href="'+url+'">Login</a>';
+        let button = page.append(anchor);
+        //alert(anchor);
+
+        let a = document.createElement('div');
+        a.innerHTML = anchor;
+        page.appendChild(a);
+
+    }
+
+}
+
+function load() {
+    console.log("signIn LOAD");
+    
+    var base = document.getElementById('base');
+    base.value = copyURL;
+}
+
+const userMap = { 'heidenreichkg':'HGKG' }
+
+    </script>
+
+    <body onload="load()">
+
+        <div id="page">
+        <div  name="subscribForm" >
+            <input type="text"    id="base" name="base"/>
+            <input type="text"    id="user" name="user" value="heidenreichkg"/>
+            <input type="number"  id="year" name="year" value="2023"/>
+            <input type="submit"            name="SIGN IN"   onclick="signIn()"/><br>
+        </form>
+        </div>
+
+    </body>
+</html>

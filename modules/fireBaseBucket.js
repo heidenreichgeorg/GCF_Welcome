@@ -140,9 +140,9 @@ async function bucketDownload(bpStorage,client,year,jData,startSessionCB,callRes
 
   
   let txnPattern = null;
-  try { txnPattern = await getFileContents(jData.root+year+"/txnPattern.txt");
+  try { txnPattern = await getFileContents(jData.root+"entity/"+client+"/"+year+"/txnPattern.txt");
   } catch(e) {}
-  if(debug>1) console.log('0030 Firebase.download read root/client/year/txnPattern.txt; '+txnPattern)
+  if(debug>1) console.log('0030 Firebase.download read root/entity/client/year/txnPattern.txt; '+txnPattern)
 
   fbStorage.getDownloadURL(fileRef)
   .then(
@@ -173,7 +173,7 @@ async function bucketDownload(bpStorage,client,year,jData,startSessionCB,callRes
                 session.txnPattern = JSON.parse(txnPattern);
                 console.log("0036 getFileContents "+JSON.stringify(Object.keys(session)));
               } catch(err) {
-                console.error("0033 Firebase.download txnPattern="+txnPattern+" ERR "+err.toString());
+                console.error("0037 Firebase.download txnPattern="+txnPattern+" ERR "+err.toString());
               }
   
             }
@@ -411,7 +411,7 @@ export function fbDownload(jConfig,client,year,callBack,res) {
             return null;
         }
     } else {
-      fbConfig={
+      let fbConfig={
 
       }
       console.log("0031 server.fbDownload NO CONFIG FROM SERVER")

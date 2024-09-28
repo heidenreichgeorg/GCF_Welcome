@@ -56,11 +56,14 @@ export function makeStatusData(response) {
 
     const page = response[D_Page];
     
+    let iDebit=0n;
+    let iCredit=0n;
     let iFixed=0n;
     let iEquity=0n;
     let iTan=0n;
     let iLia=0n;
     let iCur=0n;
+    let iTax=0n;
 
     let ass="{close:0}";
     let eql="{close:0}";
@@ -93,10 +96,11 @@ export function makeStatusData(response) {
 
     if(debug) console.log(JSON.stringify(response));
     
-    // build three columns
+    // build four columns
     let aLeft={};
     let aMidl={};
     let aRite={};
+    let aInco={};
 
     for (let name in jAccounts)   {
         var account=jAccounts[name];
@@ -108,6 +112,7 @@ export function makeStatusData(response) {
                 let iClose=BigInt(account.init)+BigInt(account.debit)+BigInt(account.credit); ;
                 if(account.xbrl.startsWith(jReport.xbrlFixed.xbrl)) { // accumulate fixed assets
                     iFixed = iFixed + iClose;
+
                     if(account.xbrl.startsWith(jReport.xbrlTanFix.xbrl)) { // accumulate tangible fixed assets
                         iTan = iTan + iClose;
                     }
@@ -115,13 +120,21 @@ export function makeStatusData(response) {
                 } else if(account.xbrl.startsWith(jReport.xbrlAcurr.xbrl)) { // accumulate current assets#
                     iCur = iCur + iClose;
                     if(debug) console.log("makeStatusData Currency Assets: "+JSON.stringify(account))
+
+                    if(account.xbrl.startsWith(jReport.xbrlPaidTax.xbrl)) { // accumulate paid tax#
+                        iTax = iTax + iClose;
+                    }
                 }
             }
             if(xbrl_pre===X_INCOME) {
                 aMidl[name]=account;
+                var iGaLs = BigInt(account.init)+BigInt(account.debit)+BigInt(account.credit); 
+                
             }
             if(xbrl_pre===X_EQLIAB) {
                 aRite[name]=account;
+                iDebit=iDebit+BigInt(account.debit);
+                iCredit=iCredit+BigInt(account.credit);
                 var iClose = BigInt(account.init)+BigInt(account.debit)+BigInt(account.credit); 
                 if(account.xbrl.startsWith(jReport.xbrlEquity.xbrl)) { // accumulate equity
                     iEquity = iEquity + iClose;
@@ -141,62 +154,55 @@ export function makeStatusData(response) {
     if(maxCom>maxRow) maxRow=maxCom;
     if(maxCor>maxRow) maxRow=maxCor;
 
-    let statusData = []; for(let i=0;i<=maxRow && i<=SCREENLINES;i++) statusData[i]={};
+    let statusData = []; for(let i=0;i<=maxRow && i<=SCREENLINES;i++) statusData[i]={ 'assets':{}, 'gals':{}, 'eqLiab':{} };
     if(maxRow>SCREENLINES) maxRow=SCREENLINES; // 20221201
     
-    let iLeft=0;
-    
 
+    // synthetic EqLiab sum account
+    eql.income=iGaLs;
+    eql.tax=iTax;
+    eql.credit=iCredit;
+    eql.debit=iDebit;
+    
+    
+    let iLeft=0;
     for (let name in aLeft)   {
         var account=aLeft[name];
-        var yearEnd = account.yearEnd;
-        var iName = account.name;
-
         if(debug) console.log("STATUS.JS STATUSDATA LEFT "+iLeft+" "+name+"="+yearEnd);
-
         if(iLeft<SCREENLINES) {
-            statusData[iLeft]={"iLeft":iLeft, "gLeft":yearEnd,"nLeft":iName, "tLeft":(account.xbrl!=X_ASSETS)?"A":""};
+            statusData[iLeft]={};
+            statusData[iLeft].assets=account;
         }
         iLeft++;
     }
-    for (let i=iLeft;i<maxRow && i<SCREENLINES;i++) { statusData[i]={"iLeft":0, "gLeft":null, "nLeft": " " }; }
+    for (let i=iLeft;i<maxRow && i<SCREENLINES;i++) {
+        statusData[i]={};
+        statusData[i].assets={};
+     }; 
+
 
 
     let iMidl=0;
-    
-
     for (let name in aMidl)   {
         var account=aMidl[name];
-        var yearEnd = account.yearEnd;
-        var iName = account.name;
-
-        statusData[iMidl].iMidl = iMidl; 
-        statusData[iMidl].gMidl = yearEnd;
-        statusData[iMidl].nMidl = iName;
-        statusData[iMidl].tMidl = (account.xbrl!=X_INCOME_REGULAR)?'G':'';
+        statusData[iMidl].gals=account;
         iMidl++;
     }
-    for (let i=iMidl;i<maxRow && i<SCREENLINES;i++) {  statusData[i].iMidl=0; statusData[i].gMidl=null; statusData[i].nMidl=' '; }
+    for (let i=iMidl;i<maxRow && i<SCREENLINES;i++) {  statusData[i].gals={}; }
 
 
-    let iRite=0;
-    
 
+    let iRite=0;    
     for (let name in aRite)   {
-        var account=aRite[name];
-        var yearEnd = account.yearEnd;
-        var iName = account.name;
-
-        if(iRite<SCREENLINES) {
-            statusData[iRite].iRite = iRite; 
-            statusData[iRite].gRite = yearEnd;
-            statusData[iRite].nRite = iName;
-            statusData[iRite].tRite = !(account.xbrl==X_EQLIAB)?(account.xbrl.startsWith(X_EQUITY))?'E':'L':'';
+        var account=aRite[name];        
+        if(iRite<SCREENLINES) {           
+            statusData[iRite].eqLiab=account;
             iRite++;
-        }
-        
+        }        
     }
-    for (let i=iRite;i<maxRow && i<SCREENLINES;i++) { statusData[i].iRite=0; statusData[i].gRite=null; statusData[i].nRite=' '; }
+    for (let i=iRite;i<maxRow && i<SCREENLINES;i++) { statusData[i].eqLiab={}; }
+
+
 
     // build fourth column with recent transactions
     if(jHistory && gSchema.Names && gSchema.Names.length>0) {
@@ -238,15 +244,218 @@ export function makeStatusData(response) {
 }
 
 
-export function makeHGBReport(response) {
+
+export function fillLeft(balance,dispValue1,dispValue2,dispValue3,iName,iLeft) {
+    if(iLeft<SCREENLINES) {
+        if(!balance[iLeft]) balance[iLeft]={};
+        balance[iLeft].tw1=iName;
+        let cValue1=cents2EU(dispValue1);
+        let cValue2=cents2EU(dispValue2);
+        let cValue3=cents2EU(dispValue3);
+        balance[iLeft].am3=cValue1; 
+        balance[iLeft].am2=cValue2; 
+        balance[iLeft].am1=cValue3; 
+        
+        iLeft++;
+    }
+    return iLeft;
+}
+
+
+function ignore(e) { e.preventDefault(); }
+
+export function InputRow({ arrAcct, arrCode, txn }) {
+    let date=txn.date;
+    let sender=txn.sender;
+    let reason=txn.reason;
+    let reasonInfo=txn.reasonInfo;
+
+    return(
+        <div className="attrRow">            
+            <div className="FIELD SYMB"> &nbsp;</div>
+            <div className="FIELD XFER"><input type="date" id="cDate"   name="cDate"   defaultValue ={date}   onChange={(e)=>addTXNData(txn,'date',e.target.value)} onDrop={ignore} /></div>
+            <div className="FIELD SEP">&nbsp;</div>
+            <div className="BIGCELL LNAM"><input className="LNAM" type="edit" id="cSender" name="cSender" defaultValue ={sender} onChange={(e)=>addTXNData(txn,'sender',e.target.value)} onDrop={ignore} /></div>
+            <div className="FIELD SEP">&nbsp;</div>
+            <div className="FIELD XFER">
+                <select type="radio" id="cReason" name="cReason" onChange={(e)=>addTXNData(txn,'refAcct',getSelect(e.target.id))} onDrop={ignore} >
+                    {arrAcct.map((reason,i) => (
+                        <option key={"reason0"+i} id={"reason0"+i} value={reason} onClick={()=>{console.log("Note "+reasonInfo)}}>{reason}</option>
+                    ))}
+                </select>                
+            </div>
+            <div className="FIELD SEP">&nbsp;</div>
+            <div className="FIELD XFER"><input type="edit" id="cRef1"   name="cRef1"   defaultValue ={reason}   onChange={(e)=>addTXNData(txn,'reason',e.target.value)} onDrop={ignore} /></div>
+            <div className="FIELD SEP">&nbsp;</div>
+            <div className="FIELD XFER">
+            <select type="radio" id="cRef2" name="cRef2" onChange={(e)=>addTXNData(txn,'refCode',getSelect(e.target.id))} onDrop={ignore} >
+                    {arrCode.map((code,i) => (
+                        <option key={"code0"+i} id={"code0"+i} value={code}>{code}</option>
+                    ))}
+                </select>
+            </div>
+        </div>)
+}
+
+export function FieldRow({ txn }) {
+
+    return(
+        <div className="attrRow">            
+            <div className="FIELD SYMB"> &nbsp;</div>
+            <div className="FIELD XFER"></div>
+            <div className="FIELD SEP">&nbsp;</div>
+            <div className="BIGCELL LNAM"></div>
+            <div className="FIELD SEP">&nbsp;</div>
+            <div className="FIELD LNAM"></div>
+            <div className="BIGCELL R105">New Asset:</div>
+            <div className="FIELD XFER">
+                <input type="edit" id="cRef2" name="cRef2" onChange={(e)=>addTXNData(txn,'refCode',getSelect(e.target.id))} onDrop={ignore} >
+                </input>                
+            </div>
+        </div>);
+}
+
+
+export function addTXNData(txn,shrtName,a) { txn[shrtName]=a; console.log("App.addTXNData TXN("+a+") "+JSON.stringify(txn)); return txn; } // avoid update
+
+
+
+
+export function makeBalance(jAccounts,jReport,value) {
+
+    let balance = new Array();
+
+    // console.log("makeBalance 001 from response D_Report"+JSON.stringify(Object.keys(jReport)));
+
+
+    let ass,eql,gls;
+    // add three additional accounts: ASSETS, EQLIAB, GAINLOSS
+    if(jReport["xbrlAssets"].account) { 
+        ass = jReport["xbrlAssets"].account; 
+        //console.log("ASSET "+JSON.stringify(ass)); 
+        jAccounts["xbrlAssets"]=ass;
+    }
+    if(jReport["xbrlEqLiab"].account) { 
+        eql = jReport["xbrlEqLiab"].account; 
+        //console.log("EQLIB "+JSON.stringify(eql)); 
+        jAccounts["xbrlEqLiab"]=eql;
+    }
+    if(jReport["xbrlRegular"].account) { 
+        gls = jReport["xbrlRegular"].account; 
+        //console.log("GALOS "+JSON.stringify(gls)); 
+        jAccounts["xbrlRegular"]=gls;
+    }
+    //console.log("makeBalance from response D_Balance"+JSON.stringify(Object.keys(jAccounts)));
+
+    
+    // build three columns
+    let aLeft={};
+    let aRite={};
+
+    for (let name in jAccounts)   {
+        var account=jAccounts[name];
+        if(account.xbrl.length>1) {
+            var xbrl = account.xbrl.split('\.').reverse();
+            var xbrl_pre = xbrl.pop()+ "."+ xbrl.pop();
+            if(xbrl_pre===X_ASSETS) aLeft[name]=account;            
+            if(xbrl_pre===X_EQLIAB) aRite[name]=account;
+        }
+    }
+    
+    var iEqLiab=0n;
+    var income=0n;
+
+    
+ 
+    var iRite=3;
+    var iLeft=3;
+    balance.push({  });
+    const aTag = Object.keys(jReport);
+    balance.push({ 'tw1':jReport.xbrlAssets.de_DE,/* 'am1': (""+aTag),*/ 'tx1':jReport.xbrlEqLiab.de_DE });
+
+    for (let tt=0;tt<aTag.length;tt++)   {
+        let tag=aTag[tt];
+        //console.log("makeBalance 005 Report "+JSON.stringify(jReport[tag]));
+        
+        var element    =  jReport[tag];
+        var level     =  element.level;
+        var account  = element.account;
+        var dispValue = account[value]; // account.yearEnd;
+        var iName    =    account.name;
+        var full_xbrl  =  account.xbrl;
+
+        if(dispValue && iName && full_xbrl) {
+            // collect compute total right side amount
+            if(full_xbrl==='de-gaap-ci_bs.eqLiab') { iEqLiab=BigInt(dispValue);  }
+            if(full_xbrl==='de-gaap-ci_is.netIncome.regular') { income=BigInt(dispValue); }
+            if(full_xbrl==='de-gaap-ci_bs.eqLiab.income') { 
+                let bIncome=(income+iEqLiab); 
+                //console.log("INCOME = "+bIncome);
+                dispValue=bIncome;
+            }
+
+            var xbrl = full_xbrl.split('\.');
+            var side = xbrl[1];
+           
+            //console.log('makeBalance side='+side + "  in "+full_xbrl + "= "+dispValue);
+
+            if(side=='ass') {
+                if(iLeft<SCREENLINES) {
+                    if(!balance[iLeft]) balance[iLeft]={};
+                    balance[iLeft].tw1=iName;
+                    let cValue=cents2EU(dispValue);
+                    if(level==1) { balance[iLeft].am1=cValue; }
+                    if(level==2) { balance[iLeft].am2=cValue; }
+                    if(level==3) { balance[iLeft].am3=cValue; }
+                    if(level==4) { balance[iLeft].am4=cValue; }
+                    iLeft++;
+                }
+            } else {
+                if(iRite<SCREENLINES) {
+                    if(!balance[iRite]) balance[iRite]={};
+                    let cValue=cents2EU(dispValue);
+                    balance[iRite].tx1=iName;
+                    if(level==1) { balance[iRite].an1=cValue; }
+                    if(level==2) { balance[iRite].an2=cValue; }
+                    if(level==3) { balance[iRite].an3=cValue; }
+                    if(level==4) { balance[iRite].an4=cValue; }
+                    iRite++;
+                }
+            }
+
+
+        } else {
+            // divider line out
+        }
+    }
+
+    while(iRite<=SCREENLINES && iLeft<=SCREENLINES) {
+        balance.push({  });
+        iLeft++;
+        iRite++;
+    }
+
+    console.log('makeBalance('+value+') EXIT '+JSON.stringify(balance));
+
+    return JSON.stringify(balance);
+    /*
+    return [ 
+        { tw1:'Gebäude    ',   am3:' 7,35' },
+        { tw1:'Grundstücke',   am3:'10,00' },
+        { tw1:'Sachanlagen',   am2:'17,35',  tx1:'Stammkapital',  an2:'17,35' },
+        { tw1:'Aktien',        am3:'80,55',  },
+        { tw1:'Münzen',        am3:'17,00',  },
+        { tw1:'Finanzanlagen', am2:'97,55',  tx1:'Kredite', an2:'97,55' },
+        { tw1:'Aktiva',       am1:'114,90',  tx1:'Passiva',an1:'114,90' }
+        ]
+      */  
+}
+
+export function makeHGBReport(jAccounts,page,jReport) {
 
     let balance = []; 
-
-    var jReport = response[D_Report];
     
-    if(debug) console.log("makeReport from response D_Report"+JSON.stringify(Object.keys(jReport)));
-    var jAccounts = response[D_Balance];
-    let page = response[D_Page];
+    console.log("makeReport from response D_Report "+JSON.stringify(Object.keys(jReport)));
               
     if(page) {           
         var chgb1 = 0n; // Umsatz
@@ -341,7 +550,7 @@ export function makeHGBReport(response) {
             //console.log("GALOS "+JSON.stringify(gls)); 
             jAccounts["xbrlRegular"]=gls;
         }
-        console.log("makeReport from response D_Balance"+JSON.stringify(Object.keys(jAccounts)));
+        console.log("makeReport from response D_Balance "+JSON.stringify(Object.keys(jAccounts)));
 
         
         // build two columns
@@ -372,7 +581,7 @@ export function makeHGBReport(response) {
             var cBegin= BigInt(account.init);
             var cClose = BigInt(account.yearEnd);
             var cNext = BigInt(account.next);
-            console.log("EqLiab account ="+JSON.stringify(account));
+            //console.log("EqLiab account ="+JSON.stringify(account));
     
            iLeft = fillLeft(balance,cBegin,cClose,cNext,iName,iLeft);
         }
@@ -423,24 +632,8 @@ export function makeHGBReport(response) {
     return balance;
 }
 
-function fillLeft(balance,dispValue1,dispValue2,dispValue3,iName,iLeft) {
-    if(iLeft<SCREENLINES) {
-        if(!balance[iLeft]) balance[iLeft]={};
-        balance[iLeft].tw1=iName;
-        let cValue1=cents2EU(dispValue1);
-        let cValue2=cents2EU(dispValue2);
-        let cValue3=cents2EU(dispValue3);
-        balance[iLeft].am3=cValue1; 
-        balance[iLeft].am2=cValue2; 
-        balance[iLeft].am1=cValue3; 
-        
-        iLeft++;
-    }
-    return iLeft;
-}
 
-
-function fillRight(balance,cValue,iName,iRite,level) {
+export function fillRight(balance,cValue,iName,iRite,level) {
     if(iRite<SCREENLINES) {
         if(!balance[iRite]) balance[iRite]={};
         balance[iRite].tx1=iName;
@@ -452,59 +645,3 @@ function fillRight(balance,cValue,iName,iRite,level) {
     }
     return iRite;
 }
-
-function ignore(e) { e.preventDefault(); }
-
-export function InputRow({ arrAcct, arrCode, txn }) {
-    let date=txn.date;
-    let sender=txn.sender;
-    let reason=txn.reason;
-    let reasonInfo=txn.reasonInfo;
-
-    return(
-        <div className="attrRow">            
-            <div className="FIELD SYMB"> &nbsp;</div>
-            <div className="FIELD XFER"><input type="date" id="cDate"   name="cDate"   defaultValue ={date}   onChange={(e)=>addTXNData(txn,'date',e.target.value)} onDrop={ignore} /></div>
-            <div className="FIELD SEP">&nbsp;</div>
-            <div className="BIGCELL LNAM"><input className="LNAM" type="edit" id="cSender" name="cSender" defaultValue ={sender} onChange={(e)=>addTXNData(txn,'sender',e.target.value)} onDrop={ignore} /></div>
-            <div className="FIELD SEP">&nbsp;</div>
-            <div className="FIELD XFER">
-                <select type="radio" id="cReason" name="cReason" onChange={(e)=>addTXNData(txn,'refAcct',getSelect(e.target.id))} onDrop={ignore} >
-                    {arrAcct.map((reason,i) => (
-                        <option key={"reason0"+i} id={"reason0"+i} value={reason} onClick={()=>{console.log("Note "+reasonInfo)}}>{reason}</option>
-                    ))}
-                </select>                
-            </div>
-            <div className="FIELD SEP">&nbsp;</div>
-            <div className="FIELD XFER"><input type="edit" id="cRef1"   name="cRef1"   defaultValue ={reason}   onChange={(e)=>addTXNData(txn,'reason',e.target.value)} onDrop={ignore} /></div>
-            <div className="FIELD SEP">&nbsp;</div>
-            <div className="FIELD XFER">
-            <select type="radio" id="cRef2" name="cRef2" onChange={(e)=>addTXNData(txn,'refCode',getSelect(e.target.id))} onDrop={ignore} >
-                    {arrCode.map((code,i) => (
-                        <option key={"code0"+i} id={"code0"+i} value={code}>{code}</option>
-                    ))}
-                </select>
-            </div>
-        </div>)
-}
-
-export function FieldRow({ txn }) {
-
-    return(
-        <div className="attrRow">            
-            <div className="FIELD SYMB"> &nbsp;</div>
-            <div className="FIELD XFER"></div>
-            <div className="FIELD SEP">&nbsp;</div>
-            <div className="BIGCELL LNAM"></div>
-            <div className="FIELD SEP">&nbsp;</div>
-            <div className="FIELD LNAM"></div>
-            <div className="BIGCELL R105">New Asset:</div>
-            <div className="FIELD XFER">
-                <input type="edit" id="cRef2" name="cRef2" onChange={(e)=>addTXNData(txn,'refCode',getSelect(e.target.id))} onDrop={ignore} >
-                </input>                
-            </div>
-        </div>);
-}
-
-
-export function addTXNData(txn,shrtName,a) { txn[shrtName]=a; console.log("App.addTXNData TXN("+a+") "+JSON.stringify(txn)); return txn; } // avoid update

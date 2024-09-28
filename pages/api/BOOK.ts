@@ -8,12 +8,13 @@
 
 
 const debug=null;
-const debugWrite=null;
+const debugWrite=1;
 
 import type { NextApiRequest, NextApiResponse } from 'next'
 import  { formatTXN  } from '../../modules/compile'
-import  { init,localhost,setSession,signIn, strSymbol, symbolic, timeSymbol } from '../../modules/session'
-import  { save2Bucket } from '../../modules/writeModule'
+import { strSymbol,timeSymbol } from '../../modules/login'
+import  { init,localhost,setSession,signIn } from '../../modules/serverSession'
+import  { save2Bucket,symbolic } from '../../modules/writeModule'
 
 
 
@@ -74,7 +75,7 @@ function bookTransaction(session:any, res:NextApiResponse<any>,jData:any) {
     let sessionId = session.id; 
     let arrTransaction = formatTXN(session,reqBody);
   
-    if(debug) console.log("0610 app.post BOOK config("+JSON.stringify(jData)+")");
+    if(debugWrite) console.log("0610 app.post BOOK config("+JSON.stringify(jData)+")");
 
     var result="SERVER BOOKED";
     
@@ -85,7 +86,7 @@ function bookTransaction(session:any, res:NextApiResponse<any>,jData:any) {
         
         if(sessionId ) {
 
-          if(debug) console.log("0612 app.post BOOK jTXN('"+(arrTransaction?JSON.stringify(arrTransaction.join(';')):"---")+"')");
+          if(debugWrite) console.log("0612 app.post BOOK jTXN('"+(arrTransaction?JSON.stringify(arrTransaction.join(';')):"---")+"')");
 
           // modifies session object and stores it under new sessionId
           session = bookSheet(session,arrTransaction,sessionTime,nextSessionId);
@@ -97,10 +98,11 @@ function bookTransaction(session:any, res:NextApiResponse<any>,jData:any) {
               .then(result => { 
                 if(res) {          
                     res.json({url:serverAddr+'/LATEST', client, year, 'result':result  })
+                    if(debugWrite) console.log("0614 app.post save2Bucket-> "+JSON.stringify(result));
                 }
               });
                 
-
+          
         } else {
             result="NO SESSION ID";
             console.log("0615 app.post BOOK NO sessionId");
