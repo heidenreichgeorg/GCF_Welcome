@@ -164,7 +164,13 @@ let de_DE = {
     Name:"Name",
     Credit:"Einlagen",
     Debit:"Entnahmen",
-    YearEnd:"Endstand"
+    YearEnd:"Endstand",
+
+    // Status
+    Date:"Datum",
+    Recipient:"Empfänger",
+    Reason:"Grund",
+    TXNType:"Buchungssatz"
 }
 module.exports['de_DE']=de_DE;
 let jLastTransaction={};

@@ -3,8 +3,8 @@ import { getSession, useSession, REACT_APP_API_HOST,getCarryOver,storeCarryOver 
 import Screen from './Screen'
 import { cents2EU,bigUSMoney,cents20EU,bigEUMoney }  from '../modules/money';
 import { CSEP, D_Account, D_Balance, D_Carry, D_CarryOver, D_Page, D_Partner, D_FixAss, D_History, D_Report, D_Schema, J_ACCT, SCREENLINES, X_ASSET_CAPTAX, X_ASSET_UNPCAP, X_ASSETS, X_EQLIAB } from '../modules/terms.js'
-import { book,prepareTXN,makeHistory }  from '../modules/writeModule';
-import { makeStatusData }  from '../modules/App';
+import { book,prepareTXN,makeHistory, symbolic }  from '../modules/writeModule';
+import { makeBalance, makeHGBReport,makeStatusData }  from '../modules/App';
 
 // the ORIGINAL FORMAT from journal sheet is 
 // columns format CSV with these columns 
@@ -328,7 +328,7 @@ export default function Status() {
         //window.open("/History?client=HGKG&year=2023&APATTERN="+shrtName+"&SELECTALL=1"); 
     }
     
-    function StatusRow({ am1,tx1, am2, tx2, am3, tx3, d, n, l, click}) {
+    function StatusRow({ am1,tx1, am2, tx2, am3, tx3, d, n, r, l, click}) {
         return(
             <div className="attrLine">
                 <div className="FIELD MOAM"> {cents2EU(am1)}</div>
@@ -343,6 +343,7 @@ export default function Status() {
                 <div className="FIELD SEP"> &nbsp;</div>
                 <div className="FIELD DATE"> {d}</div>
                 <div className="FIELD NAME"> {n}</div>
+                <div className="FIELD C100"> {r}</div>
                 <div className="FIELD">{l}</div>
                 {click==null ? (<div className="FIELD SEP"> &nbsp;</div>) : (
                 <div className="FIELD"  onClick={(() => click())}>&nbsp;.&nbsp;</div>
@@ -1019,14 +1020,14 @@ export default function Status() {
                 <div className="FIELD" key={"Dashboard"} id={'Overview0'} style= {{ 'display': aPages[0]}} >
                     <div className="FIELD LNAM">&nbsp;</div>
                     <div className="attrLine">{page.Closing}&nbsp;{parseInt(session.year)}</div>
-                    <StatusRow am1={page.Assets} am2={page.Gain}  am3={page.eqliab}/>
+                    <StatusRow am1={page.Assets} am2={page.Gain}  am3={page.eqliab} d={page.Date} n={page.Recipient} r={page.Reason} l={page.TXNType} />
                     {
                         statusReport.map((row,line) => (
                             <StatusRow  key={"Status"+line}  
                                                 am1={row.assets.yearEnd} tx1={row.assets.name} 
                                                 am2={row.gals.yearEnd} tx2={row.gals.name} 
                                                 am3={row.eqLiab.yearEnd} tx3={row.eqLiab.name} 
-                                                d={row.dTran} n={row.nTran} l={row.lTran}
+                                                d={row.dTran} n={row.nTran} r={row.rTran} l={row.lTran}
                                                 click={(line==0)?handleReview:null}/>                       
                         ))
                     }

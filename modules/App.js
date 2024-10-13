@@ -233,7 +233,8 @@ export function makeStatusData(response) {
 
                 iTran--;
                 statusData[iTran].dTran=jPrettyTXN.entry[0].slice(2);
-                statusData[iTran].nTran=jPrettyTXN.entry[1].slice(0,16);
+                statusData[iTran].nTran=jPrettyTXN.entry[1].slice(0,18);
+                statusData[iTran].rTran= jPrettyTXN.entry[2].slice(0,18);
                 statusData[iTran].lTran= sAmount;                                
             }
             bLine--;
