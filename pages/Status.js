@@ -951,6 +951,8 @@ export default function Status() {
     const tabName = "Overview";
 
     
+
+    // show account history (showAccount)
     let jColumnHeads=jHeads; // state variable, do not touch
     let jSum=JSON.parse(JSON.stringify(jPageSum));
     console.log("070 STATUS UNIFY ("+showAccount+") jSum "+JSON.stringify(jSum));
@@ -1006,10 +1008,11 @@ export default function Status() {
                                                                 aJMoney[sym],
                                                                 jColumnHeads,
                                                                 jSum,
-                                                                makeLabel(i,showAccount)) 
+                                                                makeLabel(i,showAccount),null,showAccount) 
                                                                     :""
                                                                     )) }
-                    <TXNReceiptSum text={page.Sum} jAmounts={jSum} jColumnHeads={jColumnHeads} id="" removeCol={removeCol}/>                                                                                       
+                    { TXNReceiptTotal(page.Sum,showAccount)   }
+                    <TXNReceiptSum   text={page.Sum} jAmounts={jSum} jColumnHeads={jColumnHeads} id="" removeCol={removeCol}/>                                                                                       
 
                 </div>
             )}
@@ -1261,8 +1264,10 @@ export default function Status() {
     )   
 }
 
+let iSumLeft=BigInt(0);
+let iSumRite=BigInt(0);
 
-function TXNReceipt(text,jAmounts,jColumnHeads,jSum,id,removeCol) {
+function TXNReceipt(text,jAmounts,jColumnHeads,jSum,id,removeCol,name) {
     
     Object.keys(jAmounts).forEach(acct=>{
         let value = jAmounts[acct];        
@@ -1275,20 +1280,52 @@ function TXNReceipt(text,jAmounts,jColumnHeads,jSum,id,removeCol) {
     })
     if(jSum) console.log("TXNReceipt jSum "+JSON.stringify(jSum));
     
+//    <HistoryRow jValues={jAmounts} jColumnHeads={jColumnHeads} removeCol={removeCol}/>
+
+    let comps = text.split(CSEP)
+
+    let iAmount = (name && name.length>1) ? bigEUMoney(jAmounts[name]) :BigInt(0);
+    let left = ""; if(iAmount<0) { left= cents2EU(-iAmount); iSumLeft-=iAmount; }
+    let rite = ""; if(iAmount>0) { rite= cents2EU(iAmount);  iSumRite+=iAmount; }
 
     return( // FIELD
         <div id="TXNReceipt">
-            <div className="attrLine"> <div className="FIELD"></div></div>
-            <div className="attrLine"> <div className="FIELD"> {id}&nbsp;&nbsp;{text}</div></div>
-            <HistoryRow jValues={jAmounts} jColumnHeads={jColumnHeads} removeCol={removeCol}/>
+            <div className="attrLine"> <div className="FIELD LNAM">&nbsp;</div></div>
+            <div className="attrLine"> <div className="FIELD SNAM">{id}</div>
+                                        <div className="FIELD MOAM">{comps[0]}</div>
+                                        <div className="FIELD LNAM">{comps[1]}</div>
+                                        <div className="FIELD LNAM">{comps[2]}</div>
+                                        <div className="FIELD LNAM">{comps[3]}</div>
+                                        <div className="FIELD LNAM">{comps[4]}</div>
+                    {(name && name.length>1) ? ( <div className="FIELD MOAM">{left}</div>  ):""}
+                    {(name && name.length>1) ? ( <div className="FIELD MOAM">{rite}</div>  ):""}
+            </div>
         </div>
         
 )}      
-function TXNReceiptSum(args) {
-    return TXNReceipt(args.text,args.jAmounts,args.jColumnHeads,null,args.id,args.removeCol);
+
+function TXNReceiptTotal(text,name) {
+    return( // FIELD
+        <div id="TXNReceipt">
+            <div className="attrLine"> <div className="FIELD LNAM">&nbsp;</div></div>
+            <div className="attrLine"> <div className="FIELD SNAM">{text}</div>
+                                        <div className="FIELD MOAM"></div>
+                                        <div className="FIELD LNAM"></div>
+                                        <div className="FIELD LNAM">{name}</div>
+                                        <div className="FIELD LNAM"></div>
+                                        <div className="FIELD LNAM"></div>
+                                        <div className="FIELD MOAM">{cents20EU(iSumLeft)}</div> 
+                                        <div className="FIELD MOAM">{cents20EU(iSumRite)}</div> 
+                                        <div className="FIELD MOAM">{cents20EU(iSumRite-iSumLeft)}</div> 
+            </div>
+        </div>
+    )
 }
 function nop() {}
 
+function TXNReceiptSum(args) {
+    return TXNReceipt(args.text,args.jAmounts,args.jColumnHeads,null,args.id,args.removeCol);
+}
 
 function HistoryRow(args) { 
     let amounts =[]; let cols=[];  let count=0;
