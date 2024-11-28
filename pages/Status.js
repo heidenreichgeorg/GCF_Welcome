@@ -991,6 +991,10 @@ export default function Status() {
         aFunc.push(funcHideReceipt); aText.push(page.DashBoard);
     }
 
+     iSumLeft=BigInt(0);
+     iSumRite=BigInt(0);
+    
+
     return (
         <Screen tabSelector={showAccount ? [] : tabHeaders} tabName={tabName} aFunc={aFunc} aText={aText}  > 
            
@@ -998,7 +1002,6 @@ export default function Status() {
                 (
                 <div className="mTable">                     
                     { TXNReceipt(D_Account+' '+showAccount, jColumnHeads, jColumnHeads, null, session.year, removeCol) }
-                    
                     <TXNReceiptSum text={D_Carry} jAmounts={jPageSum} jColumnHeads={jColumnHeads} id=""/>                   
                     { console.log("099 aSelText keys = "+Object.keys(aSelText).join('+')) ||
                     Object.keys(aSelText).map((sym,i) => ( (sym && aSelText[sym] && aJMoney[sym] ) ? // && i>1
@@ -1264,8 +1267,10 @@ export default function Status() {
     )   
 }
 
+
 let iSumLeft=BigInt(0);
 let iSumRite=BigInt(0);
+
 
 function TXNReceipt(text,jAmounts,jColumnHeads,jSum,id,removeCol,name) {
     
@@ -1293,8 +1298,7 @@ function TXNReceipt(text,jAmounts,jColumnHeads,jSum,id,removeCol,name) {
             <div className="attrLine"> <div className="FIELD LNAM">&nbsp;</div></div>
             <div className="attrLine"> <div className="FIELD SNAM">{id}</div>
                                         <div className="FIELD MOAM">{comps[0]}</div>
-                                        <div className="FIELD LNAM">{comps[1]}</div>
-                                        <div className="FIELD LNAM">{comps[2]}</div>
+                                        <div className="FIELD LNAM">{comps[1]}</div>                                        
                                         <div className="FIELD LNAM">{comps[3]}</div>
                                         <div className="FIELD LNAM">{comps[4]}</div>
                     {(name && name.length>1) ? ( <div className="FIELD MOAM">{left}</div>  ):""}
@@ -1310,13 +1314,11 @@ function TXNReceiptTotal(text,name) {
             <div className="attrLine"> <div className="FIELD LNAM">&nbsp;</div></div>
             <div className="attrLine"> <div className="FIELD SNAM">{text}</div>
                                         <div className="FIELD MOAM"></div>
-                                        <div className="FIELD LNAM"></div>
                                         <div className="FIELD LNAM">{name}</div>
                                         <div className="FIELD LNAM"></div>
-                                        <div className="FIELD LNAM"></div>
+                                        <div className="FIELD LNAM">{cents20EU(iSumRite-iSumLeft)}</div> 
                                         <div className="FIELD MOAM">{cents20EU(iSumLeft)}</div> 
                                         <div className="FIELD MOAM">{cents20EU(iSumRite)}</div> 
-                                        <div className="FIELD MOAM">{cents20EU(iSumRite-iSumLeft)}</div> 
             </div>
         </div>
     )
