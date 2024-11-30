@@ -88,7 +88,8 @@ export default function Status() {
     const [matrix, setMatrix] = useState(predefinedTXN )
     const [showAccount, setShowAccount] = useState(false);
     const [jHeads, setJHeads] = useState({});
-
+    const [currLine,setCurrLine] = useState(0);
+    
     const VOID ="-,--";
 
     var funcShowReceipt=null;
@@ -1001,8 +1002,8 @@ export default function Status() {
            {showAccount &&             
                 (
                 <div className="mTable">                     
-                    { TXNReceipt(D_Account+' '+showAccount, jColumnHeads, jColumnHeads, null, session.year, removeCol) }
-                    <TXNReceiptSum text={D_Carry} jAmounts={jPageSum} jColumnHeads={jColumnHeads} id=""/>                   
+                    { TXNReceipt(D_Account+' '+showAccount, jColumnHeads, jColumnHeads, null, session.year, removeCol, D_History,-1,currLine,setCurrLine) }
+                    <TXNReceiptSum text={D_Carry} jAmounts={jPageSum} jColumnHeads={jColumnHeads} id="(SELECT)"/>                   
                     { console.log("099 aSelText keys = "+Object.keys(aSelText).join('+')) ||
                     Object.keys(aSelText).map((sym,i) => ( (sym && aSelText[sym] && aJMoney[sym] ) ? // && i>1
                                                 
@@ -1011,7 +1012,12 @@ export default function Status() {
                                                                 aJMoney[sym],
                                                                 jColumnHeads,
                                                                 jSum,
-                                                                makeLabel(i,showAccount),null,showAccount) 
+                                                                makeLabel(i,showAccount),
+                                                                null,
+                                                                showAccount,
+                                                                i,
+                                                                currLine,
+                                                                setCurrLine)
                                                                     :""
                                                                     )) }
                     { TXNReceiptTotal(page.Sum,showAccount)   }
@@ -1272,7 +1278,7 @@ let iSumLeft=BigInt(0);
 let iSumRite=BigInt(0);
 
 
-function TXNReceipt(text,jAmounts,jColumnHeads,jSum,id,removeCol,name) {
+function TXNReceipt(text,jAmounts,jColumnHeads,jSum,id,removeCol,name,index,currLine,setCurrLine) {
     
     Object.keys(jAmounts).forEach(acct=>{
         let value = jAmounts[acct];        
@@ -1296,13 +1302,13 @@ function TXNReceipt(text,jAmounts,jColumnHeads,jSum,id,removeCol,name) {
     return( // FIELD
         <div id="TXNReceipt">
             <div className="attrLine"> <div className="FIELD LNAM">&nbsp;</div></div>
-            <div className="attrLine"> <div className="FIELD SNAM">{id}</div>
-                                        <div className="FIELD MOAM">{comps[0]}</div>
-                                        <div className="FIELD LNAM">{comps[1]}</div>                                        
-                                        <div className="FIELD LNAM">{comps[3]}</div>
-                                        <div className="FIELD LNAM">{comps[4]}</div>
-                    {(name && name.length>1) ? ( <div className="FIELD MOAM">{left}</div>  ):""}
-                    {(name && name.length>1) ? ( <div className="FIELD MOAM">{rite}</div>  ):""}
+            <div className={index==currLine?"attrLine key":"attrLine"}> <div className="FIELD LNAM" onClick={()=>{if(setCurrLine) setCurrLine(index)}}>{id}</div>
+                                        <div className="FIELD LNAM" draggable="true" >{comps[0]}</div>
+                                        <div className="FIELD LNAM" draggable="true">{comps[1]}</div>                                        
+                                        <div className="FIELD LNAM" draggable="true">{comps[3]}</div>
+                                        <div className="FIELD LNAM" draggable="true">{comps[4]}</div>
+                    {(name && name.length>1) ? ( <div className="FIELD MOAM" draggable="true">{left}</div>  ):""}
+                    {(name && name.length>1) ? ( <div className="FIELD MOAM" draggable="true">{rite}</div>  ):""}
             </div>
         </div>
         
@@ -1310,7 +1316,7 @@ function TXNReceipt(text,jAmounts,jColumnHeads,jSum,id,removeCol,name) {
 
 function TXNReceiptTotal(text,name) {
     return( // FIELD
-        <div id="TXNReceipt">
+        <div id="TXNReceiptTotal">
             <div className="attrLine"> <div className="FIELD LNAM">&nbsp;</div></div>
             <div className="attrLine"> <div className="FIELD SNAM">{text}</div>
                                         <div className="FIELD MOAM"></div>
@@ -1326,8 +1332,9 @@ function TXNReceiptTotal(text,name) {
 function nop() {}
 
 function TXNReceiptSum(args) {
-    return TXNReceipt(args.text,args.jAmounts,args.jColumnHeads,null,args.id,args.removeCol);
+    return TXNReceipt(args.text,args.jAmounts,args.jColumnHeads,null,args.id,args.removeCol,D_History,-1,0,null);
 }
+
 
 function HistoryRow(args) { 
     let amounts =[]; let cols=[];  let count=0;
