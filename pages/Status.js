@@ -1296,8 +1296,8 @@ function TXNReceipt(text,jAmounts,jColumnHeads,jSum,id,removeCol,name,index,curr
     let comps = text.split(CSEP)
 
     let iAmount = (name && name.length>1) ? bigEUMoney(jAmounts[name]) :BigInt(0);
-    let left = ""; if(iAmount<0) { left= cents2EU(-iAmount); iSumLeft-=iAmount; }
-    let rite = ""; if(iAmount>0) { rite= cents2EU(iAmount);  iSumRite+=iAmount; }
+    let left = ""; if(iAmount>0) { left= cents2EU( iAmount); iSumLeft+=iAmount; }
+    let rite = ""; if(iAmount<0) { rite= cents2EU(-iAmount);  iSumRite-=iAmount; }
 
     return( // FIELD
         <div id="TXNReceipt">
@@ -1318,11 +1318,11 @@ function TXNReceiptTotal(text,name) {
     return( // FIELD
         <div id="TXNReceiptTotal">
             <div className="attrLine"> <div className="FIELD LNAM">&nbsp;</div></div>
-            <div className="attrLine"> <div className="FIELD SNAM">{text}</div>
-                                        <div className="FIELD MOAM"></div>
+            <div className="attrLine"> <div className="FIELD LNAM">{text}</div>
+                                        <div className="FIELD LNAM"></div>
                                         <div className="FIELD LNAM">{name}</div>
                                         <div className="FIELD LNAM"></div>
-                                        <div className="FIELD LNAM">{cents20EU(iSumRite-iSumLeft)}</div> 
+                                        <div className="FIELD LNAM">{cents20EU(iSumLeft-iSumRite)}</div> 
                                         <div className="FIELD MOAM">{cents20EU(iSumLeft)}</div> 
                                         <div className="FIELD MOAM">{cents20EU(iSumRite)}</div> 
             </div>
