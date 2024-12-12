@@ -92,7 +92,13 @@ export function makeStatusData(response) {
         if(debug) console.log("GALOS "+JSON.stringify(gls)); 
         jAccounts["xbrlRegular"]=gls;
     }
-    if(debug) console.log("makeStatusData from response D_Balance"+JSON.stringify(Object.keys(jAccounts)));
+
+
+    // show all accounts omn console
+    if(debug) console.log("makeStatusData from response D_Balance"+JSON.stringify(Object.keys(jAccounts)));    
+    else console.log( Object.keys(jAccounts).map((name,i)=>("   "+name+": "+(jAccounts[name].xbrl))).join(" "));
+
+
 
     if(debug) console.log(JSON.stringify(response));
     
@@ -360,6 +366,9 @@ export function makeBalance(jAccounts,jReport,value) {
             var xbrl_pre = xbrl.pop()+ "."+ xbrl.pop();
             if(xbrl_pre===X_ASSETS) aLeft[name]=account;            
             if(xbrl_pre===X_EQLIAB) aRite[name]=account;
+
+            // also include NKHA into right side, liability
+//            if(xbrl_pre===X_EQLIAB) aRite[name]=account;
         }
     }
     
@@ -398,7 +407,7 @@ export function makeBalance(jAccounts,jReport,value) {
             var xbrl = full_xbrl.split('\.');
             var side = xbrl[1];
            
-            //console.log('makeBalance side='+side + "  in "+full_xbrl + "= "+dispValue);
+            console.log('makeBalance '+iName+'='+side + "  in "+full_xbrl + "= "+dispValue);
 
             if(side=='ass') {
                 if(iLeft<SCREENLINES) {

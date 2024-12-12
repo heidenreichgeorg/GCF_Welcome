@@ -253,6 +253,7 @@ function initBalance() {
         xbrlAssets :{  level:1, xbrl: "de-gaap-ci_bs.ass", de_DE:'Aktiva'},
         divider:    {  level:0, xbrl: "", de_DE:''},
         xbrlLother: {  level:3, xbrl: "de-gaap-ci_bs.eqLiab.liab.other", de_DE:'Sonstige Verb.'},
+        xbrlLAuxUtils: {  level:3, xbrl: "de-gaap-ci_bs.eqLiab.liab.advPaym", de_DE:'Verb LuL'},
         xbrlLloan:  {  level:3, xbrl: "de-gaap-ci_bs.eqLiab.liab.bank", de_DE:'Darlehen'},
         xbrlLshare: {  level:3, xbrl: "de-gaap-ci_bs.eqLiab.liab.shareholders", de_DE:'Gesell.Darlehen'},
         xbrlLiab:   {  level:2, xbrl: "de-gaap-ci_bs.eqLiab.liab", de_DE:'Fremdkapital'},
