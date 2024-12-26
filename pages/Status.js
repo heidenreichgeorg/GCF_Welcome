@@ -329,7 +329,7 @@ export default function Status() {
         //window.open("/History?client=HGKG&year=2023&APATTERN="+shrtName+"&SELECTALL=1"); 
     }
     
-    function StatusRow({ am1,tx1, am2, tx2, am3, tx3, d, n, r, l, click}) {
+    function StatusRow({ am1,tx1, am2, tx2, am3, tx3, d, n, r, l, t, click}) {
         return(
             <div className="attrLine">
                 <div className="FIELD MOAM"> {cents2EU(am1)}</div>
@@ -341,10 +341,10 @@ export default function Status() {
                 <div className="FIELD MOAM"> {cents2EU(am3)}</div>
                 <div className="FIELD SYMB" onClick={(e)=>displayAccount(tx3)}> {tx3}</div>
                 <div className="FIELD DASH"> &nbsp;</div>
-                <div className="FIELD SEP"> &nbsp;</div>
                 <div className="FIELD DATE"> {d}</div>
-                <div className="FIELD NAME"> {n}</div>
-                <div className="FIELD C100"> {r}</div>
+                <div className="FIELD SNAM"> {n}</div>
+                <div className="FIELD SNAM"> {r}</div>
+                <div className="FIELD SNAM"> {t}</div>
                 <div className="FIELD">{l}</div>
                 {click==null ? (<div className="FIELD SEP"> &nbsp;</div>) : (
                 <div className="FIELD"  onClick={(() => click())}>&nbsp;.&nbsp;</div>
@@ -1039,7 +1039,7 @@ export default function Status() {
                                                 am1={row.assets.yearEnd} tx1={row.assets.name} 
                                                 am2={row.gals.yearEnd} tx2={row.gals.name} 
                                                 am3={row.eqLiab.yearEnd} tx3={row.eqLiab.name} 
-                                                d={row.dTran} n={row.nTran} r={row.rTran} l={row.lTran}
+                                                d={row.dTran} n={row.nTran} r={row.rTran} l={row.lTran} t={row.tTran}
                                                 click={(line==0)?handleReview:null}/>                       
                         ))
                     }

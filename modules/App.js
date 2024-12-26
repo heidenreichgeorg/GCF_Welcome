@@ -50,6 +50,10 @@ export function getParam(strParam) {
 
 // STOP Left Rite Midl
 
+const iSNAM = 16;
+
+
+
 export function makeStatusData(response) {
 
     const debug=null;
@@ -235,12 +239,14 @@ export function makeStatusData(response) {
                 let aMount=jPrettyTXN.credit.concat(jPrettyTXN.debit);
                 aMount.push("-.--"); aMount.push("-.--"); aMount.push("-.--"); aMount.push("-.--"); 
 
-                let sAmount = (aMount[0]+"  "+aMount[1]+"  "+aMount[2]+"  "+aMount[3]+ " "+aMount[4]+ " ").slice(0,iCpField);
+                let sAmount = (aMount[0]+"  "+aMount[1]+"  "+aMount[2]+"  "+aMount[3]+ " "+aMount[4]+ " "+aMount[5]+ " "+aMount[6]+ " ").slice(0,iCpField);
 
+                // build one entry for list of previous transactions
                 iTran--;
-                statusData[iTran].dTran=jPrettyTXN.entry[0].slice(2);
-                statusData[iTran].nTran=jPrettyTXN.entry[1].slice(0,18);
-                statusData[iTran].rTran= jPrettyTXN.entry[2].slice(0,18);
+                statusData[iTran].dTran=jPrettyTXN.entry[0].slice(2); // skip century digits
+                statusData[iTran].nTran=jPrettyTXN.entry[1].slice(0,iSNAM);  // RECIPIENT
+                statusData[iTran].rTran= jPrettyTXN.entry[2].slice(0,iSNAM); // RIGHT_SIDE ACCOUNT GAIN LOSS EQUITY LIAB
+                statusData[iTran].tTran= jPrettyTXN.entry[3].slice(0,iSNAM); // REASON TIME
                 statusData[iTran].lTran= sAmount;                                
             }
             bLine--;
