@@ -871,9 +871,11 @@ export default function Status() {
     let tabHeaders=[page.DashBoard]; fixPages++;
 
 
+    // Verlauf Vermögen
     // account history page for assets
     tabHeaders.push(page.AccountHistoryAssets); fixPages++;
 
+    // Kapital Verlauf
     // account history page for equity/liability
     tabHeaders.push(page.AccountHistoryEqLiab); fixPages++;
 
@@ -1020,7 +1022,7 @@ export default function Status() {
                                                                 setCurrLine)
                                                                     :""
                                                                     )) }
-                    { TXNReceiptTotal(page.Sum,showAccount)   }
+                    { TXNReceiptTotal(page.Sum,showAccount,year,page.YearEnd)   }
                     <TXNReceiptSum   text={page.Sum} jAmounts={jSum} jColumnHeads={jColumnHeads} id="" removeCol={removeCol}/>                                                                                       
 
                 </div>
@@ -1291,7 +1293,6 @@ function TXNReceipt(text,jAmounts,jColumnHeads,jSum,id,removeCol,name,index,curr
     })
     if(jSum) console.log("TXNReceipt jSum "+JSON.stringify(jSum));
     
-//    <HistoryRow jValues={jAmounts} jColumnHeads={jColumnHeads} removeCol={removeCol}/>
 
     let comps = text.split(CSEP)
 
@@ -1299,32 +1300,40 @@ function TXNReceipt(text,jAmounts,jColumnHeads,jSum,id,removeCol,name,index,curr
     let left = ""; if(iAmount>0) { left= cents2EU( iAmount); iSumLeft+=iAmount; }
     let rite = ""; if(iAmount<0) { rite= cents2EU(-iAmount);  iSumRite-=iAmount; }
 
+    // 20241228
+    let bDrag = (index==currLine) ? "true":"false";
+
     return( // FIELD
         <div id="TXNReceipt">
             <div className="attrLine"> <div className="FIELD LNAM">&nbsp;</div></div>
-            <div className={index==currLine?"attrLine key":"attrLine"}> <div className="FIELD LNAM" onClick={()=>{if(setCurrLine) setCurrLine(index)}}>{id}</div>
-                                        <div className="FIELD LNAM" draggable="true" >{comps[0]}</div>
-                                        <div className="FIELD LNAM" draggable="true">{comps[1]}</div>                                        
-                                        <div className="FIELD LNAM" draggable="true">{comps[3]}</div>
-                                        <div className="FIELD LNAM" draggable="true">{comps[4]}</div>
-                    {(name && name.length>1) ? ( <div className="FIELD MOAM" draggable="true">{left}</div>  ):""}
-                    {(name && name.length>1) ? ( <div className="FIELD MOAM" draggable="true">{rite}</div>  ):""}
+            <div className={index==currLine?"attrLine key":"attrLine"}> 
+                    <div className="FIELD DATE" draggable={bDrag} >{comps[0]}</div>
+                    <div className="FIELD NAME" draggable={bDrag}>{comps[1]}</div>                                        
+                    <div className="FIELD NAME" draggable={bDrag}>{comps[3]}</div>
+                    <div className="FIELD NAME" draggable={bDrag}>{comps[4]}</div>
+                    {(name && name.length>1) ? ( <div className="FIELD MOAM" draggable={bDrag}>{left}</div>  ):""}
+                    {(name && name.length>1) ? ( <div className="FIELD MOAM" draggable={bDrag}>{rite}</div>  ):""}
+                    <div className="FIELD SEP" >&nbsp;</div>
+                    <div className="FIELD LNAM" draggable={bDrag}>{comps[2]}</div>                                        
+                    <div className="FIELD LNAM" draggable={bDrag} onClick={()=>{if(setCurrLine) setCurrLine(index)}}>{id}</div>
             </div>
         </div>
         
 )}      
 
-function TXNReceiptTotal(text,name) {
+function TXNReceiptTotal(textSum,name,year,textYearEnd) {
     return( // FIELD
         <div id="TXNReceiptTotal">
             <div className="attrLine"> <div className="FIELD LNAM">&nbsp;</div></div>
-            <div className="attrLine"> <div className="FIELD LNAM">{text}</div>
-                                        <div className="FIELD LNAM"></div>
-                                        <div className="FIELD LNAM">{name}</div>
-                                        <div className="FIELD LNAM"></div>
-                                        <div className="FIELD LNAM">{cents20EU(iSumLeft-iSumRite)}</div> 
-                                        <div className="FIELD MOAM">{cents20EU(iSumLeft)}</div> 
-                                        <div className="FIELD MOAM">{cents20EU(iSumRite)}</div> 
+            <div className="attrLine">  <div className="FIELD DATE">{year}-12-31</div>
+                                        <div className="FIELD NAME">{textSum}</div>
+                                        <div className="FIELD NAME" draggable="true">{name}</div>
+                                        <div className="FIELD NAME"></div>
+                                        <div className="FIELD MOAM" draggable="true">{cents20EU(iSumLeft)}</div> 
+                                        <div className="FIELD MOAM" draggable="true">{cents20EU(iSumRite)}</div> 
+                                        <div className="FIELD SEP" >&nbsp;</div>
+                                        <div className="FIELD NAME" draggable="true">{cents20EU(iSumLeft-iSumRite)}</div> 
+                                        <div className="FIELD NAME">{textYearEnd}</div>
             </div>
         </div>
     )
@@ -1335,7 +1344,7 @@ function TXNReceiptSum(args) {
     return TXNReceipt(args.text,args.jAmounts,args.jColumnHeads,null,args.id,args.removeCol,D_History,-1,0,null);
 }
 
-
+/*
 function HistoryRow(args) { 
     let amounts =[]; let cols=[];  let count=0;
     let off = args.removeCol ? args.removeCol : nop;
@@ -1350,7 +1359,7 @@ function HistoryRow(args) {
     )
     
 }
-
+*/
 
 function HGB275Row({ jArgs, id }) {
     return(

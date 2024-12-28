@@ -73,17 +73,6 @@ export function prettyTXN(jHistory,hash,lPattern,aPattern,names,aLen,eLen) {
                             iSaldo += item; // BigInt
                         }
 
-
-//                    if(item!=0) {// Money
-//                        delta.push(names[j]+DOUBLE+parts[j]); 
-//
-//                        // GH20220307
-//                        let value = bigEUMoney(parts[j]);
-//                        if(j<aLen) iBalance += value;
-//                        else if(j!=aLen && j!=eLen) iBalance -= value;
-//                        //console.dir("ADD "+parts[j]+ " --> "+value.cents+"  --> "+iBalance);
-//                    }
-
                     aNames.push(names[j]);   
                     aAmount.push(parts[j]);   
 
@@ -324,11 +313,7 @@ export function makeHistory(sheet,aPattern,lPattern,jHistory,aLen,eLen,gSchema,p
                 // GH 20220703
                 if(jPrettyTXN.txnAcct) {
                     let txn = jPrettyTXN.raw;
-                   
-                    // GH20221228 see ['','AN'] in App.js turned to ['AN'] 
-                        //jPrettyTXN.credit.join(CSEP)
-                        //jPrettyTXN.debit.join(CSEP)+CSEP+CSEP+CSEP
-                                           
+                                                              
                     var i=0;                    
                     var lMoney = {};
                     for (i=J_ACCT;i<txn.length;i++) { if(i!=aLen && i!=eLen && txn[i] && txn[i].length>1) lMoney[names[i]]=txn[i]; }  
