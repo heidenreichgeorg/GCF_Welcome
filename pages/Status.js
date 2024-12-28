@@ -1331,8 +1331,8 @@ function TXNReceiptTotal(textSum,name,year,textYearEnd) {
                                         <div className="FIELD NAME"></div>
                                         <div className="FIELD MOAM" draggable="true">{cents20EU(iSumLeft)}</div> 
                                         <div className="FIELD MOAM" draggable="true">{cents20EU(iSumRite)}</div> 
+                                        <div className="FIELD MOAM" draggable="true">{cents20EU(iSumLeft-iSumRite)}</div> 
                                         <div className="FIELD SEP" >&nbsp;</div>
-                                        <div className="FIELD NAME" draggable="true">{cents20EU(iSumLeft-iSumRite)}</div> 
                                         <div className="FIELD NAME">{textYearEnd}</div>
             </div>
         </div>
