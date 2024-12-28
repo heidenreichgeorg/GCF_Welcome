@@ -159,7 +159,7 @@ export default function Screen({ children, tabSelector, tabName,
 
     return (
         <div>
-            <div className="mTable">           
+            <div className="mScreen">           
                 <div className="attrLine">                     
                     <select autoFocus type="radio" id={tabName} name={tabName} onChange={(e)=>makeSelect(tabName,e.target)}> 
                         {tabSelector.map((row,tabNum) => (

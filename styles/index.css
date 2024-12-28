@@ -24,9 +24,9 @@
   color: #000000; 
 }
 
+.mScreen   { font-family: Bahnschrift,monospace;     height: 680px;         display:table;    page-break-after: always ;break-after: always  }
 
-.mTable   { font-family: Bahnschrift,monospace;                             height: 680px;             display:table;    page-break-after: always  }
-
+.mTable   { font-family: Bahnschrift,monospace;     height: 680px;         display:table;    }
 
 .console  { color:#c9a935; background-color:inherit; font-family :Courier; font-size: 0.9em; }
 
@@ -52,6 +52,9 @@ input[type=number] {
 
 .attrRow  {                       width:75rem; padding: 1px; float: left;  min-height: 16px; height: 17px; font-family :inherit; font-size: 0.7em; font-weight:400; text-align: center;}
 .attrLine { vertical-align: top;  width:75rem; padding: 1px; float: left;  min-height: 16px; height: 17px; font-family :inherit; font-size: 0.7em; font-weight:400; text-align: center;}
+
+.footer {                         width:75rem; padding: 1px; float: left;  min-height: 32px; height: 17px; font-family :inherit; font-size: 0.7em; font-weight:400; text-align: center;}
+
 
 .key      {  padding: 1px; height:14px;  margin: 0px; border-color: #817137; border-style: solid; float: left; background-color:transparent; font-family:  inherit; font-size: inherit; font-weight:600; color: #c9a935; }
 .box      {  height:40px;  margin: 0px;               border-color: #817137; border-style: solid; float: left; background-color:transparent; font-family:  inherit; font-size: inherit; font-weight:600; color: #c9a935; }

@@ -1023,7 +1023,7 @@ export default function Status() {
                                                                     :""
                                                                     )) }
                     { TXNReceiptTotal(page.Sum,showAccount,year,page.YearEnd)   }
-                    <TXNReceiptSum   text={page.Sum} jAmounts={jSum} jColumnHeads={jColumnHeads} id="" removeCol={removeCol}/>                                                                                       
+                    <TXNReceiptSum   text="" jAmounts={jSum} jColumnHeads={jColumnHeads} id="" removeCol={removeCol}/>                                                                                       
 
                 </div>
             )}
