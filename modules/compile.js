@@ -1,13 +1,16 @@
+ 
+
+// SETTING THIS WILL VIOLATE PRIVACY AT THE ADMIN CONSOLE !!! 
+const debugEquity=false;
+const debugReport=false;
+const debugTax=false;
+
 
 const debug=null;
-const debugTax=null;
-const debugPreBook=null;
+const debugPreBook=1;
 const debugAssets=1;
 const debugRegular=null;
 
-
-// SETTING THIS WILL VIOLATE PRIVACY AT THE ADMIN CONSOLE !!! 
-const debugReport=null;
 
 /* xglobal BigInt */
 
@@ -312,7 +315,7 @@ export function compile(sessionData) {
             if(!jLastTransaction[client]) jLastTransaction[client]={ };
             let jClientTID = jLastTransaction[client];
             jClientTID[year]=jlastTID;
-            if(debug) console.log("0100 compile.compile() LAST TXN includes "+lastLine[1]+" "+lastLine[3]);
+            if(debugReport) console.log("0100 compile.compile() LAST TXN includes "+lastLine[1]+" "+lastLine[3]);
             console.log("0100 compile.compile() LAST TXN "+jlastTID);
         } else console.log("0100 compile.compile() LAST TXN "+lastLine[0]);
 
@@ -333,13 +336,13 @@ export function compile(sessionData) {
 
                     
                     
-                    if(debug>3) console.log("0110 compile.compile "+JSON.stringify(row));
+                    if(debugReport>3) console.log("0110 compile.compile "+JSON.stringify(row));
                         
                     var column;
                     var key=row[0];
                     if(key && key==='N') {
                         const aNames=row;
-                        result[D_Schema]["Names"]=aNames;
+                        result[D_Schema].Names=aNames;
                         result.writeTime = strTimeSymbol;
                         if(debug>1) console.log("N at "+result.writeTime);
                         var column;
@@ -404,7 +407,7 @@ export function compile(sessionData) {
                                                          "rest":""+irest,
                                                          "cost":""+icost,
                                                          "gain":"0" }; // GH20230303
-                                if(debugAssets) console.log("0280 BOOK  "+idnt+" = "+result[D_FixAss][idnt].orig+ "for #"+nmbr+" at "+icost);                                
+                                if(debugReport) console.log("0280 BOOK  "+idnt+" = "+result[D_FixAss][idnt].orig+ "for #"+nmbr+" at "+icost);                                
                             }
                         }
                     }
@@ -436,16 +439,17 @@ export function compile(sessionData) {
                         //if(debug>1) console.log("BOOK "+row.join(CSEP));
                         if(row.length>MINTXN && result[D_Schema].Names){
                             try {
+                                var aLine = row;
+                                var gNames = result[D_Schema].Names;
+                                var gDesc  = result[D_Schema].Desc;
 
                                 if(debugReport) {
-                                    console.log("BOOK "+aLine.join(';'));
+                                    console.log("0350 BOOK  "+aLine.join(';'));
+                                    console.log("0350 NAMES "+gNames.join(';'));
                                     console.log();
                                 }
 
 
-                                var gNames = result[D_Schema].Names;
-                                var gDesc  = result[D_Schema].Desc;
-                                var aLine = row;
                                 
                                 jHistory[lineCount]=aLine;
                                 if(firstLine) {
@@ -457,8 +461,10 @@ export function compile(sessionData) {
                                             var xdesc=""+xColumn; if(gDesc && gDesc[xColumn]) xdesc=gDesc[xColumn];
                                             if(rawName && rawName.length>1) {
                                                 result[D_Balance][rawName] = Account.makeAccount(rawName,xbrl,xdesc,xColumn);
+                                                if(debugReport) console.log("0358 makeAccount("+rawName+","+xbrl+","+xdesc+","+xColumn+")");
                                             }
-                                            if(debug>1) console.log("0358 makeAccount("+rawName+","+xbrl+","+xdesc+","+xColumn+")");
+                                            else if(debugReport) console.log("0357 compile could not use makeAccount(xbrl="+xbrl+" xdesc="+xdesc+" xColumn="+xColumn+")");
+
                                             
                                         };
                                     } catch(err) { console.dir("0359 FIRST REGULAR TXN INPUT "+err); }
@@ -466,7 +472,7 @@ export function compile(sessionData) {
                                 if(aLine.length>0) {
                                     var column=0;
                                     aLine.forEach(strAmount => {
-                                        if(debug>3) console.log("0360 init "+strAmount);
+                                        if(debugReport>3) console.log("0360 init "+strAmount);
                                         if(column>=J_ACCT && strAmount && strAmount.length>0) {
                                             var acName = gNames[column];
                                             if(acName && acName.length>1) {
@@ -857,7 +863,7 @@ function sendBalance(balance) {
     let preBooked=balance[D_PreBook];
     gResponse[D_PreBook]=[];
     preBooked.forEach(preTXN=>{
-        if(debugPreBook) console.log("compile.js sendBalance preBook "+JSON.stringify(preTXN));           
+        if(debugPreBook) console.log("0290 compile.js sendBalance preBook "+JSON.stringify(preTXN));           
         gResponse[D_PreBook].push(preTXN);
     })
 
@@ -870,12 +876,14 @@ function sendBalance(balance) {
     gResponse[D_Report]=JSON.parse(JSON.stringify(bReport));
 
 
-    // R1 add account structures to  the copy of D_Report
+    // R1 add SYNTHETIC account structures to the copy of D_Report
     let gReport = gResponse[D_Report];
+    let index=0;
     for(let xbrl in gReport) {
         var element=gReport[xbrl];
-        if(debugReport) console.log("compile.js sendBalance ACCOUNT "+JSON.stringify(element));           
-        element.account = Account.openAccount(Account.makeAccount(element.de_DE,element.xbrl),0n);
+        if(debugReport) console.log("0292 compile.js sendBalance #"+index+" ACCOUNT "+JSON.stringify(element));           
+        element.account = Account.openAccount(Account.makeAccount(element.de_DE,element.xbrl,element.de_DE,index),0n);
+        index++;
     }
 
     var iTaxPaid=0n;
@@ -947,6 +955,9 @@ function sendBalance(balance) {
         //  distribute current-year VAVA changes to partners
         let vava = balance[D_Balance][all_cs];
         if(vava) {
+            
+            if(debugReport) console.log("0294 compile.js sendBalance Sold-Security ("+all_cs+") Loss="+JSON.stringify(vava));
+
             big_cyloss = Account.bigChange(vava)
 
             if(debugReport) {
@@ -957,12 +968,13 @@ function sendBalance(balance) {
             }
 
             p_cyLoss = distribute(big_cyloss,partners,'cyLoss');
-            if(debugReport) console.log("compile.js sendBalance CYLOSS  G"+p_cyLoss[0]+" E"+p_cyLoss[1]+" A"+p_cyLoss[2]+" K"+p_cyLoss[3]+" T"+p_cyLoss[4]+" L"+p_cyLoss[5]); 
-        } else if(debugReport) console.log("compile.js sendBalance CYLOSS  NO VAVA"); 
+            if(debugReport) console.log("0296 compile.js sendBalance CYLOSS  G"+p_cyLoss[0]+" E"+p_cyLoss[1]+" A"+p_cyLoss[2]+" K"+p_cyLoss[3]+" T"+p_cyLoss[4]+" L"+p_cyLoss[5]); 
+        } else if(debugReport) console.log("0295 compile.js sendBalance CYLOSS  NO VAVA"); 
     }
     
 
     //   transfer overview to report 
+    if(debugReport) console.log("0298 compile.js sendBalance overview"+JSON.stringify(gReport));
     let aAssets = gReport.xbrlAssets.account;
     let aEqliab = gReport.xbrlEqLiab.account;
     let aEqlreg = gReport.xbrlRegular.account;
@@ -972,17 +984,26 @@ function sendBalance(balance) {
     let aEqlinc = gReport.xbrlIncome.account; // should be empty at this stage
 
 
+    if(debugReport) {
+        console.log("0302 compile.js sendBalance ASSETS = "+JSON.stringify(aAssets));           
+        console.log("0304 compile.js sendBalance EQLIAB = "+JSON.stringify(aEqliab));           
+        console.log("0306 compile.js sendBalance EQLREG = "+JSON.stringify(aEqlreg));           
+        console.log("0308 compile.js sendBalance REGOTC = "+JSON.stringify(aRegOTC));           
+        console.log("0310 compile.js sendBalance REGFIN = "+JSON.stringify(aRegFin));           
+        console.log("0312 compile.js sendBalance EQLINC = "+JSON.stringify(aEqlinc));         
+     }
+
     // started addition with aEqlinc to preserve account name
     let aEqlsum=Account.add(aEqlreg,""+Account.bigChange(aEqliab));
     aEqlinc=Account.add(aEqlinc,""+Account.bigChange(aEqlsum));
 
     if(debugReport) {
-       console.log("compile.js sendBalance ASSETS = "+JSON.stringify(aAssets));           
-       console.log("compile.js sendBalance EQLIAB = "+JSON.stringify(aEqliab));           
-       console.log("compile.js sendBalance EQLREG = "+JSON.stringify(aEqlreg));           
-       console.log("compile.js sendBalance REGOTC = "+JSON.stringify(aRegOTC));           
-       console.log("compile.js sendBalance REGFIN = "+JSON.stringify(aRegFin));           
-       console.log("compile.js sendBalance EQLINC = "+JSON.stringify(aEqlinc));         
+       console.log("0314 compile.js sendBalance ASSETS = "+JSON.stringify(aAssets));           
+       console.log("0316 compile.js sendBalance EQLIAB = "+JSON.stringify(aEqliab));           
+       console.log("0318 compile.js sendBalance EQLREG = "+JSON.stringify(aEqlreg));           
+       console.log("0320 compile.js sendBalance REGOTC = "+JSON.stringify(aRegOTC));           
+       console.log("0322 compile.js sendBalance REGFIN = "+JSON.stringify(aRegFin));           
+       console.log("0324 compile.js sendBalance EQLINC = "+JSON.stringify(aEqlinc));         
     }
         
     // set the yearEnd component in each gReport account
@@ -1048,12 +1069,12 @@ function sendBalance(balance) {
             varcap.tax = ""+(iTaxPaid); // 20230218
 
 
-            if(debugReport) console.log('compile sendBalance  '+JSON.stringify(p) + "\n ==>> MODIFY K2xx "+JSON.stringify(varcap));
+            if(debugEquity) console.log('compile sendBalance  '+JSON.stringify(p) + "\n ==>> MODIFY K2xx "+JSON.stringify(varcap));
 
             if(p.resCap) {
                 // consolidate RE capital reserve
                 var rescap=bAccounts[p.resCap]; // index with name
-                if(debug) console.dir("compile sendBalance partner "+p.name+ " CapitalReserve("+p.resCap+")="+JSON.stringify(rescap));
+                if(debugEquity) console.dir("compile sendBalance partner "+p.name+ " CapitalReserve("+p.resCap+")="+JSON.stringify(rescap));
 
                 rescap.income="";
                 rescap.netIncomeOTC="";
@@ -1068,7 +1089,7 @@ function sendBalance(balance) {
     }  else console.dir('compile sendBalance NO CAPITAL ACCOUNTS FOR PARTNER #'+p);
 
 
-        if(debugReport) console.log('compile sendBalance  '+JSON.stringify(p) + "\n ==>> MODIFY K2xx  RExx"+JSON.stringify(varcap));
+        if(debugEquity) console.log('compile sendBalance  '+JSON.stringify(p) + "\n ==>> MODIFY K2xx  RExx"+JSON.stringify(varcap));
     }
 
 
@@ -1085,7 +1106,7 @@ function sendBalance(balance) {
                 account.yearEnd=""+Account.bigSaldo(account);
                 
                 gross[name]=account; 
-                if(debugReport) console.log("compile.js sendBalance2 ACCOUNT "+JSON.stringify(account));           
+                if(debugEquity) console.log("compile.js sendBalance2 ACCOUNT "+JSON.stringify(account));           
             }
         }
     }
