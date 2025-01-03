@@ -106,9 +106,10 @@ export function SessionProvider({ children,  default_value, onLoading, onError }
                 console.log("7004 SessionProvider COLD SUCCESS");
 
             })
-            .catch(() => {
+            .catch((e) => {
+                console.log("7005 SessionProvider COLD ERROR ");
                 setStatus('error')
-                console.log("7005 SessionProvider COLD ERROR");
+                console.log("7007 SessionProvider COLD ERROR "+e.toString());
             })
         // 20240104 }
     

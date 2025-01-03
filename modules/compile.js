@@ -505,17 +505,17 @@ export function compile(sessionData) {
                                 } else console.error("0367 Asset Line is not an array "+JSON.stringify(aLine));
                                 firstLine=null;                
                                 // Schema for asset line 2697211	2021-01-19	BAY001	INVEST	200	BAYR_1
-                                
-                                if(aLine[3] && aLine[3].trim().length>1) {
-                                    let iAcc=iAccount(aLine[3].trim(),result[D_Schema].Names);
-                                    if(debug>1 && iAcc>=J_ACCT) console.log("0370 compile: known account("+aLine[3]+"):"+iAcc);
+                                let  refAcct = (aLine[3] && ((aLine[3].trim().length)>1)) ? aLine[3].trim() : null;
+                                if(refAcct) {
+                                    let iAcc=iAccount(refAcct,result[D_Schema].Names);
                                     var date = aLine[1].trim();
                                     var type = aLine[2].trim();
                                     var nmbr = aLine[4].trim();
                                     var idnt = aLine[5].trim();
+                                    if(debug>1 && iAcc>=J_ACCT) console.log("0370 compile: known account("+refAcct+"):"+type+"  "+idnt+"  #"+iAcc);
 
-                                    // process YIELD,INVEST,SELL;(REGULAR)
-                                    if(aLine[3].trim()==='INVEST') {
+                                    // process YIELD,INVEST,SELL,WRITEOFF (REGULAR)
+                                    if(refAcct==='INVEST') {
                                         try {
                                             var orig = bigAssetValueChange(aLine,iAssets,result[D_XBRL]);
                                             var icost = bigCost(idnt,nmbr,orig);
@@ -533,7 +533,7 @@ export function compile(sessionData) {
                                         } catch(err) { console.dir("0365 SHEET LINE INVEST "+err); }
                                     }
 
-                                    else if(aLine[3].trim()==='SELL') {
+                                    else if(refAcct==='SELL') {
 
                                         var iSel = parseInt(aLine[4].trim());
                                         var iamnt = bigAssetValueChange(aLine,iAssets,result[D_XBRL]);  // asset value change
@@ -583,7 +583,7 @@ export function compile(sessionData) {
                                                     nmbr+" worth "+cents2EU(iremn) + " at "+cents2EU(icost)+" each");
                                     }
 
-                                    else if(aLine[3].trim()==='YIELD') {
+                                    else if(refAcct==='YIELD') {
 
                                         var iamnt = bigAssetValueChange(aLine,iAssets,result[D_XBRL]); // asset value change
 
@@ -595,7 +595,42 @@ export function compile(sessionData) {
                                                 var nmbr =  result[D_FixAss][idnt].nmbr;
                                                 var icurr = BigInt(result[D_FixAss][idnt].rest);
 
-                                                // yield type of dividend payment reduces the INIT value
+                                                // GH20250103 yield type of dividend payment increases the GAIN value
+                                                var irest = icurr+iamnt;
+
+                                                var icost = bigCost(idnt,nmbr,icurr);
+                                                // GH20230102 NEW cost is calculated as the REST price per number of units
+
+                                                // OPEN
+                                                // MUST VERIFY existing identifier
+                                                result[D_FixAss][idnt]={"date":date,
+                                                                        "type":type,
+                                                                        "orig":iVal,
+                                                                        "nmbr":nmbr,
+                                                                        "idnt":idnt,
+                                                                        "rest":""+icurr,
+                                                                        "cost":""+icost,
+                                                                        "gain":""+iamnt }; // GH20230303
+                                                if(debugAssets) console.log("0376 YIELD amount="+iamnt+" changes "+idnt+" from "+cents2EU(icurr)+" to "+cents2EU(result[D_FixAss][idnt].rest));
+
+                                            } else console.log("0371 YIELD UNKNOWN "+idnt+" ASSET ENTRY");
+
+                                        } else {
+                                            console.log("0373 YIELD UNKNOWN ASSET "+idnt);
+                                        }
+                                     
+                                    } else if (refAcct==='WRITEOFF') {
+                                        var iamnt = bigAssetValueChange(aLine,iAssets,result[D_XBRL]); // asset value change
+
+                                        if(result[D_FixAss]) {
+                                            if(result[D_FixAss][idnt]) {
+                                                var date = result[D_FixAss][idnt].date;
+                                                var type = result[D_FixAss][idnt].type;
+                                                var iVal = result[D_FixAss][idnt].orig;
+                                                var nmbr =  result[D_FixAss][idnt].nmbr;
+                                                var icurr = BigInt(result[D_FixAss][idnt].rest);
+
+                                                // WRITEOFF type of dividend payment reduces the REST value
                                                 // GH20220108  amount reduces the CURRent value
                                                 var irest = icurr+iamnt;
 
@@ -613,11 +648,12 @@ export function compile(sessionData) {
                                                                         "rest":""+irest,
                                                                         "cost":""+icost,
                                                                         "gain":"0" }; // GH20230303
-                                                if(debugAssets) console.log("0376 YIELD amount="+iamnt+" changes "+idnt+" from "+cents2EU(icurr)+" to "+cents2EU(result[D_FixAss][idnt].rest));
+                                                if(debugAssets) console.log("0362 WRITEOFF amount="+iamnt+" changes "+idnt+" from "+cents2EU(icurr)+" to "+cents2EU(result[D_FixAss][idnt].rest));
 
-                                                } else  console.log("0371 YIELD UNKNOWN "+idnt+" ASSET");
+                                            } else console.log("0361 WRITEOFF UNKNOWN "+idnt+" ASSET ENTRY");
+                                            
                                         } else {
-                                            if(debug>1) console.log("0373 YIELD UNKNOWN "+idnt);
+                                            console.log("0363 WRITEOFF UNKNOWN ASSET "+idnt);
                                         }
                                     } else if(iAcc>0) {
                                         try {
@@ -636,7 +672,7 @@ export function compile(sessionData) {
                                     } else {
                                         if(debug>1) console.log("0354 compile: normal booking transaction");
                                     }
-                                } // end processing YIELD,SELL,INVEST,(REGULAR)
+                                } // end processing YIELD,SELL,INVEST,WRITEOFF,(REGULAR)
 
                             } catch(err) { console.dir("0351 SHEET LINE INPUT "+err); }
                         }

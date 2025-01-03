@@ -42,14 +42,16 @@ export default function Status() {
     "Aktien-Kauf":{"text":"Aktien mit Kaufkosten werden gekauft und bezahlt; der Kurswert und alle Gebühren werden aktiviert.","creditEQL":{},"credit":{"CDAK":"0"},"debit":{},"debitA":{"COGK":"0"},"sender":"WKN","reason":"Stückzahl","refAcct":"INVEST","refCode":"Code"},
     "Bond-Kauf mit Stückzins":{"text":"Bonds mit Kaufkosten und Stückzins werden gekauft und bezahlt","creditEQL":{},"credit":{"CDAK":"0","FSTF":"0"},"debit":{},"debitA":{"COGK":"0"},"sender":"WKN","reason":"Nominal","refAcct":"INVEST","refCode":"Code"},
     "Aktien-Dividende bar":{"text":"Dividende wird versteuert und auf das Firmenkonto überwiesen","creditEQL":{},"credit":{"COGK":"0","KEST":"0","KESO":"0"},"debit":{"EDIV":"0"},"debitA":{},"sender":"WKN","reason":"Stückzahl","refAcct":"YIELD","refCode":"Code"},
-    "Dividende steuerfrei bar":{"text":"steuerfreie Dividende reduziert Anschaffungskosten","creditEQL":{},"credit":{"COGK":"0"},"debit":{},"debitA":{"CDAK":"0"},"sender":"WKN","reason":"Stückzahl","refAcct":"YIELD","refCode":"Code"},
-    "Dividende in Aktien steuerfrei":{"text":"steuerfreie Gratisaktien reduzieren Anschaffungskosten","creditEQL":{},"credit":{},"debit":{},"debitA":{},"sender":"WKN","reason":"Stückzahl","refAcct":"INVEST","refCode":"Code"},
+    "Dividende steuerfrei bar":{"text":"steuerfreie Dividende reduziert Anschaffungskosten","creditEQL":{},"credit":{"COGK":"0"},"debit":{},"debitA":{"CDAK":"0"},"sender":"WKN","reason":"Stückzahl","refAcct":"WRITEOFF","refCode":"Code"},
+    "Dividende in Aktien steuerfrei":{"text":"steuerfreie Gratisaktien reduzieren Anschaffungskosten","creditEQL":{},"credit":{},"debit":{},"debitA":{},"sender":"WKN","reason":"Stückzahl","refAcct":"YIELD","refCode":"Code"},
     "Zins auf Bonds steuerpflichtig":{"text":"Zins auf Festgeld wird versteuert","creditEQL":{},"credit":{"COGK":"0","KEST":"0","KESO":"0"},"debit":{"EZIN":"0"},"debitA":{},"sender":"WKN","reason":"Stückzahl","refAcct":"YIELD","refCode":"Code"},
     "Bond-Zins verr mit Stückzins":{"text":"Forderung aus Stückzins bei Bondkauf wird mit Zins auf Festgeld verrechnet","creditEQL":{"EZIN":"0"},"credit":{},"debit":{},"debitA":{"FSTF":"0"},"sender":"WKN","reason":"Stückzahl","refAcct":"EZIN","refCode":"Code"},
     "Dividende in Aktien steuerpflichtig":{"text":"Gratisaktien werden versteuert","creditEQL":{},"credit":{"KEST":"0","KESO":"0"},"debit":{"EDIV":"0"},"debitA":{},"sender":"WKN","reason":"Stückzahl","refAcct":"INVEST","refCode":"Code"},
     "Aktien-Verkauf mit Gewinn":{"text":"Aktien werden mit Gewinn verkauft","creditEQL":{},"credit":{"COGK":"0","KEST":"0","KESO":"0"},"debit":{"FSAL":"0"},"debitA":{"CDAK":"0"},"sender":"WKN","reason":"Stückzahl","refAcct":"SELL","refCode":"Code"},
     "Aktien-Verkauf mit Verlust":{"text":"Aktien werden mit Verlust verkauft; der Kurswert abzgl Gebühren geht auf das Firmenkonto","creditEQL":{},"credit":{"VAVA":"0","COGK":"0"},"debit":{},"debitA":{"CDAK":"0"},"sender":"WKN","reason":"Stückzahl","refAcct":"SELL","refCode":"Code"},
     "Ausgleich Aktien-Verluste":{"text":"Für Aktienverkäufe im selben Jahr gilt: Gewinne tilgen Verluste","creditEQL":{"FSAL":"0"},"credit":{},"debit":{},"debitA":{"VAVA":"0"},"sender":"Ausgleich","reason":"Verluste","refAcct":"VAVA","refCode":"VK Aktien"},
+    "Aktien-Wertaufholung":{"text":"Aktien-Depot hat pauschalen Anstieg des Kurswerts","creditEQL":{},"credit":{"CDAK":"0"},"debit":{"NKG":"0"},"debitA":{},"sender":"Depot","reason":"Wertaufholung","refAcct":"INVEST","refCode":"Code","txt2":"Ziel","txt3":"Grund","txt4":"Code"},
+    "Umlage Wertzuwachs":{"text":"Die Gesellschafter erhalten Kapital aus Wertzuwachs","creditEQL":{"NKG":"0"},"credit":{},"debit":{"K2GH":"0","K2EH":"0","K2AL":"0","K2KR":"0","K2TO":"0"},"debitA":{},"sender":"Wertzuwachs","refAcct":"NKG","refCode":"DEPOSIT","txt2":"Ziel"},
     "Pfandzahlung":{"text":"Die KG zahlt vom Firmenkonto eine Sicherheit","creditEQL":{},"credit":{"FSTF":"0"},"debit":{},"debitA":{"COGK":"0"},"sender":"","reason":"","refAcct":"NKHA","refCode":"AZ"},
     "Rückerstattung Pfand":{"text":"Die KG erhält die Sicherheit auf das Firmenkonto zurück","creditEQL":{},"credit":{"COGK":"0"},"debit":{},"debitA":{"FSTF":"0"},"sender":"","reason":"","refAcct":"NKHA","refCode":"AZ"},
     "Nicht-umlagefähige NK":{"text":"Eröffnung: Nebenkosten werden um nicht-umlagefähige Teile reduziert zB Versicherungsanteil f Garage","creditEQL":{"AUFW":"0"},"credit":{},"debit":{"NKHA":"0"},"debitA":{},"sender":"Ferguson","reason":"Abschluss","refAcct":"NKHA","refCode":"Versicherung Garage"},
@@ -58,9 +60,9 @@ export default function Status() {
     "Mieter zahlt Nebenkosten":{"text":"Mieter* überweist Nebenkosten auf das Firmenkonto","creditEQL":{},"credit":{"COGK":"0"},"debitA":{"NKFO":"0"},"debit":{},"sender":"Ferguson","reason":"Vorjahr","refAcct":"NKHA","refCode":"Nachzahlung"},
     "Erstattung Nebenkosten":{"text":"KG erstattet überzahlte Nebenkosten an Mieter*","creditEQL":{"NKHA":"0"},"credit":{},"debit":{},"debitA":{"COGK":"0"},"sender":"Nebenkosten","reason":"Vorjahr","refAcct":"NKHA","refCode":"Überschuss"},
     "nicht abzugsfäh.Aufwand":{"text":"Abschluss: nicht abzugsfähige Aufwände werden anteilig den Gesellschaftern abgezogen","creditEQL":{"K2GH":"0","K2EH":"0","K2AL":"0","K2KR":"0","K2TO":"0"},"credit":{},"debit":{"NKG":"0"},"debitA":{},"sender":"Abschluss","reason":"Jahr","refAcct":"K2LE","refCode":"WITHDRAW"},
-    "Abschreibung Haus":{"text":"Abschluss: Abschreibung des Hauses im Eifelweg 22 -2%","creditEQL":{"ABSC":"2430"},"credit":{},"debitA":{"GRSB":"0"},"debit":{},      "sender":"Haus",       "reason":"1","refAcct":"YIELD","refCode":"Eifelweg22"},
-    "Abschreibung Dach":{"text":"Abschluss: Abschreibung des Dachs im Eifelweg 22 -4%","creditEQL":{"ABSC":"666.40"},"credit":{},"debitA":{"DACH":"0"},"debit":{},     "sender":"Gebäudeteil","reason":"1","refAcct":"YIELD","refCode":"Dacheindeckung"},
-    "Abschreibung Spülm":{"text":"Abschluss: Abschreibung der Spülmaschine im Eifelweg 22 -10%","creditEQL":{"ABSC":"47"},"credit":{},"debitA":{"EBKS":"0"},"debit":{},"sender":"Gebäudeteil","reason":"1","refAcct":"YIELD","refCode":"Spülmaschine2018"},
+    "Abschreibung Haus":{"text":"Abschluss: Abschreibung des Hauses im Eifelweg 22 -2%","creditEQL":{"ABSC":"2430"},"credit":{},"debitA":{"GRSB":"0"},"debit":{},      "sender":"Haus",       "reason":"1","refAcct":"WRITEOFF","refCode":"Eifelweg22"},
+    "Abschreibung Dach":{"text":"Abschluss: Abschreibung des Dachs im Eifelweg 22 -4%","creditEQL":{"ABSC":"666.40"},"credit":{},"debitA":{"DACH":"0"},"debit":{},     "sender":"Gebäudeteil","reason":"1","refAcct":"WRITEOFF","refCode":"Dacheindeckung"},
+    "Abschreibung Spülm":{"text":"Abschluss: Abschreibung der Spülmaschine im Eifelweg 22 -10%","creditEQL":{"ABSC":"47"},"credit":{},"debitA":{"EBKS":"0"},"debit":{},"sender":"Gebäudeteil","reason":"1","refAcct":"WRITEOFF","refCode":"Spülmaschine2018"},
     "Einlage Kpl":{"text":"Elke u Georg zahlen auf Firmenkonto ein","creditEQL":{},"credit":{"COGK":"0"},"debitA":{},"debit":{"K2GH":"0","K2EH":"0"},"sender":"Elke u Georg","refAcct":"K2GH K2EH","refCode":"DEPOSIT"},
     "Einlage Alex":{"text":"Alex zahlt auf Firmenkonto ein","creditEQL":{},"credit":{"COGK":"0"},"debitA":{},"debit":{"K2AL":"0"},"sender":"Alexander","refAcct":"K2AL","refCode":"DEPOSIT"},
     "Einlage Kristina":{"text":"Tina zahlt auf Firmenkonto ein","creditEQL":{},"credit":{"COGK":"0"},"debitA":{},"debit":{"K2KR":"0"},"sender":"Kristina","refAcct":"K2KR","refCode":"DEPOSIT"},
@@ -1280,6 +1282,11 @@ let iSumLeft=BigInt(0);
 let iSumRite=BigInt(0);
 
 
+function TXNReceiptSum(args) {
+    return TXNReceipt(args.text,args.jAmounts,args.jColumnHeads,null,args.id,args.removeCol,D_History,-1,0,null);
+}
+
+
 function TXNReceipt(text,jAmounts,jColumnHeads,jSum,id,removeCol,name,index,currLine,setCurrLine) {
     
     Object.keys(jAmounts).forEach(acct=>{
@@ -1330,8 +1337,8 @@ function TXNReceiptTotal(textSum,name,year,textYearEnd) {
                                         <div className="FIELD NAME" draggable="true">{name}</div>
                                         <div className="FIELD NAME"></div>
                                         <div className="FIELD MOAM" draggable="true">{cents20EU(iSumLeft)}</div> 
-                                        <div className="FIELD MOAM" draggable="true">{cents20EU(iSumRite)}</div> 
-                                        <div className="FIELD MOAM" draggable="true">{cents20EU(iSumLeft-iSumRite)}</div> 
+                                        <div className="FIELD MOAM" draggable="true">-{cents20EU(iSumRite)}</div> 
+                                        <div className="FIELD MOAM" draggable="true">={cents20EU(iSumLeft-iSumRite)}</div> 
                                         <div className="FIELD SEP" >&nbsp;</div>
                                         <div className="FIELD NAME">{textYearEnd}</div>
             </div>
@@ -1339,10 +1346,6 @@ function TXNReceiptTotal(textSum,name,year,textYearEnd) {
     )
 }
 function nop() {}
-
-function TXNReceiptSum(args) {
-    return TXNReceipt(args.text,args.jAmounts,args.jColumnHeads,null,args.id,args.removeCol,D_History,-1,0,null);
-}
 
 /*
 function HistoryRow(args) { 
