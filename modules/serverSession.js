@@ -64,7 +64,7 @@ export function startSessionJSON(session,res) {
 
     // 20221207
     if(res) {
-        console.log("0046 startSessionJSON("+newSession.client+","+newSession.year);         
+        console.log("0046 startSessionJSON("+newSession.client+","+newSession.year+")");         
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers","Origin, X-Requested-With, Content-Type, Accept, Authorization");
         res.json(session);
@@ -122,14 +122,20 @@ var allSession = null; // LIFO
 export function setSession(aSession) {  
     aSession.server = localhost();
     allSession=aSession;
+
+
+
+    
+/*
+
     let prev="";
     if(aSession && aSession.sheetCells) {
-
         let len=aSession.sheetCells.length;
         let aPrev=aSession.sheetCells[len-1];
-        prev= aSession.server + " "+aPrev[1];
-        aPrev.map((field,i)=>((i>5 && field.length>2) ? (prev=prev+" "+field):""));
+        prev= aSession.server + "  " +aPrev[1];
+        aPrev.map((field,i)=>((i>5 && field && field.length>1) ? (prev=prev+" "+field):""));
     }
+*/        
     if(debug>4) console.log("\n0580  setSession("+showRecent(aSession)+") "+aSession.id); 
 }
 
@@ -189,15 +195,14 @@ export function getSession(id) {
     return result; 
 }
 
-
 function showRecent(aSession) {
-    // show recent transaction
+    // show recent transaction - wothout server number
     let prev="";
     if(aSession && aSession.sheetCells) {
         let len=aSession.sheetCells.length;
         let aPrev=aSession.sheetCells[len-1];
         prev= aPrev[1];
-        aPrev.map((field,i)=>((i>5 && field.length>2) ? (prev=prev+" "+field):""));
+        aPrev.map((field,i)=>((i>5 && field && field.length>2) ? (prev=prev+" "+field):""));
     }
     return prev;
 }
