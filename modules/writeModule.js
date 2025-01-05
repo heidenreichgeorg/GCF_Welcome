@@ -238,7 +238,7 @@ export async function sendFile(sig, response) {  // was fs.exists() GH20230401
 
 
 
-export async function save2Bucket(jConfig,session,client,year) {
+export async function save2Bucket(jConfig,session,partner,client,year) {
 
     if(jConfig) {
         console.log("0034 save2Bucket Start saving("+JSON.stringify(Object.keys(session))+") to FB for "+client+","+year);        
@@ -250,7 +250,7 @@ export async function save2Bucket(jConfig,session,client,year) {
             // session.fireBase = fbConfig.storageBucket;
 
             // async, setSession and compile
-            accessFirebase(bucketUpload,fbConfig,client,year,session,startSessionDisplay,null);
+            accessFirebase(bucketUpload,fbConfig,partner,client,year,session,startSessionDisplay,null);
                 
             if(debug) {
                 console.log("0036 save2Bucket session.sheetcells keys="+JSON.stringify(Object.keys(session.sheetCells).map((i)=>(session.sheetCells[i][0]))));

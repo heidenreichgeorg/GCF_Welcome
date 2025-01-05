@@ -72,7 +72,7 @@ let bpApp = null;
 
 // FB.accessFirebase(FB.bucketDownload,fbConfig,client,year,null,startSessionCB);
 // FB.accessFirebase(FB.bucketUpload,fbConfig,client,year,session,startSessionCB)
-function accessFirebase(accessMethod,firebaseConfig,client,year,jData,startSessionCB,res) {
+function accessFirebase(accessMethod,firebaseConfig,partner,client,year,jData,startSessionCB,res) {
 
   let url = "sync";
 
@@ -88,10 +88,15 @@ function accessFirebase(accessMethod,firebaseConfig,client,year,jData,startSessi
   if(debug) console.log("\nFB.bucketInit");
   fbAuth.signInWithEmailAndPassword(auth, firebaseConfig.usermail, firebaseConfig.userpassword)
     .then((userCredential) => {
+
+
       // Signed in 
       const user = userCredential.user;
+      // compare user===partner ??
       if(debug) console.log("\n0028 FB.bucketInit LOGGED IN FROM "+jData.root+jData.bucket);
-      url = accessMethod(bpStorage,client,year,jData,startSessionCB,res);
+
+
+      url = accessMethod(bpStorage,partner,client,year,jData,startSessionCB,res);
       if(jData) {
         jData.firebase = url;    
       }
@@ -128,7 +133,7 @@ function getFileContents(fileName) {
 // ONLY FOR BROWSERS gsutil cors set cors.json gs://bookingpapages-a0a7c -
 
 
-async function bucketDownload(bpStorage,client,year,jData,startSessionCB,callRes) {
+async function bucketDownload(bpStorage,partner,client,year,jData,startSessionCB,callRes) {
   let sClient = client.replace('.','_');
   let iYear = parseInt(year);
 
@@ -399,12 +404,12 @@ export function loadFBConfig(dir,config) {
 
 
 
-export function fbDownload(jConfig,client,year,callBack,res) {
+export function fbDownload(jConfig,partner,client,year,callBack,res) {
     if(jConfig) {
         // FIREBASE
         const fbConfig = loadFBConfig(jConfig.root,jConfig.bucket);
         if(fbConfig) {        
-            accessFirebase(bucketDownload,fbConfig,client,year,jConfig,callBack,res);
+            accessFirebase(bucketDownload,fbConfig,partner,client,year,jConfig,callBack,res);
             return "fbDownload";
         } else {
             console.log("0033 server.fbDownload NO FIREBASE CONFIG jConfig="+JSON.stringify(jConfig))

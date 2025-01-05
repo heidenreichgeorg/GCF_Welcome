@@ -16,7 +16,7 @@ export const Slash = '/';
 var nets;
 
 // load JSON file from Firebase storage
-// query = { client:CLIENT, year:YEAR }
+// query = { partner:PARTNER, client:CLIENT, year:YEAR }
 // GH20230816 bucket from string to { 'bucket':bucket }
 export function signIn(jConfig,query,remote,res,startSessionCB) {
     
@@ -25,30 +25,37 @@ export function signIn(jConfig,query,remote,res,startSessionCB) {
     
     console.log("0010  signIn at root "+JSON.stringify(jConfig)+"  for "+JSON.stringify(query));
 
-    if(query && query.client && query.client.length>2 ) { // && (query.client == "[a-zA-Z0-9]")) {
+    if(query && query.partner && query.partner.length>1 ) { // && (query.partner == "[a-zA-Z0-9]")) {
 
         // Security sanitize input client
-        let client = query.client;
-        
-        if(query && query.year && query.year.length>2 && (parseInt(query.year)>1)) {
+        let partner = query.partner;
 
-            // Security sanitize input year
-            let year   = parseInt(query.year); // Security sanitize input year
-            console.log("0012 signIn for client "+client+"  year "+year);
+        if(query && query.client && query.client.length>2 ) { // && (query.client == "[a-zA-Z0-9]")) {
 
-            let id=null;
-            {
-                console.log ( "0014 signIn READ BUCKET FOR COLD START jConfig="+JSON.stringify(jConfig));
-                fbDownload(jConfig,client,year,startSessionCB,res); // avoid double response
-            }
-                        
-        } else console.log ( "0027 signIn file no valid year for query="+JSON.stringify(query)+",addr="+remote);
+            // Security sanitize input client
+            let client = query.client;
+            
+            if(query && query.year && query.year.length>2 && (parseInt(query.year)>1)) {
 
-    } else {
-        console.log ( "0029 signIn file no valid client for query="+JSON.stringify(query)+",addr="+remote);
+                // Security sanitize input year
+                let year   = parseInt(query.year); // Security sanitize input year
+                console.log("0012 signIn for partner="+partner+"  client="+client+"  year="+year);
 
-        res.end("FORWARD FILE"); // GH20230708 was res.send
-    }
+                let id=null;
+                {
+                    console.log ( "0014 signIn READ BUCKET FOR COLD START jConfig="+JSON.stringify(jConfig));
+                    fbDownload(jConfig,partner,client,year,startSessionCB,res); // avoid double response
+                }
+                            
+            } else console.log ( "0027 signIn file no valid year for query="+JSON.stringify(query)+",addr="+remote);
+
+        } else {
+            console.log ( "0029 signIn file no valid client for query="+JSON.stringify(query)+",addr="+remote);
+
+            res.end("FORWARD FILE"); // GH20230708 was res.send
+        }
+
+    } else console.log ( "0025 signIn file no valid partner for query="+JSON.stringify(query)+",addr="+remote);
 
     return null;
 }

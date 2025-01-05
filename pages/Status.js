@@ -85,6 +85,7 @@ export default function Status() {
     const [sheet, setSheet]  = useState()
     const [year, setYear]   = useState()
     const [client,setClient] = useState()
+    const [partner,setPartner] = useState()
     const {session, status } = useSession()
     const [displayRecord, setDisplayRecord] = useState({ creditEQL:{}, credit:{}, debitA:{}, debit:{}})
     const [matrix, setMatrix] = useState(predefinedTXN )
@@ -113,6 +114,7 @@ export default function Status() {
         if(status !== 'success') return;
         setYear(session.year);
         setClient(session.client);
+        setPartner(session.partner);
         setMatrix(session.txnPattern);
         let state=getSession();
         if(state && Object.keys(state).length>5) {
@@ -797,14 +799,14 @@ export default function Status() {
     var jReport = sheet[D_Report];
 
 
-    function makeTax(partner,index) {
+    function makeTax(taxPartner,index) {
         var ifix=0n; // ifix are cents to compensate for rounding when tax is shared among partners
-        let igain=BigInt(partner.gain);
-        let ideno=BigInt(partner.denom);               
-        let taxID = partner.taxID;
-        let result= { 'name': partner.name, 'SteuerID':taxID,  };
+        let igain=BigInt(taxPartner.gain);
+        let ideno=BigInt(taxPartner.denom);               
+        let taxID = taxPartner.taxID;
+        let result= { 'name': taxPartner.name, 'SteuerID':taxID,  };
 
-        let taxPaid = BigInt(partner.tax);
+        let taxPaid = BigInt(taxPartner.tax);
         var iSum=0n;
         while(iSum<taxPaid && ifix<20n) {
             iSum=0n;
@@ -824,12 +826,12 @@ export default function Status() {
         return result;
     }
 
-    function reduceCapital(partner,deficit,index) {
+    function reduceCapital(taxPartner,deficit,index) {
         var ifix=0n; // ifix are cents to compensate for rounding when capital deficit is shared among partners
-        let igain=BigInt(partner.gain);
-        let ideno=BigInt(partner.denom);               
+        let igain=BigInt(taxPartner.gain);
+        let ideno=BigInt(taxPartner.denom);               
 
-        let cyLoss =partner.cyLoss;
+        let cyLoss =taxPartner.cyLoss;
         var iSum=0n;
         while(iSum<cyLoss && ifix<20n) {
             iSum=0n;
@@ -934,11 +936,11 @@ export default function Status() {
     
 
 
-    // partner pages
+    // taxPartner pages
     let partnerBase=fixPages;
     Object.keys(jPartnerReport).forEach((p,i)=>{
         tabHeaders.push(page.Tax+' '+jPartnerReport[i].name); 
-        fixPages++; // partner page
+        fixPages++; // taxPartner page
     })
 
 
@@ -1230,7 +1232,7 @@ export default function Status() {
                 {Object.keys(jPartnerReport).map((jPartner,partnerNo) => ( 
 
                     <div className="FIELD" key={"Partner"+partnerNo} id={tabName+(partnerBase+partnerNo)} style= {{ 'display': aPages[partnerBase+partnerNo]}} >
-                    { console.log("140 STATUS show partner "+partnerNo) }
+                    { console.log("140 STATUS show taxPartner "+partnerNo) }
                             
                             <div className="attrLine"></div>
                             <div className="attrLine">{page.Tax}&nbsp;{parseInt(session.year)}</div>

@@ -36,6 +36,7 @@ export default function handler(
 
     if(rawData && rawData.client && rawData.year) {
 
+        let partner = rawData.partner;
         let client = rawData.client;
         let year   = rawData.year;
         let time   = rawData.time;    
@@ -48,12 +49,12 @@ export default function handler(
             rawData.id=computed;
             sessionId=computed;
         }
-        if(debugUpload) console.dir("0812 app.post UPLOAD  client="+client+",year="+year+",time="+time+",r="+remote+"  ---> "+computed);
+        if(debugUpload) console.dir("0812 app.post UPLOAD partner="+partner+"  client="+client+",year="+year+",time="+time+",r="+remote+"  ---> "+computed);
 
 
         if(sessionId!=null && computed!=null && year!=null && client!=null) {
             // save file on server, not on client and forward to LOGIN page
-            if(debugUpload) console.dir("0814 app.post UPLOAD with function="+clientFunction+",client="+client+",year="+year+",time="+time+",r="+remote+"  ---> "+computed);
+            if(debugUpload) console.dir("0814 app.post UPLOAD with function="+clientFunction+",partner="+partner+",client="+client+",year="+year+",time="+time+",r="+remote+"  ---> "+computed);
          
             let sessionData = rawData;
             sessionData.strTimeSymbol=strTimeSymbol;
@@ -70,7 +71,7 @@ export default function handler(
 
             // PERSISTENT FB CLOUD FILE STORAGE
             // SETS SESSION AFTER WRITE
-            save2Bucket(jConfig,sessionData,client,year);
+            save2Bucket(jConfig,sessionData,partner,client,year);
 
             
             // 20221202 what if jConfig.bucket==null and no bucket shall be used?

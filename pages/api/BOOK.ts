@@ -79,8 +79,9 @@ function bookTransaction(session:any, res:NextApiResponse<any>,jData:any) {
 
     var result="SERVER BOOKED";
     
-    let year =session.year;
+    let partner= session.partner;
     let client = session.client;
+    let year   = session.year;
     
     if(client && year) {
         
@@ -94,7 +95,7 @@ function bookTransaction(session:any, res:NextApiResponse<any>,jData:any) {
           
           let serverAddr = localhost();
           // async
-          save2Bucket(jData,session,client,year)
+          save2Bucket(jData,session,partner,client,year)
               .then(result => { 
                 if(res) {          
                     res.json({url:serverAddr+'/LATEST', client, year, 'result':result  })
