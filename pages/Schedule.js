@@ -23,9 +23,9 @@ export default function Schedule() {
         
     const {session, status } = useSession()
     
-    const [year, setYear]   = useState()
-    const [client,setClient] = useState()
-    const [partner, setPartner] = useState(false);
+    const [year,   setYear]    = useState()
+    const [client, setClient]  = useState()
+    const [partner,setPartner] = useState(false);
     
     
     useEffect(() => {
@@ -36,7 +36,8 @@ export default function Schedule() {
         setPartner(session.partner);
     }, [status])
 
-    return (<Screen tabSelector={[]} tabName={[]} aFunc={aFunc} aText="Maya Schedule">
+
+    return (<Screen tabSelector={[]} tabName={[]} aFunc={[]} aText={[]}>
         <div>Monday  Tuesday  Wednesday  Thursday  Friday  Saturday  Sunday</div>
         </Screen>)
 }
