@@ -1,8 +1,12 @@
 <html>
 <script>
 
-const copyURL="gcf-welcome.vercel.app";
-const securityBranch="gcf-welcome-git-security-heidenreichgeorg.vercel.app";
+
+const masterURL="gcf-welcome-git-master-heidenreichgeorgs-projects.vercel.app";
+const securityURL="gcf-welcome-git-security-heidenreichgeorgs-projects.vercel.app";
+
+const localURL="127.0.0.1:3000";
+const copyURL="gcf-welcome-git-security-heidenreichgeorg.vercel.app";
 
 function timeSymbol() { 
     var u = new Date(Date.now()); 
@@ -40,67 +44,66 @@ function currentHash(client,year) {
 function signIn() {
     console.log("signIn ENTER");
     
-    var base = document.getElementById('base').value;
-    var user = document.getElementById('user').value;
-    var year = document.getElementById('year').value;
+    var partner= document.getElementById('partner').value;
+    var client = document.getElementById('client').value;
+    var year  =  document.getElementById('year').value;
     
-    console.log("signIn with U="+user+"  Y="+year);
+    console.log("signIn with P="+partner+"  C="+client+"  Y="+year);
 
-    if (user == "") {
-        alert("User name must be filled out");
-        document.getElementById('user').style.border = "solid 1px red";
+    if (client == "") {
+        alert("Client name must be filled");
+        document.getElementById('client').style.border = "solid 1px red";
     } else {
-          document.getElementById('user').style.border = "solid 1px #a9a9a9";
+          document.getElementById('client').style.border = "solid 1px #a9a9a9";
     }
     if (year == "") {
-        alert("Year must be filled out");
+        alert("Year must be filled");
         document.getElementById('year').style.border = "solid 1px red";
     } else {
          document.getElementById('year').style.border = "solid 1px #a9a9a9";
     }
 
-    let client=userMap[user];
     if (!client || client == "") {
         alert("Invalid client");
     } else {
-        console.log("signIn with U="+user+"  Y="+year+ " C="+client);
-        let hash = currentHash(client,year);
-        let url="https://"+base+"/Status?client="+client+"&year="+year+"&auth="+hash;
+
+	globalBase=masterURL;
+	localBase=localURL;
+
+        console.log("signIn with C="+client+"  Y="+year+ " P="+partner);
+        let hash = currentHash(client+partner,year); // consider partner !! Session.ts handler (auth==currentHash(client,year))
+	let app = userMap[client] ? userMap[client] : 'Status';
+
+        let global="https://"+globalBase+"/"+app+"?partner="+partner+"&client="+client+"&year="+year+"&auth="+hash;
+//        let local="https://"+localBase+"/"+app+"?partner="+partner+"&client="+client+"&year="+year+"&auth="+hash;
+
+ 
+        let anchor1 = '<a href="'+global+'">SERVER</a>';
+
+//        let anchor2 = '<a href="'+local+'">LOCAL</a>';
+
         let page=document.getElementById("page");
 
-        let anchor = '<a href="'+url+'">Login</a>';
-        let button = page.append(anchor);
-        //alert(anchor);
+        let a1 = document.createElement('div');
+        a1.innerHTML = anchor1;
+        page.appendChild(a1);
 
-        let a = document.createElement('div');
-        a.innerHTML = anchor;
-        page.appendChild(a);
-
+//        let a2 = document.createElement('div');
+//        a2.innerHTML = anchor2;
+//        page.appendChild(a2);
     }
 
 }
+const userMap = { 'HGKG':'Status', 'MAYA':'Schedule' }
 
-function load() {
-    console.log("signIn LOAD");
-    
-    var base = document.getElementById('base');
-    base.value = copyURL;
-}
 
-const userMap = { 'heidenreichkg':'HGKG' }
-
-    </script>
-
-    <body onload="load()">
-
-        <div id="page">
-        <div  name="subscribForm" >
-            <input type="text"    id="base" name="base"/>
-            <input type="text"    id="user" name="user" value="heidenreichkg"/>
-            <input type="number"  id="year" name="year" value="2023"/>
-            <input type="submit"            name="SIGN IN"   onclick="signIn()"/><br>
-        </form>
-        </div>
-
-    </body>
+</script>
+<div id="page">
+<div  name="subscribForm" onsubmit="signIn()">
+    <input type="text"    id="partner" name="partner"  value="GH"/>
+    <input type="text"    id="client"  name="client"   value="HGKG"/>
+    <input type="number"  id="year"    name="year"     value="2024"/>
+    <input type="submit"               name="SIGN IN"  onclick="signIn()"/><br>
+</form>
+</div>
 </html>

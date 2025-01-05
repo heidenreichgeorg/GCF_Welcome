@@ -373,7 +373,6 @@ export function loadFBConfig(dir,config) {
             try {
               let configStr = fs.readFileSync(fileName, 'utf8');
               if(configStr) {
-                //console.log("0052 READ SEC FILE WITH "+configStr.length+" CHARS");              
                 try {
                   fbConfig = JSON.parse(configStr);
                 } catch(err) { console.dir("0055 FAILED PARSING CONFIG "+fileName); }
@@ -382,6 +381,7 @@ export function loadFBConfig(dir,config) {
            if(!fbConfig) console.log("0059 loadFBConfig CWD="+process.cwd()+" ROOT="+dir+" NO/INVALID CONFIG FILE "+fileName);
        
     } else {
+      console.log("0051 loadFBConfig NO CONFIG ");
       fbConfig={
         'projectId':process.env.projectId,
         'authDomain':process.env.authDomain,
@@ -392,7 +392,7 @@ export function loadFBConfig(dir,config) {
         'usermail':process.env.usermail,
         'userpassword':process.env.userpassword
       }
-      console.log("0051 loadFBConfig NO CONFIG ");
+      console.log("0052 READ SET fbConfig from env(.local)");              
     }
     return fbConfig;
 } 
@@ -407,14 +407,14 @@ export function fbDownload(jConfig,client,year,callBack,res) {
             accessFirebase(bucketDownload,fbConfig,client,year,jConfig,callBack,res);
             return "fbDownload";
         } else {
-            console.log("0033 server.fbDownload NO FIREBASE CONFIG")
+            console.log("0033 server.fbDownload NO FIREBASE CONFIG jConfig="+JSON.stringify(jConfig))
             return null;
         }
     } else {
       let fbConfig={
 
       }
-      console.log("0031 server.fbDownload NO CONFIG FROM SERVER")
+      console.log("0031 server.fbDownload NO jConfig FROM SERVER")
     }
     
     return null;

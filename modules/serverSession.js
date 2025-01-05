@@ -23,7 +23,7 @@ export function signIn(jConfig,query,remote,res,startSessionCB) {
     nets = networkInterfaces();
 
     
-    console.log("0010  signIn at root "+jConfig.root+"  for "+JSON.stringify(query));
+    console.log("0010  signIn at root "+JSON.stringify(jConfig)+"  for "+JSON.stringify(query));
 
     if(query && query.client && query.client.length>2 ) { // && (query.client == "[a-zA-Z0-9]")) {
 
@@ -38,7 +38,7 @@ export function signIn(jConfig,query,remote,res,startSessionCB) {
 
             let id=null;
             {
-                console.log ( "0014 signIn READ BUCKET FOR COLD id ="+id);
+                console.log ( "0014 signIn READ BUCKET FOR COLD START jConfig="+JSON.stringify(jConfig));
                 fbDownload(jConfig,client,year,startSessionCB,res); // avoid double response
             }
                         

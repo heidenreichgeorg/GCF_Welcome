@@ -74,48 +74,33 @@ export function SessionProvider({ children,  default_value, onLoading, onError }
 
         setStatus('loading')
         let browserItem = sessionStorage.getItem(SX_SESSION);
-        /*if(browserItem!=null && browserItem.length>256) GH20240104
-        {
-            try {
-                let len=0;
-                let data = JSON.parse(browserItem);
-                setSession(data);               
-
-                setStatus('success');
-
-                console.log("7002 SessionProvider WARM SUCCESS");
-
-            }
-            catch(err) {
-                setStatus('error')
-                console.log("7003 SessionProvider WARM ERROR");
-            }
-        } else { GH20240104 */
+       
 
             // PUT REAL IP ADDR or DNS NAME OF BACKEND INTO .env file
             fetch(`${REACT_APP_API_HOST}/SESSION?${strSearch}`,  
             {mode:'cors'}) // CORS 20230114
             .then(data => data.json())
-            .then(data => {
-                let len=0;                
-                setSession(data);
-                sessionStorage.setItem(SX_SESSION,JSON.stringify(data));
-                console.log("COLD data.root="+data.root+"  data.sheetCells.length="+data.sheetCells.length);
+            .then(jData => {
+                console.log("7004 sessionStorage.setItem SY_SESSION="+JSON.stringify(jData));
+                setSession(jData);
+                sessionStorage.setItem(SX_SESSION,JSON.stringify(jData));
+               
+                console.log("COLD data.root="+jData.root+"  data.sheetCells.length="+jData.sheetCells.length);
                 setStatus('success');
-
-                console.log("7004 SessionProvider COLD SUCCESS");
+                
+                
 
             })
             .catch((e) => {
-                console.log("7005 SessionProvider COLD ERROR ");
+                console.log("7007 SessionProvider COLD ERROR ");
                 setStatus('error')
-                console.log("7007 SessionProvider COLD ERROR "+e.toString());
+                console.log("7009 SessionProvider COLD ERROR "+e.toString());
             })
         // 20240104 }
     
     }, [])
 
-    console.log("7006 sessionmanager.SessionProvider returns session and status");
+    console.log("7008 sessionmanager.SessionProvider returns session and status");
 
 
     return (
