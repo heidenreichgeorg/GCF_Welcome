@@ -24,6 +24,18 @@
   color: #000000; 
 }
 
+
+.mobile{   
+  background: #ffffff;
+	height: 100%;
+	width: 35rem;
+  font-family: Bahnschrift, monospace, sans-serif;
+  padding: 12px; 
+  border:none;
+  color: #000022; 
+}
+
+
 .mScreen   { font-family: Bahnschrift,monospace;     height: 680px;         display:table;    page-break-after: always ;break-after: always  }
 
 .mTable   { font-family: Bahnschrift,monospace;     height: 680px;         display:table;    }
@@ -50,14 +62,14 @@ input[type=number] {
   -moz-appearance:textfield;
 }
 
-.attrRow  {                       width:75rem; padding: 1px; float: left;  min-height: 16px; height: 17px; font-family :inherit; font-size: 0.7em; font-weight:400; text-align: center;}
-.attrLine { vertical-align: top;  width:75rem; padding: 1px; float: left;  min-height: 16px; height: 17px; font-family :inherit; font-size: 0.7em; font-weight:400; text-align: center;}
+.attrRow  {                       width:100%; padding: 1px; float: left;  min-height: 16px; height: 17px; font-family :inherit; font-size: 0.7em; font-weight:400; text-align: center;}
+.attrLine { vertical-align: top;  width:100%; padding: 1px; float: left;  min-height: 16px; height: 17px; font-family :inherit; font-size: 0.7em; font-weight:400; text-align: center;}
 
-.footer {                         width:75rem; padding: 1px; float: left;  min-height: 32px; height: 17px; font-family :inherit; font-size: 0.7em; font-weight:400; text-align: center;}
+.footer {                         width:100%; padding: 1px; float: left;  min-height: 32px; height: 17px; font-family :inherit; font-size: 0.7em; font-weight:400; text-align: center;}
 
 
-.key      {  padding: 1px; height:14px;  margin: 0px; border-color: #817137; border-style: solid; float: left; background-color:transparent; font-family:  inherit; font-size: inherit; font-weight:600; color: #c9a935; }
-.box      {  height:40px;  margin: 0px;               border-color: #817137; border-style: solid; float: left; background-color:transparent; font-family:  inherit; font-size: inherit; font-weight:600; color: #c9a935; }
+.key      {  padding: 1px; height:14px;  margin: 0px; border-color: #817137; border-style: solid; float: center; background-color:transparent; font-family:  inherit; font-size: inherit; font-weight:600; color: #c9a935; }
+.box      {  height:40px;  margin: 0px;               border-color: #817137; border-style: solid; float: left;   background-color:transparent; font-family:  inherit; font-size: inherit; font-weight:600; color: #c9a935; }
 
 .SWITCH   {                   padding: 1px; border: none; font-size: 1em; font-weight:400;  } 
 .BIGCELL  {                   padding: 1px;               float: left; color:inherit;min-height: 48px; font-family: inherit; font-size: 0.8em; font-weight:400; text-align: center; background-color: inherit; } 
