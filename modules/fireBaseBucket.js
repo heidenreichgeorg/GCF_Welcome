@@ -170,6 +170,11 @@ async function bucketDownload(bpStorage,partner,client,year,jData,startSessionCB
               // build session object
               session = JSON.parse(body);
 
+              // GH202501
+              session.year = year;
+              session.client = client;
+              session.partner = partner;
+
               // GH202311
               // in case entity/CLIENT/YEAR/txnPattern.txt JSON file exists
               // session.txnPattern will be overwritten with that file
