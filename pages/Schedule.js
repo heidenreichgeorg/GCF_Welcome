@@ -58,19 +58,19 @@ export default function Schedule() {
 
 
     var offset = dayOfWeek-dayOfMonth+1;
-    var cDom = dayOfMonth; 
+
+    var cOffset=offset;
     var cMonth = iMonth;
     var cMonthLen=1+getDaysInMonth(iYear,cMonth);
 
-    for(let count=1;count<100;count++) {
-        if(count+offset>=cMonthLen) {
+    for(let count=1;count<103;count++) {
+        if((count+offset)>=cMonthLen) {
             cMonth++;
-            offset-=cMonthLen-1
-            cMonthLen=1+getDaysInMonth(iYear,cMonth);
-            cDom=3;
+            offset-=cMonthLen-1;            
+            cMonthLen=1+getDaysInMonth(iYear,cMonth);  
         }
-        row.push( (count+offset)>0 && (count+offset<cMonthLen) ? (""+ (count+offset)+"."+monat[cMonth].substring(0,3)) : "-" )
-        cls.push( (count+offset)>0 && (count+offset<cMonthLen) ? ((count+offset>dayOfMonth) ? "key" : "" ): "") 
+        row.push( (count+offset)>0   ? ((""+ (count+offset)+".")+monat[cMonth%12].substring(0,3)) : "-" )
+        cls.push( (count+cOffset>=dayOfMonth) ?  "key" : " " )
     }
     
     return (<Screen tabSelector={[]} tabName={[]} aFunc={[]} aText={[]}>
@@ -78,7 +78,7 @@ export default function Schedule() {
             <div className = "attrLine">                
                 <div className="FIELD NAME">&nbsp;{dayOfMonth}&nbsp;{monat[iMonth]}&nbsp;{iYear}</div>
                 <div className="FIELD SNAM">&nbsp;{partner}&nbsp;{year}&nbsp;;{client}</div>
-                <div className="FIELD SNAM">&nbsp;{offset}</div>
+                <div className="FIELD SNAM">&nbsp;{cOffset}</div>
             </div>        
             <div className = "attrLine">                
                 <div className="FIELD DATE">&nbsp;</div>
@@ -190,6 +190,25 @@ export default function Schedule() {
                     <div className="FIELD DATE"><div className={cls[i]}>&nbsp;{row[i]}&nbsp;</div></div>
                  )) }
             </div>                       
+
+            <div className = "attrLine">                
+                <div className="FIELD DATE">&nbsp;</div>
+            </div>
+            <div className = "attrLine">                
+                { [78,79,80,81,82,83,84].map((i) => ( 
+                    <div className="FIELD DATE"><div className={cls[i]}>&nbsp;{row[i]}&nbsp;</div></div>
+                 )) }
+            </div>     
+
+            <div className = "attrLine">                
+                <div className="FIELD DATE">&nbsp;</div>
+            </div>
+            <div className = "attrLine">                
+                { [85,86,87,88,89,100,101].map((i) => ( 
+                    <div className="FIELD DATE"><div className={cls[i]}>&nbsp;{row[i]}&nbsp;</div></div>
+                 )) }
+            </div>        
+
                     </div>        
         </Screen>)
 }
