@@ -22,6 +22,7 @@ import  { save2Bucket,symbolic } from '../../modules/writeModule'
 let reqBody:String[] | null;
 let sessionTime="";
 let nextSessionId= "";
+let partner = ""; // GH20250112
 let client = "";
 let year="";
 
@@ -41,9 +42,10 @@ export default function handler(
 
       if(req.body) {       
         reqBody = req.body;
+        partner = req.body.partner ; // GH20250112
         client =  req.body.client;
         year = req.body.year;
-        const query:JSON = <JSON><unknown> { "ext":"JSON", "client":client, "year":year  };
+        const query:JSON = <JSON><unknown> { "ext":"JSON", "partner":partner, "client":client, "year":year  }; // GH20250112
         if(debug) console.log("0064 BOOK.handler "+JSON.stringify(query));
         sessionTime=timeSymbol();
         nextSessionId= strSymbol(sessionTime+client+year+sessionTime);
@@ -98,7 +100,7 @@ function bookTransaction(session:any, res:NextApiResponse<any>,jData:any) {
           save2Bucket(jData,session,partner,client,year)
               .then(result => { 
                 if(res) {          
-                    res.json({url:serverAddr+'/LATEST', client, year, 'result':result  })
+                    res.json({url:serverAddr+'/LATEST', partner, client, year, 'result':result  }) // dummy call
                     if(debugWrite) console.log("0614 app.post save2Bucket-> "+JSON.stringify(result));
                 }
               });

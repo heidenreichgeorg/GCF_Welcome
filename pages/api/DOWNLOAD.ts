@@ -8,6 +8,8 @@ let config:string|null;
 
 // data that can be computed synchronously
 let reqBody:String[] | null;
+
+var partner:string|string[]|undefined;
 var client:string|string[]|undefined;
 var year:string|string[]|undefined;
 let sessionTime="";
@@ -26,9 +28,10 @@ export default function handler(
 
   if(req && req.query && req.socket) {       
   
+    partner = req.query.partner;
     client =  req.query.client;
     year = req.query.year;
-    const query:JSON = <JSON><unknown> { "ext":"JSON", "client":client, "year":year  };
+    const query:JSON = <JSON><unknown> { "ext":"JSON", "partner":partner, "client":client, "year":year  };
     console.log("    DOWNLOAD.handler "+JSON.stringify(query));
 
       signIn(jConfig,query,req.socket.remoteAddress,res,downloadJSON); 

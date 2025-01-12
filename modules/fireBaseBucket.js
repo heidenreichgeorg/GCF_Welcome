@@ -23,10 +23,10 @@ UPLOAD JSON (Admin only)
 
 */
 
-const debug=null;
+const debug=7;
 
 // SETTING THIS WILL VIOLATE PRIVACY AT ADMIN CONSOLE
-const debugReport=null;
+const debugReport=7;
 
 //import * as utf8 from 'utf8'
 
@@ -66,7 +66,7 @@ UNAUTHORIZED
 Firebase Storage: User does not have permission to access 'HGKG/2022/main.json'. (storage/unauthorized)"
 */
 
-const sessionKeys = ["client","year","remote","time","sheetCells","sheetName","id","creditorsT","sheetFile","sessionId","generated","ext","clientFunction","strTimeSymbol","fireBase"]
+const sessionKeys = ["partner","client","year","remote","time","sheetCells","sheetName","id","creditorsT","sheetFile","sessionId","generated","ext","clientFunction","strTimeSymbol","fireBase"]
 
 let bpApp = null;
 
@@ -271,7 +271,7 @@ const jMetadata = {
     contentType: 'application/json',
   };
 
-async function bucketUpload(bpStorage,client,year,jData,startSessionCB,callRes) {
+async function bucketUpload(bpStorage,partner,client,year,jData,startSessionCB,callRes) {
 
   let downloadUrl = "no Firebase Storage";
   if(fbStorage) {
@@ -284,6 +284,7 @@ async function bucketUpload(bpStorage,client,year,jData,startSessionCB,callRes) 
         const strChild = fbS+sClient+fbS+iYear+fbS+MAIN;
         const fileRef = fbStorage.ref(bpStorage, strChild);
         if(fileRef) {
+          if(debug) console.log("0074 bucketUpload fielRef for "+strChild);
 
           var jsonString = JSON.stringify(jData);
           const buffer = Buffer.from(jsonString, 'utf8');     
@@ -298,10 +299,14 @@ async function bucketUpload(bpStorage,client,year,jData,startSessionCB,callRes) 
                 Math.round((snapshot.bytesTransferred / total) * 100);
               //setProgresspercent(progress);
               
-              if(debug) console.log("Firebase fbWriteJSON "+progress+"%");
+              if(debug) console.log("0076 bucketUpload "+progress+"%");
 
             },
-          (error) => { // ERROR
+          (error) => { 
+            console.log("0077 bucketUpload  ");                      
+            console.log(error.toString());          
+
+            // ERROR
           // A full list of error codes is available at
               // https://firebase.google.com/docs/storage/web/handle-errors
               if(debug) console.log(error.name +" "+error.code+" "+error._baseMessage);
@@ -328,7 +333,7 @@ async function bucketUpload(bpStorage,client,year,jData,startSessionCB,callRes) 
             if(uploadTask.snapshot && uploadTask.snapshot.ref && uploadTask.snapshot.ref._location) {
               const loc = uploadTask.snapshot.ref._location;
               downloadUrl = loc.bucket+fbS+loc.path_;
-              if(debug) console.log("Firebase fbWriteJSON to: "+downloadUrl);          
+              if(debug) console.log("0078 Firebase fbWriteJSON to: "+downloadUrl);          
               
               // 20221127
               startSessionCB(jData,callRes,{});

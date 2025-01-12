@@ -11,6 +11,8 @@ const debug=true;
 
 // data that can be computed synchronously
 let reqBody:String[] | null;
+
+var partner:string|string[]|undefined;
 var client:string|string[]|undefined;
 var year:string|string[]|undefined;
 
@@ -38,10 +40,10 @@ export default function handler(
     // trick to use jConfig as carrier from client req.query into jData input to the callback
     // DOES NOT WORK REPEATEDLY
     
-
+    partner = req.query.partner,
     client =  req.query.client;
     year = req.query.year;
-    const query = { "ext":"JSON", "client":client, "year":year  };
+    const query = { "ext":"JSON", "client":client, "partner":partner, "year":year  }; // GH20250112
     if(debug) console.log("0001 ADDACCOUNT.handler "+JSON.stringify(query));
 
       signIn(jConfig,query,req.socket.remoteAddress,res,downloadPlusAcct); 

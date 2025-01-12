@@ -35,7 +35,7 @@ export function signIn(jConfig,query,remote,res,startSessionCB) {
             // Security sanitize input client
             let client = query.client;
             
-            if(query && query.year && query.year.length>2 && (parseInt(query.year)>1)) {
+            if(query && query.year && (parseInt(query.year)>1)) {
 
                 // Security sanitize input year
                 let year   = parseInt(query.year); // Security sanitize input year

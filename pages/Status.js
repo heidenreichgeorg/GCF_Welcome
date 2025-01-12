@@ -263,7 +263,7 @@ export default function Status() {
 
 
     function handleReview() {        
-        book({'client':session.client,'year':session.year},session)
+        book({'partner':session.partner,'client':session.client,'year':session.year},session)
     }
 
     function makeXLSButton(url,client,year) { 
@@ -498,9 +498,9 @@ export default function Status() {
 
     function bookTemplate(jTXN) {   
 
-
         jTXN.year=session.year;
         jTXN.client=session.client;
+        jTXN.partner=session.partner; // 20250112
 
         jTXN.sessionId = session.id; // won't book otherwise        
         jTXN.flag='1'; // flag that a pre-claim is being entered
@@ -650,15 +650,15 @@ export default function Status() {
     
                         
                 <div className="FIELD SYMB" >{txt2}</div>
-                <input type ="text" className="key MOAM" defaultValue={form.sender} onChange={((e) => bufferField(strKey,'sender',e.target.value))}/>
+                <div className="FIELD" ><input type ="text" className="key" defaultValue={form.sender} onChange={((e) => bufferField(strKey,'sender',e.target.value))}/></div>
                 <div className="FIELD SEP" ></div>
     
                 <div className="FIELD SYMB" >{txt3}</div>
-                <input type ="text" className="key MOAM" defaultValue={form.reason} onChange={((e) => bufferField(strKey,'reason',e.target.value))}/>
+                <div className="FIELD "><input type ="text" className="key" defaultValue={form.reason} onChange={((e) => bufferField(strKey,'reason',e.target.value))}/></div>
                 <div className="FIELD SEP" ></div>
     
                 <div className="FIELD SYMB" >{txt4}</div>
-                <input type ="text" className="key MOAM" defaultValue={form.refCode} onChange={((e) => bufferField(strKey,'refCode',e.target.value))}/>
+                <div className="FIELD "><input type ="text" className="key" defaultValue={form.refCode} onChange={((e) => bufferField(strKey,'refCode',e.target.value))}/></div>
                 <div className="FIELD SEP" ></div>
                 
             </div>
@@ -667,14 +667,14 @@ export default function Status() {
                 {arrCredit.map((acct,line)=>(
                     (<div key={"credit"+line}  >
                         <div className="FIELD TAG" > {acct}</div>
-                        { acct!=autoAcct ? (<input type ="number" className="key MOAM" defaultValue={form.credit[acct]} onChange={((e) => bufferAmount(strKey,acct,e.target.value,'credit'))} /> ):''}
+                        { acct!=autoAcct ? (<div className="FIELD "><input type ="number" className="key MOAM" defaultValue={form.credit[acct]} onChange={((e) => bufferAmount(strKey,acct,e.target.value,'credit'))} /></div>):''}
                         <div className="FIELD SEP" ></div>
                     </div>)
                 ))}
                  {arrCreditEQL.map((acct,line)=>(
                     (<div key={"creditEqL"+line}  >
                         <div className="FIELD TAG" > {acct}</div>
-                        { acct!=autoAcct ? (<input type ="number" className="key MOAM" defaultValue={form.creditEQL[acct]} onChange={((e) => bufferAmount(strKey,acct,e.target.value,'creditEQL'))} /> ):''} 
+                        { acct!=autoAcct ? (<div className="FIELD "><input type ="number" className="key MOAM" defaultValue={form.creditEQL[acct]} onChange={((e) => bufferAmount(strKey,acct,e.target.value,'creditEQL'))} /></div>):''} 
                         <div className="FIELD SEP" ></div>
                     </div>)
                 ))}
@@ -682,14 +682,14 @@ export default function Status() {
                 {arrDebit.map((acct,line)=>(
                     (<div key={"debit"+line}  >
                         <div className="FIELD TAG" > {acct}</div>
-                        { acct!=autoAcct ? (<input type ="number" className="key MOAM" defaultValue={form.debit[acct]} onChange={((e) => bufferAmount(strKey,acct,e.target.value,'debit'))} /> ):''}  
+                        { acct!=autoAcct ? (<div className="FIELD "><input type ="number" className="key MOAM" defaultValue={form.debit[acct]} onChange={((e) => bufferAmount(strKey,acct,e.target.value,'debit'))} /></div>):''}  
                         <div className="FIELD SEP" ></div>
                     </div>)
                 ))}
                 {arrDebitA.map((acct,line)=>(
                     (<div key={"debitA"+line}  >
                         <div className="FIELD TAG" > {acct}</div>
-                        { acct!=autoAcct ? (<input type ="number" className="key MOAM" defaultValue={form.debitA[acct]} onChange={((e) => bufferAmount(strKey,acct,e.target.value,'debitA'))} /> ):''}
+                        { acct!=autoAcct ? (<div className="FIELD "><input type ="number" className="key MOAM" defaultValue={form.debitA[acct]} onChange={((e) => bufferAmount(strKey,acct,e.target.value,'debitA'))} /></div>):''}
                         <div className="FIELD SEP" ></div>
                     </div>)
                 ))}

@@ -144,6 +144,8 @@ export function prepareTXN(schema,flow, name,amount) {
 
 export function book(jTXN,session) {
 
+    console.log("7104 BOOK TXN "+JSON.stringify(jTXN));
+
     const requestOptions = {
         method: 'POST',
         headers: {  'Accept': 'application/json'
@@ -156,9 +158,11 @@ export function book(jTXN,session) {
         body: JSON.stringify(jTXN)
     };
 
+    console.log("7106 BOOK REQUEST "+JSON.stringify(requestOptions));
+
     fetch(`${REACT_APP_API_HOST}/BOOK?sessionId=${session.id}`, requestOptions)
     .then(data => data.json())
-    .then(body => { console.log("BOOK RESULT "+JSON.stringify(body));
+    .then(body => { console.log("7108 BOOK RESULT "+JSON.stringify(body));
     
 
             location.reload(true);
@@ -168,6 +172,10 @@ export function book(jTXN,session) {
             fetch(urlCommand, requestOptions) // GH20230226
             .then(res => { console.log("BOOK REFRESH "+JSON.stringify(res.body))})
 */            
+        }) .catch((e) => {
+            console.log("7109 writeModule book() ERROR ");
+            setStatus('error')
+            console.log("7109 writeModule book() ERROR "+e.toString());
         });
 }
 
@@ -256,7 +264,7 @@ export async function save2Bucket(jConfig,session,partner,client,year) {
                 console.log("0036 save2Bucket session.sheetcells keys="+JSON.stringify(Object.keys(session.sheetCells).map((i)=>(session.sheetCells[i][0]))));
             }
 
-            return "save2Bucket OK";
+            return "0038 save2Bucket OK";
 
         } else {
             console.error("0033 save2Bucket NO FIREBASE CONFIG");

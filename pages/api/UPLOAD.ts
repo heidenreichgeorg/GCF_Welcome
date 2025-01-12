@@ -82,7 +82,7 @@ export default function handler(
             
 
             
-            let cmdLogin = "http://"+localhost().addr+":3000/Status?client="+client+"&year="+year;
+            let cmdLogin = "http://"+localhost().addr+":3000/Status?partner="+partner+"&client="+client+"&year="+year; // GH20250112
             // should not set a sesssion.id because id not known while async save2bucket is not finished       
 
             if(debugUpload) console.dir("0822 app.post UPLOAD rendering QR code");
