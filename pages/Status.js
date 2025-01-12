@@ -77,7 +77,9 @@ export default function Status() {
     "Sicherheit Alex":{"text":"Alex stellt Sicherheit bei Drittem","creditEQL":{},"credit":{"FSTF":"0"},"debitA":{},"debit":{"K2AL":"0"},"sender":"Ext","refAcct":"K2AL","refCode":"DEPOSIT"},
     "Sicherheit Kristina":{"text":"Tina stellt Sicherheit bei Drittem","creditEQL":{},"credit":{"FSTF":"0"},"debitA":{},"debit":{"K2KR":"0"},"sender":"Ext","refAcct":"K2KR","refCode":"DEPOSIT"},
     "Sicherheit Tom":{"text":"Tom stellt Sicherheit bei Drittem","creditEQL":{},"credit":{"FSTF":"0"},"debitA":{},"debit":{"K2TO":"0"},"sender":"Ext","refAcct":"K2TO","refCode":"DEPOSIT"},
-    "Sicherheit Leon":{"text":"Leon stellt Sicherheit bei Drittem","creditEQL":{},"credit":{"FSTF":"0"},"debitA":{},"debit":{"K2LE":"0"},"sender":"Ext","refAcct":"K2LE","refCode":"DEPOSIT"}   
+    "Sicherheit Leon":{"text":"Leon stellt Sicherheit bei Drittem","creditEQL":{},"credit":{"FSTF":"0"},"debitA":{},"debit":{"K2LE":"0"},"sender":"Ext","refAcct":"K2LE","refCode":"DEPOSIT"},
+    "Zuordnung Nebenkosten":{"text":"Auslagen werden als Nebenkosten umgebucht","creditEQL":{},"credit":{"FSTF":"0"},"debit":{"NKHA":"0"},"debitA":{},"sender":"Nebenkosten","reason":"Zuordnung","refAcct":"NKHA","refCode":"Abrechnung"},
+    
             */
         };
             
