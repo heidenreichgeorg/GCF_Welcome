@@ -102,7 +102,7 @@ export default function Schedule() {
             </div>
             <div className = "attrLine">                
                 { [1,2,3,4,5,6,7].map((i) => ( 
-                    <div className="FIELD DATE" onClick={()=>{book(dat[i],partner)}}><div className={cls[i]}>&nbsp;{row[i]}&nbsp;</div></div>
+                    <div className="FIELD DATE" key={"v0"+i} onClick={()=>{book(dat[i],partner)}}><div key={"w0"+i} className={cls[i]}>&nbsp;{row[i]}&nbsp;</div></div>
                 )) }
             </div>        
 
@@ -111,7 +111,7 @@ export default function Schedule() {
             </div>
             <div className = "attrLine">                
                 { [8,9,10,11,12,13,14].map((i) => ( 
-                    <div className="FIELD DATE" onClick={()=>{book(dat[i],partner)}}><div className={cls[i]}>&nbsp;{row[i]}&nbsp;</div></div>
+                    <div className="FIELD DATE" key={"v1"+i} onClick={()=>{book(dat[i],partner)}}><div key={"w1"+i} className={cls[i]}>&nbsp;{row[i]}&nbsp;</div></div>
                 )) }
             </div>     
 
@@ -120,7 +120,7 @@ export default function Schedule() {
             </div>
             <div className = "attrLine">                
                 { [15,16,17,18,19,20,21].map((i) => ( 
-                    <div className="FIELD DATE" onClick={()=>{book(dat[i],partner)}}><div className={cls[i]}>&nbsp;{row[i]}&nbsp;</div></div>
+                    <div className="FIELD DATE" key={"v2"+i} onClick={()=>{book(dat[i],partner)}}><div key={"w2"+i} className={cls[i]}>&nbsp;{row[i]}&nbsp;</div></div>
                 )) }
             </div>        
 
@@ -129,7 +129,7 @@ export default function Schedule() {
             </div>
             <div className = "attrLine">                
                 { [22,23,24,25,26,27,28].map((i) => ( 
-                    <div className="FIELD DATE" onClick={()=>{book(dat[i],partner)}}><div className={cls[i]}>&nbsp;{row[i]}&nbsp;</div></div>
+                    <div className="FIELD DATE" key={"v3"+i} onClick={()=>{book(dat[i],partner)}}><div key={"w3"+i} className={cls[i]}>&nbsp;{row[i]}&nbsp;</div></div>
                 )) }
             </div>        
 
@@ -138,7 +138,7 @@ export default function Schedule() {
             </div>
             <div className = "attrLine">                
                 { [29,30,31,32,33,34,35].map((i) => ( 
-                    <div className="FIELD DATE" onClick={()=>{book(dat[i],partner)}}><div className={cls[i]}>&nbsp;{row[i]}&nbsp;</div></div>
+                    <div className="FIELD DATE" key={"v4"+i} onClick={()=>{book(dat[i],partner)}}><div key={"w4"+i} className={cls[i]}>&nbsp;{row[i]}&nbsp;</div></div>
                 )) }
             </div>                       
 
@@ -147,7 +147,7 @@ export default function Schedule() {
             </div>
             <div className = "attrLine">                
                 { [36,37,38,39,40,41,42].map((i) => ( 
-                    <div className="FIELD DATE" onClick={()=>{book(dat[i],partner)}}><div className={cls[i]}>&nbsp;{row[i]}&nbsp;</div></div>
+                    <div className="FIELD DATE" key={"v5"+i} onClick={()=>{book(dat[i],partner)}}><div key={"w5"+i} className={cls[i]}>&nbsp;{row[i]}&nbsp;</div></div>
                 )) }
             </div>                       
 
@@ -156,7 +156,7 @@ export default function Schedule() {
             </div>
             <div className = "attrLine">                
                 { [43,44,45,46,47,48,49].map((i) => ( 
-                    <div className="FIELD DATE" onClick={()=>{book(dat[i],partner)}}><div className={cls[i]}>&nbsp;{row[i]}&nbsp;</div></div>
+                    <div className="FIELD DATE" key={"v6"+i} onClick={()=>{book(dat[i],partner)}}><div key={"w6"+i} className={cls[i]}>&nbsp;{row[i]}&nbsp;</div></div>
                 )) }
             </div>                       
 
@@ -165,7 +165,7 @@ export default function Schedule() {
             </div>
             <div className = "attrLine">                
                 { [50,51,52,53,54,55,56].map((i) => ( 
-                    <div className="FIELD DATE" onClick={()=>{book(dat[i],partner)}}><div className={cls[i]}>&nbsp;{row[i]}&nbsp;</div></div>
+                    <div className="FIELD DATE" key={"v7"+i} onClick={()=>{book(dat[i],partner)}}><div key={"w7"+i} className={cls[i]}>&nbsp;{row[i]}&nbsp;</div></div>
                 )) }
             </div>                     
 
@@ -174,7 +174,7 @@ export default function Schedule() {
             </div>
             <div className = "attrLine">                
                 { [57,58,59,60,61,62,63].map((i) => ( 
-                    <div className="FIELD DATE" onClick={()=>{book(dat[i],partner)}}><div className={cls[i]}>&nbsp;{row[i]}&nbsp;</div></div>
+                    <div className="FIELD DATE" key={"v8"+i} onClick={()=>{book(dat[i],partner)}}><div key={"w8"+i} className={cls[i]}>&nbsp;{row[i]}&nbsp;</div></div>
                 )) }
             </div>                       
 
@@ -183,7 +183,7 @@ export default function Schedule() {
             </div>
             <div className = "attrLine">                
                 { [64,65,66,67,68,69,70].map((i) => ( 
-                    <div className="FIELD DATE" onClick={()=>{book(dat[i],partner)}}><div className={cls[i]}>&nbsp;{row[i]}&nbsp;</div></div>
+                    <div className="FIELD DATE" key={"v9"+i} onClick={()=>{book(dat[i],partner)}}><div key={"w9"+i} className={cls[i]}>&nbsp;{row[i]}&nbsp;</div></div>
                 )) }
             </div>                       
 
@@ -192,7 +192,7 @@ export default function Schedule() {
             </div>
             <div className = "attrLine">                
                 {  [71,72,73,74,75,76,77].map((i) => ( 
-                    <div className="FIELD DATE" onClick={()=>{book(dat[i],partner)}}><div className={cls[i]}>&nbsp;{row[i]}&nbsp;</div></div>
+                    <div className="FIELD DATE" key={"vA"+i} onClick={()=>{book(dat[i],partner)}}><div key={"wA"+i} className={cls[i]}>&nbsp;{row[i]}&nbsp;</div></div>
                 )) }
             </div>                       
 
@@ -201,7 +201,7 @@ export default function Schedule() {
             </div>
             <div className = "attrLine">                
                 { [78,79,80,81,82,83,84].map((i) => ( 
-                    <div className="FIELD DATE" onClick={()=>{book(dat[i],partner)}}><div className={cls[i]}>&nbsp;{row[i]}&nbsp;</div></div>
+                    <div className="FIELD DATE"  key={"vB"+i} onClick={()=>{book(dat[i],partner)}}><div key={"wB"+i} className={cls[i]}>&nbsp;{row[i]}&nbsp;</div></div>
                 )) }
             </div>     
 
@@ -210,7 +210,7 @@ export default function Schedule() {
             </div>
             <div className = "attrLine">                
                 { [85,86,87,88,89,100,101].map((i) => ( 
-                    <div className="FIELD DATE" onClick={()=>{book(dat[i],partner)}}><div className={cls[i]}>&nbsp;{row[i]}&nbsp;</div></div>
+                    <div className="FIELD DATE"  key={"vC"+i} onClick={()=>{book(dat[i],partner)}}><div key={"wC"+i} className={cls[i]}>&nbsp;{row[i]}&nbsp;</div></div>
                 )) }
             </div>        
 
