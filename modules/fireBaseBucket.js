@@ -3,6 +3,9 @@
 import * as fs from 'fs';
 
 
+// GH20250212
+//import fsPromises from 'fs/promises';
+
 /*
 
 bookingpages-a0a7c
@@ -282,14 +285,50 @@ async function bucketUpload(bpStorage,partner,client,year,jData,startSessionCB,c
         let iYear = parseInt(year);
 
         const strChild = fbS+sClient+fbS+iYear+fbS+MAIN;
+
+
+            // GH20250212 write local main.json
+
+            try {
+/*
+              const response = await fetch('c:/temp/storeJSONmain.json', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(jData)
+              });
+              if(debug) console.log("0070 bucketUpload plain local file write POST");
+
+              const data = await response.json();
+*/
+              const dataFilePath = "c:\\temp\\main.json";
+
+	            // Write the updated data to the JSON file
+    	        let writeResult = await fs.promises.writeFile(dataFilePath, JSON.stringify(jData));
+
+              if(debug) console.log("0072 bucketUpload plain local file write DONE");
+
+
+            } catch(e) {
+
+              if(debug) console.log("0073 bucketUpload plain local file write FAILED");
+            }
+
+
+
+
+        // FireBase UPload
         const fileRef = fbStorage.ref(bpStorage, strChild);
         if(fileRef) {
-          if(debug) console.log("0074 bucketUpload fielRef for "+strChild);
+          if(debug) console.log("0074 bucketUpload fileRef for "+strChild);
 
           var jsonString = JSON.stringify(jData);
           const buffer = Buffer.from(jsonString, 'utf8');     
           
           const uploadTask = fbStorage.uploadBytesResumable(fileRef, buffer.buffer);
+
+
           
           uploadTask.on("state_changed", // params are: EVENT NEXT ERROR COMPLETE
           (snapshot) => { // NEXT
