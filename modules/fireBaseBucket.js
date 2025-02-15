@@ -33,8 +33,9 @@ const debugReport=7;
 
 //import * as utf8 from 'utf8'
 
-const fbS = "/";
 const MAIN = "main.json";
+
+import { Slash, Backslash } from './serverSession'
 
 import * as fbApp from 'firebase/app'
 import * as fbStorage from 'firebase/storage'
@@ -142,7 +143,7 @@ async function bucketDownload(bpStorage,partner,client,year,jData,startSessionCB
 
   if(debug) console.log('0030 Firebase.download jData '+JSON.stringify(jData))
 
-  const strChild = fbS+sClient+fbS+iYear+fbS+MAIN;  
+  const strChild = Slash+sClient+Slash+iYear+Slash+MAIN;  
   const fileRef = fbStorage.ref(bpStorage, strChild);
   if(debug) console.log('0030 Firebase.download fileRef='+JSON.stringify(fileRef._service.app._options.projectId));
 
@@ -284,25 +285,15 @@ async function bucketUpload(bpStorage,partner,client,year,jData,startSessionCB,c
         let sClient = client.replace('.','_');
         let iYear = parseInt(year);
 
-        const strChild = fbS+sClient+fbS+iYear+fbS+MAIN;
+        const strChild = Slash+sClient+Slash+iYear+Slash+MAIN;
 
 
             // GH20250212 write local main.json
 
+            // write to NEXTCLOUD Documents Privat
+            const dataFilePath = process.env.localPath+client+Backslash+year+Backslash+MAIN;
             try {
-/*
-              const response = await fetch('c:/temp/storeJSONmain.json', {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(jData)
-              });
-              if(debug) console.log("0070 bucketUpload plain local file write POST");
 
-              const data = await response.json();
-*/
-              const dataFilePath = "c:\\temp\\main.json";
 
 	            // Write the updated data to the JSON file
     	        let writeResult = await fs.promises.writeFile(dataFilePath, JSON.stringify(jData));
@@ -312,7 +303,7 @@ async function bucketUpload(bpStorage,partner,client,year,jData,startSessionCB,c
 
             } catch(e) {
 
-              if(debug) console.log("0073 bucketUpload plain local file write FAILED");
+              if(debug) console.log("0073 bucketUpload plain local file "+dataFilePath+" write FAILED");
             }
 
 
@@ -371,7 +362,7 @@ async function bucketUpload(bpStorage,partner,client,year,jData,startSessionCB,c
           () => { 
             if(uploadTask.snapshot && uploadTask.snapshot.ref && uploadTask.snapshot.ref._location) {
               const loc = uploadTask.snapshot.ref._location;
-              downloadUrl = loc.bucket+fbS+loc.path_;
+              downloadUrl = loc.bucket+Slash+loc.path_;
               if(debug) console.log("0078 Firebase fbWriteJSON to: "+downloadUrl);          
               
               // 20221127

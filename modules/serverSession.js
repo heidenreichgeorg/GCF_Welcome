@@ -12,6 +12,7 @@ export const HTTP_OK = 200;
 export const HTTP_WRONG = 400;
 
 export const Slash = '/';
+export const Backslash = '\\';
 
 var nets;
 
