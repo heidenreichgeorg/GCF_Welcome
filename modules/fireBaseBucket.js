@@ -136,23 +136,97 @@ function getFileContents(fileName) {
 
 // ONLY FOR BROWSERS gsutil cors set cors.json gs://bookingpapages-a0a7c -
 
+function makeSession(body,partner,client,year,txnPattern) {
+
+      let session = {}
+
+      try {
+        // build session object
+          session = JSON.parse(body);
+      } catch(err) {}
+        
+      // GH202501
+      session.partner = partner;
+      session.client = client;
+      session.year = year;
+
+      // GH202311
+      // in case entity/CLIENT/YEAR/txnPattern.txt JSON file exists
+      // session.txnPattern will be overwritten with that file
+      if(txnPattern) try {
+        // GH20231127 using jConfig, add local txnPattern data
+        session.txnPattern = JSON.parse(txnPattern);
+        console.log("0036 getFileContents "+JSON.stringify(Object.keys(session)));
+      } catch(err) {
+        console.error("0037 Firebase.download txnPattern="+txnPattern+" ERR "+err.toString());
+      }
+
+      return session;
+}
+
 
 async function bucketDownload(bpStorage,partner,client,year,jData,startSessionCB,callRes) {
-  let sClient = client.replace('.','_');
-  let iYear = parseInt(year);
+    let sClient = client.replace('.','_');
+    let iYear = parseInt(year);
 
-  if(debug) console.log('0030 Firebase.download jData '+JSON.stringify(jData))
+    if(debug) console.log('0030 firebaseBucket.bucketDownload jData '+JSON.stringify(jData))
 
-  const strChild = Slash+sClient+Slash+iYear+Slash+MAIN;  
-  const fileRef = fbStorage.ref(bpStorage, strChild);
-  if(debug) console.log('0030 Firebase.download fileRef='+JSON.stringify(fileRef._service.app._options.projectId));
 
-  
-  let txnPattern = null;
-  try { txnPattern = await getFileContents(jData.root+"entity/"+client+"/"+year+"/txnPattern.txt");
-  } catch(e) {}
-  if(debug>1) console.log('0030 Firebase.download read root/entity/client/year/txnPattern.txt; '+txnPattern)
 
+
+
+    const strChild = Slash+sClient+Slash+iYear+Slash+MAIN;  
+    const fileRef = fbStorage.ref(bpStorage, strChild);
+    if(debug) console.log('0030 firebaseBucket.bucketDownload fileRef='+JSON.stringify(fileRef._service.app._options.projectId));
+
+    
+    let txnPattern = null;
+    try { txnPattern = await getFileContents(jData.root+"entity/"+client+"/"+year+"/txnPattern.txt");
+    } catch(e) {}
+    if(debug>1) console.log('0030 firebaseBucket.bucketDownload read root/entity/client/year/txnPattern.txt; '+txnPattern)
+
+
+
+
+            // GH20250212 read local main.json
+
+            // read from NEXTCLOUD Documents Privat
+            const dataFilePath = process.env.localPath+client+Backslash+year+Backslash+MAIN;
+            try {
+                let session = {};
+
+                //Read data from the JSON file
+                let strBody = await fs.promises.readFile(dataFilePath,  'utf8');
+                //  fs.readFileSync(fileName, 'utf8');
+
+                if(debug) console.log("0032A firebaseBucket.bucketDownload plain local file read DONE");
+
+                session = makeSession(strBody,partner,client,year,txnPattern)
+
+                if(debugReport) console.dir("0034A Firebase.download session "+JSON.stringify(session));
+
+                // AVOID double HEADERS 
+                startSessionCB(session,callRes,jData); 
+                // 3rd param to startSessionCB JData is from config = 1st arg on calling fireBaseBucket.js
+    
+
+                if(debugReport) console.dir("0034A Firebase.download startSessionCB ");
+
+                return null;
+            } catch(e) {
+
+              if(debug) console.log("0033A firebaseBucket.bucketDownload plain local file "+dataFilePath+" read FAILED");
+            }
+ 
+
+
+            // GH 2025
+
+            // GH2025
+
+            // TURNED OFF GOOGLE CLOUD - FILE BASE - BUCKET
+
+/*
   fbStorage.getDownloadURL(fileRef)
   .then(
     
@@ -169,30 +243,13 @@ async function bucketDownload(bpStorage,partner,client,year,jData,startSessionCB
           });
           res.on('end', () => {
             try {
-              if(debugReport) console.dir("0034 Firebase.download body "+body);
-              
-              // build session object
-              session = JSON.parse(body);
+               if(debugReport) console.dir("0034 Firebase.download body "+body);
 
-              // GH202501
-              session.year = year;
-              session.client = client;
-              session.partner = partner;
-
-              // GH202311
-              // in case entity/CLIENT/YEAR/txnPattern.txt JSON file exists
-              // session.txnPattern will be overwritten with that file
-              if(txnPattern) try {
-                // GH20231127 using jConfig, add local txnPattern data
-                session.txnPattern = JSON.parse(txnPattern);
-                console.log("0036 getFileContents "+JSON.stringify(Object.keys(session)));
-              } catch(err) {
-                console.error("0037 Firebase.download txnPattern="+txnPattern+" ERR "+err.toString());
-              }
+               session = makeSession(body,partner,client,year,txnPattern)
   
             }
             catch(err) {
-              console.error("0035 Firebase.download ERR "+err.toString());
+               console.error("0035 Firebase.download ERR "+err.toString());
             }
 
             if(debug) console.log("0038 Firebase.download session "+JSON.stringify(Object.keys(session)));
@@ -201,6 +258,7 @@ async function bucketDownload(bpStorage,partner,client,year,jData,startSessionCB
             // AVOID double HEADERS 
             startSessionCB(session,callRes,jData); 
             // 3rd param to startSessionCB JData is from config = 1st arg on calling fireBaseBucket.js
+
           })
         }).on('error', function(error) {     
 
@@ -248,6 +306,10 @@ async function bucketDownload(bpStorage,partner,client,year,jData,startSessionCB
           }  
       })
     })
+
+
+*/
+
   /*
 storage/unknown	Ein unbekannter Fehler ist aufgetreten.
 storage/object-not-found	An der gewünschten Referenz existiert kein Objekt.
@@ -308,6 +370,12 @@ async function bucketUpload(bpStorage,partner,client,year,jData,startSessionCB,c
 
 
 
+            // GH 2025
+
+            // GH2025
+
+            // TURNED OFF GOOGLE CLOUD - FILE BASE - BUCKET
+/*
 
         // FireBase UPload
         const fileRef = fbStorage.ref(bpStorage, strChild);
@@ -340,7 +408,8 @@ async function bucketUpload(bpStorage,partner,client,year,jData,startSessionCB,c
           // A full list of error codes is available at
               // https://firebase.google.com/docs/storage/web/handle-errors
               if(debug) console.log(error.name +" "+error.code+" "+error._baseMessage);
-              /*
+              
+
               switch (error.code) {
                 case 'storage/unauthorized':
                   break;
@@ -352,8 +421,9 @@ async function bucketUpload(bpStorage,partner,client,year,jData,startSessionCB,c
 
                 case 'storage/unknown':
                   // Unknown error occurred, inspect error.serverResponse
-                  break;          },
-                  */
+                  break;          
+                },
+                  
               },
 
 
@@ -371,22 +441,23 @@ async function bucketUpload(bpStorage,partner,client,year,jData,startSessionCB,c
               }
             }
           );
-          
-/*
+  
 
-{allPaths=**}
-if request.auth != null
 
-{"code":"storage/unauthorized",
-"customData":{"serverResponse":""},
-"name":"FirebaseError",
-"status_":403,"_baseMessage":
-"Firebase Storage: User does not have permission to access 'HGKG/2022/main.json'. 
-(storage/unauthorized)"
-}`
-*/
+
+    //{allPaths=**}
+    //if request.auth != null) {}
+          let errResponse = 
+          {"code":"storage/unauthorized",
+          "customData":{"serverResponse":""},
+          "name":"FirebaseError",
+          "status_":403,"_baseMessage":"Firebase Storage: User does not have permission to access 'HGKG/2022/main.json'. (storage/unauthorized)"
+          }
+
         } else downloadUrl = "no Firebase Storage Ref for"+strChild;
-    } else downloadUrl = "no Firebase Storage";
+    */
+
+      } else downloadUrl = "no Firebase Storage";
   }
   return downloadUrl;
 }
