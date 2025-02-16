@@ -2,10 +2,6 @@
 // local fileSystem
 import * as fs from 'fs';
 
-
-// GH20250212
-//import fsPromises from 'fs/promises';
-
 /*
 
 bookingpages-a0a7c
@@ -31,7 +27,6 @@ const debug=7;
 // SETTING THIS WILL VIOLATE PRIVACY AT ADMIN CONSOLE
 const debugReport=7;
 
-//import * as utf8 from 'utf8'
 
 const MAIN = "main.json";
 
@@ -40,9 +35,7 @@ import { Slash, Backslash } from './serverSession'
 import * as fbApp from 'firebase/app'
 import * as fbStorage from 'firebase/storage'
 import * as fbAuth  from "firebase/auth"
-//import * as FS from 'firebase/firestore'; 
 
-//const {Datastore} = require('@google-cloud/datastore');
 
 const https = require('https');
 
@@ -74,8 +67,6 @@ const sessionKeys = ["partner","client","year","remote","time","sheetCells","she
 
 let bpApp = null;
 
-// FB.accessFirebase(FB.bucketDownload,fbConfig,client,year,null,startSessionCB);
-// FB.accessFirebase(FB.bucketUpload,fbConfig,client,year,session,startSessionCB)
 function accessFirebase(accessMethod,firebaseConfig,partner,client,year,jData,startSessionCB,res) {
 
   let url = "sync";
@@ -186,47 +177,6 @@ async function bucketDownload(bpStorage,partner,client,year,jData,startSessionCB
     if(debug>1) console.log('0030 firebaseBucket.bucketDownload read root/entity/client/year/txnPattern.txt; '+txnPattern)
 
 
-
-
-            // GH20250212 read local main.json
-
-            // read from NEXTCLOUD Documents Privat
-            const dataFilePath = process.env.localPath+client+Backslash+year+Backslash+MAIN;
-            try {
-                let session = {};
-
-                //Read data from the JSON file
-                let strBody = await fs.promises.readFile(dataFilePath,  'utf8');
-                //  fs.readFileSync(fileName, 'utf8');
-
-                if(debug) console.log("0032A firebaseBucket.bucketDownload plain local file read DONE");
-
-                session = makeSession(strBody,partner,client,year,txnPattern)
-
-                if(debugReport) console.dir("0034A Firebase.download session "+JSON.stringify(session));
-
-                // AVOID double HEADERS 
-                startSessionCB(session,callRes,jData); 
-                // 3rd param to startSessionCB JData is from config = 1st arg on calling fireBaseBucket.js
-    
-
-                if(debugReport) console.dir("0034A Firebase.download startSessionCB ");
-
-                return null;
-            } catch(e) {
-
-              if(debug) console.log("0033A firebaseBucket.bucketDownload plain local file "+dataFilePath+" read FAILED");
-            }
- 
-
-
-            // GH 2025
-
-            // GH2025
-
-            // TURNED OFF GOOGLE CLOUD - FILE BASE - BUCKET
-
-/*
   fbStorage.getDownloadURL(fileRef)
   .then(
     
@@ -308,7 +258,7 @@ async function bucketDownload(bpStorage,partner,client,year,jData,startSessionCB
     })
 
 
-*/
+
 
   /*
 storage/unknown	Ein unbekannter Fehler ist aufgetreten.
@@ -368,14 +318,6 @@ async function bucketUpload(bpStorage,partner,client,year,jData,startSessionCB,c
               if(debug) console.log("0073 bucketUpload plain local file "+dataFilePath+" write FAILED");
             }
 
-
-
-            // GH 2025
-
-            // GH2025
-
-            // TURNED OFF GOOGLE CLOUD - FILE BASE - BUCKET
-/*
 
         // FireBase UPload
         const fileRef = fbStorage.ref(bpStorage, strChild);
@@ -455,7 +397,6 @@ async function bucketUpload(bpStorage,partner,client,year,jData,startSessionCB,c
           }
 
         } else downloadUrl = "no Firebase Storage Ref for"+strChild;
-    */
 
       } else downloadUrl = "no Firebase Storage";
   }
