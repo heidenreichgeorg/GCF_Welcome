@@ -2,7 +2,7 @@
 
 import * as fs from 'fs';
 
-import { accessFirebase,bucketUpload,loadFBConfig } from './fireBaseBucket'
+import { accessFirebase,bucketUpload,loadFBConfig } from './plainFileIO' //import { accessFirebase,bucketUpload,loadFBConfig } from './fireBaseBucket'
 import {  J_ACCT, COLMIN, DOUBLE } from './terms.js'
 import { REACT_APP_API_HOST } from "./sessionmanager"
 import { bigEUMoney, cents2US, cents2EU, cents20EU } from './money'

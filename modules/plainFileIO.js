@@ -114,7 +114,7 @@ async function bucketDownload(bpStorage,partner,client,year,jData,startSessionCB
 
                 // AVOID double HEADERS 
                 startSessionCB(session,callRes,jData); 
-                // 3rd param to startSessionCB JData is from config = 1st arg on calling fireBaseBucket.js
+                // 3rd param to startSessionCB JData is from config = 1st arg on calling plainFileIO.js
     
 
                 if(debugReport) console.dir("0034 plainFileIO.download returned from startSessionCB ");
