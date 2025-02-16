@@ -2,7 +2,7 @@
 
 import { networkInterfaces } from 'os';
 import { strSymbol,timeSymbol } from './login'
-import { fbDownload } from './plainFileIO.js'   //import { fbDownload } from './fireBaseBucket.js'
+import { fbDownload } from './plainFileIO.js' 
 import { compile } from './compile.js'
 import { PORT } from './terms.js'
 
@@ -24,7 +24,7 @@ export function signIn(jConfig,query,remote,res,startSessionCB) {
     nets = networkInterfaces();
 
     
-    console.log("0010  signIn at root "+JSON.stringify(jConfig)+"  for "+JSON.stringify(query));
+    console.log("0008  signIn at root "+JSON.stringify(jConfig)+"  for "+JSON.stringify(query));
 
     if(query && query.partner && query.partner.length>1 ) { // && (query.partner == "[a-zA-Z0-9]")) {
 
@@ -40,11 +40,11 @@ export function signIn(jConfig,query,remote,res,startSessionCB) {
 
                 // Security sanitize input year
                 let year   = parseInt(query.year); // Security sanitize input year
-                console.log("0012 signIn for partner="+partner+"  client="+client+"  year="+year);
+                console.log("0010 signIn for partner="+partner+"  client="+client+"  year="+year);
 
                 let id=null;
                 {
-                    console.log ( "0014 signIn READ BUCKET FOR COLD START jConfig="+JSON.stringify(jConfig));
+                    console.log ( "0012 signIn READ BUCKET FOR COLD START jConfig="+JSON.stringify(jConfig));
                     fbDownload(jConfig,partner,client,year,startSessionCB,res); // avoid double response
                 }
                             

@@ -2,7 +2,7 @@
 
 import * as fs from 'fs';
 
-import { accessFirebase,bucketUpload,loadFBConfig } from './plainFileIO' //import { accessFirebase,bucketUpload,loadFBConfig } from './fireBaseBucket'
+import { accessFirebase,bucketUpload,loadFBConfig } from './plainFileIO' 
 import {  J_ACCT, COLMIN, DOUBLE } from './terms.js'
 import { REACT_APP_API_HOST } from "./sessionmanager"
 import { bigEUMoney, cents2US, cents2EU, cents20EU } from './money'
@@ -277,7 +277,7 @@ export async function save2Bucket(jConfig,session,partner,client,year) {
 
 export function startSessionDisplay(session,res) {
 
-    console.log("0018 startSessionDisplay="+JSON.stringify(Object.keys(session))); 
+    console.log("0018 writeModule.startSessionDisplay="+JSON.stringify(Object.keys(session))); 
 
     // START A NEW SESSION
     let time = timeSymbol();

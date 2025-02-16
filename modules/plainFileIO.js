@@ -3,7 +3,8 @@
 import * as fs from 'fs';
 
 
-const debug=7;
+// debug level violates admin confidentiality
+const debug=8;
 
 // SETTING THIS WILL VIOLATE PRIVACY AT ADMIN CONSOLE
 const debugReport=7;
@@ -14,16 +15,16 @@ import { Slash, Backslash } from './serverSession'
 
 
 const https = require('https');
-
+const bpStorage=null;
 
 const sessionKeys = ["partner","client","year","remote","time","sheetCells","sheetName","id","creditorsT","sheetFile","sessionId","generated","ext","clientFunction","strTimeSymbol","fireBase"]
 
-let bpApp = null;
 
-function accessFirebase(accessMethod,firebaseConfig,partner,client,year,jData,startSessionCB,res) { 
-    // dummy 
-    // might be used to check file System availability
-    // like directory of process.env.localPath
+function accessFirebase(accessMethod,filebaseConfig,partner,client,year,jData,startSessionCB,res) { 
+    let url = accessMethod(bpStorage,partner,client,year,jData,startSessionCB,res);
+    if(jData) {
+      jData.firebase = url;    
+    }
 }
 module.exports['accessFirebase']=accessFirebase;
 
@@ -77,13 +78,15 @@ function makeSession(body,partner,client,year,txnPattern) {
 
 
 async function bucketDownload(bpStorage,partner,client,year,jData,startSessionCB,callRes) {
-    let sClient = client.replace('.','_');
-    let iYear = parseInt(year);
 
     if(debug) console.log('0030 plainFileIO.bucketDownload jData '+JSON.stringify(jData))
+        let sClient = client.replace('.','_');
+    let iYear = 0
+    try {
+        iYear = parseInt(year);
+    } catch(e) {}
 
     const strChild = Slash+sClient+Slash+iYear+Slash+MAIN;  
-    if(debug) console.log('0030 plainFileIO.bucketDownload fileRef='+JSON.stringify(fileRef._service.app._options.projectId));
     if(debug) console.log('0030 plainFileIO.bucketDownload strChild='+strChild);
 
     
@@ -220,13 +223,15 @@ export function loadFBConfig(dir,config) {
 
 export function fbDownload(jConfig,partner,client,year,callBack,res) {
     if(jConfig) {
-        // FIREBASE
+        console.log("0016 plainFileIO.fbDownload with jConfig="+JSON.stringify(jConfig))
+        // FILEBASE
         const fbConfig = loadFBConfig(jConfig.root,jConfig.bucket);
         if(fbConfig) {        
+            console.log("0016 plainFileIO.fbDownload FILEBASE CONFIG fbConfig="+JSON.stringify(fbConfig))
             accessFirebase(bucketDownload,fbConfig,partner,client,year,jConfig,callBack,res);
             return "fbDownload";
         } else {
-            console.log("0033 server.fbDownload NO FIREBASE CONFIG jConfig="+JSON.stringify(jConfig))
+            console.log("0033 plainFileIO.fbDownload NO FILEBASE CONFIG but jConfig="+JSON.stringify(jConfig))
             return null;
         }
     } else {
