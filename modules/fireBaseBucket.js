@@ -364,9 +364,9 @@ async function bucketUpload(bpStorage,partner,client,year,jData,startSessionCB,c
                 case 'storage/unknown':
                   // Unknown error occurred, inspect error.serverResponse
                   break;          
-                },
+                }
                   
-              },
+          },
 
 
 

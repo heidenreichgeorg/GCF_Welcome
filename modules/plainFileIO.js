@@ -82,12 +82,9 @@ async function bucketDownload(bpStorage,partner,client,year,jData,startSessionCB
 
     if(debug) console.log('0030 plainFileIO.bucketDownload jData '+JSON.stringify(jData))
 
-
-
-
-
     const strChild = Slash+sClient+Slash+iYear+Slash+MAIN;  
     if(debug) console.log('0030 plainFileIO.bucketDownload fileRef='+JSON.stringify(fileRef._service.app._options.projectId));
+    if(debug) console.log('0030 plainFileIO.bucketDownload strChild='+strChild);
 
     
     let txnPattern = null;
@@ -127,7 +124,7 @@ async function bucketDownload(bpStorage,partner,client,year,jData,startSessionCB
 
               if(debug) console.log("0033 plainFileIO.bucketDownload plain local file "+dataFilePath+" read FAILED");
             }
-
+        
       return null; // synch caller gets null value
 }
 module.exports['bucketDownload']=bucketDownload;
@@ -147,7 +144,7 @@ async function bucketUpload(bpStorage,partner,client,year,jData,startSessionCB,c
 
         let iYear = parseInt(year);
 
-        downloadUrl = "plainFileIO.bucketUpload sClient="+sClient+"   iYear="+iYear);
+        downloadUrl = "plainFileIO.bucketUpload sClient="+sClient+"   iYear="+iYear;
         const strFile = sClient+Backslash+iYear+Backslash+MAIN
 
 
