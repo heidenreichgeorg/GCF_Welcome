@@ -138,7 +138,9 @@ const jMetadata = { contentType: 'application/json' };
 async function bucketUpload(bpStorage,partner,client,year,jData,startSessionCB,callRes) {
 
   let downloadUrl = "no bpStorage";
-    if(bpStorage) {
+
+  console.log("0070 plainFileIO.bucketUpload plain local file write ENTER");
+
 
       // sanitize input
         let sClient = client.replace('.','_');
@@ -168,7 +170,7 @@ async function bucketUpload(bpStorage,partner,client,year,jData,startSessionCB,c
 
               if(debug) console.log("0073 plainFileIO.bucketUpload plain local file "+dataFilePath+" write FAILED");
             }      
-  }
+  
   return downloadUrl;
 }
 module.exports['bucketUpload']=bucketUpload;
