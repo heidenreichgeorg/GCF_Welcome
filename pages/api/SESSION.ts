@@ -31,6 +31,7 @@ export default function handler(
       else  {
 
         if(debugAUTH) console.log("0005 no match "+JSON.stringify(query));
+        if(debugAUTH) console.log("0005 wrong auth "+JSON.stringify(req.query));
 
         res.json({ id: '0666', code : "NO VALID AUTH"})
       }
