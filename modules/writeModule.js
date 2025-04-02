@@ -330,7 +330,7 @@ export function makeHistory(sheet,aPattern,lPattern,jHistory,aLen,eLen,gSchema,p
 
                     iSaldo += BigInt(jPrettyTXN.strSaldo);
                     
-                    arrHistory.push({'entry':jPrettyTXN.entry.join(CSEP), 'jMoney':lMoney,  'saldo':""+(iSaldo) });                    
+                    arrHistory.push({'entry':jPrettyTXN.entry.join(CSEP), 'jMoney':lMoney,  'saldo':""+(iSaldo), 'token':txn[0] });                    
                                  
                 }
             }

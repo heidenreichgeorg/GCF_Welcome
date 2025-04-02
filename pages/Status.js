@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { getSession, useSession, REACT_APP_API_HOST,getCarryOver,storeCarryOver } from '../modules/sessionmanager';
 import Screen from './Screen'
 import { cents2EU,bigUSMoney,cents20EU,bigEUMoney }  from '../modules/money';
-import { CSEP, D_Account, D_Balance, D_Carry, D_CarryOver, D_Page, D_Partner, D_FixAss, D_History, D_Report, D_Schema, J_ACCT, SCREENLINES, X_ASSET_CAPTAX, X_ASSET_UNPCAP, X_ASSETS, X_EQLIAB } from '../modules/terms.js'
+import { CSEP, D_INITIAL, D_Account, D_Balance, D_Carry, D_CarryOver, D_Page, D_Partner, D_FixAss, D_History, D_Report, D_Schema, J_ACCT, SCREENLINES, X_ASSET_CAPTAX, X_ASSET_UNPCAP, X_ASSETS, X_EQLIAB } from '../modules/terms.js'
 import { book,prepareTXN,makeHistory, symbolic }  from '../modules/writeModule';
 import { makeBalance, makeHGBReport,makeStatusData }  from '../modules/App';
 
@@ -102,6 +102,7 @@ export default function Status() {
     var funcHideReceipt=null;
     var funcCleaReceipt=null;
     var aSelText = {};
+    var aToken   = {};
     var aReason  = {};
     var aJMoney  = {};
     var aSelSaldo= {};
@@ -110,6 +111,7 @@ export default function Status() {
     useEffect(() => {
 
         aSelText = {};
+        aToken   = {};
         aReason  = {};
         aJMoney = {};
         
@@ -138,10 +140,10 @@ export default function Status() {
     }, [status])
 
 
-    function computeRow(row,index,client,year,line) {
+    function computeRow(row,index,client,year,nLine) {
 
         if(row) {
-            console.log("computeRow ENTER("+line+") "+JSON.stringify(row));
+            console.log("computeRow ENTER("+nLine+") "+JSON.stringify(row));
     
             let aRow = [0n,0n,0n,0n,0n,0n]
             try { let saRow = row.entry;
@@ -157,17 +159,22 @@ export default function Status() {
             if(isNaN(row.saldo)) saldo="0";
             else saldo = cents20EU(row.saldo); // cents2EU with 0 digit
             
-            let id = symbolic(''+line+aRow.join('')+line+JSON.stringify(tRow));
+            let id = symbolic(''+nLine+aRow.join('')+nLine+JSON.stringify(tRow));
     
-            if(index>0 || line>0) { 
+            if(index>0 || nLine>0) { 
                 
                     console.log("computeRow ADDING("+id+") "+JSON.stringify(aRow));
     
                 aSelText[id]=aRow; 
                 aReason[id]=row.entry;
                 aJMoney[id]=tRow;
-                aSelSaldo[id]=""+saldo;         
+                aSelSaldo[id]=""+saldo;
+
+                 // 20250402 encode token - e.g. to identity opening line
+                if(row.token) aToken[id]=row.token;         
             }
+
+           
         }
     }
     
@@ -1000,8 +1007,9 @@ export default function Status() {
         aFunc.push(funcHideReceipt); aText.push(page.DashBoard);
     }
 
-     iSumLeft=BigInt(0);
-     iSumRite=BigInt(0);
+    iInitial=BigInt(0);
+    iSumLeft=BigInt(0);
+    iSumRite=BigInt(0);
     
 
     return (
@@ -1010,12 +1018,13 @@ export default function Status() {
            {showAccount &&             
                 (
                 <div className="mTable">                     
-                    { TXNReceipt(D_Account+' '+showAccount, jColumnHeads, jColumnHeads, null, session.year, removeCol, D_History,-1,currLine,setCurrLine) }
+                    { TXNReceipt("",D_Account+' '+showAccount, jColumnHeads, jColumnHeads, null, session.year, removeCol, D_History,-1,currLine,setCurrLine) }
                     <TXNReceiptSum text={D_Carry} jAmounts={jPageSum} jColumnHeads={jColumnHeads} id="(SELECT)"/>                   
-                    { console.log("099 aSelText keys = "+Object.keys(aSelText).join('+')) ||
+                    { console.log("096 aSelText() keys = "+Object.keys(aSelText).join('+')) ||
                     Object.keys(aSelText).map((sym,i) => ( (sym && aSelText[sym] && aJMoney[sym] ) ? // && i>1
                                                 
                                                             TXNReceipt(
+                                                                aToken[sym],
                                                                 aReason[sym],
                                                                 aJMoney[sym],
                                                                 jColumnHeads,
@@ -1282,16 +1291,17 @@ export default function Status() {
 }
 
 
+let iInitial=BigInt(0);
 let iSumLeft=BigInt(0);
 let iSumRite=BigInt(0);
 
 
 function TXNReceiptSum(args) {
-    return TXNReceipt(args.text,args.jAmounts,args.jColumnHeads,null,args.id,args.removeCol,D_History,-1,0,null);
+    return TXNReceipt("",args.text,args.jAmounts,args.jColumnHeads,null,args.id,args.removeCol,D_History,-1,0,null);
 }
 
 
-function TXNReceipt(text,jAmounts,jColumnHeads,jSum,id,removeCol,name,index,currLine,setCurrLine) {
+function TXNReceipt(token,text,jAmounts,jColumnHeads,jSum,id,removeCol,name,index,currLine,setCurrLine) {
     
     Object.keys(jAmounts).forEach(acct=>{
         let value = jAmounts[acct];        
@@ -1302,16 +1312,22 @@ function TXNReceipt(text,jAmounts,jColumnHeads,jSum,id,removeCol,name,index,curr
             }
         }
     })
-    if(jSum) console.log("TXNReceipt jSum "+JSON.stringify(jSum));
+    if(jSum) console.log("TXNReceipt ("+token+") jSum "+JSON.stringify(jSum));
     
 
     let comps = text.split(CSEP)
-
+    let left = ""; 
+    let rite = ""; 
     let iAmount = (name && name.length>1) ? bigEUMoney(jAmounts[name]) :BigInt(0);
-    let left = ""; if(iAmount>0) { left= cents2EU( iAmount); iSumLeft+=iAmount; }
-    let rite = ""; if(iAmount<0) { rite= cents2EU(-iAmount);  iSumRite-=iAmount; }
 
-    // 20241228
+    // detect first opening line, does not recognize D_INITIAL
+    if(token==="1")     { left= cents2EU( iAmount);  iInitial=iAmount; } 
+    else {
+        if(iAmount>0) { left= cents2EU( iAmount);  iSumLeft+=iAmount; }
+        if(iAmount<0) { rite= cents2EU(-iAmount);  iSumRite-=iAmount; }
+    }
+
+    // 20241228 move currLine by clicking on the receipt number in the rightmost column
     let bDrag = (index==currLine) ? "true":"false";
 
     return( // FIELD
@@ -1339,8 +1355,9 @@ function TXNReceiptTotal(textSum,name,year,textYearEnd) {
             <div className="attrLine">  <div className="FIELD DATE">{year}-12-31</div>
                                         <div className="FIELD NAME">{textSum}</div>
                                         <div className="FIELD NAME" draggable="true">{name}</div>
-                                        <div className="FIELD NAME"></div>
-                                        <div className="FIELD MOAM" draggable="true">{cents20EU(iSumLeft)}</div> 
+                                        <div className="FIELD TAG">&nbsp;</div>
+                                        <div className="FIELD MOAM" draggable="true">{cents20EU(iInitial)}</div>
+                                        <div className="FIELD MOAM" draggable="true">+{cents20EU(iSumLeft)}</div> 
                                         <div className="FIELD MOAM" draggable="true">-{cents20EU(iSumRite)}</div> 
                                         <div className="FIELD MOAM" draggable="true">={cents20EU(iSumLeft-iSumRite)}</div> 
                                         <div className="FIELD SEP" >&nbsp;</div>

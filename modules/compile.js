@@ -200,6 +200,7 @@ const D_Muster = "Muster";
 const D_Adressen="Adressen";
 const D_Page = "Seite";   // client register reference author
 
+const D_INITIAL=1; // erste Zelle in der Eröffnungszeile
 
 import { cents2EU }  from '../modules/money';
 
@@ -738,8 +739,11 @@ export function compile(sessionData) {
                             var pShare = shares[col];
                             
                             if(isNaN(pShare)) pShare=" 0";                       
-                            partners[pNum]={ 'id':pNum, 'varCap':gNames[col], 'gain':pShare, 'denom':basis, 'iVar':col, 'taxID':arrTaxID[col] };
+                            let partnerEntry={ 'id':pNum, 'varCap':gNames[col], 'gain':pShare, 'denom':basis, 'iVar':col, 'taxID':arrTaxID[col] };
+                            partners[pNum]=partnerEntry;
                             pNum++; // GH20220206 
+                            console.log("0376 compile: PARTNER "+JSON.stringify(partnerEntry));
+
                         }
                     }
 
@@ -752,6 +756,7 @@ export function compile(sessionData) {
                                 partners[pNum].iCap=col;
                                 partners[pNum].name=shares[col];
                                 pNum++;
+                                console.log("0376 compile: FIXED"+pNum);
                             }
                         }
 
@@ -763,6 +768,7 @@ export function compile(sessionData) {
                                 partners[pNum].resCap=gNames[col];
                                 partners[pNum].iRes=col;
                                 pNum++;
+                                console.log("0376 compile: CAP RES"+pNum);
                             }
                         }
                     } else console.log("0377 compile: NO arrXBRL for PARTNERS");
