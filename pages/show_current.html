@@ -1,0 +1,216 @@
+<html>
+<script>
+/* global BigInt */
+
+function cents20EU(amount) { 
+    if(!amount) return "0";
+    else return cents2EU(amount);
+}
+
+function cents2EU(amount) { 
+    let cents=amount; 
+    
+    if(!cents) return "";
+    let result=cents;
+    
+    try {
+        if(typeof(cents)==="string") {
+            cents=BigInt(cents); 
+        } // fixedAssets: some cents are strings with plain int format
+
+        var sign=""; if(cents<0n) { sign="-"; cents= -cents; }
+        var kiloNum = BigInt(cents/100000n);
+
+        var megaNum = BigInt(kiloNum/1000n);
+        var megaStr = (megaNum>0n) ? megaNum.toString()+"." : "";
+
+        var milleNum = kiloNum-(1000n*megaNum); 
+        var milleStr = (megaNum>0n) ? milleNum.toString().padStart(3,'0')+"." : (milleNum>0n) ? milleNum.toString()+"." : "";
+        cents = cents - (kiloNum*100000n);
+
+        var euroNum = BigInt(cents/100n);
+        var euroStr = (milleNum>0n)  ? euroNum.toString().padStart(3,'0') : euroNum.toString();
+        cents = cents - (euroNum*100n);
+
+        result =  sign + megaStr + milleStr + euroStr+"," +(BigInt(cents%100n).toString().padStart(2,'0'));
+    } catch(err) { /*result=typeof(cents);*/ }
+    return result;
+}
+
+function bigMoney(strAdd,factor,money) {
+    if(money==null) money = 0n;
+    money=BigInt(money);
+    factor=BigInt(factor);
+    var euros=0n;
+    var cents=0n;
+    if(strAdd && strAdd.length>0) {          
+        var amount = strAdd.split(',');
+        var plain = amount[0].replace('.', '').trim(); 
+        if(plain.startsWith('-')) { factor=-1n * factor; plain=plain.slice(1); }
+        try { euros = BigInt(('0'+plain)); } catch(err) {}
+        if(amount.length>1) { // GH 20201117
+            const digits=amount[1]+"00";
+            const strDigits=digits[0]+digits[1];
+            cents=BigInt(strDigits);
+        }
+    }
+    cents=(euros*100n)+cents;
+    money = money + (factor * cents);
+    return money;
+}
+
+const CSV_FS=','
+const J_ACCT=6;
+let nLine=[];
+let sLine=[];
+let kLine=[];
+let cLine=[];
+let iLine=[];
+let rLine=[];
+let eLine=[];
+let xLine=[];
+let pLine=[];
+let aLine=[];
+let oLine=[];
+
+let aAccount=[];
+
+function dragoverHandler(ev) {  ev.preventDefault(); }
+function dropHandler(ev) {
+    // Prevent default behavior (Prevent file from being opened)
+    ev.preventDefault();
+    console.log('File(s) dropped');        
+
+    if (ev.dataTransfer.items) {
+    // Use DataTransferItemList interface to access the file(s)
+            
+        // If dropped items aren't files, reject them
+        if (ev.dataTransfer.items[0].kind === 'file') {
+            let file = ev.dataTransfer.files[0];
+            console.log('File '+file.name+'  dropped' );
+            var fr = new FileReader();
+            fr.onload = function () {
+                let fileBuffer = this.result;                                    
+                let jData={};
+                try {
+                    jData = JSON.parse(fileBuffer);
+                } catch(err) { }
+                
+                let ready=0;
+
+                if(jData) {
+                    let sheetLines = jData.sheetCells;
+                    if(sheetLines.length>J_ACCT) {
+                        console.error("0820 UPLOAD CSV WITH "+sheetLines.length+" lines");                  
+                        sheetLines.forEach((aTrans)=>{
+                            
+                            let indicator=aTrans[0];
+                            //console.dir("\n0822 UPLOAD indicator  "+indicator); 
+                            if(indicator=='N') {                            
+                                console.dir("\n0824 N-line  "+JSON.stringify(aTrans)); 
+                                nLine=aTrans;
+                                ready+=1;
+
+                            } else if(indicator=='S') {                            
+                                console.dir("\n0824 S-line  "+JSON.stringify(aTrans)); 
+                                sLine=aTrans;
+
+                            } else if(indicator=='C') {                            
+                                console.dir("\n0824 C-line  "+JSON.stringify(aTrans)); 
+                                cLine=aTrans;
+
+                            } else if(indicator=='I') {                            
+                                console.dir("\n0824 I-line  "+JSON.stringify(aTrans)); 
+                                iLine=aTrans;
+
+                            } else if(indicator=='R') {                            
+                                console.dir("\n0824 R-line  "+JSON.stringify(aTrans)); 
+                                rLine=aTrans;
+
+                            } else if(indicator=='E') {                            
+                                console.dir("\n0824 E-line  "+JSON.stringify(aTrans)); 
+                                eLine=aTrans;
+
+                            } else if(indicator=='X') {                            
+                                console.dir("\n0824 X-line  "+JSON.stringify(aTrans)); 
+                                xLine=aTrans;
+                                ready+=4;
+
+                            } else if(indicator=='A') {                            
+                                console.dir("\n0824 A-line  "+JSON.stringify(aTrans)); 
+                                aLine=aTrans;
+
+                            } else if(indicator=='P') {                            
+                                console.dir("\n0824 P-line  "+JSON.stringify(aTrans)); 
+                                pLine=aTrans;
+
+                            } else if(indicator=='K') {                            
+                                kLine=aTrans;
+
+                                console.dir("\n0824 K-line  "+JSON.stringify(aTrans)); 
+                                let year  = kLine[2];
+                                let client= kLine[4];
+                                console.dir("\n0826 UPLOAD client:"+client+"  year:"+year);                                                                                   
+                            
+                            } else if(indicator=='1') {                            
+                                console.dir("\n0828 opening line  "+JSON.stringify(aTrans)); 
+                                oLine=aTrans;
+                                aAccount=nLine.map((name,i)=>(
+                                    (xLine[i] && xLine[i].length>4) ?
+                                    { "Account":name,"xbrl":xLine[i],"init":oLine[i],"debit":"0","credit":"0","saldo":oLine[i] }
+                                        :
+                                        {}
+                                ))
+                                aAccount.forEach((acct)=>{console.log(JSON.stringify(acct))})
+                                ready+=2;
+                                                                
+
+                            } else if(ready>=7) {
+                                let symbol=parseInt(indicator);
+                                if(!isNaN(symbol)) {
+                                //    console.dir("0830 BOOK:"+aTrans);                                      
+                                xLine.forEach((xbrl,i)=>{
+                                            if(xbrl && xbrl.length>4 && aTrans[i] && aTrans[i].length>0) {
+                                                let sign=aTrans[i].charAt(0);
+
+                                                let bigInit=bigMoney(aAccount[i].init,1,0n);
+                                                let bigDebit=bigMoney(aAccount[i].debit,1,0n);
+                                                let bigCredit=bigMoney(aAccount[i].credit,1,0n);
+
+                                                if(sign=='-') {
+                                                    bigDebit=bigMoney(aTrans[i],-1,bigDebit);
+                                                    aAccount[i].debit = cents20EU(bigDebit);
+                                                } else {
+                                                    bigCredit=bigMoney(aTrans[i],1,bigCredit);
+                                                    aAccount[i].credit = cents20EU (bigCredit);
+                                                }
+
+                                                aAccount[i].saldo = cents20EU(bigInit+bigCredit-bigDebit);
+                                                
+                                                console.log( nLine[i] + ":  "+aAccount[i].init+ " + "+aAccount[i].credit+ "  - "+aAccount[i].debit+ " = "+aAccount[i].saldo);
+                                                
+                                            }
+                                    })
+                                }
+                            }
+                        }
+                    )}
+                }
+                console.log('PROCESSED');
+                aAccount.forEach((acct)=>{console.log(JSON.stringify(acct))})
+
+            }
+            fr.readAsText(file);
+
+
+        }
+    }
+}
+
+</script>
+<div id="page">
+    <DIV ondrop="dropHandler(event)" ondragover="dragoverHandler(event)">
+        <H3>DROP HERE</H3>
+    </DIV>
+</div>
+</html>
