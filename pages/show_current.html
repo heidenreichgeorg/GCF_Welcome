@@ -1,5 +1,9 @@
 <html>
-<script>
+    <style>
+.amount { text-align:right; }   
+.xbrl { min-width:40em; max-width:40em;  }     
+    </style>
+    <script>
 /* global BigInt */
 
 function cents20EU(amount) { 
@@ -73,7 +77,29 @@ let pLine=[];
 let aLine=[];
 let oLine=[];
 
+
+function makeAccount(name,xbrl,strInit,strSaldo) {
+    return { "Account":name,"xbrl":xbrl,"init":strInit,"debit":"0","credit":"0","saldo":strSaldo }
+}
+
+
 let aAccount=[];
+function acctPattern(name,pattern) {
+    let bigPatternInit = 0n;
+    let bigPatternClos = 0n;
+    aAccount.forEach((acct)=>{
+        if(acct.Account && acct.credit  && acct.debit && acct.xbrl) {
+            if(acct.xbrl.startsWith(pattern)) {
+                bigPatternInit=bigMoney(acct.init, 1,bigPatternInit);
+                bigPatternClos=bigMoney(acct.saldo,1,bigPatternClos);
+            }
+        }
+    })
+    aAccount.push({ "Account":name,"xbrl":pattern,"init":cents20EU(bigPatternInit),"saldo":cents20EU(bigPatternClos) })
+
+    return bigPatternClos;
+}
+
 
 function dragoverHandler(ev) {  ev.preventDefault(); }
 function dropHandler(ev) {
@@ -155,9 +181,11 @@ function dropHandler(ev) {
                             } else if(indicator=='1') {                            
                                 console.dir("\n0828 opening line  "+JSON.stringify(aTrans)); 
                                 oLine=aTrans;
+                                let strAmount="0";
+
                                 aAccount=nLine.map((name,i)=>(
-                                    (xLine[i] && xLine[i].length>4) ?
-                                    { "Account":name,"xbrl":xLine[i],"init":oLine[i],"debit":"0","credit":"0","saldo":oLine[i] }
+                                    (xLine[i] && xLine[i].length>4 && ((strAmount = cents20EU(bigMoney(oLine[i],1,0n)))!=null)) ?
+                                        makeAccount(name,xLine[i],strAmount,strAmount)
                                         :
                                         {}
                                 ))
@@ -197,7 +225,58 @@ function dropHandler(ev) {
                     )}
                 }
                 console.log('PROCESSED');
-                aAccount.forEach((acct)=>{console.log(JSON.stringify(acct))})
+                let uiAccounts = document.getElementById("accounts")
+                if(uiAccounts) {
+
+                        acctPattern('Sachanlagen','de-gaap-ci_bs.ass.fixAss.tan');
+                        acctPattern('Finanzanlagen','de-gaap-ci_bs.ass.fixAss.fin');
+                        acctPattern('Forderungen aLuL','de-gaap-ci_bs.ass.currAss.receiv.trade');
+                        acctPattern('sonst. Forderungen','de-gaap-ci_bs.ass.currAss.receiv.other');
+                        acctPattern('Sichteinlagen','de-gaap-ci_bs.ass.currAss.cashEquiv');
+                        acctPattern('Anlagen-Verluste','de-gaap-ci_bs.ass.currAss.unpaidCapital');
+                        acctPattern('Aktiva','de-gaap-ci_bs.ass');
+
+                        acctPattern('Umsatz',            'de-gaap-ci_is.netIncome.regular.operatingTC.grossTradingProfit');
+                        acctPattern('Rohertrag',         'de-gaap-ci_is.netIncome.regular.operatingTC');
+                        acctPattern('Beteilungsergebnis','de-gaap-ci_is.netIncome.regular.fin');
+            let bilg =  acctPattern('Ergebnis',          'de-gaap-ci_is.netIncome.regular');
+
+                        acctPattern('Verb aLul','de-gaap-ci_bs.eqLiab.liab.advPaym');
+                        acctPattern('sonst Verb','de-gaap-ci_bs.eqLiab.liab.other.other');
+                        acctPattern('Kapitaldarlehen Kpl','de-gaap-ci_bs.eqLiab.equity.subscribed.unlimitedLiablePartners.VK');
+                        acctPattern('Kapitaldarlehen Kmd','de-gaap-ci_bs.eqLiab.equity.subscribed.limitedLiablePartners.VK');
+                        acctPattern('Festkapital Kpl','de-gaap-ci_bs.eqLiab.equity.subscribed.unlimitedLiablePartners.FK');
+                        acctPattern('Festkapital Kmd','de-gaap-ci_bs.eqLiab.equity.subscribed.limitedLiablePartners.KK');
+                        acctPattern('EK-Reserve','de-gaap-ci_bs.eqLiab.equity.capRes');
+                        
+            let paog =  acctPattern('Passiva ohne Gewinn','de-gaap-ci_bs.eqLiab');
+
+                        aAccount.push(makeAccount("Passiva mit Gewinn",'de-gaap-ci_bs.eqLiab',"",cents20EU(bigMoney("",1,bilg+paog))))
+
+                        acctPartner('')
+
+                        aAccount.forEach((acct)=>{
+                            console.log(JSON.stringify(acct))
+                            if(acct.Account && acct.xbrl) {
+                                let uiRow=document.createElement('TR');uiAccounts.append(uiRow);
+                                let uiNam=document.createElement('TD'); uiRow.append(uiNam);
+                                let uiOpn=document.createElement('TD'); uiRow.append(uiOpn);
+                                let uiCrd=document.createElement('TD'); uiRow.append(uiCrd);
+                                let uiDbt=document.createElement('TD'); uiRow.append(uiDbt);
+                                let uiCls=document.createElement('TD'); uiRow.append(uiCls);
+                                let uiXbr=document.createElement('TD'); uiRow.append(uiXbr);
+                                uiNam.innerHTML=acct.Account;
+                                uiOpn.innerHTML=acct.init;  uiOpn.className="amount";
+                                uiCrd.innerHTML=acct.credit;uiCrd.className="amount";
+                                uiDbt.innerHTML=acct.debit; uiDbt.className="amount";
+                                uiCls.innerHTML=acct.saldo; uiCls.className="amount";
+                                uiXbr.innerHTML=acct.xbrl;  uiXbr.className="xbrl";
+                                }                            
+
+                        })
+
+                        
+                }
 
             }
             fr.readAsText(file);
@@ -210,7 +289,16 @@ function dropHandler(ev) {
 </script>
 <div id="page">
     <DIV ondrop="dropHandler(event)" ondragover="dragoverHandler(event)">
-        <H3>DROP HERE</H3>
+        <H2>DROP HERE</H2>
     </DIV>
+    <TABLE>
+        <THEAD>
+            <TR>
+                <TH>Name&nbsp;</TH><TH>Initial&nbsp;</TH><TH>Credit&nbsp;</TH><TH>Debit&nbsp;</TH><TH>Close&nbsp;</TH><TH class="xbrl">XBRL&nbsp;</TH>
+            </TR>
+        </THEAD>
+        <TBODY id="accounts">
+        </TBODY>
+    </TABLE>
 </div>
 </html>
