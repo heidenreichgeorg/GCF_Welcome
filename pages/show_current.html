@@ -1,7 +1,13 @@
 <html>
     <style>
-.amount { text-align:right; }   
+.drop { padding: 9px; margin: 3px;  border-radius: 20px;  font-family: Bahnschrift,monospace; border:2px solid #0818aa; break-after: page; }        
+.rawt { padding: 9px; margin: 3px;  min-height: 19px; font-size: 8pt; font-family: Bahnschrift,monospace;  color:#0715a0; background-color: #CCCCDD;}        
+.sheet { padding: 9px; margin: 3px;  min-height: 19px; font-size: 10pt; font-family: Bahnschrift,monospace;  color:#0818aa; background-color: #CCCCDD;}        
+.trow   { margin-top: 7px; }    
+.symb   { text-align:left;  border-radius: 6px; border:1px solid #0d5997; }   
+.amount { text-align:right; border-radius: 6px; border:1px solid #0d5997; }   
 .xbrl { min-width:40em; max-width:40em;  }     
+.text { min-width:20em; max-width:20em; border-radius: 6px; border:1px solid #0d5997; }     
     </style>
     <script>
 /* global BigInt */
@@ -78,25 +84,27 @@ let aLine=[];
 let oLine=[];
 
 
-function makeAccount(name,xbrl,strInit,strSaldo) {
-    return { "Account":name,"xbrl":xbrl,"init":strInit,"debit":"0","credit":"0","saldo":strSaldo }
+function makeAccount(symb,name,xbrl,strInit,strSaldo) {
+    return { "symb":symb, "Account":name, "xbrl":xbrl, "init":strInit, "debit":"0", "credit":"0", "saldo":strSaldo }
 }
 
 
 let aAccount=[];
+let aPartners=[];
+
 function acctPattern(name,pattern) {
     let bigPatternInit = 0n;
     let bigPatternClos = 0n;
     aAccount.forEach((acct)=>{
-        if(acct.Account && acct.credit  && acct.debit && acct.xbrl) {
+        if(acct.symb && acct.credit  && acct.debit && acct.xbrl) {
             if(acct.xbrl.startsWith(pattern)) {
                 bigPatternInit=bigMoney(acct.init, 1,bigPatternInit);
                 bigPatternClos=bigMoney(acct.saldo,1,bigPatternClos);
             }
         }
     })
-    aAccount.push({ "Account":name,"xbrl":pattern,"init":cents20EU(bigPatternInit),"saldo":cents20EU(bigPatternClos) })
-
+    aAccount.push({ "Account":name, "xbrl":pattern, "init":cents20EU(bigPatternInit), "credit":"0", "debit":"0", "saldo":cents20EU(bigPatternClos) })
+   // symb not filled by intent - because this new account is synthetic
     return bigPatternClos;
 }
 
@@ -115,77 +123,118 @@ function dropHandler(ev) {
             let file = ev.dataTransfer.files[0];
             console.log('File '+file.name+'  dropped' );
             var fr = new FileReader();
+
             fr.onload = function () {
                 let fileBuffer = this.result;                                    
                 let jData={};
                 try {
                     jData = JSON.parse(fileBuffer);
                 } catch(err) { }
-                
-                let ready=0;
+                let uiHeader=document.getElementById("headers");
 
+                let isInitial=true;
+                let ready=0;
                 if(jData) {
                     let sheetLines = jData.sheetCells;
                     if(sheetLines.length>J_ACCT) {
                         console.error("0820 UPLOAD CSV WITH "+sheetLines.length+" lines");                  
-                        sheetLines.forEach((aTrans)=>{
+                        sheetLines.forEach((arrayTrans)=>{
+                            let aTrans=JSON.parse(JSON.stringify(arrayTrans));
+
+
+                            let isHeader=false;
                             
+
                             let indicator=aTrans[0];
                             //console.dir("\n0822 UPLOAD indicator  "+indicator); 
                             if(indicator=='N') {                            
                                 console.dir("\n0824 N-line  "+JSON.stringify(aTrans)); 
                                 nLine=aTrans;
                                 ready+=1;
+                                isHeader=true;
 
                             } else if(indicator=='S') {                            
                                 console.dir("\n0824 S-line  "+JSON.stringify(aTrans)); 
-                                sLine=aTrans;
+                                sLine=JSON.parse(JSON.stringify(aTrans));
+                                isHeader=true;
 
                             } else if(indicator=='C') {                            
                                 console.dir("\n0824 C-line  "+JSON.stringify(aTrans)); 
                                 cLine=aTrans;
+                                isHeader=true;
 
                             } else if(indicator=='I') {                            
                                 console.dir("\n0824 I-line  "+JSON.stringify(aTrans)); 
                                 iLine=aTrans;
+                                isHeader=true;
 
                             } else if(indicator=='R') {                            
                                 console.dir("\n0824 R-line  "+JSON.stringify(aTrans)); 
                                 rLine=aTrans;
+                                isHeader=true;
 
                             } else if(indicator=='E') {                            
                                 console.dir("\n0824 E-line  "+JSON.stringify(aTrans)); 
-                                eLine=aTrans;
+                                eLine=aTrans; 
+                                isHeader=true;
 
                             } else if(indicator=='X') {                            
                                 console.dir("\n0824 X-line  "+JSON.stringify(aTrans)); 
                                 xLine=aTrans;
                                 ready+=4;
+                                isHeader=true;
 
                             } else if(indicator=='A') {                            
                                 console.dir("\n0824 A-line  "+JSON.stringify(aTrans)); 
                                 aLine=aTrans;
+                                isHeader=true;
 
                             } else if(indicator=='P') {                            
                                 console.dir("\n0824 P-line  "+JSON.stringify(aTrans)); 
                                 pLine=aTrans;
+                                isHeader=true;
+                                let p=0;
+                                let n=0;
+                                if(sLine && sLine.length>1) {
+                                    pLine.forEach((longName,t)=>{ 
+                                        let shareInfo=sLine[p];
+                                        if(p>J_ACCT && longName && longName.length>1) {
+                                            
+                                            if(!isNaN(parseInt(shareInfo)) || shareInfo.startsWith('-')) {
+                                                let nPartner={"tax":longName,"denom":shareInfo};
+                                                aPartners.push(nPartner);
+                                            }
+                                                // names in same ordering as shares
+                                            else if(shareInfo.length>2) {
+                                                aPartners[n].name=shareInfo;
+                                                aPartners[n].fullName=longName;
+                                                console.log("Partner "+JSON.stringify(aPartners[n]));
+                                                n++;
+                                            }
+                                        }
+                                        p++;
+                                    })
+                                }
 
                             } else if(indicator=='K') {                            
                                 kLine=aTrans;
+                                isHeader=true;
 
                                 console.dir("\n0824 K-line  "+JSON.stringify(aTrans)); 
                                 let year  = kLine[2];
                                 let client= kLine[4];
                                 console.dir("\n0826 UPLOAD client:"+client+"  year:"+year);                                                                                   
                             
-                            } else if(indicator=='1') {                            
+                            } else if(indicator=='1' && isInitial) {                            
                                 console.dir("\n0828 opening line  "+JSON.stringify(aTrans)); 
                                 oLine=aTrans;
+                                isInitial=false;
                                 let strAmount="0";
+                                isHeader=true;
 
-                                aAccount=nLine.map((name,i)=>(
+                                aAccount=nLine.map((symb,i)=>(
                                     (xLine[i] && xLine[i].length>4 && ((strAmount = cents20EU(bigMoney(oLine[i],1,0n)))!=null)) ?
-                                        makeAccount(name,xLine[i],strAmount,strAmount)
+                                        makeAccount(symb,cLine[i],xLine[i],strAmount,strAmount)
                                         :
                                         {}
                                 ))
@@ -221,6 +270,15 @@ function dropHandler(ev) {
                                     })
                                 }
                             }
+
+                            if(isHeader) {
+                                let hRow=document.createElement('TR');uiHeader.append(hRow);
+                                arrayTrans.forEach((cell,i)=>{                                
+                                    let uiCell=document.createElement('TD'); 
+                                    hRow.append(uiCell); 
+                                    uiCell.innerHTML=cell.substring(0,10);
+                                })                            
+                            }
                         }
                     )}
                 }
@@ -230,10 +288,10 @@ function dropHandler(ev) {
 
                         acctPattern('Sachanlagen','de-gaap-ci_bs.ass.fixAss.tan');
                         acctPattern('Finanzanlagen','de-gaap-ci_bs.ass.fixAss.fin');
-                        acctPattern('Forderungen aLuL','de-gaap-ci_bs.ass.currAss.receiv.trade');
-                        acctPattern('sonst. Forderungen','de-gaap-ci_bs.ass.currAss.receiv.other');
+                        acctPattern('Forderungen aus LuL','de-gaap-ci_bs.ass.currAss.receiv.trade');
+                        acctPattern('sonstige Forderungen','de-gaap-ci_bs.ass.currAss.receiv.other');
                         acctPattern('Sichteinlagen','de-gaap-ci_bs.ass.currAss.cashEquiv');
-                        acctPattern('Anlagen-Verluste','de-gaap-ci_bs.ass.currAss.unpaidCapital');
+                        acctPattern('Verluste aus Anlagen-Verkauf','de-gaap-ci_bs.ass.currAss.unpaidCapital');
                         acctPattern('Aktiva','de-gaap-ci_bs.ass');
 
                         acctPattern('Umsatz',            'de-gaap-ci_is.netIncome.regular.operatingTC.grossTradingProfit');
@@ -241,60 +299,61 @@ function dropHandler(ev) {
                         acctPattern('Beteilungsergebnis','de-gaap-ci_is.netIncome.regular.fin');
             let bilg =  acctPattern('Ergebnis',          'de-gaap-ci_is.netIncome.regular');
 
-                        acctPattern('Verb aLul','de-gaap-ci_bs.eqLiab.liab.advPaym');
-                        acctPattern('sonst Verb','de-gaap-ci_bs.eqLiab.liab.other.other');
-                        acctPattern('Kapitaldarlehen Kpl','de-gaap-ci_bs.eqLiab.equity.subscribed.unlimitedLiablePartners.VK');
-                        acctPattern('Kapitaldarlehen Kmd','de-gaap-ci_bs.eqLiab.equity.subscribed.limitedLiablePartners.VK');
-                        acctPattern('Festkapital Kpl','de-gaap-ci_bs.eqLiab.equity.subscribed.unlimitedLiablePartners.FK');
-                        acctPattern('Festkapital Kmd','de-gaap-ci_bs.eqLiab.equity.subscribed.limitedLiablePartners.KK');
-                        acctPattern('EK-Reserve','de-gaap-ci_bs.eqLiab.equity.capRes');
+                        acctPattern('Verbindlichkeiten aLuL','de-gaap-ci_bs.eqLiab.liab.advPaym');
+                        acctPattern('sonstige Verbindlichkeiten','de-gaap-ci_bs.eqLiab.liab.other.other');
+                        acctPattern('Kapitaldarlehen Komplementäre','de-gaap-ci_bs.eqLiab.equity.subscribed.unlimitedLiablePartners.VK');
+                        acctPattern('Kapitaldarlehen Kommanditisten','de-gaap-ci_bs.eqLiab.equity.subscribed.limitedLiablePartners.VK');
+                        acctPattern('Festkapital Komplementäre','de-gaap-ci_bs.eqLiab.equity.subscribed.unlimitedLiablePartners.FK');
+                        acctPattern('Festkapital Kommanditisten','de-gaap-ci_bs.eqLiab.equity.subscribed.limitedLiablePartners.KK');
+                        acctPattern('Eigenkapital-Reserve','de-gaap-ci_bs.eqLiab.equity.capRes');
                         
-            let paog =  acctPattern('Passiva ohne Gewinn','de-gaap-ci_bs.eqLiab');
+            let paog =  acctPattern('Kapital und Verbindlichkeiten','de-gaap-ci_bs.eqLiab');
 
-                        aAccount.push(makeAccount("Passiva mit Gewinn",'de-gaap-ci_bs.eqLiab',"",cents20EU(bigMoney("",1,bilg+paog))))
+                        aAccount.push(makeAccount(null,"Passiva mit Gewinn",'de-gaap-ci_bs.eqLiab',"",cents20EU(bigMoney("",1,bilg+paog))))
 
-                        acctPartner('')
+                        // acctPartner('')
 
                         aAccount.forEach((acct)=>{
                             console.log(JSON.stringify(acct))
                             if(acct.Account && acct.xbrl) {
+                                let uiDiv=document.createElement('TR');uiAccounts.append(uiDiv);
                                 let uiRow=document.createElement('TR');uiAccounts.append(uiRow);
+                                let uiSpc=document.createElement('TD'); uiDiv.append(uiSpc);
                                 let uiNam=document.createElement('TD'); uiRow.append(uiNam);
                                 let uiOpn=document.createElement('TD'); uiRow.append(uiOpn);
                                 let uiCrd=document.createElement('TD'); uiRow.append(uiCrd);
                                 let uiDbt=document.createElement('TD'); uiRow.append(uiDbt);
                                 let uiCls=document.createElement('TD'); uiRow.append(uiCls);
-                                let uiXbr=document.createElement('TD'); uiRow.append(uiXbr);
-                                uiNam.innerHTML=acct.Account;
-                                uiOpn.innerHTML=acct.init;  uiOpn.className="amount";
-                                uiCrd.innerHTML=acct.credit;uiCrd.className="amount";
-                                uiDbt.innerHTML=acct.debit; uiDbt.className="amount";
-                                uiCls.innerHTML=acct.saldo; uiCls.className="amount";
-                                uiXbr.innerHTML=acct.xbrl;  uiXbr.className="xbrl";
+                                let uiTxt=document.createElement('TD'); uiRow.append(uiTxt);
+
+                                uiRow.className="trow";
+                                uiNam.innerHTML=acct.symb?acct.symb:"---"; uiNam.className="symb";
+                                uiOpn.innerHTML=acct.init;   uiOpn.className="amount";
+                                uiCrd.innerHTML=acct.credit; uiCrd.className="amount";
+                                uiDbt.innerHTML=acct.debit;  uiDbt.className="amount";
+                                uiCls.innerHTML=acct.saldo;  uiCls.className="amount";
+                                uiTxt.innerHTML=acct.Account;uiTxt.className="text";
                                 }                            
-
                         })
-
-                        
                 }
-
             }
             fr.readAsText(file);
-
-
         }
     }
 }
 
 </script>
 <div id="page">
-    <DIV ondrop="dropHandler(event)" ondragover="dragoverHandler(event)">
-        <H2>DROP HERE</H2>
+    <DIV  class="drop" ondrop="dropHandler(event)" ondragover="dragoverHandler(event)">
+        <H1>DROP HERE</H1>
     </DIV>
-    <TABLE>
+    <TABLE class="rawt">        
+        <TBODY id="headers">
+        </TBODY>
+    <TABLE class="sheet">
         <THEAD>
-            <TR>
-                <TH>Name&nbsp;</TH><TH>Initial&nbsp;</TH><TH>Credit&nbsp;</TH><TH>Debit&nbsp;</TH><TH>Close&nbsp;</TH><TH class="xbrl">XBRL&nbsp;</TH>
+            <TR class="trow">
+                <TH class="symb">Symbol&nbsp;</TH><TH class="symb">Initial&nbsp;</TH><TH class="symb">Credit&nbsp;</TH><TH class="symb">Debit&nbsp;</TH><TH class="symb">Close&nbsp;</TH><TH class="text">Name&nbsp;</TH>
             </TR>
         </THEAD>
         <TBODY id="accounts">
