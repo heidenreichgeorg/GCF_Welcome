@@ -69,8 +69,11 @@ function bigMoney(strAdd,factor,money) {
     return money;
 }
 
+
 const CSV_FS=','
 const J_ACCT=6;
+let maxAsset=J_ACCT+1;
+
 let nLine=[];
 let sLine=[];
 let kLine=[];
@@ -92,6 +95,7 @@ let bigDenominator=1n;
 
 let aAccount=[];
 let aPartners=[];
+let aTransactions=[];
 
 function acctPattern(name,pattern) {
     let bigPatternInit = 0n;
@@ -132,6 +136,7 @@ function dropHandler(ev) {
                     jData = JSON.parse(fileBuffer);
                 } catch(err) { }
                 let uiHeader=document.getElementById("headers");
+                let uiTransactions=document.getElementById("transactions");
 
                 let isInitial=true;
                 let ready=0;
@@ -151,6 +156,7 @@ function dropHandler(ev) {
                             if(indicator=='N') {                            
                                 console.dir("\n0824 N-line  "+JSON.stringify(aTrans)); 
                                 nLine=aTrans;
+                                nLine.forEach((name,i)=>{if(name==='ASSETS') maxAsset=i})
                                 ready+=1;
                                 isHeader=true;
 
@@ -280,6 +286,15 @@ function dropHandler(ev) {
                                     })
                                 }
                             }
+
+                            if(!isNaN(indicator) && !isInitial) {                            
+                                let jAction=aTrans;
+                                if(aTrans.length>J_ACCT)
+                                    aTransactions.unshift({"text":aTrans[1]+" "+aTrans[4]+" "+aTrans[2],"action":jAction})
+                            }
+
+
+
 /*
                             // header checking on UI
                             if(isHeader) {
@@ -415,6 +430,61 @@ function dropHandler(ev) {
                                         
                                 })
 
+
+
+                    if(aTransactions.length>0) {
+                        aTransactions.forEach((strAction,i)=>{
+                            if(i<20) {
+                                let uiDiv=document.createElement('TR'); uiTransactions.append(uiDiv);
+                                let uiRow=document.createElement('TR'); uiTransactions.append(uiRow);
+                                let uiSpc=document.createElement('TD'); uiDiv.append(uiSpc);
+                                uiRow.className="trow";
+
+                                let uiDat=document.createElement('TD'); uiRow.append(uiDat);
+                                uiDat.innerHTML=strAction.text; uiDat.className="text";
+
+                                let acLine = ""
+                                let adLine = ""
+                                strAction.action.forEach((move,a)=>{
+                                    let cText=null;
+                                    let dText=null;
+                                    if(a>J_ACCT && move && move.length>0) {
+                                        if(move.startsWith('-')) {
+                                            dText=nLine[a]+":"+move.substring(1);
+                                        } else {
+                                            cText=nLine[a]+":"+move;
+                                        }
+                                        if(a<maxAsset) {
+                                            if(cText) acLine=acLine+" "+cText
+                                            if(dText) adLine=adLine+" "+dText
+                                        } else {
+                                            if(dText) acLine=acLine+" "+dText
+                                            if(cText) adLine=adLine+" "+cText
+                                        }
+                                    }
+                                })
+                                
+
+                                
+                                let uiCrd=document.createElement('TD'); 
+                                    uiRow.append(uiCrd);
+                                    uiCrd.innerHTML=acLine; 
+                                    uiCrd.className="amount";
+
+                                let uiAn=document.createElement('TD'); 
+                                    uiRow.append(uiAn);
+                                    uiAn.innerHTML="AN"; 
+                                    uiAn.className="amount";
+
+                                let uiDbt=document.createElement('TD'); 
+                                    uiRow.append(uiDbt);
+                                    uiDbt.innerHTML=adLine; 
+                                    uiDbt.className="amount";
+                                
+                                
+                            }
+                        })
+                    }
                 }
             }
             fr.readAsText(file);
@@ -446,6 +516,15 @@ function dropHandler(ev) {
             </TR>
         </THEAD>
         <TBODY id="partners">
+        </TBODY>
+    </TABLE>
+    <TABLE class="sheet">
+        <THEAD>
+            <TR class="trow">
+                <TH class="text">Text&nbsp;</TH><TH class="text">Credit&nbsp;</TH><TH class="symb">AN</TH><TH class="text">Debit&nbsp;</TH>
+            </TR>
+        </THEAD>
+        <TBODY id="transactions">
         </TBODY>
     </TABLE>
 </div>
