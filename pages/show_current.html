@@ -280,7 +280,8 @@ function dropHandler(ev) {
                                     })
                                 }
                             }
-
+/*
+                            // header checking on UI
                             if(isHeader) {
                                 let hRow=document.createElement('TR');uiHeader.append(hRow);
                                 arrayTrans.forEach((cell,i)=>{                                
@@ -289,11 +290,14 @@ function dropHandler(ev) {
                                     uiCell.innerHTML=cell.substring(0,10);
                                 })                            
                             }
+*/                                
                         }
                     )}
                 }
+
                 console.log('PROCESSED');
                 let uiAccounts = document.getElementById("accounts")
+                let uiPartners = document.getElementById("partners")
                 if(uiAccounts) {
 
                         acctPattern('Sachanlagen','de-gaap-ci_bs.ass.fixAss.tan');
@@ -359,6 +363,8 @@ function dropHandler(ev) {
                                         bigRest -= bigShare;
 
                                         let index=jPartner.iVarCap;
+                                        jPartner.credit = aAccount[index].credit;
+                                        jPartner.debit = aAccount[index].debit;
                                         jPartner.saldo = aAccount[index].saldo;
                             });
 
@@ -386,23 +392,25 @@ function dropHandler(ev) {
                         aPartners.forEach((jPartner,n)=>{
                                     let index=jPartner.iVarCap;
                                     if(index>J_ACCT) {
-                                        let uiDiv=document.createElement('TR');uiAccounts.append(uiDiv);
-                                        let uiRow=document.createElement('TR');uiAccounts.append(uiRow);
+                                        let uiDiv=document.createElement('TR');uiPartners.append(uiDiv);
+                                        let uiRow=document.createElement('TR');uiPartners.append(uiRow);
                                         let uiSpc=document.createElement('TD'); uiDiv.append(uiSpc);
                                         let uiNam=document.createElement('TD'); uiRow.append(uiNam);
                                         let uiOpn=document.createElement('TD'); uiRow.append(uiOpn);
                                         let uiCrd=document.createElement('TD'); uiRow.append(uiCrd);
                                         let uiDbt=document.createElement('TD'); uiRow.append(uiDbt);
+                                        let uiGal=document.createElement('TD'); uiRow.append(uiGal);
+                                        let uiTax=document.createElement('TD'); uiRow.append(uiTax);
                                         let uiCls=document.createElement('TD'); uiRow.append(uiCls);
-                                        let uiTxt=document.createElement('TD'); uiRow.append(uiTxt);
 
                                         uiRow.className="trow";
-                                        uiNam.innerHTML=jPartner.name; uiNam.className="symb";
-                                        uiOpn.innerHTML=jPartner.open; uiOpn.className="amount";
-                                        uiCrd.innerHTML=jPartner.gain; uiCrd.className="amount";
-                                        uiDbt.innerHTML=jPartner.taxP; uiDbt.className="amount";
-                                        uiCls.innerHTML=jPartner.saldo;uiCls.className="amount";
-                                        uiTxt.innerHTML=jPartner.fullName;uiTxt.className="text";
+                                        uiNam.innerHTML=jPartner.fullName; uiNam.className="text";
+                                        uiOpn.innerHTML=jPartner.open;  uiOpn.className="amount";
+                                        uiCrd.innerHTML=jPartner.credit;uiCrd.className="amount";
+                                        uiDbt.innerHTML=jPartner.debit; uiDbt.className="amount";
+                                        uiGal.innerHTML=jPartner.gain;  uiGal.className="amount";
+                                        uiTax.innerHTML=jPartner.taxP;  uiTax.className="amount";
+                                        uiCls.innerHTML=jPartner.saldo; uiCls.className="amount";
                                             }
                                         
                                 })
@@ -429,6 +437,15 @@ function dropHandler(ev) {
             </TR>
         </THEAD>
         <TBODY id="accounts">
+        </TBODY>
+    </TABLE>
+    <TABLE class="sheet">
+        <THEAD>
+            <TR class="trow">
+                <TH class="symb">Name&nbsp;</TH><TH class="symb">Initial&nbsp;</TH><TH class="symb">Credit&nbsp;</TH><TH class="symb">Debit&nbsp;</TH><TH class="symb">Gain&nbsp;</TH><TH class="symb">Tax&nbsp;</TH><TH class="symb">Close&nbsp;</TH>
+            </TR>
+        </THEAD>
+        <TBODY id="partners">
         </TBODY>
     </TABLE>
 </div>
