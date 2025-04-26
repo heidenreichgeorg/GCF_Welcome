@@ -88,6 +88,7 @@ function makeAccount(symb,name,xbrl,strInit,strSaldo) {
     return { "symb":symb, "Account":name, "xbrl":xbrl, "init":strInit, "debit":"0", "credit":"0", "saldo":strSaldo }
 }
 
+let bigDenominator=1n;
 
 let aAccount=[];
 let aPartners=[];
@@ -195,13 +196,17 @@ function dropHandler(ev) {
                                 isHeader=true;
                                 let p=0;
                                 let n=0;
+                                bigDenominator= BigInt(parseInt(sLine[2]));
+                                console.log("DENOMINATOR "+bigDenominator);
+
                                 if(sLine && sLine.length>1) {
                                     pLine.forEach((longName,t)=>{ 
                                         let shareInfo=sLine[p];
                                         if(p>J_ACCT && longName && longName.length>1) {
-                                            
-                                            if(!isNaN(parseInt(shareInfo)) || shareInfo.startsWith('-')) {
-                                                let nPartner={"tax":longName,"denom":shareInfo};
+                                            if(shareInfo.startsWith('-')) shareInfo="0";
+                                            let iShare = parseInt(shareInfo);
+                                            if(!isNaN(iShare)) {
+                                                let nPartner={"tax":longName,"share":iShare,"iVarCap":p};
                                                 aPartners.push(nPartner);
                                             }
                                                 // names in same ordering as shares
@@ -238,7 +243,12 @@ function dropHandler(ev) {
                                         :
                                         {}
                                 ))
-                                aAccount.forEach((acct)=>{console.log(JSON.stringify(acct))})
+                                //aAccount.forEach((acct)=>{console.log(JSON.stringify(acct))})
+                                aPartners.forEach((jPartner,n)=>{
+                                    let index=jPartner.iVarCap;
+                                    if(index>J_ACCT)
+                                        jPartner.open=oLine[index]
+                                })
                                 ready+=2;
                                                                 
 
@@ -289,7 +299,7 @@ function dropHandler(ev) {
                         acctPattern('Sachanlagen','de-gaap-ci_bs.ass.fixAss.tan');
                         acctPattern('Finanzanlagen','de-gaap-ci_bs.ass.fixAss.fin');
                         acctPattern('Forderungen aus LuL','de-gaap-ci_bs.ass.currAss.receiv.trade');
-                        acctPattern('sonstige Forderungen','de-gaap-ci_bs.ass.currAss.receiv.other');
+            let taxP =  acctPattern('gezahlte Steuern','de-gaap-ci_bs.ass.currAss.receiv.other.otherTaxRec');
                         acctPattern('Sichteinlagen','de-gaap-ci_bs.ass.currAss.cashEquiv');
                         acctPattern('Verluste aus Anlagen-Verkauf','de-gaap-ci_bs.ass.currAss.unpaidCapital');
                         acctPattern('Aktiva','de-gaap-ci_bs.ass');
@@ -314,7 +324,7 @@ function dropHandler(ev) {
                         // acctPartner('')
 
                         aAccount.forEach((acct)=>{
-                            console.log(JSON.stringify(acct))
+                            //console.log(JSON.stringify(acct))
                             if(acct.Account && acct.xbrl) {
                                 let uiDiv=document.createElement('TR');uiAccounts.append(uiDiv);
                                 let uiRow=document.createElement('TR');uiAccounts.append(uiRow);
@@ -335,6 +345,68 @@ function dropHandler(ev) {
                                 uiTxt.innerHTML=acct.Account;uiTxt.className="text";
                                 }                            
                         })
+
+
+                        // distribute gain/loss
+                        if(bilg!=0n) {
+                            let bigSign=bilg>0n?1n:-1n;
+                            let bigRest=bigSign*bilg; 
+                            bilg=bigRest;
+
+                            aPartners.forEach((jPartner,n)=>{
+                                        let bigShare = (bilg * BigInt(jPartner.share)) / bigDenominator;
+                                        jPartner.save= bigShare;
+                                        bigRest -= bigShare;
+
+                                        let index=jPartner.iVarCap;
+                                        jPartner.saldo = aAccount[index].saldo;
+                            });
+
+                            aPartners.forEach((jPartner,n)=>{
+                                jPartner.gain= cents20EU(bigSign * BigInt(jPartner.save)+(bigRest>0n?1n:0n));
+                                bigRest--;
+                            });                            
+                        }
+
+                        if(taxP>0n) {
+                            // distribute tax
+                            let bigRest=taxP; 
+                            aPartners.forEach((jPartner,n)=>{
+                                        let index=jPartner.iVarCap;
+                                        let bigTax = (taxP * BigInt(jPartner.share)) / bigDenominator;
+                                        jPartner.save= bigTax;
+                                        bigRest -= bigTax;
+                            });
+                            aPartners.forEach((jPartner,n)=>{
+                                    jPartner.taxP= cents20EU(BigInt(jPartner.save)+(bigRest>0n?1n:0n));
+                                    bigRest--;
+                                });                            
+                        }
+
+                        aPartners.forEach((jPartner,n)=>{
+                                    let index=jPartner.iVarCap;
+                                    if(index>J_ACCT) {
+                                        let uiDiv=document.createElement('TR');uiAccounts.append(uiDiv);
+                                        let uiRow=document.createElement('TR');uiAccounts.append(uiRow);
+                                        let uiSpc=document.createElement('TD'); uiDiv.append(uiSpc);
+                                        let uiNam=document.createElement('TD'); uiRow.append(uiNam);
+                                        let uiOpn=document.createElement('TD'); uiRow.append(uiOpn);
+                                        let uiCrd=document.createElement('TD'); uiRow.append(uiCrd);
+                                        let uiDbt=document.createElement('TD'); uiRow.append(uiDbt);
+                                        let uiCls=document.createElement('TD'); uiRow.append(uiCls);
+                                        let uiTxt=document.createElement('TD'); uiRow.append(uiTxt);
+
+                                        uiRow.className="trow";
+                                        uiNam.innerHTML=jPartner.name; uiNam.className="symb";
+                                        uiOpn.innerHTML=jPartner.open; uiOpn.className="amount";
+                                        uiCrd.innerHTML=jPartner.gain; uiCrd.className="amount";
+                                        uiDbt.innerHTML=jPartner.taxP; uiDbt.className="amount";
+                                        uiCls.innerHTML=jPartner.saldo;uiCls.className="amount";
+                                        uiTxt.innerHTML=jPartner.fullName;uiTxt.className="text";
+                                            }
+                                        
+                                })
+
                 }
             }
             fr.readAsText(file);
