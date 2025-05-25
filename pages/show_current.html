@@ -93,8 +93,10 @@ function makeAccount(symb,name,xbrl,strInit,strSaldo) {
 
 let bigDenominator=1n;
 
+let aAssets=[];
 let aAccount=[];
 let aPartners=[];
+let currentAssets={} // symbol to current value
 let aTransactions=[];
 
 function acctPattern(name,pattern) {
@@ -136,6 +138,7 @@ function dropHandler(ev) {
                     jData = JSON.parse(fileBuffer);
                 } catch(err) { }
                 let uiHeader=document.getElementById("headers");
+                let uiAssets=document.getElementById("assets");
                 let uiTransactions=document.getElementById("transactions");
 
                 let isInitial=true;
@@ -192,9 +195,18 @@ function dropHandler(ev) {
                                 isHeader=true;
 
                             } else if(indicator=='A') {                            
-                                console.dir("\n0824 A-line  "+JSON.stringify(aTrans)); 
                                 aLine=aTrans;
+                                let jAsset = {}
+                                jAsset.investDate=aLine[1];
+                                jAsset.code=aLine[2];
+                                jAsset.beginYear=aLine[3];
+                                jAsset.currentUnits=aLine[4];
+                                jAsset.symbol=aLine[5];
+                                jAsset.current=aLine[6];
+                                console.dir("\n0824 A-line  "+JSON.stringify(jAsset)); 
                                 isHeader=true;
+                                aAssets.push(jAsset);
+                                currentAssets[jAsset.symbol]=jAsset.current; // default, if no INVEST SELL DEPRECIATE in current year
 
                             } else if(indicator=='P') {                            
                                 console.dir("\n0824 P-line  "+JSON.stringify(aTrans)); 
@@ -261,10 +273,21 @@ function dropHandler(ev) {
                             } else if(ready>=7) {
                                 let symbol=parseInt(indicator);
                                 if(!isNaN(symbol)) {
-                                //    console.dir("0830 BOOK:"+aTrans);                                      
-                                xLine.forEach((xbrl,i)=>{
+
+                                    iAsset=-1; // Account column position of asset
+
+
+                                    // REGULAR TRANSACTION BOOKING 
+                                    xLine.forEach((xbrl,i)=>{
                                             if(xbrl && xbrl.length>4 && aTrans[i] && aTrans[i].length>0) {
                                                 let sign=aTrans[i].charAt(0);
+
+
+                                                // check whether this really is a ass.fixAss account
+                                                if(xbrl.startsWith("de-gaap-ci_bs.ass.fixAss"))
+                                                    iAsset=i; 
+
+
 
                                                 let bigInit=bigMoney(aAccount[i].init,1,0n);
                                                 let bigDebit=bigMoney(aAccount[i].debit,1,0n);
@@ -279,12 +302,23 @@ function dropHandler(ev) {
                                                 }
 
                                                 aAccount[i].saldo = cents20EU(bigInit+bigCredit-bigDebit);
+
+
+                                                // ASSET TRACKING
+                                                if(aTrans[3]==="INVEST" && iAsset>=0 && i==iAsset) {
+                                                    let code=aTrans[2];
+                                                    let symbol=aTrans[5];
+                                                    console.log("INVEST "+aTrans[i]+" into "+code+":"+symbol+"  =  "+ aAccount[i].saldo)   
+                                                    currentAssets[symbol]=aAccount[i].saldo;
+                                                }
                                                 
                                                 console.log( nLine[i] + ":  "+aAccount[i].init+ " + "+aAccount[i].credit+ "  - "+aAccount[i].debit+ " = "+aAccount[i].saldo);
                                                 
                                             }
                                     })
+
                                 }
+                                
                             }
 
                             if(!isNaN(indicator) && !isInitial) {                            
@@ -431,6 +465,35 @@ function dropHandler(ev) {
                                 })
 
 
+                        aAssets.forEach((jAsset,n)=>{
+                                        let symbol = jAsset.symbol;
+                                        let code = jAsset.code;
+
+                                        let uiDiv=document.createElement('TR');uiAssets.append(uiDiv);
+                                        let uiRow=document.createElement('TR');uiAssets.append(uiRow);
+                                        let uiSpc=document.createElement('TD'); uiDiv.append(uiSpc);
+                                        let uiSym=document.createElement('TD'); uiRow.append(uiSym);
+                                        let uiCod=document.createElement('TD'); uiRow.append(uiCod);
+                                        let uiDat=document.createElement('TD'); uiRow.append(uiDat);
+                                        let uiQua=document.createElement('TD'); uiRow.append(uiQua);
+                                        let uiBeg=document.createElement('TD'); uiRow.append(uiBeg);
+                                        let uiCur=document.createElement('TD'); uiRow.append(uiCur);
+                                        let uiCls=document.createElement('TD'); uiRow.append(uiCls);
+                                        uiRow.className="trow";
+                                        uiSym.innerHTML=symbol;             uiSym.className="amount";
+                                        uiCod.innerHTML=code;               uiCod.className="amount";
+                                        uiDat.innerHTML=jAsset.investDate;  uiDat.className="amount";
+                                        uiQua.innerHTML=jAsset.currentUnits;uiQua.className="amount";
+                                        uiBeg.innerHTML=jAsset.beginYear;   uiBeg.className="amount";
+                                        uiCur.innerHTML=jAsset.current;     uiCur.className="amount";
+                                        uiCls.innerHTML=currentAssets[symbol];uiCls.className="amount";
+                                        
+                                            
+                                        
+                                })
+
+
+
 
                     if(aTransactions.length>0) {
                         aTransactions.forEach((strAction,i)=>{
@@ -512,10 +575,19 @@ function dropHandler(ev) {
     <TABLE class="sheet">
         <THEAD>
             <TR class="trow">
-                <TH class="symb">Name&nbsp;</TH><TH class="symb">Initial&nbsp;</TH><TH class="symb">Credit&nbsp;</TH><TH class="symb">Debit&nbsp;</TH><TH class="symb">Gain&nbsp;</TH><TH class="symb">Tax&nbsp;</TH><TH class="symb">Close&nbsp;</TH>
+                <TH class="symb">Symbol&nbsp;</TH><TH class="symb">Initial&nbsp;</TH><TH class="symb">Credit&nbsp;</TH><TH class="symb">Debit&nbsp;</TH><TH class="symb">Close&nbsp;</TH><TH class="text">Name&nbsp;</TH>
             </TR>
         </THEAD>
         <TBODY id="partners">
+        </TBODY>
+    </TABLE>
+    <TABLE class="sheet">
+        <THEAD>
+            <TR class="trow">
+                <TH class="symb">Symbol&nbsp;</TH><TH class="symb">Code&nbsp;</TH> <TH class="symb">Purchase&nbsp;</TH><TH class="symb">Quantity&nbsp;</TH><TH class="symb">Purchase&nbsp;</TH><TH class="symb">Initial&nbsp;</TH><TH class="symb">Current&nbsp;</TH>
+            </TR>
+        </THEAD>
+        <TBODY id="assets">
         </TBODY>
     </TABLE>
     <TABLE class="sheet">
