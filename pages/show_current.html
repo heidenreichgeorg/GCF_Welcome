@@ -1,13 +1,13 @@
 <html>
     <style>
-.drop { padding: 9px; margin: 3px;  border-radius: 20px;  font-family: Bahnschrift,monospace; border:2px solid #0818aa; break-after: page; }        
-.rawt { padding: 9px; margin: 3px;  min-height: 19px; font-size: 8pt; font-family: Bahnschrift,monospace;  color:#0715a0; background-color: #CCCCDD;}        
-.sheet { padding: 9px; margin: 3px;  min-height: 19px; font-size: 10pt; font-family: Bahnschrift,monospace;  color:#0818aa; background-color: #CCCCDD;}        
+.drop { padding: 9px; margin: 3px;  border-radius: 20px;  font-family: Bahnschrift,monospace;    border:2px solid #030f94; break-after: page; }        
+.rawt { padding: 9px; margin: 3px;  min-height: 19px; font-size: 8pt; font-family: Bahnschrift,monospace;   color:#030f94; background-color: #dfdff4;}        
+.sheet { padding: 9px; margin: 3px;  min-height: 19px; font-size: 10pt; font-family: Bahnschrift,monospace; color:#030f94; background-color: #dfdff4;}        
 .trow   { margin-top: 7px; }    
-.symb   { text-align:left;  border-radius: 6px; border:1px solid #0d5997; }   
-.amount { text-align:right; border-radius: 6px; border:1px solid #0d5997; }   
+.symb   { text-align:left;  border-radius: 6px; border:1px solid #030f94; }   
+.amount { text-align:right; border-radius: 6px; border:1px solid #030f94; }   
 .xbrl { min-width:40em; max-width:40em;  }     
-.text { min-width:20em; max-width:20em; border-radius: 6px; border:1px solid #0d5997; }     
+.text { min-width:20em; max-width:20em; border-radius: 6px; border:1px solid #030f94; }     
     </style>
     <script>
 /* global BigInt */
@@ -98,6 +98,13 @@ let aAccount=[];
 let aPartners=[];
 let currentAssets={} // symbol to current value
 let aTransactions=[];
+
+function lookupAsset(symbol) {
+    let result = -1;
+    let lenAssets=aAssets.length;
+    for(let i=0;i<lenAssets && i<1000 && aAssets[i];i++) if(aAssets[i].symbol===symbol) result=i;
+    return result;
+}
 
 function acctPattern(name,pattern) {
     let bigPatternInit = 0n;
@@ -206,7 +213,7 @@ function dropHandler(ev) {
                                 console.dir("\n0824 A-line  "+JSON.stringify(jAsset)); 
                                 isHeader=true;
                                 aAssets.push(jAsset);
-                                currentAssets[jAsset.symbol]=jAsset.current; // default, if no INVEST SELL DEPRECIATE in current year
+                                currentAssets[jAsset.symbol]=jAsset.current; // default, if no INVEST SELL WRITEOFF in current year
 
                             } else if(indicator=='P') {                            
                                 console.dir("\n0824 P-line  "+JSON.stringify(aTrans)); 
@@ -301,17 +308,83 @@ function dropHandler(ev) {
                                                     aAccount[i].credit = cents20EU (bigCredit);
                                                 }
 
-                                                aAccount[i].saldo = cents20EU(bigInit+bigCredit-bigDebit);
+                                                let saldo = cents20EU(bigInit+bigCredit-bigDebit);
+                                                
 
-
-                                                // ASSET TRACKING
-                                                if(aTrans[3]==="INVEST" && iAsset>=0 && i==iAsset) {
+                                                if(iAsset>=0 && i==iAsset) {
+                                                    // ASSET TRACKING
                                                     let code=aTrans[2];
                                                     let symbol=aTrans[5];
-                                                    console.log("INVEST "+aTrans[i]+" into "+code+":"+symbol+"  =  "+ aAccount[i].saldo)   
-                                                    currentAssets[symbol]=aAccount[i].saldo;
+
+                                                    if(aTrans[3]==="INVEST") {
+                                                        console.log("\nINVEST "+aTrans[i]+" into "+code+":"+symbol+"  =  "+ saldo)   
+
+
+
+                                                        // if currentAssets[symbol] does not exist: create aAsset entry
+                                                        if(!currentAssets[symbol]) {
+                                                            let bigSaldo=bigMoney(aTrans[i],1,0n);
+                                                            saldo = cents20EU(bigSaldo);
+
+                                                            let jAsset = {}
+                                                            jAsset.investDate=aTrans[1];
+                                                            jAsset.code=code;
+                                                            jAsset.beginYear="0";
+                                                            jAsset.currentUnits=aTrans[4]; // ??
+                                                            jAsset.symbol=symbol;
+                                                            jAsset.current=saldo;
+                                                            console.dir("NEW ASSET  "+JSON.stringify(jAsset)); 
+                                                            aAssets.push(jAsset);
+                                                        }
+
+
+                                                        currentAssets[symbol]=saldo;
+
+
+                                                    }
+                                                    
+                                                    else if(aTrans[3]==="SELL") {
+                                                        let iAssetEntry = lookupAsset(symbol);
+                                                        let previous = currentAssets[symbol];
+                                                        let sales = aTrans[i];
+                                                        let unitsSold = parseInt(aTrans[4]);
+                                                        if(iAssetEntry>=0) {
+
+                                                            let jAsset = aAssets[iAssetEntry];
+                                                            let unitsRemain = jAsset.currentUnits-unitsSold;
+                                                            console.log("\nSELL "+unitsSold+" units from "+code+":"+symbol+"("+jAsset.currentUnits+")  worth  "+ previous+ " giving "+sales+  " leaving "+unitsRemain)   
+
+
+                                                            jAsset.currentUnits=unitsRemain;
+
+
+
+                                                            // COMPUTE TOTAL SALES ONLY
+                                                            currentAssets[symbol]="0";
+
+                                                        }
+                                                        else console.log("\nFAKE SELL "+unitsSold+" units from "+code+":"+symbol+"  worth  "+ previous+ " giving "+sales)   
+                                                    }
+
+
+
+
+                                                    else if(aTrans[3]==="WRITEOFF") {
+                                                        let iAssetEntry = lookupAsset(symbol);
+                                                        let previous = currentAssets[symbol];
+                                                        let sales = aTrans[i];
+                                                        let unitsSold = parseInt(aTrans[4]);
+                                                        if(iAssetEntry>=0) {
+
+                                                            let jAsset = aAssets[iAssetEntry];
+                                                            let unitsRemain = jAsset.currentUnits-unitsSold;
+                                                            console.log("\nWRITEOFF "+unitsSold+" units from "+code+":"+symbol+"("+jAsset.currentUnits+")  worth  "+ previous+ " giving "+sales+  " leaving "+unitsRemain)   
+                                                        }
+                                                    }
                                                 }
-                                                
+
+                                                // ALL TRANSACTIONS
+                                                aAccount[i].saldo = saldo;                                                
                                                 console.log( nLine[i] + ":  "+aAccount[i].init+ " + "+aAccount[i].credit+ "  - "+aAccount[i].debit+ " = "+aAccount[i].saldo);
                                                 
                                             }
@@ -575,7 +648,7 @@ function dropHandler(ev) {
     <TABLE class="sheet">
         <THEAD>
             <TR class="trow">
-                <TH class="symb">Symbol&nbsp;</TH><TH class="symb">Initial&nbsp;</TH><TH class="symb">Credit&nbsp;</TH><TH class="symb">Debit&nbsp;</TH><TH class="symb">Close&nbsp;</TH><TH class="text">Name&nbsp;</TH>
+                <TH class="symb">Symbol&nbsp;</TH><TH class="symb">Initial&nbsp;</TH><TH class="symb">Credit&nbsp;</TH><TH class="symb">Debit&nbsp;</TH><TH class="symb">Earned&nbsp;</TH><TH class="symb">Tax&nbsp;</TH><TH class="symb">Saldo&nbsp;</TH>
             </TR>
         </THEAD>
         <TBODY id="partners">
