@@ -95,13 +95,16 @@ async function bucketDownload(bpStorage,partner,client,year,jData,startSessionCB
     } catch(e) {}
     if(debug>1) console.log('0030 plainFileIO.bucketDownload read root/entity/client/year/txnPattern.txt; '+txnPattern)
 
+    if (process && process.env) {
+      let slash = Slash; if(process.env.slash) slash = process.env.slash;
+      if(process.env.localPath) {
 
+            let localPath = process.env.localPath;
 
+            // GH20250212 read local main.json from a file
 
-            // GH20250212 read local main.json
-
-            // read from NEXTCLOUD Documents Privat
-            const dataFilePath = process.env.localPath+client+Backslash+year+Backslash+MAIN;
+            // read from NEXTCLOUD Documents from localPath folder
+            const dataFilePath = localPath+client+slash+year+slash+MAIN;
             try {
                 let session = {};
 
@@ -127,7 +130,8 @@ async function bucketDownload(bpStorage,partner,client,year,jData,startSessionCB
 
               if(debug) console.log("0033 plainFileIO.bucketDownload plain local file "+dataFilePath+" read FAILED");
             }
-        
+        }
+      }    
       return null; // synch caller gets null value
 }
 module.exports['bucketDownload']=bucketDownload;
@@ -142,21 +146,30 @@ async function bucketUpload(bpStorage,partner,client,year,jData,startSessionCB,c
   console.log("0070 plainFileIO.bucketUpload plain local file write ENTER");
 
 
-      // sanitize input
-        let sClient = client.replace('.','_');
+    // sanitize input
+    let sClient = client.replace('.','_');
 
-        downloadUrl = "plainFileIO.bucketUpload sClient="+sClient;
+    downloadUrl = "plainFileIO.bucketUpload sClient="+sClient;
 
-        let iYear = parseInt(year);
+    let iYear = parseInt(year);
 
-        downloadUrl = "plainFileIO.bucketUpload sClient="+sClient+"   iYear="+iYear;
-        const strFile = sClient+Backslash+iYear+Backslash+MAIN
+    downloadUrl = "plainFileIO.bucketUpload sClient="+sClient+"   iYear="+iYear;
 
+    if (process && process.env) {
+      
+      let slash = Slash; 
+      if(process.env.slash) slash = process.env.slash;
+      const strFile = sClient+slash+iYear+slash+MAIN;
+
+      if(process.env.localPath) {
+
+            // must be termineated with a slash
+            let localPath = process.env.localPath;
 
             // GH20250212 write local main.json
 
             // write to NEXTCLOUD Documents Privat
-            const dataFilePath = process.env.localPath+strFile;
+            const dataFilePath = localPath+strFile;
             try {
 
 
@@ -170,8 +183,9 @@ async function bucketUpload(bpStorage,partner,client,year,jData,startSessionCB,c
 
               if(debug) console.log("0073 plainFileIO.bucketUpload plain local file "+dataFilePath+" write FAILED");
             }      
-  
-  return downloadUrl;
+      }
+    }
+    return downloadUrl;
 }
 module.exports['bucketUpload']=bucketUpload;
 
