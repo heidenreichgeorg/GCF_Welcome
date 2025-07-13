@@ -14,6 +14,9 @@ const MAIN = "main.json";
 import { Slash, Backslash } from './serverSession'
 
 
+//const { MongoClient, ServerApiVersion } = require('mongodb');
+
+
 const https = require('https');
 const bpStorage=null;
 
@@ -96,16 +99,30 @@ async function bucketDownload(bpStorage,partner,client,year,jData,startSessionCB
     if(debug>1) console.log('0030 plainFileIO.bucketDownload read root/entity/client/year/txnPattern.txt; '+txnPattern)
 
     if (process && process.env) {
-      let slash = Slash; if(process.env.slash) slash = process.env.slash;
+      
+      let slash = Slash; 
+      if(process.env.slash) slash = process.env.slash;
+
+
       if(process.env.localPath) {
 
+            // read from NEXTCLOUD Documents from localPath folder
             let localPath = process.env.localPath;
 
             // GH20250212 read local main.json from a file
-
-            // read from NEXTCLOUD Documents from localPath folder
             const dataFilePath = localPath+client+slash+year+slash+MAIN;
+
             try {
+
+
+                let dbcred = process.env.dbcred;
+                let dbinst = process.env.dbinst;
+                if(dbcred && dbinst) {
+                  let strMongoDB = "mongodb+srv://"+dbcred+"@"+dbinst+"?retryWrites=true&w=majority&appName=Sampling"
+                  console.log(strMongoDB);
+                }
+
+
                 let session = {};
 
                 //Read data from the JSON file
@@ -137,6 +154,13 @@ async function bucketDownload(bpStorage,partner,client,year,jData,startSessionCB
 module.exports['bucketDownload']=bucketDownload;
 
 
+
+
+
+
+
+
+
 const jMetadata = { contentType: 'application/json' };
 
 async function bucketUpload(bpStorage,partner,client,year,jData,startSessionCB,callRes) {
@@ -157,13 +181,62 @@ async function bucketUpload(bpStorage,partner,client,year,jData,startSessionCB,c
 
     if (process && process.env) {
       
+
+
+
+
+
+
       let slash = Slash; 
       if(process.env.slash) slash = process.env.slash;
       const strFile = sClient+slash+iYear+slash+MAIN;
 
       if(process.env.localPath) {
+/*
+                let dbcred = process.env.dbcred;
+                let dbinst = process.env.dbinst;
+                if(dbcred && dbinst) {
+                  
+                  const uri = "mongodb+srv://"+dbcred+"@"+dbinst+"?retryWrites=true&w=majority&appName=Sampling"
 
-            // must be termineated with a slash
+
+
+                  // Create a MongoClient with a MongoClientOptions object to set the Stable API version
+                  const client = new MongoClient(uri, {
+                    serverApi: {
+                      version: ServerApiVersion.v1,
+                      strict: true,
+                      deprecationErrors: true,
+                    }
+                  });
+
+                  async function run() {
+                    try {
+                      // Connect the client to the server	(optional starting in v4.7)
+                      await client.connect();
+                      // Send a ping to confirm a successful connection
+                      await client.db("admin").command({ ping: 1 });
+                      console.log("Pinged your deployment. You successfully connected to MongoDB!");
+                    } finally {
+                      // Ensures that the client will close when you finish/error
+                      await client.close();
+                    }
+                  }
+                  run().catch(console.dir);
+
+                }
+
+*/
+
+
+
+
+
+
+
+
+
+            // must be terminated with a slash
             let localPath = process.env.localPath;
 
             // GH20250212 write local main.json
@@ -176,7 +249,7 @@ async function bucketUpload(bpStorage,partner,client,year,jData,startSessionCB,c
 	            // Write the updated data to the JSON file
     	        let writeResult = await fs.promises.writeFile(dataFilePath, JSON.stringify(jData));
 
-              if(debug) console.log("0072 plainFileIO.bucketUpload plain local file write DONE");
+              if(debug) console.log("0072 plainFileIO.bucketUpload plain local file write DONE: "+dataFilePath);
 
 
             } catch(e) {
