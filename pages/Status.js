@@ -367,7 +367,7 @@ export default function Status() {
                 <div className="FIELD SYMB" onClick={(e)=>displayAccount(tx3)}> {tx3}</div>
                 <div className="FIELD DASH"> &nbsp;</div>
                 <div className="FIELD DATE"> {d}</div>
-                <div className="FIELD SNAM"> {n}</div>
+                <div className="FIELD NAME"> {n}</div>
                 <div className="FIELD SNAM"> {r}</div>
                 <div className="FIELD NAME"> {t}</div>
                 <div className="FIELD">{l}</div>
