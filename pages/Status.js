@@ -369,7 +369,7 @@ export default function Status() {
                 <div className="FIELD DATE"> {d}</div>
                 <div className="FIELD SNAM"> {n}</div>
                 <div className="FIELD SNAM"> {r}</div>
-                <div className="FIELD SNAM"> {t}</div>
+                <div className="FIELD NAME"> {t}</div>
                 <div className="FIELD">{l}</div>
                 {click==null ? (<div className="FIELD SEP"> &nbsp;</div>) : (
                 <div className="FIELD"  onClick={(() => click())}>&nbsp;.&nbsp;</div>
