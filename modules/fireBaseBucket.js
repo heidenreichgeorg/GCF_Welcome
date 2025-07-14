@@ -426,7 +426,7 @@ export function loadFBConfig(dir,config) {
         //    sec:
         
         
-            console.log("0050 loadFBConfig from "+fileName);
+            console.log("0054 loadFBConfig from "+fileName);
             try {
               let configStr = fs.readFileSync(fileName, 'utf8');
               if(configStr) {

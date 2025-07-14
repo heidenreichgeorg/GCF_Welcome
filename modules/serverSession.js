@@ -72,7 +72,7 @@ export function startSessionJSON(session,res) {
 
     // 20221207
     if(res) {
-        console.log("0046 startSessionJSON("+newSession.client+","+newSession.year+")");         
+        console.log("0056 startSessionJSON("+newSession.client+","+newSession.year+")");         
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers","Origin, X-Requested-With, Content-Type, Accept, Authorization");
         res.json(session);

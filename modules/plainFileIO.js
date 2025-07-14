@@ -51,13 +51,13 @@ function getFileContents(fileName) {
 
 // ONLY FOR BROWSERS gsutil cors set cors.json gs://bookingpapages-a0a7c -
 
-function makeSession(body,partner,client,year,txnPattern) {
+function makeSession(strBody,partner,client,year,txnPattern) {
 
       let session = {}
 
       try {
         // build session object
-          session = JSON.parse(body);
+          session = JSON.parse(strBody);
       } catch(err) {}
         
       // GH202501
@@ -68,13 +68,16 @@ function makeSession(body,partner,client,year,txnPattern) {
       // GH202311
       // in case entity/CLIENT/YEAR/txnPattern.txt JSON file exists
       // session.txnPattern will be overwritten with that file
-      if(txnPattern) try {
-        // GH20231127 using jConfig, add local txnPattern data
-        session.txnPattern = JSON.parse(txnPattern);
-        console.log("0036 plainFileIO.makeSession "+JSON.stringify(Object.keys(session)));
-      } catch(err) {
-        console.error("0037 plainFileIO.makeSession txnPattern="+txnPattern+" ERR "+err.toString());
+      if(txnPattern) {
+        try {
+          // GH20231127 using jConfig, add local txnPattern data
+          session.txnPattern = JSON.parse(txnPattern);
+          console.log("0036 plainFileIO.makeSession set txnPattern keys="+JSON.stringify(Object.keys(session)));
+        } catch(err) {
+          console.error("0037 plainFileIO.makeSession txnPattern="+txnPattern+" ERR "+err.toString());
+        }
       }
+      else console.log("0058 plainFileIO.makeSession by reading these keys="+JSON.stringify(Object.keys(session)));
 
       return session;
 }
@@ -90,13 +93,13 @@ async function bucketDownload(bpStorage,partner,client,year,jData,startSessionCB
     } catch(e) {}
 
     const strChild = Slash+sClient+Slash+iYear+Slash+MAIN;  
-    if(debug) console.log('0030 plainFileIO.bucketDownload strChild='+strChild);
+    if(debug) console.log('0044 plainFileIO.bucketDownload strChild='+strChild);
 
     
     let txnPattern = null;
     try { txnPattern = await getFileContents(jData.root+"entity/"+client+"/"+year+"/txnPattern.txt");
     } catch(e) {}
-    if(debug>1) console.log('0030 plainFileIO.bucketDownload read root/entity/client/year/txnPattern.txt; '+txnPattern)
+    if(debug>1) console.log('0034 plainFileIO.bucketDownload read root/entity/client/year/txnPattern.txt; '+txnPattern)
 
     if (process && process.env) {
       
@@ -111,6 +114,7 @@ async function bucketDownload(bpStorage,partner,client,year,jData,startSessionCB
 
             // GH20250212 read local main.json from a file
             const dataFilePath = localPath+client+slash+year+slash+MAIN;
+            if(debug>1) console.log('0044 plainFileIO.bucketDownload read root/entity/client/year/txnPattern.txt; '+txnPattern)
 
             try {
 
@@ -129,18 +133,20 @@ async function bucketDownload(bpStorage,partner,client,year,jData,startSessionCB
                 let strBody = await fs.promises.readFile(dataFilePath,  'utf8');
                 //  fs.readFileSync(fileName, 'utf8');
 
-                if(debug) console.log("0032 plainFileIO.bucketDownload plain local file read DONE");
+                if(debug) console.log("0046 plainFileIO.bucketDownload plain local file read "+dataFilePath+" DONE");
+                // GH20250714
+                // console.log("0046 plainFileIO.bucketDownload plain  file read "+strBody);
 
                 session = makeSession(strBody,partner,client,year,txnPattern)
 
-                if(debugReport) console.dir("0034 plainFileIO.download session "+JSON.stringify(session));
+                if(debugReport) console.dir("0048 plainFileIO.bucketDownload session "+JSON.stringify(session));
 
                 // AVOID double HEADERS 
                 startSessionCB(session,callRes,jData); 
                 // 3rd param to startSessionCB JData is from config = 1st arg on calling plainFileIO.js
     
 
-                if(debugReport) console.dir("0034 plainFileIO.download returned from startSessionCB ");
+                if(debugReport) console.dir("0050 plainFileIO.bucketDownload returned from startSessionCB ");
 
                 return null;
             } catch(e) {
