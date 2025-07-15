@@ -72,9 +72,9 @@ function makeSession(strBody,partner,client,year,txnPattern) {
         try {
           // GH20231127 using jConfig, add local txnPattern data
           session.txnPattern = JSON.parse(txnPattern);
-          console.log("0036 plainFileIO.makeSession set txnPattern keys="+JSON.stringify(Object.keys(session)));
+          console.log("0050 plainFileIO.makeSession set txnPattern keys="+JSON.stringify(Object.keys(session)));
         } catch(err) {
-          console.error("0037 plainFileIO.makeSession txnPattern="+txnPattern+" ERR "+err.toString());
+          console.error("0053 plainFileIO.makeSession txnPattern="+txnPattern+" ERR "+err.toString());
         }
       }
       else console.log("0058 plainFileIO.makeSession by reading these keys="+JSON.stringify(Object.keys(session)));
@@ -85,36 +85,38 @@ function makeSession(strBody,partner,client,year,txnPattern) {
 
 async function bucketDownload(bpStorage,partner,client,year,jData,startSessionCB,callRes) {
 
-    if(debug) console.log('0030 plainFileIO.bucketDownload jData '+JSON.stringify(jData))
+    if(debug) console.log('0038 plainFileIO.bucketDownload jData '+JSON.stringify(jData))
         let sClient = client.replace('.','_');
     let iYear = 0
     try {
         iYear = parseInt(year);
     } catch(e) {}
 
-    const strChild = Slash+sClient+Slash+iYear+Slash+MAIN;  
-    if(debug) console.log('0044 plainFileIO.bucketDownload strChild='+strChild);
-
-    
-    let txnPattern = null;
-    try { txnPattern = await getFileContents(jData.root+"entity/"+client+"/"+year+"/txnPattern.txt");
-    } catch(e) {}
-    if(debug>1) console.log('0034 plainFileIO.bucketDownload read root/entity/client/year/txnPattern.txt; '+txnPattern)
-
     if (process && process.env) {
       
       let slash = Slash; 
       if(process.env.slash) slash = process.env.slash;
 
+        if(process.env.localPath) {
 
-      if(process.env.localPath) {
 
             // read from NEXTCLOUD Documents from localPath folder
             let localPath = process.env.localPath;
 
+            
+            let txnFileName = process.env.localPath+client+"/"+year+"/txnPattern.txt";
+            let txnPattern = null;
+            try { txnPattern = await getFileContents(txnFileName);
+            } catch(e) {}
+
+
+            if(debug>1) console.log('0040 plainFileIO.bucketDownload read '+txnFileName+' --> '+txnPattern)
+
+
+
             // GH20250212 read local main.json from a file
             const dataFilePath = localPath+client+slash+year+slash+MAIN;
-            if(debug>1) console.log('0044 plainFileIO.bucketDownload read root/entity/client/year/txnPattern.txt; '+txnPattern)
+            if(debug>1) console.log('0042 plainFileIO.bucketDownload read root/entity/client/year/txnPattern.txt; '+txnPattern)
 
             try {
 
@@ -133,20 +135,20 @@ async function bucketDownload(bpStorage,partner,client,year,jData,startSessionCB
                 let strBody = await fs.promises.readFile(dataFilePath,  'utf8');
                 //  fs.readFileSync(fileName, 'utf8');
 
-                if(debug) console.log("0046 plainFileIO.bucketDownload plain local file read "+dataFilePath+" DONE");
+                if(debug) console.log("0044 plainFileIO.bucketDownload plain local file read "+dataFilePath+" DONE");
                 // GH20250714
                 // console.log("0046 plainFileIO.bucketDownload plain  file read "+strBody);
 
                 session = makeSession(strBody,partner,client,year,txnPattern)
 
-                if(debugReport) console.dir("0048 plainFileIO.bucketDownload session "+JSON.stringify(session));
+                if(debugReport) console.dir("0046 plainFileIO.bucketDownload session "+JSON.stringify(session));
 
                 // AVOID double HEADERS 
                 startSessionCB(session,callRes,jData); 
                 // 3rd param to startSessionCB JData is from config = 1st arg on calling plainFileIO.js
     
 
-                if(debugReport) console.dir("0050 plainFileIO.bucketDownload returned from startSessionCB ");
+                if(debugReport) console.dir("0048 plainFileIO.bucketDownload returned from startSessionCB ");
 
                 return null;
             } catch(e) {
@@ -286,7 +288,7 @@ export function loadFBConfig(dir,config) {
         //    sec:
         
         
-            console.log("0050 loadFBConfig from "+fileName);
+            console.log("0054 loadFBConfig from "+fileName);
             try {
               let configStr = fs.readFileSync(fileName, 'utf8');
               if(configStr) {
