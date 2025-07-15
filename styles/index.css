@@ -79,10 +79,10 @@ input[type=number] {
 
 .DASH     { width: 0.8rem; text-align: center; border-left-color: #817137; border-left-style: solid; border-left-width: 1px; }		
 .SEP      { width: 0.8rem; text-align: center; }		
-.TRASH    { width: 1rem; text-align: center; font-size:2em; height:17px; vertical-align: top;}		
+.TRASH    { width: 1rem;   text-align: center; font-size:2em; height:17px; vertical-align: top;}		
 .TAG      { width: 1.8rem; text-align: left;  }		
-.SYMB     { width: 3rem;  text-align: left; }		
-.DATE     { width: 4rem;  text-align: center; }		
+.SYMB     { width: 3rem;   text-align: left; }		
+.DATE     { width: 4.3rem; text-align: center; }		
 .MOAM     { width: 5.2rem; text-align: right; font-family:monospace; font-size:1.3em;}
 .TEAM     { width: 5.3rem; text-align: right; }
 .SNAM     { width: 5.8rem; text-align: left; }		
