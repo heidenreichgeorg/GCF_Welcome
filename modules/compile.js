@@ -526,7 +526,8 @@ export function compile(sessionData) {
                                     // process YIELD,INVEST,SELL,WRITEOFF,ACCUMULATE (REGULAR)
                                     if(refAcct==='INVEST') {
                                         try {
-                                            var gain = result[D_FixAss][idnt].gain;
+                                            var gain = "0";
+                                            try { gain = result[D_FixAss][idnt].gain; } catch(e) {}
 
                                             var orig = bigAssetValueChange(aLine,iAssets,result[D_XBRL]);
                                             try {
@@ -553,7 +554,8 @@ export function compile(sessionData) {
 
                                     else if(refAcct==='SELL') {
 
-                                        var gain = result[D_FixAss][idnt].gain;
+                                        var gain = "0";
+                                        try { gain = result[D_FixAss][idnt].gain; } catch(e) {}
 
                                         var iSel = parseInt(aLine[4].trim());
                                         var iamnt = bigAssetValueChange(aLine,iAssets,result[D_XBRL]);  // asset value change
@@ -650,7 +652,7 @@ export function compile(sessionData) {
                                                 var type =  result[D_FixAss][idnt].type;
                                                 var orig =  result[D_FixAss][idnt].orig;
                                                 var nmbr =  result[D_FixAss][idnt].nmbr;
-                                                var gain =  result[D_FixAss][idnt].gain;
+                                                var gain =  "0"; try { gain = result[D_FixAss][idnt].gain; } catch(e) {}
                                                 var iCost = BigInt(result[D_FixAss][idnt].cost);
                                                 var iCurr = BigInt(result[D_FixAss][idnt].rest);
                                                 var iRest=iCurr;
@@ -689,7 +691,7 @@ export function compile(sessionData) {
                                                 var type = result[D_FixAss][idnt].type;
                                                 var iVal = result[D_FixAss][idnt].orig;
                                                 var nmbr =  result[D_FixAss][idnt].nmbr;
-                                                var gain =  result[D_FixAss][idnt].gain;
+                                                var gain = "0"; try { gain = result[D_FixAss][idnt].gain; } catch(e) {}
                                                 var icurr = BigInt(result[D_FixAss][idnt].rest);
 
                                                 // WRITEOFF type of dividend payment reduces the REST value
