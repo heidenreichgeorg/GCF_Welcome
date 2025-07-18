@@ -147,6 +147,7 @@ function dropHandler(ev) {
                 let uiHeader=document.getElementById("headers");
                 let uiAssets=document.getElementById("assets");
                 let uiTransactions=document.getElementById("transactions");
+                let uiPatterns=document.getElementById("patterns");
 
                 let isInitial=true;
                 let ready=0;
@@ -415,6 +416,38 @@ function dropHandler(ev) {
 */                                
                         }
                     )}
+
+                    let txnPattern = jData.txnPattern;
+                    let arrTxnKeys=Object.keys(txnPattern)
+                    for(let p=0;p<arrTxnKeys.length;p++) {
+
+                                let key = arrTxnKeys[p];
+                                let jPattern = txnPattern[key];
+                                let strPattern = JSON.stringify(jPattern.credit)+JSON.stringify(jPattern.debitA)+" AN "+JSON.stringify(jPattern.creditEQL)+JSON.stringify(jPattern.debit)
+
+                                let uiDiv=document.createElement('TR'); uiPatterns.append(uiDiv);
+                                let uiRow=document.createElement('TR'); uiPatterns.append(uiRow);
+                                let uiSpc=document.createElement('TD'); uiDiv.append(uiSpc);
+                                uiRow.className="trow";
+
+                                let uiKey=document.createElement('TD'); uiRow.append(uiKey);
+                                uiKey.innerHTML=key; uiKey.className="symb";
+
+                                let uiText=document.createElement('TD'); uiRow.append(uiText);
+                                uiText.innerHTML=jPattern.text; uiText.className="text";
+                                
+                                let uiSend=document.createElement('TD'); uiRow.append(uiSend);
+                                uiSend.innerHTML=jPattern.refCode; uiSend.className="text";
+
+                                let uiAcct=document.createElement('TD'); uiRow.append(uiAcct);
+                                uiAcct.innerHTML=jPattern.refAcct; uiAcct.className="text";
+
+                                let uiTxt2=document.createElement('TD'); uiRow.append(uiTxt2);
+                                uiTxt2.innerHTML=jPattern.txt2; uiTxt2.className="text";
+
+                                let uiTxn=document.createElement('TD'); uiRow.append(uiTxn);
+                                uiTxn.innerHTML=strPattern; uiTxn.className="text";
+                    }
                 }
 
                 console.log('PROCESSED');
@@ -670,6 +703,15 @@ function dropHandler(ev) {
             </TR>
         </THEAD>
         <TBODY id="transactions">
+        </TBODY>
+    </TABLE>
+    <TABLE class="sheet">
+        <THEAD>
+            <TR class="trow">
+                <TH class="symb">Key&nbsp;</TH><TH class="text">Text&nbsp;</TH><TH class="text">Sender&nbsp;</TH><TH class="text">Account&nbsp;</TH><TH class="text">Txt2&nbsp;</TH><TH class="text">TXN&nbsp;</TH>
+            </TR>
+        </THEAD>
+        <TBODY id="patterns">
         </TBODY>
     </TABLE>
 </div>
