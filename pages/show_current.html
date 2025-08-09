@@ -4,8 +4,9 @@
 .rawt { padding: 9px; margin: 3px;  min-height: 19px; font-size: 8pt; font-family: Bahnschrift,monospace;   color:#030f94; background-color: #dfdff4;}        
 .sheet { padding: 9px; margin: 3px;  min-height: 19px; font-size: 10pt; font-family: Bahnschrift,monospace; color:#030f94; background-color: #dfdff4;}        
 .trow   { margin-top: 7px; }    
-.symb   { text-align:left;  border-radius: 6px; border:1px solid #030f94; }   
-.amount { text-align:right; border-radius: 6px; border:1px solid #030f94; }   
+.symb   { text-align:left;   border-radius: 6px; border:1px solid #030f94; }   
+.button { text-align:center; font-size: 10pt; font-family: Bahnschrift,monospace; color:#030f94; }   
+.amount { text-align:right;  border-radius: 6px; border:1px solid #030f94; }   
 .xbrl { min-width:40em; max-width:40em;  }     
 .text { min-width:20em; max-width:20em; border-radius: 6px; border:1px solid #030f94; }     
     </style>
@@ -16,6 +17,20 @@ function cents20EU(amount) {
     if(!amount) return "0";
     else return cents2EU(amount);
 }
+
+function showTXN(jTXN,e) { 
+    
+                            // console.log("TXN #"+JSON.stringify(jTXN)) 
+
+                            let queue=document.getElementById("pending");
+                            let newRow=document.createElement('TR'); queue.append(newRow);
+                            let nxtTXN=document.createElement('TD'); newRow.append(nxtTXN);
+                            nxtTXN.innerHTML=JSON.stringify(jTXN);
+                                
+
+                        }
+
+function makeShowTXN(jTXN) { return (e)=>{showTXN(jTXN,e)} }
 
 function cents2EU(amount) { 
     let cents=amount; 
@@ -417,6 +432,7 @@ function dropHandler(ev) {
                         }
                     )}
 
+                    // show available transaction patterns
                     let txnPattern = jData.txnPattern;
                     let arrTxnKeys=Object.keys(txnPattern)
                     for(let p=0;p<arrTxnKeys.length;p++) {
@@ -426,26 +442,33 @@ function dropHandler(ev) {
                                 let strPattern = JSON.stringify(jPattern.credit)+JSON.stringify(jPattern.debitA)+" AN "+JSON.stringify(jPattern.creditEQL)+JSON.stringify(jPattern.debit)
 
                                 let uiDiv=document.createElement('TR'); uiPatterns.append(uiDiv);
-                                let uiRow=document.createElement('TR'); uiPatterns.append(uiRow);
+                                let uiInfoRow=document.createElement('TR'); uiPatterns.append(uiInfoRow);
+                                let uiDialog=document.createElement('TR'); uiPatterns.append(uiDialog);
                                 let uiSpc=document.createElement('TD'); uiDiv.append(uiSpc);
-                                uiRow.className="trow";
+                                uiInfoRow.className="trow";
+                                uiDialog.className="trow"; // HIDE
 
-                                let uiKey=document.createElement('TD'); uiRow.append(uiKey);
-                                uiKey.innerHTML=key; uiKey.className="symb";
+                                let uiKey=document.createElement('TD'); uiInfoRow.append(uiKey);
+                                uiKey.className="button";
 
-                                let uiText=document.createElement('TD'); uiRow.append(uiText);
+                                let uiButton=document.createElement('INPUT'); uiKey.append(uiButton);
+                                uiButton.value=key; uiButton.type='BUTTON';  uiButton.className="button";
+                                uiButton.addEventListener("click", makeShowTXN(jPattern));
+
+                                let uiText=document.createElement('TD'); uiInfoRow.append(uiText);
                                 uiText.innerHTML=jPattern.text; uiText.className="text";
                                 
-                                let uiSend=document.createElement('TD'); uiRow.append(uiSend);
+                                let uiSend=document.createElement('TD'); uiInfoRow.append(uiSend);
                                 uiSend.innerHTML=jPattern.refCode; uiSend.className="text";
 
-                                let uiAcct=document.createElement('TD'); uiRow.append(uiAcct);
+                                let uiAcct=document.createElement('TD'); uiInfoRow.append(uiAcct);
                                 uiAcct.innerHTML=jPattern.refAcct; uiAcct.className="text";
 
-                                let uiTxt2=document.createElement('TD'); uiRow.append(uiTxt2);
+                                let uiTxt2=document.createElement('TD'); uiInfoRow.append(uiTxt2);
                                 uiTxt2.innerHTML=jPattern.txt2; uiTxt2.className="text";
 
-                                let uiTxn=document.createElement('TD'); uiRow.append(uiTxn);
+                                // uiDialog
+                                let uiTxn=document.createElement('TD'); uiInfoRow.append(uiTxn);
                                 uiTxn.innerHTML=strPattern; uiTxn.className="text";
                     }
                 }
@@ -600,7 +623,7 @@ function dropHandler(ev) {
 
 
 
-
+// show historic transactions
                     if(aTransactions.length>0) {
                         aTransactions.forEach((strAction,i)=>{
                             if(i<20) {
@@ -712,6 +735,15 @@ function dropHandler(ev) {
             </TR>
         </THEAD>
         <TBODY id="patterns">
+        </TBODY>
+    </TABLE>
+    <TABLE class="sheet">
+        <THEAD>
+            <TR class="trow">
+                <TH class="text"></TH>
+            </TR>
+        </THEAD>
+        <TBODY id="pending">
         </TBODY>
     </TABLE>
 </div>
