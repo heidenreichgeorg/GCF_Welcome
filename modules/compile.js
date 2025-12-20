@@ -2,6 +2,10 @@
 // all JSONs - substitute INVEST with ACCUMULATE if an extra value is augmenting an existing asset
 
 
+// OPEN
+//generate monthly SALDO for partner account - inserting a virtual booking to an interest members
+// ! assume at least one transaction per month !!
+
 
 // SETTING THIS WILL VIOLATE PRIVACY AT THE ADMIN CONSOLE !!! 
 const debugEquity=false;
@@ -27,6 +31,8 @@ const debugRegular=null;
 // table parsing
 const CEND= '|';
 const CSEP = ';';
+
+const J_DATE = 1; // date column
 const J_ACCT = 6; // first account
 const J_MINROW=7;
 
@@ -337,10 +343,13 @@ export function compile(sessionData) {
                 var iEqLiab=0;
                 var iTotal=0;
 
+                var lMonth=1; 
+                // counter for Interests
+
                 // print all lines
                 aoaCells.forEach((row,lineCount) => {
 
-                    
+                    let isLastLine = (lineCount+1>=aoaCells.length)
                     
                     if(debugReport>3) console.log("0110 compile.compile "+JSON.stringify(row));
                         
@@ -439,10 +448,14 @@ export function compile(sessionData) {
                         // tax subject identifier
                         result[D_SteuerID]=row;
                     }
-                    else if(key && parseInt(key)>0) {                    
+                    else if(key && parseInt(key)>0) {             
+                        
+                        
+
                         const MINTXN=5; // elements in a TXN
                         var jHistory = result[D_History];
-                        //if(debug>1) console.log("BOOK "+row.join(CSEP));
+                        //if(debug>1)        console.log("0348 BOOK "+row.join(CSEP));
+
                         if(row.length>MINTXN && result[D_Schema].Names){
                             try {
                                 var aLine = row;
@@ -467,7 +480,7 @@ export function compile(sessionData) {
                                             var xdesc=""+xColumn; if(gDesc && gDesc[xColumn]) xdesc=gDesc[xColumn];
                                             if(rawName && rawName.length>1) {
                                                 result[D_Balance][rawName] = Account.makeAccount(rawName,xbrl,xdesc,xColumn);
-                                                if(debugReport) console.log("0358 makeAccount("+rawName+","+xbrl+","+xdesc+","+xColumn+")");
+                                                if(debugReport) console.log("0356 makeAccount("+rawName+","+xbrl+","+xdesc+","+xColumn+")");
                                             }
                                             else if(debugReport) console.log("0357 compile could not use makeAccount(xbrl="+xbrl+" xdesc="+xdesc+" xColumn="+xColumn+")");
 
@@ -475,270 +488,324 @@ export function compile(sessionData) {
                                         };
                                     } catch(err) { console.dir("0359 FIRST REGULAR TXN INPUT "+err); }
                                 }
-                                if(aLine.length>0) {
+
+                                if(aLine.length>0) { // transaction line must be an array
                                     var column=0;
-                                    aLine.forEach(strAmount => {
-                                        if(debugReport>3) console.log("0360 init "+strAmount);
-                                        if(column>=J_ACCT && strAmount && strAmount.length>0) {
-                                            var acName = gNames[column];
-                                            if(acName && acName.length>1) {
-                                                if(firstLine) {
-                                                    // initialize the values with 0,00 if nothing is specified
-                                                    if(strAmount==null || strAmount.length==0) strAmount="0";
-                                                }
-                                                try {
-                                                    var account = result[D_Balance][acName];
-                                                    if(account && account.xbrl) {
-                                                        const iAmount = Sheets.bigEUMoney(strAmount);
-                                                        if(firstLine) {
-                                                            result[D_Balance][acName] = Account.openAccount(account,iAmount);
-                                                            if(debug>2) console.log("0366 open "+strAmount+"("+iAmount+")"
-                                                                +" for "+gNames[column]
-                                                                +"  = "+JSON.stringify(result[D_Balance][acName])
-                                                            );
-                                                        } else { 
-                                                            result[D_Balance][acName] = Account.add(account,iAmount);
-                                                            if(debug>2) console.log("0368 add  "+strAmount+"("+iAmount+")"
-                                                            +" to  "+gNames[column]
-                                                            +"  = "+JSON.stringify(result[D_Balance][acName]));
+
+                                    let strDate = aLine[J_DATE];
+                                    let aDate=strDate.split('-');
+                                    let iMonth=0; if(aDate.length>0 && aDate[1] && parseInt(aDate[1])>0) iMonth=parseInt(aDate[1]);
+
+                                    if(iMonth>0 || firstLine>0) // proper month>0 OR firstLine
+                                    {
+
+                                                if(iMonth>0) {
+                                                        
+                                                        if((iMonth>lMonth) || isLastLine) {
+                                                            console.log("0358 NEXT ("+iMonth+">"+lMonth+")");
+                                                            lMonth++; // repeat until lMonth === iMonth !! 
+                                                            // assume at least one transaction per month !!
+
+                                                            // book interest for certain EQLIAB accounts
+                                                            // i=4% means monthly factor of 1,0033
+                                                            const fourPercent = 10033; // for tenthousand
+                                                            if(iEqLiab>0) {
+                                                                for(let eqVar=iEqLiab+1;eqVar<iTotal;eqVar++) {
+                                                                    
+                                                                    let acName=gNames[eqVar];
+                                                                    if(acName && acName.length>1) {
+                                                                        var account = result[D_Balance][acName];
+                                                                        var xbrl = result[D_XBRL][eqVar];
+                                                                        if(xbrl=='de-gaap-ci_bs.eqLiab.equity.subscribed.limitedLiablePartners.VK') {
+                                                                            let bigSaldo = Account.bigSaldo(account);
+                                                                            console.log("0358 INTEREST "+ acName+"  "+bigSaldo+ " + "+bigSaldo*33n /10000n);
+                                                                        }
+                                                                    }
+                                                                }
+                                                            }
                                                         }
+                                                }
+
+
+                                        //if(debug) 
+                                            console.log("0358 BOOK ("+iMonth+")"+row.join(CSEP));
+
+
+                                        // NORMAL TRANSACTION PROCESSING: DISTRIBUTE TO EACH ACCOUNT
+                                        aLine.forEach(strAmount => {
+                                            if(debugReport>3) console.log("0360 init "+strAmount);
+                                            if(column>=J_ACCT && strAmount && strAmount.length>0) {
+                                                var acName = gNames[column];
+                                                if(acName && acName.length>1) {
+                                                    if(firstLine) {
+                                                        // initialize the values with 0,00 if nothing is specified
+                                                        if(strAmount==null || strAmount.length==0) strAmount="0";
+                                                       console.log("0358 OPEN "+row.join(CSEP));
                                                     }
-                                                } catch(err) { console.dir("0369 REGULAR TXN INPUT "+err); }
+                                                    
+                                                    try {
+                                                        var account = result[D_Balance][acName];
+                                                        if(account && account.xbrl) {
+                                                            const iAmount = Sheets.bigEUMoney(strAmount);
+                                                            if(firstLine) {
+                                                                result[D_Balance][acName] = Account.openAccount(account,iAmount);
+                                                                if(debug>2) console.log("0366 open "+strAmount+"("+iAmount+")"
+                                                                    +" for "+gNames[column]
+                                                                    +"  = "+JSON.stringify(result[D_Balance][acName])
+                                                                );
+                                                            } else { 
+                                                                result[D_Balance][acName] = Account.add(account,iAmount);
+                                                                if(debug>2) console.log("0368 add  "+strAmount+"("+iAmount+")"
+                                                                +" to  "+gNames[column]
+                                                                +"  = "+JSON.stringify(result[D_Balance][acName]));
+                                                            }
+                                                        }
+                                                    } catch(err) { console.dir("0369 REGULAR TXN INPUT "+err); }
+                                                }
                                             }
-                                        }
-                                        column++;
-                                    })
-                                } else console.error("0367 Asset Line is not an array "+JSON.stringify(aLine));
-                                firstLine=null;               
-                                
-                                
-                                // Schema for asset line 2697211	2021-01-19	BAY001	INVEST	200	BAYR_1
-                                let  refAcct = (aLine[3] && ((aLine[3].trim().length)>1)) ? aLine[3].trim() : null;
-                                if(refAcct) {
-                                    let iAcc=iAccount(refAcct,result[D_Schema].Names);
-                                    var date = aLine[1].trim();
-                                    var type = aLine[2].trim();
-                                    var nvst = aLine[3].trim();
-                                    var nmbr = aLine[4].trim();
-                                    var idnt = aLine[5].trim();
-                                    if(debug>1 && iAcc>=J_ACCT) console.log("0370 compile: known account("+refAcct+"):"+type+"  "+idnt+"  #"+iAcc);
-
-                                    // process YIELD,INVEST,SELL,WRITEOFF,ACCUMULATE (REGULAR)
-                                    if(refAcct==='INVEST') {
-                                        try {
-                                            var gain = "0";
-                                            try { gain = result[D_FixAss][idnt].gain; } catch(e) {}
-
-                                            var orig = bigAssetValueChange(aLine,iAssets,result[D_XBRL]);
-                                            try {
+                                            column++;
+                                        })
+                                    
 
 
-                                                var icost = bigCost(idnt,nmbr,orig);
-                    
+
+                                        // BOOK ASSETS
+                                        // Schema for asset line 2697211	2021-01-19	BAY001	INVEST	200	BAYR_1
+                                        let  refAcct = (aLine[3] && ((aLine[3].trim().length)>1)) ? aLine[3].trim() : null;
+                                        if(refAcct) {
+                                            let iAcc=iAccount(refAcct,result[D_Schema].Names);
+                                            var date = aLine[1].trim();
+                                            var type = aLine[2].trim();
+                                            var nvst = aLine[3].trim();
+                                            var nmbr = aLine[4].trim();
+                                            var idnt = aLine[5].trim();
+                                            if(debug>1 && iAcc>=J_ACCT) console.log("0370 compile: known account("+refAcct+"):"+type+"  "+idnt+"  #"+iAcc);
+
+                                            // process YIELD,INVEST,SELL,WRITEOFF,ACCUMULATE (REGULAR)
+                                            if(refAcct==='INVEST') {
+                                                try {
+                                                    var gain = "0";
+                                                    try { gain = result[D_FixAss][idnt].gain; } catch(e) {}
+
+                                                    var orig = bigAssetValueChange(aLine,iAssets,result[D_XBRL]);
+                                                    try {
+
+
+                                                        var icost = bigCost(idnt,nmbr,orig);
+                            
+                                                        result[D_FixAss][idnt]={"date":date, 
+                                                                                "type":type,
+                                                                                "orig":""+orig,
+                                                                                "nmbr":nmbr,
+                                                                                "idnt":idnt,
+                                                                                "rest":""+orig,
+                                                                                "cost":""+icost,
+                                                                                "gain":gain}; // GH20230202
+
+                                                    } catch(err) { console.dir("0375 SHEET LINE INVEST nvst="+nvst+" idnt="+idnt+" nmbr="+nmbr+"  orig="+orig+"  when making icost "+err); }
+
+                                                    if(debugAssets) console.log("0372 INVEST "+idnt+" for "+
+                                                        cents2EU(result[D_FixAss][idnt].rest)+ " for #"+nmbr+" at "+cents2EU(icost));
+
+                                                } catch(err) { console.dir("0365 SHEET LINE INVEST orig "+err); }
+                                            }
+
+                                            else if(refAcct==='SELL') {
+
+                                                var gain = "0";
+                                                try { gain = result[D_FixAss][idnt].gain; } catch(e) {}
+
+                                                var iSel = parseInt(aLine[4].trim());
+                                                var iamnt = bigAssetValueChange(aLine,iAssets,result[D_XBRL]);  // asset value change
+
+                                                var orig = BigInt(result[D_FixAss][idnt].orig);
+
+                                                // sales reduce number of assets and amount of asset value
+                                                var iNum = parseInt(result[D_FixAss][idnt].nmbr);
+                                                var nmbr = iNum-iSel;
+                                                var irest = BigInt(result[D_FixAss][idnt].rest);
+
+
+                                                // GH20240301
+                                                // REDUCE CURRENT COST FOR REMAINING PIECES OF THAT ASSET
+                                                // was var iremn = irest+iamnt;
+                                                var iremn = orig * BigInt(nmbr);
+
+
+                                                // reduce cost basis for price per piece
+                                                //var icost =bigCost(idnt,nmbr,orig);
+                                                var icost =bigCost(idnt,nmbr,iremn);
+                                                
+
+                                                // SELL
+                                                // GH20230923
+                                                // REDUCE INITIAL PRICE FOR REMAINING PIECES OF THAT ASSET
+                                                // GH20230923
+                                                orig= ((orig*BigInt(nmbr)*10n)+4n)/BigInt(iNum*10);
+
+
+                                                // GH20230923
+                                                // REDUCE CURRENT COST FOR REMAINING PIECES OF THAT ASSET
+
+                                                // OPEN
+                                                // MUST VERIFY existing identifier
                                                 result[D_FixAss][idnt]={"date":date, 
                                                                         "type":type,
                                                                         "orig":""+orig,
                                                                         "nmbr":nmbr,
                                                                         "idnt":idnt,
-                                                                        "rest":""+orig,
-                                                                        "cost":""+icost,
-                                                                        "gain":gain}; // GH20230202
-
-                                            } catch(err) { console.dir("0375 SHEET LINE INVEST nvst="+nvst+" idnt="+idnt+" nmbr="+nmbr+"  orig="+orig+"  when making icost "+err); }
-
-                                            if(debugAssets) console.log("0372 INVEST "+idnt+" for "+
-                                                cents2EU(result[D_FixAss][idnt].rest)+ " for #"+nmbr+" at "+cents2EU(icost));
-
-                                        } catch(err) { console.dir("0365 SHEET LINE INVEST orig "+err); }
-                                    }
-
-                                    else if(refAcct==='SELL') {
-
-                                        var gain = "0";
-                                        try { gain = result[D_FixAss][idnt].gain; } catch(e) {}
-
-                                        var iSel = parseInt(aLine[4].trim());
-                                        var iamnt = bigAssetValueChange(aLine,iAssets,result[D_XBRL]);  // asset value change
-
-                                        var orig = BigInt(result[D_FixAss][idnt].orig);
-
-                                        // sales reduce number of assets and amount of asset value
-                                        var iNum = parseInt(result[D_FixAss][idnt].nmbr);
-                                        var nmbr = iNum-iSel;
-                                        var irest = BigInt(result[D_FixAss][idnt].rest);
-
-
-                                        // GH20240301
-                                        // REDUCE CURRENT COST FOR REMAINING PIECES OF THAT ASSET
-                                        // was var iremn = irest+iamnt;
-                                        var iremn = orig * BigInt(nmbr);
-
-
-                                        // reduce cost basis for price per piece
-                                        //var icost =bigCost(idnt,nmbr,orig);
-                                        var icost =bigCost(idnt,nmbr,iremn);
-                                        
-
-                                        // SELL
-                                        // GH20230923
-                                        // REDUCE INITIAL PRICE FOR REMAINING PIECES OF THAT ASSET
-                                        // GH20230923
-                                        orig= ((orig*BigInt(nmbr)*10n)+4n)/BigInt(iNum*10);
-
-
-                                        // GH20230923
-                                        // REDUCE CURRENT COST FOR REMAINING PIECES OF THAT ASSET
-
-                                        // OPEN
-                                        // MUST VERIFY existing identifier
-                                        result[D_FixAss][idnt]={"date":date, 
-                                                                "type":type,
-                                                                "orig":""+orig,
-                                                                "nmbr":nmbr,
-                                                                "idnt":idnt,
-                                                                "rest":""+iremn,
-                                                                "cost":""+icost,
-                                                                "gain":gain }; // GH20230303
-                                        if(debugAssets) console.log(
-                                                    "0374 SELL "+type+" "+iSel+" (giving "+cents2EU(iamnt)+
-                                                    ") from "+iNum+" of Asset "+idnt+" resulting in "+
-                                                    nmbr+" worth "+cents2EU(iremn) + " at "+cents2EU(icost)+" each");
-                                    }
-
-                                    else if(refAcct==='YIELD') {
-
-                                        var iamnt = bigAssetValueChange(aLine,iAssets,result[D_XBRL]); // asset value change
-
-                                        if(result[D_FixAss]) {
-                                            if(result[D_FixAss][idnt]) {
-                                                var date = result[D_FixAss][idnt].date;
-                                                var type = result[D_FixAss][idnt].type;
-                                                var iVal = result[D_FixAss][idnt].orig;
-                                                var nmbr =  result[D_FixAss][idnt].nmbr;
-                                                var icurr = BigInt(result[D_FixAss][idnt].rest);
-                                                var iGain = 0n; try { iGain= BigInt(result[D_FixAss][idnt].gain); } catch(e) {}
-
-
-                                                // GH20250103 yield type of dividend payment increases the GAIN value
-                                                var irest = icurr+iamnt;
-
-                                                var icost = bigCost(idnt,nmbr,icurr);
-                                                // GH20230102 NEW cost is calculated as the REST price per number of units
-
-                                                // OPEN
-                                                // MUST VERIFY existing identifier
-                                                result[D_FixAss][idnt]={"date":date,
-                                                                        "type":type,
-                                                                        "orig":iVal,
-                                                                        "nmbr":nmbr,
-                                                                        "idnt":idnt,
-                                                                        "rest":""+icurr,
-                                                                        "cost":""+icost,
-                                                                        "gain":""+(iamnt+iGain) }; // GH20230303
-                                                if(debugAssets) console.log("0376 YIELD amount="+iamnt+" changes "+idnt+" from "+cents2EU(icurr)+" to "+cents2EU(result[D_FixAss][idnt].rest) + " adding up to new gain "+esult[D_FixAss][idnt].gain);
-
-                                            } else console.log("0371 YIELD UNKNOWN "+idnt+" ASSET ENTRY");
-
-                                        } else {
-                                            console.log("0373 YIELD UNKNOWN ASSET "+idnt);
-                                        }
-                                    } else if (refAcct==='ACCUMULATE') {
-                                          try {
-                                            var iChange = bigAssetValueChange(aLine,iAssets,result[D_XBRL]);
-                                            try {
-
-                                                // this transaction is about augmenting some existing asset with value
-
-                                                var type =  result[D_FixAss][idnt].type;
-                                                var orig =  result[D_FixAss][idnt].orig;
-                                                var nmbr =  result[D_FixAss][idnt].nmbr;
-                                                var gain =  "0"; try { gain = result[D_FixAss][idnt].gain; } catch(e) {}
-                                                var iCost = BigInt(result[D_FixAss][idnt].cost);
-                                                var iCurr = BigInt(result[D_FixAss][idnt].rest);
-                                                var iRest=iCurr;
-
-                                                // try adding the augment value
-                                                try { iRest = iCurr + BigInt(iChange); } catch(e) {}
-
-                                                // shall also compute new unit cost
-                                                var iNum =  1n; try { iNum=BigInt(nmbr); } catch(e) {}
-                                                if(iNum!=0n)  iCost = iRest / iNum; 
-                    
-                                                result[D_FixAss][idnt]={"date":date, 
-                                                                        "type":type,
-                                                                        "idnt":idnt,
-                                                                        "orig":orig,
-                                                                        "nmbr":""+iNum,
-                                                                        "rest":""+iRest,
-                                                                        "cost":""+iCost,
-                                                                        "gain":gain}; // GH20230202
-
-                                            } catch(err) { console.dir("0385 SHEET LINE ACCUMULATE accu="+accu+" idnt="+idnt+" nmbr="+nmbr+"  orig="+orig+"  when making icost "+err); }
-
-                                            //if(debugAssets) 
-                                                console.log("0382 ACCUMULATE "+idnt+" from "+
-                                                cents2EU(result[D_FixAss][idnt].rest)+ " for #"+nmbr+" at "+cents2EU(icost));
-
-                                        } catch(err) { console.dir("0381 SHEET LINE ACCUMULATE orig "+err); }                                
-
-
-                                    } else if (refAcct==='WRITEOFF') {
-                                        var iamnt = bigAssetValueChange(aLine,iAssets,result[D_XBRL]); // asset value change
-
-                                        if(result[D_FixAss]) {
-                                            if(result[D_FixAss][idnt]) {
-                                                var date = result[D_FixAss][idnt].date;
-                                                var type = result[D_FixAss][idnt].type;
-                                                var iVal = result[D_FixAss][idnt].orig;
-                                                var nmbr =  result[D_FixAss][idnt].nmbr;
-                                                var gain = "0"; try { gain = result[D_FixAss][idnt].gain; } catch(e) {}
-                                                var icurr = BigInt(result[D_FixAss][idnt].rest);
-
-                                                // WRITEOFF type of dividend payment reduces the REST value
-                                                // GH20220108  amount reduces the CURRent value
-                                                var irest = icurr+iamnt;
-
-                                                // GH20220108 NEW cost is calculated as the INIT price per number of units
-                                                var icost = bigCost(idnt,nmbr,irest);
-                                                // GH20230102 NEW cost is calculated as the REST price per number of units
-
-                                                // OPEN
-                                                // MUST VERIFY existing identifier
-                                                result[D_FixAss][idnt]={ "date":date,
-                                                                        "type":type,
-                                                                        "orig":iVal,
-                                                                        "nmbr":nmbr,
-                                                                        "idnt":idnt,
-                                                                        "rest":""+irest,
+                                                                        "rest":""+iremn,
                                                                         "cost":""+icost,
                                                                         "gain":gain }; // GH20230303
-                                                if(debugAssets) console.log("0362 WRITEOFF amount="+iamnt+" changes "+idnt+" from "+cents2EU(icurr)+" to "+cents2EU(result[D_FixAss][idnt].rest));
-
-                                            } else console.log("0361 WRITEOFF UNKNOWN "+idnt+" ASSET ENTRY");
-                                            
-                                        } else {
-                                            console.log("0363 WRITEOFF UNKNOWN ASSET "+idnt);
-                                        }
-                                    } else if(iAcc>0) {
-                                        try {
-                                            const xbrl=result[D_XBRL][iAcc];
-                                            const xRegular=result[D_Report].xbrlRegular.xbrl;
-                                            if(xbrl && xbrl.startsWith(xRegular)) {
-                                                // GH20230202
-                                                if(debugRegular) console.log("0378 compile: ("+aLine[iAcc]+") regular income:"+xbrl);
-                                                if(result[D_FixAss][idnt]) {
-                                                    var iGain = BigInt(result[D_FixAss][idnt].gain);
-                                                    result[D_FixAss][idnt].gain = ""+(iGain+Sheets.bigEUMoney(aLine[iAcc]));
-                                                    if(debugRegular) console.log("0378 compile: Asset gain is "+cents2EU(iGain));
-                                                }
+                                                if(debugAssets) console.log(
+                                                            "0374 SELL "+type+" "+iSel+" (giving "+cents2EU(iamnt)+
+                                                            ") from "+iNum+" of Asset "+idnt+" resulting in "+
+                                                            nmbr+" worth "+cents2EU(iremn) + " at "+cents2EU(icost)+" each");
                                             }
-                                        } catch(err) { console.dir("0353 SHEET LINE GAIN "+err); }
-                                    } else {
-                                        if(debug>1) console.log("0354 compile: normal booking transaction");
-                                    }
-                                } // end processing YIELD,SELL,INVEST,WRITEOFF,(REGULAR)
 
-                            } catch(err) { console.dir("0351 SHEET LINE INPUT "+err); }
+                                            else if(refAcct==='YIELD') {
+
+                                                var iamnt = bigAssetValueChange(aLine,iAssets,result[D_XBRL]); // asset value change
+
+                                                if(result[D_FixAss]) {
+                                                    if(result[D_FixAss][idnt]) {
+                                                        var date = result[D_FixAss][idnt].date;
+                                                        var type = result[D_FixAss][idnt].type;
+                                                        var iVal = result[D_FixAss][idnt].orig;
+                                                        var nmbr =  result[D_FixAss][idnt].nmbr;
+                                                        var icurr = BigInt(result[D_FixAss][idnt].rest);
+                                                        var iGain = 0n; try { iGain= BigInt(result[D_FixAss][idnt].gain); } catch(e) {}
+
+
+                                                        // GH20250103 yield type of dividend payment increases the GAIN value
+                                                        var irest = icurr+iamnt;
+
+                                                        var icost = bigCost(idnt,nmbr,icurr);
+                                                        // GH20230102 NEW cost is calculated as the REST price per number of units
+
+                                                        // OPEN
+                                                        // MUST VERIFY existing identifier
+                                                        result[D_FixAss][idnt]={"date":date,
+                                                                                "type":type,
+                                                                                "orig":iVal,
+                                                                                "nmbr":nmbr,
+                                                                                "idnt":idnt,
+                                                                                "rest":""+icurr,
+                                                                                "cost":""+icost,
+                                                                                "gain":""+(iamnt+iGain) }; // GH20230303
+                                                        if(debugAssets) console.log("0376 YIELD amount="+iamnt+" changes "+idnt+" from "+cents2EU(icurr)+" to "+cents2EU(result[D_FixAss][idnt].rest) + " adding up to new gain "+esult[D_FixAss][idnt].gain);
+
+                                                    } else console.log("0371 YIELD UNKNOWN "+idnt+" ASSET ENTRY");
+
+                                                } else {
+                                                    console.log("0373 YIELD UNKNOWN ASSET "+idnt);
+                                                }
+                                            } else if (refAcct==='ACCUMULATE') {
+                                                try {
+                                                    var iChange = bigAssetValueChange(aLine,iAssets,result[D_XBRL]);
+                                                    try {
+
+                                                        // this transaction is about augmenting some existing asset with value
+
+                                                        var type =  result[D_FixAss][idnt].type;
+                                                        var orig =  result[D_FixAss][idnt].orig;
+                                                        var nmbr =  result[D_FixAss][idnt].nmbr;
+                                                        var gain =  "0"; try { gain = result[D_FixAss][idnt].gain; } catch(e) {}
+                                                        var iCost = BigInt(result[D_FixAss][idnt].cost);
+                                                        var iCurr = BigInt(result[D_FixAss][idnt].rest);
+                                                        var iRest=iCurr;
+
+                                                        // try adding the augment value
+                                                        try { iRest = iCurr + BigInt(iChange); } catch(e) {}
+
+                                                        // shall also compute new unit cost
+                                                        var iNum =  1n; try { iNum=BigInt(nmbr); } catch(e) {}
+                                                        if(iNum!=0n)  iCost = iRest / iNum; 
+                            
+                                                        result[D_FixAss][idnt]={"date":date, 
+                                                                                "type":type,
+                                                                                "idnt":idnt,
+                                                                                "orig":orig,
+                                                                                "nmbr":""+iNum,
+                                                                                "rest":""+iRest,
+                                                                                "cost":""+iCost,
+                                                                                "gain":gain}; // GH20230202
+
+                                                    } catch(err) { console.dir("0385 SHEET LINE ACCUMULATE change="+iChange+" idnt="+idnt+" nmbr="+nmbr+"  orig="+orig+"  when making icost "+err); }
+
+                                                    //if(debugAssets) 
+                                                        console.log("0382 ACCUMULATE "+idnt+" from "+
+                                                        cents2EU(result[D_FixAss][idnt].rest)+ " for #"+nmbr+" units at "+cents2EU(iCost));
+
+                                                } catch(err) { console.dir("0381 SHEET LINE ACCUMULATE orig "+err); }                                
+
+
+                                            } else if (refAcct==='WRITEOFF') {
+                                                var iamnt = bigAssetValueChange(aLine,iAssets,result[D_XBRL]); // asset value change
+
+                                                if(result[D_FixAss]) {
+                                                    if(result[D_FixAss][idnt]) {
+                                                        var date = result[D_FixAss][idnt].date;
+                                                        var type = result[D_FixAss][idnt].type;
+                                                        var iVal = result[D_FixAss][idnt].orig;
+                                                        var nmbr =  result[D_FixAss][idnt].nmbr;
+                                                        var gain = "0"; try { gain = result[D_FixAss][idnt].gain; } catch(e) {}
+                                                        var icurr = BigInt(result[D_FixAss][idnt].rest);
+
+                                                        // WRITEOFF type of dividend payment reduces the REST value
+                                                        // GH20220108  amount reduces the CURRent value
+                                                        var irest = icurr+iamnt;
+
+                                                        // GH20220108 NEW cost is calculated as the INIT price per number of units
+                                                        var icost = bigCost(idnt,nmbr,irest);
+                                                        // GH20230102 NEW cost is calculated as the REST price per number of units
+
+                                                        // OPEN
+                                                        // MUST VERIFY existing identifier
+                                                        result[D_FixAss][idnt]={ "date":date,
+                                                                                "type":type,
+                                                                                "orig":iVal,
+                                                                                "nmbr":nmbr,
+                                                                                "idnt":idnt,
+                                                                                "rest":""+irest,
+                                                                                "cost":""+icost,
+                                                                                "gain":gain }; // GH20230303
+                                                        if(debugAssets) console.log("0362 WRITEOFF amount="+iamnt+" changes "+idnt+" from "+cents2EU(icurr)+" to "+cents2EU(result[D_FixAss][idnt].rest));
+
+                                                    } else console.log("0361 WRITEOFF UNKNOWN "+idnt+" ASSET ENTRY");
+                                                    
+                                                } else {
+                                                    console.log("0363 WRITEOFF UNKNOWN ASSET "+idnt);
+                                                }
+                                            } else if(iAcc>0) {
+                                                try {
+                                                    const xbrl=result[D_XBRL][iAcc];
+                                                    const xRegular=result[D_Report].xbrlRegular.xbrl;
+                                                    if(xbrl && xbrl.startsWith(xRegular)) {
+                                                        // GH20230202
+                                                        if(debugRegular) console.log("0378 compile: ("+aLine[iAcc]+") regular income:"+xbrl);
+                                                        if(result[D_FixAss][idnt]) {
+                                                            var iGain = BigInt(result[D_FixAss][idnt].gain);
+                                                            result[D_FixAss][idnt].gain = ""+(iGain+Sheets.bigEUMoney(aLine[iAcc]));
+                                                            if(debugRegular) console.log("0378 compile: Asset gain is "+cents2EU(iGain));
+                                                        }
+                                                    }
+                                                } catch(err) { console.dir("0353 SHEET LINE GAIN "+err); }
+                                            } else {
+                                                if(debug>1) console.log("0354 compile: normal booking transaction");
+                                            }
+                                        } // end processing ASSETS with keyword   YIELD,SELL,INVEST,WRITEOFF,(REGULAR)
+                                    
+
+
+
+                                    // end general booking line from journal with proper month
+                                    } else console.error("0367 Transaction Line is not an array "+JSON.stringify(aLine));
+
+                                } else console.error("0351 Transaction Line is not an array "+JSON.stringify(aLine));
+                                firstLine=null;               
+
+                            } catch(err) { console.dir("0349 SHEET LINE INPUT "+err); }
                         }
                     }
                     else if(row.length>20) {
@@ -944,6 +1011,8 @@ function iAccount(strAccountName,arrAcctNames) {
 
 // in gResponse generate a copy of the balance, with all accounts closed 
 // and GAIN LOSS being distributed to partners
+// INPUT balance is a structure with elements: D_Balance, D_History D_Schema D_Partner D_PreBook D_XBRL D_SteuerID  D_Report
+// D_Balance is a structure of Accounts
 function sendBalance(balance) {
     
     var gResponse = {}; 
@@ -1051,7 +1120,7 @@ function sendBalance(balance) {
     for(var lossCol=J_ACCT;lossCol<assets;lossCol++) {
         if( arrXBRL[lossCol] && arrXBRL[lossCol].includes('unpaidCapital')) { // GH20230910
             all_cs=gNames[lossCol]; // Kontoname gemeinschaftl Verluste aus Verkaeufen von Aktien
-            all_iSale=lossCol;      // Spalte    gemeinschaftl Verluste aus Verkaeufen von Aktien
+            all_iSale=lossCol;      // SpaltenNr in der Matrix für gemeinschaftl Verluste aus Verkaeufen von Aktien
         }
     }
     // distribute share-sales losses to partners
