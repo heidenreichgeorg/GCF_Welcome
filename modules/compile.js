@@ -506,19 +506,25 @@ export function compile(sessionData) {
                                                             lMonth++; // repeat until lMonth === iMonth !! 
                                                             // assume at least one transaction per month !!
 
+                                                            // INTEREST 4% fixed
                                                             // book interest for certain EQLIAB accounts
                                                             // i=4% means monthly factor of 1,0033
-                                                            const fourPercent = 10033; // for tenthousand
+                                                            const fourPA_in_MonthlyPPM = 3639n; // monthly, PPM, no re-invest
                                                             if(iEqLiab>0) {
                                                                 for(let eqVar=iEqLiab+1;eqVar<iTotal;eqVar++) {
                                                                     
                                                                     let acName=gNames[eqVar];
                                                                     if(acName && acName.length>1) {
-                                                                        var account = result[D_Balance][acName];
                                                                         var xbrl = result[D_XBRL][eqVar];
-                                                                        if(xbrl=='de-gaap-ci_bs.eqLiab.equity.subscribed.limitedLiablePartners.VK') {
+                                                                        if(xbrl.startsWith('de-gaap-ci_bs.eqLiab.liab')) {
+                                                                            var account = result[D_Balance][acName];
                                                                             let bigSaldo = Account.bigSaldo(account);
-                                                                            console.log("0358 INTEREST "+ acName+"  "+bigSaldo+ " + "+bigSaldo*33n /10000n);
+                                                                        //if(xbrl=='de-gaap-ci_bs.eqLiab.equity.subscribed.limitedLiablePartners.VK') {
+                                                                            let prevInterest = (account && account.interest) ? BigInt(parseInt(account.interest)) : 0n;
+                                                                            let currInterest = (bigSaldo*fourPA_in_MonthlyPPM) / 1000000n;
+                                                                            console.log("0358 INTEREST "+ acName+"  "+bigSaldo + " & "+ currInterest+" + "+prevInterest+" = "+account.interest);
+                                                                            account.interest = ""+(prevInterest + currInterest).toString();
+                                                                            result[D_Balance][acName] = account;
                                                                         }
                                                                     }
                                                                 }
