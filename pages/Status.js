@@ -1024,7 +1024,7 @@ export default function Status() {
     iSumLeft=BigInt(0);
     iSumRite=BigInt(0);
     
-    let strInterest = (jBalance[showAccount] && jBalance[showAccount].interest) ? jBalance[showAccount].interest : "0";
+    let strInterest = (jBalance[showAccount] && jBalance[showAccount].interest) ? jBalance[showAccount].interest : "";
     
 
     return (
@@ -1369,7 +1369,7 @@ function TXNReceiptTotal(textSum,name,strInterest,year,textYearEnd) {
             <div className="attrLine"> <div className="FIELD LNAM">&nbsp;</div></div>
             <div className="attrLine">  <div className="FIELD DATE">{year}-12-31</div>
                                         <div className="FIELD NAME">{textSum+' '+name}</div>
-                                        <div className="FIELD MOAM" draggable="true">={'('+cents20EU(strInterest)+')'}</div> 
+                                        <div className="FIELD MOAM" draggable="true">={(strInterest && strInterest.length)? '('+cents20EU(strInterest)+')':''}</div> 
                                         <div className="FIELD TAG">&nbsp;</div>
                                         <div className="FIELD MOAM" draggable="true">{cents20EU(iInitial)}</div>
                                         <div className="FIELD MOAM" draggable="true">+{cents20EU(iSumLeft)}</div> 

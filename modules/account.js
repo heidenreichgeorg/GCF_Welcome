@@ -1,13 +1,13 @@
 // manages an account with BigInt for cents
 const debug=null;
 
-function makeAccount(n,x,d,c) { return { "name":n, "index":c, "xbrl":x, "desc":(d?d:n), "init":"0", "min":"00", "credit":"000", "debit":"0000", "next":"000000" , "interest":"000000" }; }
+function makeAccount(n,x,d,c) { return { "name":n, "index":c, "xbrl":x, "desc":(d?d:n), "init":"0", "min":"00", "credit":"000", "debit":"0000", "next":"000000" , "interest":"" }; }
 module.exports['makeAccount']=makeAccount;
 
 
 function openAccount(a,openVal) { 
     if(debug) console.log("OPEN "+a+":"+openVal);
-    return { "name":a.name, "index":a.index, "desc":a.desc, "xbrl":a.xbrl, "init":""+BigInt(openVal), "min":""+BigInt(openVal), "credit":"0", "debit":"00", "next":"000", "interest":"0000"  }; }
+    return { "name":a.name, "index":a.index, "desc":a.desc, "xbrl":a.xbrl, "init":""+BigInt(openVal), "min":""+BigInt(openVal), "credit":"0", "debit":"00", "next":"000", "interest":""  }; }
 module.exports['openAccount']=openAccount;
 
 

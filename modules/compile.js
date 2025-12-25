@@ -519,8 +519,10 @@ export function compile(sessionData) {
                                                                     let acName=gNames[eqVar];
                                                                     if(acName && acName.length>1) {
                                                                         var xbrl = result[D_XBRL][eqVar];
-                                                                        if(xbrl=='de-gaap-ci_bs.eqLiab.equity.subscribed.limitedLiablePartners.VK') { //  PARTNERS VARIABLE KAP
-                                                                        //if(xbrl.startsWith('de-gaap-ci_bs.eqLiab.liab')) { //  KAUTION
+                                                                        if((xbrl=='de-gaap-ci_bs.eqLiab.equity.subscribed.limitedLiablePartners.VK') ||  //  LL PARTNERS VARIABLE KAP
+                                                                           (xbrl=='de-gaap-ci_bs.eqLiab.equity.subscribed.limitedLiablePartners.KK') ) //  LL PARTNERS FIXED KAP
+                                                                        //if(xbrl.startsWith('de-gaap-ci_bs.eqLiab.liab'))  //  KAUTION
+                                                                        {
                                                                             var account = result[D_Balance][acName];
                                                                             let bigSaldo = Account.bigSaldo(account);
                                                                         
