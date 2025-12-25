@@ -119,13 +119,14 @@ export default function Status() {
     var aJMoney  = {};
     var aSelSaldo= {};
     var jPageSum = {};
+    var arrNames=[];
 
     useEffect(() => {
 
         aSelText = {};
         aToken   = {};
         aReason  = {};
-        aJMoney = {};
+        aJMoney = {};        
         
         if(status !== 'success') return;
         setYear(session.year);
@@ -138,8 +139,8 @@ export default function Status() {
             if(state.generated) {
                 // history layout methods                
                 let jInitialHeads={}; 
-                let names=state.generated[D_Schema].Names;
-                names.slice(J_ACCT).forEach(acct => { if(acct.length>2) jInitialHeads[acct]='1'; });
+                arrNames=state.generated[D_Schema].Names;
+                arrNames.slice(J_ACCT).forEach(acct => { if(acct.length>2) jInitialHeads[acct]='1'; });
                 console.log("useEffect jinitialHeads="+JSON.stringify(jInitialHeads));
                 setJHeads(jInitialHeads);   
                 resetJSum(jInitialHeads);         
@@ -1023,6 +1024,8 @@ export default function Status() {
     iSumLeft=BigInt(0);
     iSumRite=BigInt(0);
     
+    let strInterest = (jBalance[showAccount] && jBalance[showAccount].interest) ? jBalance[showAccount].interest : "0";
+    
 
     return (
         <Screen tabSelector={showAccount ? [] : tabHeaders} tabName={tabName} aFunc={aFunc} aText={aText}  > 
@@ -1031,7 +1034,7 @@ export default function Status() {
                 (
                 <div className="mTable">                     
                     { TXNReceipt("",D_Account+' '+showAccount, jColumnHeads, jColumnHeads, null, session.year, removeCol, D_History,-1,currLine,setCurrLine) }
-                    <TXNReceiptSum text={D_Carry} jAmounts={jPageSum} jColumnHeads={jColumnHeads} id="(SELECT)"/>                   
+                    <TXNReceiptSum text={D_Carry} jAmounts={jPageSum} jColumnHeads={jColumnHeads} id="(SELECT)" />                   
                     { console.log("096 aSelText() keys = "+Object.keys(aSelText).join('+')) ||
                     Object.keys(aSelText).map((sym,i) => ( (sym && aSelText[sym] && aJMoney[sym] ) ? // && i>1
                                                 
@@ -1049,7 +1052,7 @@ export default function Status() {
                                                                 setCurrLine)
                                                                     :""
                                                                     )) }
-                    { TXNReceiptTotal(page.Sum,showAccount,year,page.YearEnd)   }
+                    { TXNReceiptTotal(page.Sum + ' ',showAccount,strInterest,year,page.YearEnd )  }   
                     <TXNReceiptSum   text="" jAmounts={jSum} jColumnHeads={jColumnHeads} id="" removeCol={removeCol}/>                                                                                       
 
                 </div>
@@ -1360,13 +1363,13 @@ function TXNReceipt(token,text,jAmounts,jColumnHeads,jSum,id,removeCol,name,inde
         
 )}      
 
-function TXNReceiptTotal(textSum,name,year,textYearEnd) {
+function TXNReceiptTotal(textSum,name,strInterest,year,textYearEnd) {
     return( // FIELD
         <div id="TXNReceiptTotal">
             <div className="attrLine"> <div className="FIELD LNAM">&nbsp;</div></div>
             <div className="attrLine">  <div className="FIELD DATE">{year}-12-31</div>
-                                        <div className="FIELD NAME">{textSum}</div>
-                                        <div className="FIELD NAME" draggable="true">{name}</div>
+                                        <div className="FIELD NAME">{textSum+' '+name}</div>
+                                        <div className="FIELD MOAM" draggable="true">={'('+cents20EU(strInterest)+')'}</div> 
                                         <div className="FIELD TAG">&nbsp;</div>
                                         <div className="FIELD MOAM" draggable="true">{cents20EU(iInitial)}</div>
                                         <div className="FIELD MOAM" draggable="true">+{cents20EU(iSumLeft)}</div> 

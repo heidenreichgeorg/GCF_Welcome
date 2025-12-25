@@ -5,6 +5,7 @@
 // OPEN
 //generate monthly SALDO for partner account - inserting a virtual booking to an interest members
 // ! assume at least one transaction per month !!
+// stores it in the account structure but cannot reproduce it in the TXNReceipt page
 
 
 // SETTING THIS WILL VIOLATE PRIVACY AT THE ADMIN CONSOLE !!! 
@@ -333,6 +334,7 @@ export function compile(sessionData) {
 
 
 
+        // GH TRANSACTION START AFTER SVEN ROWS OF DECLARATIONS
         if(numLines>J_MINROW) {
 
             result[D_SteuerID] = {};
@@ -349,7 +351,8 @@ export function compile(sessionData) {
                 // print all lines
                 aoaCells.forEach((row,lineCount) => {
 
-                    let isLastLine = (lineCount+1>=aoaCells.length)
+                    // GH aoaCells must have a last line as a booking transaction
+                    let isLastLine = (lineCount+1>=aoaCells.length); 
                     
                     if(debugReport>3) console.log("0110 compile.compile "+JSON.stringify(row));
                         
@@ -382,7 +385,7 @@ export function compile(sessionData) {
                         result[D_Schema].residence = row[3];
 
 
-                        // GH20211015 result[D_Schema]={ "Names": aNames }; crashes                        
+                        // GH20211015 result[D_Schema]={ "Names": aNames }; crashes  for whatever reason                      
                         if(debugAssets) console.log("0114 SCHEMA N assets="+iAssets+ " eqLiab="+iEqLiab+ " Total="+iTotal);
                         
                     }
@@ -508,22 +511,23 @@ export function compile(sessionData) {
 
                                                             // INTEREST 4% fixed
                                                             // book interest for certain EQLIAB accounts
-                                                            // i=4% means monthly factor of 1,0033
-                                                            const fourPA_in_MonthlyPPM = 3639n; // monthly, PPM, no re-invest
+                                                            // i=4% means monthly factor of 1,003334
+                                                            const fourPA_in_MonthlyPPM = 3334n; // monthly, PPM, no re-invest
                                                             if(iEqLiab>0) {
                                                                 for(let eqVar=iEqLiab+1;eqVar<iTotal;eqVar++) {
                                                                     
                                                                     let acName=gNames[eqVar];
                                                                     if(acName && acName.length>1) {
                                                                         var xbrl = result[D_XBRL][eqVar];
-                                                                        if(xbrl.startsWith('de-gaap-ci_bs.eqLiab.liab')) {
+                                                                        if(xbrl=='de-gaap-ci_bs.eqLiab.equity.subscribed.limitedLiablePartners.VK') { //  PARTNERS VARIABLE KAP
+                                                                        //if(xbrl.startsWith('de-gaap-ci_bs.eqLiab.liab')) { //  KAUTION
                                                                             var account = result[D_Balance][acName];
                                                                             let bigSaldo = Account.bigSaldo(account);
-                                                                        //if(xbrl=='de-gaap-ci_bs.eqLiab.equity.subscribed.limitedLiablePartners.VK') {
+                                                                        
                                                                             let prevInterest = (account && account.interest) ? BigInt(parseInt(account.interest)) : 0n;
                                                                             let currInterest = (bigSaldo*fourPA_in_MonthlyPPM) / 1000000n;
-                                                                            console.log("0358 INTEREST "+ acName+"  "+bigSaldo + " & "+ currInterest+" + "+prevInterest+" = "+account.interest);
                                                                             account.interest = ""+(prevInterest + currInterest).toString();
+                                                                            console.log("0358 INTEREST "+ acName+"  "+bigSaldo + "-> 4%= "+ currInterest+" + "+prevInterest+" => "+account.interest);
                                                                             result[D_Balance][acName] = account;
                                                                         }
                                                                     }
