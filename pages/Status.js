@@ -273,13 +273,13 @@ export default function Status() {
         
         const rqOptions = { method: 'GET', headers: rqHeaders, mode:'cors'};
         try {                
-            fetch(`${REACT_APP_API_HOST}/EXCEL?client=${client}&year=${year}`, rqOptions)
+            fetch(`${REACT_APP_API_HOST}/EXCEL?partner=${partner}&client=${client}&year=${year}`, rqOptions)
             .then((response) => response.blob())
             .then((blob) => URL.createObjectURL(blob))
             .then((url) => console.log("1120 handleXLSave URL= "+ makeXLSButton(url,session.client,session.year)))
             .catch((err) => console.error("1127 handleXLSave ERR "+err));           
         } catch(err) { console.log("1117 GET /EXCEL handleXLSave:"+err);}
-        console.log("1140 Status.handleXLSave EXIT");
+        console.log("1130 Status.handleXLSave EXIT");
     }
 
 
@@ -313,7 +313,7 @@ export default function Status() {
         const rqOptions = { method: 'GET', headers: {  'Accept': 'application/json'}, mode:'cors'};
         try {
             
-            fetch(`${REACT_APP_API_HOST}/DOWNLOAD?client=${session.client}&year=${session.year}`, rqOptions)
+            fetch(`${REACT_APP_API_HOST}/DOWNLOAD?partner=${partner}&client=${session.client}&year=${session.year}`, rqOptions)
             .then((response) => response.blob())
             .then((blob) => URL.createObjectURL(blob))
             .then((url) => console.log("1120 handleJSONSave URL= "+ makeJSONButton(url)))

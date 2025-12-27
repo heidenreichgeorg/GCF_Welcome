@@ -6,7 +6,9 @@ import { REACT_APP_API_HOST } from '../modules/sessionmanager';
 const CSV_RS = '\n';
 const CSV_FS = ';';
 
-export default function Welcome() {
+// GH202512 OUT was Welcome()
+
+export default function Wellcome() {
 
     function dragOverHandler(ev) {
         // Prevent default behavior (Prevent file from being opened)

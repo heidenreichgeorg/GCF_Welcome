@@ -156,17 +156,19 @@ export function createSession(session) {
     let generated = compile(session);
     let year=session.year;
     let client = session.client;
+    let partner = session.partner;
     let sheetCells = session.sheetCells;
     let txnPattern = session.txnPattern;
     let sheetName = session.sheetName;
 
     let time = timeSymbol();
     let id = strSymbol(time+client+year+time);
-/*
+
     // START A NEW SESSION
     let result = {
         'client':client,
         'year':year,
+        'partner':partner,
         'sheetName':sheetName,
         'server':localhost(),
         'time':time,
@@ -175,8 +177,8 @@ export function createSession(session) {
         'txnPattern':txnPattern,
         'generated': generated,
     }    
-*/
-    let result = session;
+
+// HACK 2022    let result = session;
     session.id=id;
 
     // 20240107 WHY WORK WITH OLD SESSION INSTANCE ??
