@@ -120,7 +120,7 @@ async function bucketDownload(bpStorage,partner,client,year,jData,startSessionCB
 
             try {
 
-
+/*
                 let dbcred = process.env.dbcred;
                 let dbinst = process.env.dbinst;
                 if(dbcred && dbinst) {
@@ -128,7 +128,7 @@ async function bucketDownload(bpStorage,partner,client,year,jData,startSessionCB
                   console.log(strMongoDB);
                 }
 
-
+*/
                 let session = {};
 
                 //Read data from the JSON file

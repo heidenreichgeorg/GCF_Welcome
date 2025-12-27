@@ -2,7 +2,7 @@ const debug=2;
 
 
 // setting this will violate privacy 
-const debugWrite=null;
+const debugWrite=1;
 
 
 
@@ -553,6 +553,14 @@ export function xlsxWrite(session,root) {
     
     if(session) {
        
+        try {
+
+            // SERVER FUNCTION COMPILE GH20251228
+            session.generated = Compiler.compile(session);
+
+        } catch(e) { console.err("1539 sheets.xlsxWrite compile() error: "+e); }
+
+
         // return 'serverFile':sheetFile
         sheetFile = root + session.year + session.client + ".xlsx"
         if(sheetFile) {
@@ -562,12 +570,13 @@ export function xlsxWrite(session,root) {
                 year = session.year;
                 let sheetName = session.sheetName;
                 if(client && year) {
-                        if(debugWrite) console.dir("1544 sheets.xlsxWrite START "+sheetName+ " for ("+client+","+year+") in file "+sheetFile);
+                    try {
+                        if(debugWrite) console.log("1544 sheets.xlsxWrite START "+sheetName+ " for ("+client+","+year+") in file "+sheetFile);
 
-                        if(debugWrite) console.dir("1546 sheets.xlsxWrite session "+sheetName+ " = "+Object.keys(session).join(", "));
+                        if(debugWrite) console.log("1546 sheets.xlsxWrite session "+sheetName+ " = "+Object.keys(session).join(", "));
 
                         let balance = session.generated;
-                        if(debugWrite) console.dir("1548 sheets.xlsxWrite balance "+sheetName+ " = "+Object.keys(balance).join(", "));
+                        if(debugWrite) console.log("1548 sheets.xlsxWrite balance "+sheetName+ " = "+Object.keys(balance).join(", "));
 
                         var jAssets = balance.Anlagen; // balance[Compiler.D_FixAss];
                         if(debugWrite) console.dir("1550 sheets.xlsxWrite jAssets "+sheetName+ " = "+JSON.stringify(jAssets));
@@ -583,11 +592,10 @@ export function xlsxWrite(session,root) {
 
 
                         var jBalance = balance.Bilanz;
-                        if(debug) console.log("1558 sheets.xlsxWrite jBalance "+sheetName+ " = "+JSON.stringify(jBalance));
+                        if(debugWrite) console.log("1558 sheets.xlsxWrite jBalance "+sheetName+ " = "+JSON.stringify(jBalance));
 
                         var jXBRL = balance.XBRL;
-                        if(debug) console.log("1560 sheets.xlsxWrite jXBRL "+sheetName+ " = "+JSON.stringify(jXBRL));
-
+                        if(debugWrite) console.log("1560 sheets.xlsxWrite jXBRL "+sheetName+ " = "+JSON.stringify(jXBRL));
 
                         let jExcel = makeXLTabs(                            
                             session.sheetCells,
@@ -659,25 +667,27 @@ export function xlsxWrite(session,root) {
 
                         if(debugWrite)  console.dir("1568 sheets.xlsxWrite WRITE FILE "+sheetFile);
                         
-                    } else {
-                        if(debugWrite) console.dir("1563 sheets.xlsxWrite() NO client / year "+JSON.stringify(session));
-                        console.log("1407 sheets.xlsxWrite() NO client / year "+JSON.stringify(session));
-                    }   
+                    } catch(e) { console.err("1567 sheets.xlsxWrite() error when writing: "+err); }
+
                 } else {
-                    if(debugWrite) console.dir("1561 sheets.xlsxWrite() NO sheetName and NOT writing "+JSON.stringify(session));
-                    console.log("1405 sheets.xlsxWrite() NO sheetName and NOT writing");
-                }
+                    if(debugWrite) console.dir("1563 sheets.xlsxWrite() NO client / year "+JSON.stringify(session));
+                    console.log("1407 sheets.xlsxWrite() NO client / year "+JSON.stringify(session));
+                }   
             } else {
-                if(debugWrite) console.dir("1559 sheets.xlsxWrite NO sheetFile and NOT writing "+JSON.stringify(session));
-                console.log("1557 sheets.xlsxWrite NO sheetFile and NOT writing");
+                if(debugWrite) console.dir("1561 sheets.xlsxWrite() NO sheetName and NOT writing "+JSON.stringify(session));
+                console.log("1405 sheets.xlsxWrite() NO sheetName and NOT writing");
             }
         } else {
-            console.log("1555 sheets.xlsxWrite NO SESSION ");
+            if(debugWrite) console.dir("1559 sheets.xlsxWrite NO sheetFile and NOT writing "+JSON.stringify(session));
+            console.log("1557 sheets.xlsxWrite NO sheetFile and NOT writing");
         }
-
-        // return csv;
-        return {'serverFile':sheetFile, 'localFile': (client+year+".xlsx") };
+    } else {
+        console.log("1555 sheets.xlsxWrite NO SESSION ");
     }
+
+    // return csv;
+    return {'serverFile':sheetFile, 'localFile': (client+year+".xlsx") };
+}
 
 
 
