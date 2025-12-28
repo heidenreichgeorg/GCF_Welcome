@@ -1,14 +1,15 @@
-const debug=2;
+const debug=null;
 
 
 // setting this will violate privacy 
-const debugWrite=1;
+const debugWrite=null;
 
 
 
 
 /* global BigInt */
 import {  symbolic } from './writeModule'
+import { cents2EU }  from './money';
 
 const Compiler=require("./compile.js");
 
@@ -34,6 +35,52 @@ const COLMIN = 2;
 
 
 
+
+const eboReport = ['de-gaap-ci_bs.ass.fixAss.tan.landBuildings.buildingsOnOwnLand',
+'de-gaap-ci_bs.ass.fixAss.tan.landBuildings.other',
+'de-gaap-ci_bs.ass.fixAss.fin.securities',
+'de-gaap-ci_bs.ass.currAss.cashEquiv.bank',
+'de-gaap-ci_bs.ass.currAss.cashEquiv.bank',
+'de-gaap-ci_bs.ass.currAss.cashEquiv.bank',
+'de-gaap-ci_bs.ass.currAss.receiv.trade',
+'de-gaap-ci_bs.ass.currAss.receiv.other.otherTaxRec.kest',
+'de-gaap-ci_bs.ass.currAss.receiv.other.otherTaxRec.kest',
+'de-gaap-ci_is.netIncome.regular.operatingTC.grossTradingProfit.totalOutput.netSales.grossSales.untaxable',
+'de-gaap-ci_is.netIncome.regular.operatingTC.otherCost.fixingLandBuildings',
+'de-gaap-ci_is.netIncome.regular.operatingTC.deprAmort.fixAss.tan',
+'de-gaap-ci_is.netIncome.regular.operatingTC.otherCost.otherOrdinary',
+'de-gaap-ci_is.netIncome.regular.fin.expenses.regularInterest',
+'de-gaap-ci_is.netIncome.regular.fin.netInterest.income',
+'de-gaap-ci_is.netIncome.regular.fin.netParticipation',
+'de-gaap-ci_is.netIncome.regular.operatingTC.deprAmort.fixAss.other',
+'de-gaap-ci_is.netIncome.regular.operatingTC.otherOpRevenue.disposFixAss.sale.fin.domesticCorp',
+'de-gaap-ci_is.netIncome.regular.operatingTC.otherCost.leaseFix.other',
+'de-gaap-ci_bs.eqLiab.liab.other.other',
+'de-gaap-ci_bs.eqLiab.liab.other.profSharRights',
+'de-gaap-ci_bs.eqLiab.equity.subscribed.unlimitedLiablePartners.VK.beginYear',
+'de-gaap-ci_bs.eqLiab.equity.profitLossPartnershipsHGBs264c',
+'de-gaap-ci_bs.eqLiab.equity.subscribed.unlimitedLiablePartners.VK.incomeUseDeposits',
+'de-gaap-ci_bs.eqLiab.equity.subscribed.unlimitedLiablePartners.VK.incomeUseWithdrawals',
+'de-gaap-ci_bs.eqLiab.equity.subscribed.unlimitedLiablePartners.VK.beginYear',
+'de-gaap-ci_bs.eqLiab.equity.profitLossPartnershipsHGBs264c',
+'de-gaap-ci_bs.eqLiab.equity.subscribed.unlimitedLiablePartners.VK.incomeUseDeposits',
+'de-gaap-ci_bs.eqLiab.equity.subscribed.unlimitedLiablePartners.VK.incomeUseWithdrawals',
+'de-gaap-ci_bs.eqLiab.equity.subscribed.limitedLiablePartners.VK.beginYear',
+'de-gaap-ci_bs.eqLiab.equity.profitLossPartnershipsHGBs264c',
+'de-gaap-ci_bs.eqLiab.equity.subscribed.limitedLiablePartners.VK.incomeUseDeposits',
+'de-gaap-ci_bs.eqLiab.equity.subscribed.limitedLiablePartners.VK.incomeUseWithdrawals',
+'de-gaap-ci_bs.eqLiab.equity.subscribed.limitedLiablePartners.VK.beginYear',
+'de-gaap-ci_bs.eqLiab.equity.profitLossPartnershipsHGBs264c',
+'de-gaap-ci_bs.eqLiab.equity.subscribed.limitedLiablePartners.VK.incomeUseDeposits',
+'de-gaap-ci_bs.eqLiab.equity.subscribed.limitedLiablePartners.VK.incomeUseWithdrawals',
+'de-gaap-ci_bs.eqLiab.equity.subscribed.limitedLiablePartners.VK.beginYear',
+'de-gaap-ci_bs.eqLiab.equity.subscribed.limitedLiablePartners.VK.beginYear',
+'de-gaap-ci_bs.eqLiab.equity.subscribed.unlimitedLiablePartners.FK.beginYear',
+'de-gaap-ci_bs.eqLiab.equity.subscribed.unlimitedLiablePartners.FK.beginYear',
+'de-gaap-ci_bs.eqLiab.equity.subscribed.limitedLiablePartners.KK.beginYear',
+'de-gaap-ci_bs.eqLiab.equity.subscribed.limitedLiablePartners.KK.beginYear',
+'de-gaap-ci_bs.eqLiab.equity.subscribed.limitedLiablePartners.KK.beginYear',
+'de-gaap-ci_bs.eqLiab.equity.subscribed.limitedLiablePartners.KK.beginYear'];
 
 
 
@@ -250,6 +297,7 @@ function makeXLTabs(sheetCells,jAssets,jHistory,jSchema,jPartner,jBalance,jXBRL,
     var excelAddrT=[];            
     var excelPartnerT=[];  
     var excelTransactionT=[];          
+    var excelBilanzT=[];            
 
     function pushTAX(arr,line){
         arr.push(Object.keys(line).map((key,i)=>(i>10?(isNaN(line[key])?'0':parseFloat(line[key])/100.0):line[key])));
@@ -278,7 +326,7 @@ function makeXLTabs(sheetCells,jAssets,jHistory,jSchema,jPartner,jBalance,jXBRL,
 
     partnerTable.push({});
 
-    if(debugWrite) taxDetails.map((row) =>(console.dir(JSON.stringify(taxDetails))));
+    if(debugWrite) taxDetails.map((row) =>(console.dir("1414 Partner tax "+JSON.stringify(taxDetails))));
                 
     taxDetails.map((row) => (                
         Object.keys(row).map((fieldName) => (partnerTable.push({'name':fieldName==='name'?'':fieldName,'amnt':row[fieldName]})))));
@@ -323,13 +371,60 @@ function makeXLTabs(sheetCells,jAssets,jHistory,jSchema,jPartner,jBalance,jXBRL,
     } else console.error("1421 sheets.makeXLTabs NO sheetCells");
 
 
+
+    // GH2025 EBO
+    // GH EBIlanzOnline eBilanz-Online e-Bilanzonline
+    /*
+    schema = {
+            String[] Names      Numbers
+                assets        eqliab        total
+                author        residence        Desc
+                iban        register        taxnumber
+                reportYear        client
+         }
+    */  
+
+    let iTotal = jSchema.total;
+
+    excelBilanzT.push(["XBRL","NAME","KONTO","NA","GUV","WERTE","SOLL/HABEN","PARTNER","FPGLM","XBRL_INCOME"])
+
+    console.log("EBO Partners "+JSON.stringify(jPartner))
+
+    jSchema.Names.forEach((accName,col)=>{
+        if(col>=J_MINROW && col<iTotal) if(accName && accName.length>1) {
+
+            let account = jBalance[accName];
+            if(account) {
+                const xbrl = account.xbrl;
+                const iValue = cents2EU(account.yearEnd);
+                const aNumber = account.number;
+                const strSollHaben = xbrl.startsWith("de-gaap-ci_bs.ass") ? "S" : "H";
+
+
+                let strPartner="";
+                Object.keys(jPartner).forEach((index)=>{
+                    let partner=jPartner[index];
+                    console.log("1616 EBO PARTNER:"+JSON.stringify(partner))
+                    if(partner.iVar && parseInt(partner.iVar)==col) strPartner=""+index;
+                    if(partner.iCap && parseInt(partner.iCap)==col) strPartner=""+index;
+                    if(partner.iRes && parseInt(partner.iRes)==col) strPartner=""+index;
+                })
+
+                excelBilanzT.push([xbrl,accName,aNumber,"","0",iValue,strSollHaben,strPartner])
+            }
+        }
+    })
+
     
+
+
 
     // make a TAB-structure
     let excelTabs = {  
                         'TXN'    : excelTransactionT,  
                         'PARTNER': excelPartnerT,  
-                        'ADDR'   : excelAddrT                        
+                        'ADDR'   : excelAddrT,    
+                        'EBO-BILANZ': excelBilanzT
                     };
 
 
@@ -432,13 +527,13 @@ function makeXLStart(sheetCells,jHistory,jSchema,jBalance,jXBRL,client,year,exce
             let aLen = parseInt(arrSchema.assets);
             let eLen = parseInt(arrSchema.eqliab);
             console.dir("1420 sheets.makeXLStart using schemaLen "+schemaLen+"("+aLen+","+eLen+")");
-            console.dir("     Schema = "+JSON.stringify(arrSchema));
+            if(debugWrite) console.dir("     Schema = "+JSON.stringify(arrSchema));
             console.dir("     XBRL = "+JSON.stringify(arrXBRL));
 
             if(jHistory) {
 
                 let aNames = jSchema.Names;
-                console.dir("1422 sheets.makeXLStart ACCOUNT NAMES("+aLen+"-"+eLen+") "+aNames.join(",  "));
+                if(debugWrite) console.dir("1422 sheets.makeXLStart ACCOUNT NAMES("+aLen+"-"+eLen+") "+aNames.join(",  "));
 
                 var tempStartT=[]; 
                 tempStartT.push(nLine);
@@ -447,18 +542,18 @@ function makeXLStart(sheetCells,jHistory,jSchema,jBalance,jXBRL,client,year,exce
                 tempStartT.push([]); // next
 
                 if(jBalance) {
-                    console.dir("1424 sheets.makeXLStart ACCOUNT NAMES("+aLen+"-"+eLen+") "+JSON.stringify(nLine));
+                    if(debugWrite) console.dir("1424 sheets.makeXLStart ACCOUNT NAMES("+aLen+"-"+eLen+") "+JSON.stringify(nLine));
 
                     nLine.forEach((name,c) => {
 
-                        console.dir("1426 makeXLStart pushClose c="+c);
+                        if(debugWrite) console.dir("1426 makeXLStart pushClose c="+c);
                         if(c>=J_ACCT) {
                             
                             let account = jBalance[name];
                             // append one column per account
-                            console.dir("1428 makeXLStart pushClose A="+name);
+                            if(debugWrite) console.dir("1428 makeXLStart pushClose A="+name);
                             if(account) {
-                                console.dir("1430 makeXLStart pushClose A="+JSON.stringify(account));
+                                if(debugWrite) console.dir("1430 makeXLStart pushClose A="+JSON.stringify(account));
                                 pushClose(tempStartT,name,account.xbrl,account.yearEnd,account.next);
                             } else pushClose(tempStartT,name,".","0","0");
                         } else if(c==0)  pushClose(tempStartT,name,"X","0","1"); 
@@ -492,7 +587,7 @@ function makeXLStart(sheetCells,jHistory,jSchema,jBalance,jXBRL,client,year,exce
 
             excelAssetT.forEach((asset,i) => { 
                 if(i==0) pushAssetTitle(excelStartT,asset); else pushAssetStart(excelStartT,asset);
-                console.log("Asset#"+i+"  "+JSON.stringify(asset));
+                if(debugWrite) console.dir("Asset#"+i+"  "+JSON.stringify(asset));
             })
 
             excelStartT.push(strCLOS);
@@ -520,20 +615,20 @@ function makeGALS(aName,index,sheetCells) {
     if(sheetCells) {        
         try {        
             
-            console.dir("1910 sheets.makeGALS "+index+" for "+aName);
+            if(debugWrite) console.dir("1910 sheets.makeGALS "+index+" for "+aName);
 
             //20230101
             let allTXN = sheetCells.filter(function(booking) {
                 let indicator = booking[0]; 
                 return (parseInt(indicator)>0); });
 
-            console.dir("1920 sheets.makeGALS "+index+" for "+JSON.stringify(allTXN));
+            if(debugWrite) console.dir("1920 sheets.makeGALS "+index+" for "+JSON.stringify(allTXN));
 
 
             allTXN.map(function(txn) { 
                          
                 let numericTXN = txn.map((cell,i) =>((i>=J_ACCT)?parseFloat(bigEUMoney(cell))/100.0:cell)); 
-                console.dir("1930 sheets.makeGALS "+index+" for "+JSON.stringify(numericTXN));
+                if(debugWrite) console.dir("1930 sheets.makeGALS "+index+" for "+JSON.stringify(numericTXN));
 
                 if(numericTXN[index]!=0.0) excelTransactionT.push([numericTXN[1],numericTXN[2],numericTXN[3],numericTXN[4],numericTXN[5],numericTXN[index]]) });
 
@@ -624,8 +719,16 @@ export function xlsxWrite(session,root) {
                             year,
                             jExcel.ASSETS); // also produce assets init lines
 
-
-
+/*
+                        jExcel.REPORT = makeXLReport(
+                            JSON.parse(strHistory), // all bookings of a year
+                            jSchema,        // account schema
+                            jBalance,  // account values
+                            jXBRL,
+                            client,
+                            year
+                        );
+*/
                         let aLen = parseInt(jSchema.assets);
                         let eLen =  parseInt(jSchema.eqliab)
 
@@ -634,7 +737,7 @@ export function xlsxWrite(session,root) {
 
                         try {
                             
-                            console.dir("1564 sheets.xlsxWrite ("+aLen+","+eLen+") GALS "+client+year+ " = "+JSON.stringify(jSchema.Names));
+                            if(debugWrite) console.dir("1564 sheets.xlsxWrite ("+aLen+","+eLen+") GALS "+client+year+ " = "+JSON.stringify(jSchema.Names));
 
                 
                             let accNames = jSchema.Names;

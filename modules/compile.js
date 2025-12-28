@@ -194,7 +194,7 @@ let jLastTransaction={};
 // SCHEMA-part
 // must also repeat under terms.js !!!!
 const COLMIN=2;
-const D_Schema = "Schema"; // includes .Names .total .assets .eqliab  N1.author N2.residence  I1.iban I2.register I3.taxnumber  K1.reportYear K2.client
+const D_Schema = "Schema"; // includes .Names .Numbers .total .assets .eqliab  N1.author N2.residence  I1.iban I2.register I3.taxnumber  K1.reportYear K2.client
 const D_XBRL   = "XBRL";
 const D_SteuerID = "SteuerID";
 const D_Equity = "Kapital";
@@ -404,6 +404,7 @@ export function compile(sessionData) {
                         // N1.author N2.residence  I1.iban I2.register I3.taxnumber  K1.reportYear K2.client
                         result[D_Schema].reportYear= sessionData.year; //row[2]; GH20230402
                         result[D_Schema].client    = row[3];
+                        result[D_Schema].Numbers= row;  // 20251228
                     }
                     else if(key && key==='A') {
                         if(debugAssets) console.log("0270 compile.compile ASSET  "+row);
@@ -479,11 +480,12 @@ export function compile(sessionData) {
                                         // opening balance lines
                                         for(var xColumn=0;xColumn<gNames.length;xColumn++) {
                                             var rawName = gNames[xColumn].trim(); // 20230120
+                                            var accNumber = result[D_Schema].Numbers[xColumn]; // 20251228
                                             var xbrl = result[D_XBRL][xColumn];
                                             var xdesc=""+xColumn; if(gDesc && gDesc[xColumn]) xdesc=gDesc[xColumn];
                                             if(rawName && rawName.length>1) {
-                                                result[D_Balance][rawName] = Account.makeAccount(rawName,xbrl,xdesc,xColumn);
-                                                if(debugReport) console.log("0356 makeAccount("+rawName+","+xbrl+","+xdesc+","+xColumn+")");
+                                                result[D_Balance][rawName] = Account.makeAccount(rawName,xbrl,xdesc,xColumn,accNumber);
+                                                if(debugReport) console.log("0356 makeAccount("+rawName+","+xbrl+","+xdesc+","+xColumn+"  "+accNumber+")");
                                             }
                                             else if(debugReport) console.log("0357 compile could not use makeAccount(xbrl="+xbrl+" xdesc="+xdesc+" xColumn="+xColumn+")");
 
@@ -511,8 +513,10 @@ export function compile(sessionData) {
 
                                                             // INTEREST 4% fixed
                                                             // book interest for certain EQLIAB accounts
-                                                            // i=4% means monthly factor of 1,003334
-                                                            const fourPA_in_MonthlyPPM = 3334n; // monthly, PPM, no re-invest
+                                                            // i=4% means monthly factor of 1/3
+                                                            const FOURPERCENT = 4n;
+                                                            const MONTHLYQUOTE = 1200n;
+
                                                             if(iEqLiab>0) {
                                                                 for(let eqVar=iEqLiab+1;eqVar<iTotal;eqVar++) {
                                                                     
@@ -527,7 +531,7 @@ export function compile(sessionData) {
                                                                             let bigSaldo = Account.bigSaldo(account);
                                                                         
                                                                             let prevInterest = (account && account.interest) ? BigInt(parseInt(account.interest)) : 0n;
-                                                                            let currInterest = (bigSaldo*fourPA_in_MonthlyPPM) / 1000000n;
+                                                                            let currInterest = (bigSaldo * FOURPERCENT) / MONTHLYQUOTE;
                                                                             account.interest = ""+(prevInterest + currInterest).toString();
                                                                             console.log("0358 INTEREST "+ acName+"  "+bigSaldo + "-> 4%= "+ currInterest+" + "+prevInterest+" => "+account.interest);
                                                                             result[D_Balance][acName] = account;
@@ -552,7 +556,7 @@ export function compile(sessionData) {
                                                     if(firstLine) {
                                                         // initialize the values with 0,00 if nothing is specified
                                                         if(strAmount==null || strAmount.length==0) strAmount="0";
-                                                       console.log("0358 OPEN "+row.join(CSEP));
+                                                       console.log("0362 OPEN "+row.join(CSEP));
                                                     }
                                                     
                                                     try {
@@ -560,16 +564,20 @@ export function compile(sessionData) {
                                                         if(account && account.xbrl) {
                                                             const iAmount = Sheets.bigEUMoney(strAmount);
                                                             if(firstLine) {
-                                                                result[D_Balance][acName] = Account.openAccount(account,iAmount);
-                                                                if(debug>2) console.log("0366 open "+strAmount+"("+iAmount+")"
-                                                                    +" for "+gNames[column]
-                                                                    +"  = "+JSON.stringify(result[D_Balance][acName])
-                                                                );
+                                                                try {
+                                                                    result[D_Balance][acName] = Account.openAccount(account,iAmount);
+                                                                    if(debug>2) console.log("0366 open "+strAmount+"("+iAmount+")"
+                                                                        +" for "+gNames[column]
+                                                                        +"  = "+JSON.stringify(result[D_Balance][acName])
+                                                                    );
+                                                                } catch(err) { console.dir("0366 FIRST TXN BOOKING"+err); }
                                                             } else { 
-                                                                result[D_Balance][acName] = Account.add(account,iAmount);
-                                                                if(debug>2) console.log("0368 add  "+strAmount+"("+iAmount+")"
-                                                                +" to  "+gNames[column]
-                                                                +"  = "+JSON.stringify(result[D_Balance][acName]));
+                                                                try {
+                                                                    result[D_Balance][acName] = Account.add(account,iAmount);
+                                                                    if(debug>2) console.log("0368 add  "+strAmount+"("+iAmount+")"
+                                                                    +" to  "+gNames[column]
+                                                                    +"  = "+JSON.stringify(result[D_Balance][acName]));
+                                                                } catch(err) { console.dir("0368 REGULAR TXN BOOKING"+err); }
                                                             }
                                                         }
                                                     } catch(err) { console.dir("0369 REGULAR TXN INPUT "+err); }
@@ -782,7 +790,7 @@ export function compile(sessionData) {
                                                                                 "rest":""+irest,
                                                                                 "cost":""+icost,
                                                                                 "gain":gain }; // GH20230303
-                                                        if(debugAssets) console.log("0362 WRITEOFF amount="+iamnt+" changes "+idnt+" from "+cents2EU(icurr)+" to "+cents2EU(result[D_FixAss][idnt].rest));
+                                                        if(debugAssets) console.log("0364 WRITEOFF amount="+iamnt+" changes "+idnt+" from "+cents2EU(icurr)+" to "+cents2EU(result[D_FixAss][idnt].rest));
 
                                                     } else console.log("0361 WRITEOFF UNKNOWN "+idnt+" ASSET ENTRY");
                                                     
@@ -1068,7 +1076,7 @@ function sendBalance(balance) {
     for(let xbrl in gReport) {
         var element=gReport[xbrl];
         if(debugReport) console.log("0292 compile.js sendBalance #"+index+" ACCOUNT "+JSON.stringify(element));           
-        element.account = Account.openAccount(Account.makeAccount(element.de_DE,element.xbrl,element.de_DE,index),0n);
+        element.account = Account.openAccount(Account.makeAccount(element.de_DE,element.xbrl,element.de_DE,index,""+(9900+index)),0n);
         index++;
     }
 
@@ -1370,7 +1378,8 @@ function sendBalance(balance) {
                             closeIncome.credit[name]=""+iCents;
                         }
                         iMoneyIndex=acc.index; 
-                        if(debugReport) console.log("sendBalance CLOSING OTC "+iMoneyIndex);
+                        let iMoneyNumber=acc.number; 
+                        if(debugReport) console.log("sendBalance CLOSING OTC "+iMoneyIndex+":"+iMoneyNumber);
                     }
                 }
                 aNum++;
