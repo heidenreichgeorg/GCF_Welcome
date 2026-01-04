@@ -353,6 +353,7 @@ function makeXLTabs(sheetCells,jAssets,jHistory,jSchema,jPartner,jBalance,jXBRL,
         }
     } catch(err) {console.dir("1431 sheets.makeXLTabs CREDITORS tab: "+err);}
 
+
     if(sheetCells) {        
         try {        
             
@@ -388,6 +389,8 @@ function makeXLTabs(sheetCells,jAssets,jHistory,jSchema,jPartner,jBalance,jXBRL,
 
     excelBilanzT.push(["XBRL","NAME","KONTO","NA","GUV","WERTE","SOLL/HABEN","PARTNER","FPGLM","XBRL_INCOME"])
 
+    const profitLoss = "de-gaap-ci_bs.eqLiab.equity.profitLossPartnershipsHGBs264c";
+
     console.log("EBO Partners "+JSON.stringify(jPartner))
 
     jSchema.Names.forEach((accName,col)=>{
@@ -398,19 +401,36 @@ function makeXLTabs(sheetCells,jAssets,jHistory,jSchema,jPartner,jBalance,jXBRL,
                 const xbrl = account.xbrl;
                 const iValue = cents2EU(account.yearEnd);
                 const aNumber = account.number;
-                const strSollHaben = xbrl.startsWith("de-gaap-ci_bs.ass") ? "S" : "H";
+                const SH = xbrl.startsWith("de-gaap-ci_bs.ass") ? "S" : "H";
 
 
-                let strPartner="";
-                Object.keys(jPartner).forEach((index)=>{
-                    let partner=jPartner[index];
-                    console.log("1616 EBO PARTNER:"+JSON.stringify(partner))
-                    if(partner.iVar && parseInt(partner.iVar)==col) strPartner=""+index;
-                    if(partner.iCap && parseInt(partner.iCap)==col) strPartner=""+index;
-                    if(partner.iRes && parseInt(partner.iRes)==col) strPartner=""+index;
+                let iPartner=0;
+                Object.keys(jPartner).forEach((num,index)=>{
+                    let partner=jPartner[num];
+                    if(partner.iVar && parseInt(partner.iVar)==col) iPartner=index+1;
+                    if(partner.iCap && parseInt(partner.iCap)==col) iPartner=index+1;
+                    if(partner.iRes && parseInt(partner.iRes)==col) iPartner=index+1;
                 })
 
-                excelBilanzT.push([xbrl,accName,aNumber,"","0",iValue,strSollHaben,strPartner])
+                if(iPartner==0) excelBilanzT.push([xbrl,accName,aNumber,"","",iValue,SH,"0"])
+                   
+                else {
+                    //console.log("1616 EBO PARTNER:"+JSON.stringify(jPartner[index]))
+
+                    let pId=""+iPartner;
+                    let income = (account.income) ? cents2EU(account.income) : "0"
+
+                    
+                    excelBilanzT.push([xbrl+".beginYear",           accName+"_ANFANG",  ""+aNumber+"0","","",   cents2EU(account.init),  SH,pId])
+                    excelBilanzT.push([profitLoss,                  accName+"_EINK",    ""+aNumber+"1","","",   income,                  SH,pId])
+                    excelBilanzT.push([xbrl+".incomeUseDeposits",   accName+"_EINLAGE", ""+aNumber+"2","","",   cents2EU(account.credit),SH,pId])
+                    excelBilanzT.push([xbrl+".incomeUseWithdrawals",accName+"_ENTNAHME",""+aNumber+"3","","",   cents2EU(account.debit), SH,pId])
+                    excelBilanzT.push(["",                          accName+"_EINK2",   ""+aNumber+"4","","GKV",income,                  SH,pId,income,"de-gaap-ci_fpl.netIncome"])
+                    excelBilanzT.push(["",                          accName+"_VERWENDG",""+aNumber+"5","","",   income,                  SH,pId,"",    "de-gaap-ci_incomeUse.paidInCapital"])
+                    excelBilanzT.push(["",                          accName+"_EINLAGE2",""+aNumber+"6","","",   "0",                     SH,pId,"",    "de-gaap-ci_incomeUse.deposits"])
+                    excelBilanzT.push(["",                          accName+"_ENTNAHM2",""+aNumber+"7","","",   "0",                     SH,pId,"",    "de-gaap-ci_incomeUse.withdrawals"])
+                   
+                }
             }
         }
     })

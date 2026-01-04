@@ -56,7 +56,7 @@ const iSNAM = 16;
 
 export function makeStatusData(response) {
 
-    const debug=null;
+    const debugMSD=1;
 
     const page = response[D_Page];
     
@@ -74,7 +74,7 @@ export function makeStatusData(response) {
     let gls="{close:0}";
 
     var jReport = response[D_Report];
-    if(debug) console.log("makeStatusData from response D_Report"+JSON.stringify(Object.keys(jReport)));
+    if(debugMSD) console.log("1200 makeStatusData from response D_Report"+JSON.stringify(Object.keys(jReport)));
 
     var jHistory = response[D_History];
     var gSchema = response[D_Schema];
@@ -83,28 +83,29 @@ export function makeStatusData(response) {
     // add three additional accounts: ASSETS, EQLIAB, GAINLOSS
     if(jReport["xbrlAssets"].account) { 
         ass = jReport["xbrlAssets"].account; 
-        if(debug) console.log("ASSET "+JSON.stringify(ass)); 
+        if(debugMSD) console.log("1210 ASSET "+JSON.stringify(ass)); 
         jAccounts["xbrlAssets"]=ass;
     }
     if(jReport["xbrlEqLiab"].account) { 
         eql = jReport["xbrlEqLiab"].account; 
-        if(debug) console.log("EQLIB "+JSON.stringify(eql)); 
+        //if(debugMSD) console.log("1220 EQLIB "+JSON.stringify(eql)); 
+        console.log("1220 EQLIB "+jReport["xbrlEqLiab"].account.toString()); 
         jAccounts["xbrlEqLiab"]=eql;
     }
     if(jReport["xbrlRegular"].account) { 
         gls = jReport["xbrlRegular"].account; 
-        if(debug) console.log("GALOS "+JSON.stringify(gls)); 
+        if(debugMSD) console.log("1230 GALOS "+JSON.stringify(gls)); 
         jAccounts["xbrlRegular"]=gls;
     }
 
 
     // show all accounts omn console
-    if(debug) console.log("makeStatusData from response D_Balance"+JSON.stringify(Object.keys(jAccounts)));    
+    if(debugMSD) console.log("1240 makeStatusData from response D_Balance"+JSON.stringify(Object.keys(jAccounts)));    
     else console.log( Object.keys(jAccounts).map((name,i)=>("   "+name+": "+(jAccounts[name].xbrl))).join(" "));
 
 
 
-    if(debug) console.log(JSON.stringify(response));
+    if(debugMSD) console.log("1250 "+response.toString());
     
     // build four columns
     let aLeft={};
@@ -126,10 +127,10 @@ export function makeStatusData(response) {
                     if(account.xbrl.startsWith(jReport.xbrlTanFix.xbrl)) { // accumulate tangible fixed assets
                         iTan = iTan + iClose;
                     }
-                    if(debug) console.log("makeStatusData Fixed Assets: "+JSON.stringify(account))
+                    if(debugMSD) console.log("1260 makeStatusData Fixed Assets: "+JSON.stringify(account))
                 } else if(account.xbrl.startsWith(jReport.xbrlAcurr.xbrl)) { // accumulate current assets#
                     iCur = iCur + iClose;
-                    if(debug) console.log("makeStatusData Currency Assets: "+JSON.stringify(account))
+                    if(debugMSD) console.log("1270 makeStatusData Currency Assets: "+JSON.stringify(account))
 
                     if(account.xbrl.startsWith(jReport.xbrlPaidTax.xbrl)) { // accumulate paid tax#
                         iTax = iTax + iClose;
@@ -173,12 +174,14 @@ export function makeStatusData(response) {
     eql.tax=iTax;
     eql.credit=iCredit;
     eql.debit=iDebit;
+
+    
     
     
     let iLeft=0;
     for (let name in aLeft)   {
         var account=aLeft[name];
-        if(debug) console.log("STATUS.JS STATUSDATA LEFT "+iLeft+" "+name+"="+yearEnd);
+        if(debugMSD) console.log("1280 STATUS.JS STATUSDATA LEFT "+iLeft+" "+name+"="+account.yearEnd);
         if(iLeft<SCREENLINES) {
             statusData[iLeft]={};
             statusData[iLeft].assets=account;
@@ -228,7 +231,7 @@ export function makeStatusData(response) {
 
         for (let hash in jHistory)  {
 
-            if(debug) console.log("Recent TXN("+hash+") #iTran="+iTran+ "      #bLine="+bLine+"    #maxRow="+maxRow);
+            if(debugMSD) console.log("Recent TXN("+hash+") #iTran="+iTran+ "      #bLine="+bLine+"    #maxRow="+maxRow);
 
             if(bLine<=maxRow && iTran>=0) {
         

@@ -1,13 +1,15 @@
 // manages an account with BigInt for cents
 const debug=null;
 
-function makeAccount(n,x,d,column,number) { return { "name":n, "index":column, "number":number, "xbrl":x, "desc":(d?d:n), "init":"0", "min":"00", "credit":"000", "debit":"0000", "next":"000000" , "interest":"" }; }
+function makeAccount(n,x,d,column,number) { return { "name":n, "index":column, "number":number, "xbrl":x, "desc":(d?d:n), "init":"0", "min":"0", "credit":"0", "debit":"0", "next":"0" , "interest":"" }; }
 module.exports['makeAccount']=makeAccount;
 
 
 function openAccount(a,openVal) { 
     if(debug) console.log("OPEN "+a+":"+openVal);
-    return { "name":a.name, "index":a.index, "number":a.number, "desc":a.desc, "xbrl":a.xbrl, "init":""+BigInt(openVal), "min":""+BigInt(openVal), "credit":"0", "debit":"00", "next":"000", "interest":""  }; }
+//    return { "name":a.name, "index":a.index, "number":a.number, "desc":a.desc, "xbrl":a.xbrl, "init":""+BigInt(openVal), "min":""+BigInt(openVal), "credit":"0", "debit":"0", "next":"0", "interest":""  }; }
+    return { "name":a.name, "index":a.index, "number":a.number, "desc":a.desc, "xbrl":a.xbrl, "init":""+(openVal), "min":""+(openVal), "credit":"0", "debit":"0", "next":"0", "interest":""  }; }
+    // GH 202601 initialize synthetic accounts
 module.exports['openAccount']=openAccount;
 
 

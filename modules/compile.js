@@ -10,7 +10,7 @@
 
 // SETTING THIS WILL VIOLATE PRIVACY AT THE ADMIN CONSOLE !!! 
 const debugEquity=false;
-const debugReport=false;
+const debugReport=1;
 const debugTax=false;
 
 
@@ -20,7 +20,7 @@ const debugAssets=null;
 const debugRegular=null;
 
 
-/* xglobal BigInt */
+/* global BigInt */
 
 
 // K2 accounts must go first in EQLIAB
@@ -1075,8 +1075,8 @@ function sendBalance(balance) {
     let index=0;
     for(let xbrl in gReport) {
         var element=gReport[xbrl];
-        if(debugReport) console.log("0292 compile.js sendBalance #"+index+" ACCOUNT "+JSON.stringify(element));           
         element.account = Account.openAccount(Account.makeAccount(element.de_DE,element.xbrl,element.de_DE,index,""+(9900+index)),0n);
+        if(debugReport) console.log("0292 compile.js sendBalance #"+index+" ACCOUNT "+JSON.stringify(element));           
         index++;
     }
 
