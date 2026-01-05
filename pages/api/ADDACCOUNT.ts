@@ -7,7 +7,7 @@ import { J_ACCT } from '@/modules/terms';
 
 let config:string|null;
 
-const debug=true;
+const debugFlag=true;
 
 // data that can be computed synchronously
 let reqBody:String[] | null;
@@ -25,7 +25,7 @@ export default function handler(
   req: NextApiRequest,
   res: NextApiResponse<any>
 ) {
-  if(debug) console.log("ADDACCOUNT.handler "+JSON.stringify(req.query));
+  if(debugFlag) console.log("ADDACCOUNT.handler "+JSON.stringify(req.query));
   sessionTime=timeSymbol();
   nextSessionId= strSymbol(sessionTime+client+year+sessionTime);
 
@@ -44,7 +44,7 @@ export default function handler(
     client =  req.query.client;
     year = req.query.year;
     const query = { "ext":"JSON", "client":client, "partner":partner, "year":year  }; // GH20250112
-    if(debug) console.log("0001 ADDACCOUNT.handler "+JSON.stringify(query));
+    if(debugFlag) console.log("0001 ADDACCOUNT.handler "+JSON.stringify(query));
 
       signIn(jConfig,query,req.socket.remoteAddress,res,downloadPlusAcct); 
   }
@@ -53,7 +53,7 @@ export default function handler(
 
 function downloadPlusAcct(session:any, res:NextApiResponse<any>, jData:any) {
   
-    if(debug) console.log("1700 app.post ADDACCOUNT");
+    if(debugFlag) console.log("1700 app.post ADDACCOUNT");
     if(session) {
         let sessionId = session.id; 
         if(sessionId && jData.column) {
@@ -64,7 +64,7 @@ function downloadPlusAcct(session:any, res:NextApiResponse<any>, jData:any) {
 
             // 20230816
             if(iColumn>J_ACCT && session.sheetCells) {
-                if(debug) console.log("1720 /ADDACCOUNT map addAccount"); 
+                if(debugFlag) console.log("1720 /ADDACCOUNT map addAccount"); 
                 let sheetCells = session.sheetCells.map((row:any,line:number)=>( addAccount(row,line,iColumn)));
                 session.sheetCells = sheetCells;
             } else console.log("1721 /ADDACCOUNT no columns"); 
@@ -74,7 +74,7 @@ function downloadPlusAcct(session:any, res:NextApiResponse<any>, jData:any) {
                 let client = session.client;
                 let year = session.year;
                 let sheetName = session.sheetName;
-                if(debug) console.log("1730 /ADDACCOUNT sheetName="+sheetName); 
+                if(debugFlag) console.log("1730 /ADDACCOUNT sheetName="+sheetName); 
                 if(client && year) {
 
                     console.log("1740 GET /ADDACCOUNT "+sheetName+ " for ("+client+","+year+")");
@@ -82,7 +82,7 @@ function downloadPlusAcct(session:any, res:NextApiResponse<any>, jData:any) {
                     writeFile(session);
 
                     try {
-                        if(debug) console.log("1760 GET /ADDACCOUNT JSON "+JSON.stringify(session.serverFile));
+                        if(debugFlag) console.log("1760 GET /ADDACCOUNT JSON "+JSON.stringify(session.serverFile));
 
                         // check file and send response to client
                         sendFile(session, res);
@@ -102,7 +102,7 @@ function addAccount(row:any,line:number,column:number) {
     let result = (column<row.length) ? row.slice(0,column+1) : row;
     if(line<10) {
         result.push("NACC");
-        if(debug) console.log("+"+column+" #"+line+":"+JSON.stringify(result));
+        if(debugFlag) console.log("+"+column+" #"+line+":"+JSON.stringify(result));
     }  else result.push("");
     return (column<row.length) ? result.concat(row.slice(column+1)) : result;    
 }

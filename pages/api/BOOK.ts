@@ -7,8 +7,8 @@
 
 
 
-const debug=null;
-const debugWrite=1;
+const debugFlag=1;
+const debugFlagReport=1;
 
 import type { NextApiRequest, NextApiResponse } from 'next'
 import  { formatTXN  } from '../../modules/compile'
@@ -34,11 +34,11 @@ export default function handler(
   if(req) {
 
     if(req.query) {       
-      if(debug) console.log("0060 BOOK.handler query="+JSON.stringify(req.query));
+      if(debugFlag) console.log("0060 BOOK.handler query="+JSON.stringify(req.query));
 
       let jConfig =  init(process.argv) as any; // GH20221003 need to init for each module
           
-      if(debug) console.log("0062 BOOK.handler config="+jConfig.bucket);
+      if(debugFlag) console.log("0062 BOOK.handler config="+jConfig.bucket);
 
       if(req.body) {       
         reqBody = req.body;
@@ -46,7 +46,7 @@ export default function handler(
         client =  req.body.client;
         year = req.body.year;
         const query:JSON = <JSON><unknown> { "ext":"JSON", "partner":partner, "client":client, "year":year  }; // GH20250112
-        if(debug) console.log("0064 BOOK.handler "+JSON.stringify(query));
+        if(debugFlag) console.log("0064 BOOK.handler "+JSON.stringify(query));
         sessionTime=timeSymbol();
         nextSessionId= strSymbol(sessionTime+client+year+sessionTime);
 
@@ -77,7 +77,12 @@ function bookTransaction(session:any, res:NextApiResponse<any>,jData:any) {
     let sessionId = session.id; 
     let arrTransaction = formatTXN(session,reqBody);
   
-    if(debugWrite) console.log("0610 app.post BOOK config("+JSON.stringify(jData)+")");
+    if(debugFlag) {
+      if(arrTransaction) console.log("0608 app.post BOOK bookTransaction txn="+JSON.stringify(arrTransaction));
+      else console.dir("0609 app.post BOOK bookTransaction EMPTY txn");
+    }
+
+    if(debugFlagReport) console.log("0610 app.post BOOK config("+JSON.stringify(jData)+")");
 
     var result="SERVER BOOKED";
     
@@ -89,7 +94,7 @@ function bookTransaction(session:any, res:NextApiResponse<any>,jData:any) {
         
         if(sessionId ) {
 
-          if(debugWrite) console.log("0612 app.post BOOK jTXN('"+(arrTransaction?JSON.stringify(arrTransaction.join(';')):"---")+"')");
+          if(debugFlagReport) console.log("0612 app.post BOOK jTXN('"+(arrTransaction?JSON.stringify(arrTransaction.join(';')):"---")+"')");
 
           // modifies session object and stores it under new sessionId
           session = bookSheet(session,arrTransaction,sessionTime,nextSessionId);
@@ -101,7 +106,7 @@ function bookTransaction(session:any, res:NextApiResponse<any>,jData:any) {
               .then(result => { 
                 if(res) {          
                     res.json({url:serverAddr+'/LATEST', partner, client, year, 'result':result  }) // dummy call
-                    if(debugWrite) console.log("0614 app.post save2Bucket-> "+JSON.stringify(result));
+                    if(debugFlagReport) console.log("0614 app.post save2Bucket-> "+JSON.stringify(result));
                 }
               });
                 
@@ -129,11 +134,11 @@ function bookSheet(session:any,tBuffer:string[]|null,sessionTime:String,nextSess
           if(client && year && session.sheetCells) {
 
               var numLines = session.sheetCells.length;
-              if(debugWrite) console.dir("1450 sheets.bookSheet ENTER "+JSON.stringify(tBuffer)+" into "+session.sheetName+ " for ("+client+","+year+") with "+numLines+" lines in sheet ");
+              if(debugFlagReport) console.dir("1450 sheets.bookSheet ENTER "+JSON.stringify(tBuffer)+" into "+session.sheetName+ " for ("+client+","+year+") with "+numLines+" lines in sheet ");
               
               // GH20230401
               if(!tBuffer || tBuffer.length==0) {
-                if(debugWrite) console.dir("1451 sheets.bookSheet SAVE NO booking statement tBuffer ("+client+","+year+") #"+numLines);
+                if(debugFlagReport) console.dir("1451 sheets.bookSheet SAVE NO booking statement tBuffer ("+client+","+year+") #"+numLines);
                 session.sheetCells.pop();
               } else {
                   // add hash
@@ -144,25 +149,25 @@ function bookSheet(session:any,tBuffer:string[]|null,sessionTime:String,nextSess
                   session.time=sessionTime;
                   session.id=nextSessionId;
 
-                  if(debugWrite) console.dir("1452 sheets.bookSheet APPEND  "+JSON.stringify(tBuffer)+" to ("+client+","+year+") #"+numLines);
+                  if(debugFlagReport) console.dir("1452 sheets.bookSheet APPEND  "+JSON.stringify(tBuffer)+" to ("+client+","+year+") #"+numLines);
 
                           
-                  if(debug) {
+                  if(debugFlag) {
                       console.log("1454 sheets.bookSheet NEW keys="+JSON.stringify(Object.keys(session.sheetCells).map((i)=>(session.sheetCells[i][0]))));
                   }
 
                   setSession(session);
 
-                  if(debugWrite) console.dir("1456 sheets.bookSheet SET SESSION  "+session.id + " "+session.client + " "+session.year + " --> "+JSON.stringify(Object.keys(session)));
+                  if(debugFlagReport) console.dir("1456 sheets.bookSheet SET SESSION  "+session.id + " "+session.client + " "+session.year + " --> "+JSON.stringify(Object.keys(session)));
                   
               }
               
           }
-          else if(debugWrite) console.dir("1453 sheets.bookSheet SAVE NO DATA ("+client+","+year+")") ;
+          else if(debugFlagReport) console.dir("1453 sheets.bookSheet SAVE NO DATA ("+client+","+year+")") ;
       }
-      else if(debug) console.log("1455 sheets.bookSheet SAVE NO sheetName"+session.id);
+      else if(debugFlag) console.log("1455 sheets.bookSheet SAVE NO sheetName"+session.id);
   }
-  else if(debug) console.log("1457 sheets.bookSheet SAVE NO session");
+  else if(debugFlag) console.log("1457 sheets.bookSheet SAVE NO session");
 
   return session;
 }

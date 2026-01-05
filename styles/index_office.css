@@ -24,13 +24,13 @@ input[type="radio"] {
 input[type="radio"]::before {content: "#"; }
 
 
-.attrRow  {                       width:79rem; padding: 1px; float: left;  min-height: 16px; height: 17px; font-family :inherit; font-size: 11px; font-weight:400; text-align: center;}
-.attrLine { vertical-align: top;  width:79rem; padding: 1px; float: left;  min-height: 16px; height: 17px; font-family :inherit; font-size: 11px; font-weight:400; text-align: center;}
+.attrRow  {                       width:79rem; padding: 1px; float: left;  min-height: 16px; height: 18px; font-family :inherit; font-size: 11px; font-weight:400; text-align: center;}
+.attrLine { vertical-align: top;  width:79rem; padding: 1px; float: left;  min-height: 16px; height: 18px; font-family :inherit; font-size: 11px; font-weight:400; text-align: center;}
 .attrLine:nth-child(even) { background: #f0f0f0;  padding: 0px; border: 1px dotted gray;}
 .footer {                         width:79rem; padding: 1px; float: left;  min-height: 32px; height: 17px; font-family :inherit; font-size: 11px; font-weight:400; text-align: center;}
 
 
-.key      {  padding: 1px; height:14px;  margin: 0px; border-color: rgb(167, 152, 152); border-style: solid; float: left; background-color:transparent; font-family:  inherit; font-size: inherit; font-weight:600; color: #000; }
+.key      {  padding: 0px; height:18px;  margin: 0px; border-color: rgb(167, 152, 152); border-style: solid; float: left; background-color:transparent; font-family:  inherit; font-size: inherit; font-weight:600; color: #000; }
 .box      {  height:40px;  margin: 0px; border-color: gray;               border-style: solid; float: left; background-color:transparent; font-family:  inherit; font-size: inherit; font-weight:600; color: #000; }
 
 .SWITCH  {                   padding: 1px; border: none; font-size: 12px; font-weight:400;  } 

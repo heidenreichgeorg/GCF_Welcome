@@ -9,15 +9,16 @@
 
 
 // SETTING THIS WILL VIOLATE PRIVACY AT THE ADMIN CONSOLE !!! 
-const debugEquity=false;
-const debugReport=1;
-const debugTax=false;
+const debugFlagEquity=false;
+const debugFlagReport=false;
+const debugFlagTax=false;
 
 
-const debug=null;
-const debugPreBook=null;
-const debugAssets=null;
-const debugRegular=null;
+const debugFlag=null;
+const debugFlagAssets=null;
+const debugFlagRegular=null;
+
+const debugFlagPreBook=1;
 
 
 /* global BigInt */
@@ -37,10 +38,10 @@ const J_DATE = 1; // date column
 const J_ACCT = 6; // first account
 const J_MINROW=7;
 
-const Buffer = require('buffer' );
-
 
 const Account = require('./account');
+
+const Compiler = require('./compile.js' );
 
 const Sheets = require('./sheets'); // setting root attribute
 //const Server = require('../.old/server');
@@ -163,6 +164,9 @@ let de_DE = {
     Closing:"Abschluss",
     Diagram:"Diagramm",
     Display:"Anzeigen",
+    Month:"Monat",
+    Quarter:"Quartal",
+    Year:"Jahr",
     Transfer:"Überweisung",
     Transaction:"Buchung",
 
@@ -328,7 +332,7 @@ export function compile(sessionData) {
             if(!jLastTransaction[client]) jLastTransaction[client]={ };
             let jClientTID = jLastTransaction[client];
             jClientTID[year]=jlastTID;
-            if(debugReport) console.log("0100 compile.compile() LAST TXN includes "+lastLine[1]+" "+lastLine[3]);
+            if(debugFlagReport) console.log("0100 compile.compile() LAST TXN includes "+lastLine[1]+" "+lastLine[3]);
             console.log("0100 compile.compile() LAST TXN "+jlastTID);
         } else console.log("0100 compile.compile() LAST TXN "+lastLine[0]);
 
@@ -354,7 +358,7 @@ export function compile(sessionData) {
                     // GH aoaCells must have a last line as a booking transaction
                     let isLastLine = (lineCount+1>=aoaCells.length); 
                     
-                    if(debugReport>3) console.log("0110 compile.compile "+JSON.stringify(row));
+                    if(debugFlagReport>3) console.log("0110 compile.compile "+JSON.stringify(row));
                         
                     var column;
                     var key=row[0];
@@ -362,13 +366,13 @@ export function compile(sessionData) {
                         const aNames=row;
                         result[D_Schema].Names=aNames;
                         result.writeTime = strTimeSymbol;
-                        if(debug>1) console.log("N at "+result.writeTime);
+                        if(debugFlag>1) console.log("N at "+result.writeTime);
                         var column;
                         for(column=0;column<aNames.length && !(aNames[column].length>0 && aNames[column].length<4 && aNames[column].includes(CEND));column++) {
                             var rawName=aNames[column];
                             if(rawName && rawName.length>=COLMIN && column>=J_ACCT) {
                                 var aName=rawName.trim();
-                                if(debug>1) console.log("N "+aName);
+                                if(debugFlag>1) console.log("N "+aName);
                                 if(aName==='ASSETS') { iAssets=column;
                                     result[D_Schema].assets=column;
                                 } else if(aName==='EQLIAB') { iEqLiab=column;
@@ -386,7 +390,7 @@ export function compile(sessionData) {
 
 
                         // GH20211015 result[D_Schema]={ "Names": aNames }; crashes  for whatever reason                      
-                        if(debugAssets) console.log("0114 SCHEMA N assets="+iAssets+ " eqLiab="+iEqLiab+ " Total="+iTotal);
+                        if(debugFlagAssets) console.log("0114 SCHEMA N assets="+iAssets+ " eqLiab="+iEqLiab+ " Total="+iTotal);
                         
                     }
                     else if(key && key==='C') {
@@ -407,7 +411,7 @@ export function compile(sessionData) {
                         result[D_Schema].Numbers= row;  // 20251228
                     }
                     else if(key && key==='A') {
-                        if(debugAssets) console.log("0270 compile.compile ASSET  "+row);
+                        if(debugFlagAssets) console.log("0270 compile.compile ASSET  "+row);
                         const assetInfo = row;
                         if(assetInfo.length>J_ACCT) {
                             var date = assetInfo[1];
@@ -426,7 +430,7 @@ export function compile(sessionData) {
                                                          "rest":""+irest,
                                                          "cost":""+icost,
                                                          "gain":"0" }; // GH20230303
-                                if(debugReport) console.log("0280 BOOK  "+idnt+" = "+result[D_FixAss][idnt].orig+ "for #"+nmbr+" at "+icost);                                
+                                if(debugFlagReport) console.log("0280 BOOK  "+idnt+" = "+result[D_FixAss][idnt].orig+ "for #"+nmbr+" at "+icost);                                
                             }
                         }
                     }
@@ -458,7 +462,7 @@ export function compile(sessionData) {
 
                         const MINTXN=5; // elements in a TXN
                         var jHistory = result[D_History];
-                        //if(debug>1)        console.log("0348 BOOK "+row.join(CSEP));
+                        //if(debugFlag>1)        console.log("0348 BOOK "+row.join(CSEP));
 
                         if(row.length>MINTXN && result[D_Schema].Names){
                             try {
@@ -466,7 +470,7 @@ export function compile(sessionData) {
                                 var gNames = result[D_Schema].Names;
                                 var gDesc  = result[D_Schema].Desc;
 
-                                if(debugReport) {
+                                if(debugFlagReport) {
                                     console.log("0350 BOOK  "+aLine.join(';'));
                                     console.log("0350 NAMES "+gNames.join(';'));
                                     console.log();
@@ -485,9 +489,9 @@ export function compile(sessionData) {
                                             var xdesc=""+xColumn; if(gDesc && gDesc[xColumn]) xdesc=gDesc[xColumn];
                                             if(rawName && rawName.length>1) {
                                                 result[D_Balance][rawName] = Account.makeAccount(rawName,xbrl,xdesc,xColumn,accNumber);
-                                                if(debugReport) console.log("0356 makeAccount("+rawName+","+xbrl+","+xdesc+","+xColumn+"  "+accNumber+")");
+                                                if(debugFlagReport) console.log("0356 makeAccount("+rawName+","+xbrl+","+xdesc+","+xColumn+"  "+accNumber+")");
                                             }
-                                            else if(debugReport) console.log("0357 compile could not use makeAccount(xbrl="+xbrl+" xdesc="+xdesc+" xColumn="+xColumn+")");
+                                            else if(debugFlagReport) console.log("0357 compile could not use makeAccount(xbrl="+xbrl+" xdesc="+xdesc+" xColumn="+xColumn+")");
 
                                             
                                         };
@@ -543,20 +547,20 @@ export function compile(sessionData) {
                                                 }
 
 
-                                        //if(debug) 
+                                        //if(debugFlag) 
                                             console.log("0358 BOOK ("+iMonth+")"+row.join(CSEP));
 
 
                                         // NORMAL TRANSACTION PROCESSING: DISTRIBUTE TO EACH ACCOUNT
                                         aLine.forEach(strAmount => {
-                                            if(debugReport>3) console.log("0360 init "+strAmount);
+                                            if(debugFlagReport>3) console.log("0360 init "+strAmount);
                                             if(column>=J_ACCT && strAmount && strAmount.length>0) {
                                                 var acName = gNames[column];
                                                 if(acName && acName.length>1) {
                                                     if(firstLine) {
                                                         // initialize the values with 0,00 if nothing is specified
                                                         if(strAmount==null || strAmount.length==0) strAmount="0";
-                                                       console.log("0362 OPEN "+row.join(CSEP));
+                                                        else if(!(strAmount==="0")) console.log("0362 FIRSTLINE OPEN "+acName+"="+strAmount);
                                                     }
                                                     
                                                     try {
@@ -566,7 +570,7 @@ export function compile(sessionData) {
                                                             if(firstLine) {
                                                                 try {
                                                                     result[D_Balance][acName] = Account.openAccount(account,iAmount);
-                                                                    if(debug>2) console.log("0366 open "+strAmount+"("+iAmount+")"
+                                                                    if(debugFlag>2) console.log("0366 open "+strAmount+"("+iAmount+")"
                                                                         +" for "+gNames[column]
                                                                         +"  = "+JSON.stringify(result[D_Balance][acName])
                                                                     );
@@ -574,7 +578,7 @@ export function compile(sessionData) {
                                                             } else { 
                                                                 try {
                                                                     result[D_Balance][acName] = Account.add(account,iAmount);
-                                                                    if(debug>2) console.log("0368 add  "+strAmount+"("+iAmount+")"
+                                                                    if(debugFlag>2) console.log("0368 add  "+strAmount+"("+iAmount+")"
                                                                     +" to  "+gNames[column]
                                                                     +"  = "+JSON.stringify(result[D_Balance][acName]));
                                                                 } catch(err) { console.dir("0368 REGULAR TXN BOOKING"+err); }
@@ -599,7 +603,7 @@ export function compile(sessionData) {
                                             var nvst = aLine[3].trim();
                                             var nmbr = aLine[4].trim();
                                             var idnt = aLine[5].trim();
-                                            if(debug>1 && iAcc>=J_ACCT) console.log("0370 compile: known account("+refAcct+"):"+type+"  "+idnt+"  #"+iAcc);
+                                            if(debugFlag>1 && iAcc>=J_ACCT) console.log("0370 compile: known account("+refAcct+"):"+type+"  "+idnt+"  #"+iAcc);
 
                                             // process YIELD,INVEST,SELL,WRITEOFF,ACCUMULATE (REGULAR)
                                             if(refAcct==='INVEST') {
@@ -624,7 +628,7 @@ export function compile(sessionData) {
 
                                                     } catch(err) { console.dir("0375 SHEET LINE INVEST nvst="+nvst+" idnt="+idnt+" nmbr="+nmbr+"  orig="+orig+"  when making icost "+err); }
 
-                                                    if(debugAssets) console.log("0372 INVEST "+idnt+" for "+
+                                                    if(debugFlagAssets) console.log("0372 INVEST "+idnt+" for "+
                                                         cents2EU(result[D_FixAss][idnt].rest)+ " for #"+nmbr+" at "+cents2EU(icost));
 
                                                 } catch(err) { console.dir("0365 SHEET LINE INVEST orig "+err); }
@@ -677,7 +681,7 @@ export function compile(sessionData) {
                                                                         "rest":""+iremn,
                                                                         "cost":""+icost,
                                                                         "gain":gain }; // GH20230303
-                                                if(debugAssets) console.log(
+                                                if(debugFlagAssets) console.log(
                                                             "0374 SELL "+type+" "+iSel+" (giving "+cents2EU(iamnt)+
                                                             ") from "+iNum+" of Asset "+idnt+" resulting in "+
                                                             nmbr+" worth "+cents2EU(iremn) + " at "+cents2EU(icost)+" each");
@@ -713,7 +717,7 @@ export function compile(sessionData) {
                                                                                 "rest":""+icurr,
                                                                                 "cost":""+icost,
                                                                                 "gain":""+(iamnt+iGain) }; // GH20230303
-                                                        if(debugAssets) console.log("0376 YIELD amount="+iamnt+" changes "+idnt+" from "+cents2EU(icurr)+" to "+cents2EU(result[D_FixAss][idnt].rest) + " adding up to new gain "+esult[D_FixAss][idnt].gain);
+                                                        if(debugFlagAssets) console.log("0376 YIELD amount="+iamnt+" changes "+idnt+" from "+cents2EU(icurr)+" to "+cents2EU(result[D_FixAss][idnt].rest) + " adding up to new gain "+esult[D_FixAss][idnt].gain);
 
                                                     } else console.log("0371 YIELD UNKNOWN "+idnt+" ASSET ENTRY");
 
@@ -753,7 +757,7 @@ export function compile(sessionData) {
 
                                                     } catch(err) { console.dir("0385 SHEET LINE ACCUMULATE change="+iChange+" idnt="+idnt+" nmbr="+nmbr+"  orig="+orig+"  when making icost "+err); }
 
-                                                    //if(debugAssets) 
+                                                    //if(debugFlagAssets) 
                                                         console.log("0382 ACCUMULATE "+idnt+" from "+
                                                         cents2EU(result[D_FixAss][idnt].rest)+ " for #"+nmbr+" units at "+cents2EU(iCost));
 
@@ -790,7 +794,7 @@ export function compile(sessionData) {
                                                                                 "rest":""+irest,
                                                                                 "cost":""+icost,
                                                                                 "gain":gain }; // GH20230303
-                                                        if(debugAssets) console.log("0364 WRITEOFF amount="+iamnt+" changes "+idnt+" from "+cents2EU(icurr)+" to "+cents2EU(result[D_FixAss][idnt].rest));
+                                                        if(debugFlagAssets) console.log("0364 WRITEOFF amount="+iamnt+" changes "+idnt+" from "+cents2EU(icurr)+" to "+cents2EU(result[D_FixAss][idnt].rest));
 
                                                     } else console.log("0361 WRITEOFF UNKNOWN "+idnt+" ASSET ENTRY");
                                                     
@@ -803,16 +807,16 @@ export function compile(sessionData) {
                                                     const xRegular=result[D_Report].xbrlRegular.xbrl;
                                                     if(xbrl && xbrl.startsWith(xRegular)) {
                                                         // GH20230202
-                                                        if(debugRegular) console.log("0378 compile: ("+aLine[iAcc]+") regular income:"+xbrl);
+                                                        if(debugFlagRegular) console.log("0378 compile: ("+aLine[iAcc]+") regular income:"+xbrl);
                                                         if(result[D_FixAss][idnt]) {
                                                             var iGain = BigInt(result[D_FixAss][idnt].gain);
                                                             result[D_FixAss][idnt].gain = ""+(iGain+Sheets.bigEUMoney(aLine[iAcc]));
-                                                            if(debugRegular) console.log("0378 compile: Asset gain is "+cents2EU(iGain));
+                                                            if(debugFlagRegular) console.log("0378 compile: Asset gain is "+cents2EU(iGain));
                                                         }
                                                     }
                                                 } catch(err) { console.dir("0353 SHEET LINE GAIN "+err); }
                                             } else {
-                                                if(debug>1) console.log("0354 compile: normal booking transaction");
+                                                if(debugFlag>1) console.log("0354 compile: normal booking transaction");
                                             }
                                         } // end processing ASSETS with keyword   YIELD,SELL,INVEST,WRITEOFF,(REGULAR)
                                     
@@ -830,12 +834,12 @@ export function compile(sessionData) {
                     }
                     else if(row.length>20) {
                         //if(!key || parseInt(key)==0) {                    
-                        if(debugPreBook) console.dir("0352 SHEET LINE PRE-BOOK "+JSON.stringify(row)); 
+                        if(debugFlagPreBook) console.dir("0352 SHEET LINE PRE-BOOK "+JSON.stringify(row)); 
                         row[1]=lineCount; // GH20231002 allow trace-back and put lineCount into date field
                         result[D_PreBook].push(row);
                     }
             });
-                if(debug>1) console.log("0368 compile: check partners");
+                if(debugFlag>1) console.log("0368 compile: check partners");
 
                 // process the partners
                 var partners = {};
@@ -963,7 +967,7 @@ export function compile(sessionData) {
 
 
                 result[D_Partner]=partners;
-                if(debugReport) 
+                if(debugFlagReport) 
                     for (let i in partners) { console.log("0380 compile Partner("+i+") "+JSON.stringify(partners[i])); }
 
             } catch (err) {
@@ -971,7 +975,7 @@ export function compile(sessionData) {
                 console.dir('0125 compile.js compile:'+err);
             }
 
-            if(debug) console.log("0129 compile.compile.Schema="+JSON.stringify(Object.keys(result[D_Schema])));
+            if(debugFlag) console.log("0129 compile.compile.Schema="+JSON.stringify(Object.keys(result[D_Schema])));
 
         } else console.error('0111 compile.js compile NO BALANCE');
 
@@ -980,20 +984,20 @@ export function compile(sessionData) {
 
 
     for(let key in result) {
-        if(debug) console.log('0386 compile.js compile() -> balance['+key+']'); 
+        if(debugFlag) console.log('0386 compile.js compile() -> balance['+key+']'); 
     }
 
-    if(debug) console.log("0388 COMPILED = "+JSON.stringify(Object.keys(result)));
+    if(debugFlag) console.log("0388 COMPILED = "+JSON.stringify(Object.keys(result)));
 
 
     let balance = sendBalance(result);
 
     
-    //if(debug) console.log("0390 COMPILED         = "+JSON.stringify(Object.keys(balance)));
-    if(debug) console.log("0390 COMPILED HISTORY = "+JSON.stringify(Object.keys(balance[D_History])));
-    if(debugPreBook) console.log("0390 COMPILED PRE_BOOK = "+JSON.stringify(balance[D_PreBook]));
+    //if(debugFlag) console.log("0390 COMPILED         = "+JSON.stringify(Object.keys(balance)));
+    if(debugFlag) console.log("0390 COMPILED HISTORY = "+JSON.stringify(Object.keys(balance[D_History])));
+    if(debugFlagPreBook) console.log("0390 COMPILED PRE_BOOK = "+JSON.stringify(balance[D_PreBook]));
 
-    if(debugReport) { 
+    if(debugFlagReport) { 
         let jHistory=balance[D_History];
         Object.keys(jHistory).map((lineNo) => (console.log("0390 #"+lineNo+"= "+JSON.stringify(jHistory[lineNo])))) }
 
@@ -1006,7 +1010,7 @@ export function compile(sessionData) {
 function isSameFY(year) 
 {
     let numYear=unixYear();
-    if(debug) console.log("isSameFY"+numYear);
+    if(debugFlag) console.log("isSameFY"+numYear);
     if(parseInt(year)>numYear-1) return true;
     return (parseInt(year)==numYear) 
 }
@@ -1022,7 +1026,7 @@ function iAccount(strAccountName,arrAcctNames) {
     let index=0;
     try {
         index=parseInt(arrAcctNames.map((strName,i) => (strAccountName==strName?(""+i):" ")).join('').trim());
-        if(debug) console.log("     iAccount("+strAccountName+") = "+index);
+        if(debugFlag) console.log("     iAccount("+strAccountName+") = "+index);
     } catch(e) {
         console.err("compile.iAccount("+strAccountName+") failed.");
     }
@@ -1057,7 +1061,7 @@ function sendBalance(balance) {
     let preBooked=balance[D_PreBook];
     gResponse[D_PreBook]=[];
     preBooked.forEach(preTXN=>{
-        if(debugPreBook) console.log("0290 compile.js sendBalance preBook "+JSON.stringify(preTXN));           
+        if(debugFlagPreBook) console.log("0290 compile.js sendBalance preBook "+JSON.stringify(preTXN));           
         gResponse[D_PreBook].push(preTXN);
     })
 
@@ -1076,7 +1080,7 @@ function sendBalance(balance) {
     for(let xbrl in gReport) {
         var element=gReport[xbrl];
         element.account = Account.openAccount(Account.makeAccount(element.de_DE,element.xbrl,element.de_DE,index,""+(9900+index)),0n);
-        if(debugReport) console.log("0292 compile.js sendBalance #"+index+" ACCOUNT "+JSON.stringify(element));           
+        if(debugFlagReport) console.log("0292 compile.js sendBalance #"+index+" ACCOUNT "+JSON.stringify(element));           
         index++;
     }
 
@@ -1095,17 +1099,17 @@ function sendBalance(balance) {
 
                 // GH20221028
                 if(axbrl.startsWith(bReport.xbrlRegular.xbrl)) {  // clear income
-                    if(debugReport) console.log("compile.js sendBalance REGULAR:"+axbrl);
+                    if(debugFlagReport) console.log("compile.js sendBalance REGULAR:"+axbrl);
                     account.next="0";
                 }
                 else if(axbrl.startsWith(bReport.xbrlPaidTax.xbrl)) { // move tax paid
                     iTaxPaid += BigInt(account.yearEnd);
-                    if(debugReport) console.log("compile.js sendBalance Tax Paid="+iTaxPaid);
+                    if(debugFlagReport) console.log("compile.js sendBalance Tax Paid="+iTaxPaid);
                     account.next="0";
                 }
                 else if(axbrl.startsWith(bReport.xbrlSecLoss.xbrl)) { // move sold-security losses
                     iSoldSecurityLoss += BigInt(account.yearEnd);
-                    if(debugReport) console.log("compile.js sendBalance Sold-Security Loss="+iSoldSecurityLoss);
+                    if(debugFlagReport) console.log("compile.js sendBalance Sold-Security Loss="+iSoldSecurityLoss);
                     account.next="0";
                     // GH 20230910 OPEN : kill partner capital 
                 }
@@ -1150,11 +1154,11 @@ function sendBalance(balance) {
         let vava = balance[D_Balance][all_cs];
         if(vava) {
             
-            if(debugReport) console.log("0294 compile.js sendBalance Sold-Security ("+all_cs+") Loss="+JSON.stringify(vava));
+            if(debugFlagReport) console.log("0294 compile.js sendBalance Sold-Security ("+all_cs+") Loss="+JSON.stringify(vava));
 
             big_cyloss = Account.bigChange(vava)
 
-            if(debugReport) {
+            if(debugFlagReport) {
                 console.log("VAVA INIT   "+vava.init);
                 console.log("VAVA CREDIT "+vava.credit);
                 console.log("VAVA DEBIT  "+vava.debit);
@@ -1162,13 +1166,13 @@ function sendBalance(balance) {
             }
 
             p_cyLoss = distribute(big_cyloss,partners,'cyLoss');
-            if(debugReport) console.log("0296 compile.js sendBalance CYLOSS  G"+p_cyLoss[0]+" E"+p_cyLoss[1]+" A"+p_cyLoss[2]+" K"+p_cyLoss[3]+" T"+p_cyLoss[4]+" L"+p_cyLoss[5]); 
-        } else if(debugReport) console.log("0295 compile.js sendBalance CYLOSS  NO VAVA"); 
+            if(debugFlagReport) console.log("0296 compile.js sendBalance CYLOSS  G"+p_cyLoss[0]+" E"+p_cyLoss[1]+" A"+p_cyLoss[2]+" K"+p_cyLoss[3]+" T"+p_cyLoss[4]+" L"+p_cyLoss[5]); 
+        } else if(debugFlagReport) console.log("0295 compile.js sendBalance CYLOSS  NO VAVA"); 
     }
     
 
     //   transfer overview to report 
-    if(debugReport) console.log("0298 compile.js sendBalance overview"+JSON.stringify(gReport));
+    if(debugFlagReport) console.log("0298 compile.js sendBalance overview"+JSON.stringify(gReport));
     let aAssets = gReport.xbrlAssets.account;
     let aEqliab = gReport.xbrlEqLiab.account;
     let aEqlreg = gReport.xbrlRegular.account;
@@ -1178,7 +1182,7 @@ function sendBalance(balance) {
     let aEqlinc = gReport.xbrlIncome.account; // should be empty at this stage
 
 
-    if(debugReport) {
+    if(debugFlagReport) {
         console.log("0302 compile.js sendBalance ASSETS = "+JSON.stringify(aAssets));           
         console.log("0304 compile.js sendBalance EQLIAB = "+JSON.stringify(aEqliab));           
         console.log("0306 compile.js sendBalance EQLREG = "+JSON.stringify(aEqlreg));           
@@ -1191,7 +1195,7 @@ function sendBalance(balance) {
     let aEqlsum=Account.add(aEqlreg,""+Account.bigChange(aEqliab));
     aEqlinc=Account.add(aEqlinc,""+Account.bigChange(aEqlsum));
 
-    if(debugReport) {
+    if(debugFlagReport) {
        console.log("0314 compile.js sendBalance ASSETS = "+JSON.stringify(aAssets));           
        console.log("0316 compile.js sendBalance EQLIAB = "+JSON.stringify(aEqliab));           
        console.log("0318 compile.js sendBalance EQLREG = "+JSON.stringify(aEqlreg));           
@@ -1207,7 +1211,7 @@ function sendBalance(balance) {
         account.yearEnd=""+Account.bigChange(account);
         account.next = "0";
 
-        if(debugReport) console.log("compile.js sendBalance send1 REPORT("+element.de_DE+") "+JSON.stringify(element.account));
+        if(debugFlagReport) console.log("compile.js sendBalance send1 REPORT("+element.de_DE+") "+JSON.stringify(element.account));
     }
 
 
@@ -1263,12 +1267,12 @@ function sendBalance(balance) {
             varcap.tax = ""+(iTaxPaid); // 20230218
 
 
-            if(debugEquity) console.log('compile sendBalance  '+JSON.stringify(p) + "\n ==>> MODIFY K2xx "+JSON.stringify(varcap));
+            if(debugFlagEquity) console.log('compile sendBalance  '+JSON.stringify(p) + "\n ==>> MODIFY K2xx "+JSON.stringify(varcap));
 
             if(p.resCap) {
                 // consolidate RE capital reserve
                 var rescap=bAccounts[p.resCap]; // index with name
-                if(debugEquity) console.dir("compile sendBalance partner "+p.name+ " CapitalReserve("+p.resCap+")="+JSON.stringify(rescap));
+                if(debugFlagEquity) console.dir("compile sendBalance partner "+p.name+ " CapitalReserve("+p.resCap+")="+JSON.stringify(rescap));
 
                 rescap.income="";
                 rescap.netIncomeOTC="";
@@ -1283,7 +1287,7 @@ function sendBalance(balance) {
     }  else console.dir('compile sendBalance NO CAPITAL ACCOUNTS FOR PARTNER #'+p);
 
 
-        if(debugEquity) console.log('compile sendBalance  '+JSON.stringify(p) + "\n ==>> MODIFY K2xx  RExx"+JSON.stringify(varcap));
+        if(debugFlagEquity) console.log('compile sendBalance  '+JSON.stringify(p) + "\n ==>> MODIFY K2xx  RExx"+JSON.stringify(varcap));
     }
 
 
@@ -1300,7 +1304,7 @@ function sendBalance(balance) {
                 account.yearEnd=""+Account.bigSaldo(account);
                 
                 gross[name]=account; 
-                if(debugEquity) console.log("compile.js sendBalance2 ACCOUNT "+JSON.stringify(account));           
+                if(debugFlagEquity) console.log("compile.js sendBalance2 ACCOUNT "+JSON.stringify(account));           
             }
         }
     }
@@ -1359,12 +1363,12 @@ function sendBalance(balance) {
             closeIncome['refCode']=de_DE['NextYear'];
 
             let yearEnd = gReport.xbrlRegular.account.yearEnd;
-            if(debugReport) console.log("sendBalance CLOSING income "+yearEnd);
+            if(debugFlagReport) console.log("sendBalance CLOSING income "+yearEnd);
 
             var aNum=0;
             for(let name in gAccounts) {
                 if(gAccounts[name]) {
-                    // if(debugReport) console.dir("sendBalance UPDATE CLOSING OTC "+JSON.stringify(gAccounts[name]));
+                    // if(debugFlagReport) console.dir("sendBalance UPDATE CLOSING OTC "+JSON.stringify(gAccounts[name]));
                     let acc = gAccounts[name];
                     let xbrl = acc.xbrl;
                     let iCents=0n;
@@ -1379,7 +1383,7 @@ function sendBalance(balance) {
                         }
                         iMoneyIndex=acc.index; 
                         let iMoneyNumber=acc.number; 
-                        if(debugReport) console.log("sendBalance CLOSING OTC "+iMoneyIndex+":"+iMoneyNumber);
+                        if(debugFlagReport) console.log("sendBalance CLOSING OTC "+iMoneyIndex+":"+iMoneyNumber);
                     }
                 }
                 aNum++;
@@ -1391,7 +1395,7 @@ function sendBalance(balance) {
                 try {
                     let varcap=gAccounts[p.varCap];                   
                     if(varcap) {
-                        // if(debugReport) console.dir("sendBalance UPDATE CLOSING VAR "+JSON.stringify(p)+"Partner("+i+") "+JSON.stringify(varcap)); 
+                        // if(debugFlagReport) console.dir("sendBalance UPDATE CLOSING VAR "+JSON.stringify(p)+"Partner("+i+") "+JSON.stringify(varcap)); 
                         let name = varcap.name;
                         let aci = BigInt(varcap.income);
                         if(aci<0n) {
@@ -1403,15 +1407,15 @@ function sendBalance(balance) {
                             closeIncome.debit[name]=""+iCents;
                         }
                         iMoneyIndex=p.iVar; 
-                        if(debugReport) console.log("sendBalance CLOSING VAR "+iMoneyIndex);
+                        if(debugFlagReport) console.log("sendBalance CLOSING VAR "+iMoneyIndex);
                     }
                 } catch(err) { console.dir("compile.js sendBalance UPDATE CLOSING  VARCAP ERROR: "+err); }
             }
 
-            if(debugReport) console.log("sendBalance "+yearEnd+" CLOSING "+JSON.stringify(Object.keys(closeIncome.credit))+"  "+JSON.stringify(Object.keys(closeIncome.debit)));
+            if(debugFlagReport) console.log("sendBalance "+yearEnd+" CLOSING "+JSON.stringify(Object.keys(closeIncome.credit))+"  "+JSON.stringify(Object.keys(closeIncome.debit)));
 
             gReport.xbrlIncome.closing = JSON.stringify(closeIncome);
-            if(debugReport) console.log("1900 compile.js sendBalance UPDATE gReport.xbrlIncome.closing="+gReport.xbrlIncome.closing);
+            if(debugFlagReport) console.log("1900 compile.js sendBalance UPDATE gReport.xbrlIncome.closing="+gReport.xbrlIncome.closing);
 
         } else console.log("compile.js sendBalance UPDATE CLOSING: NO gReport.xbrlRegular.account.yearEnd");
     } catch(err) { console.dir("compile.js sendBalance UPDATE CLOSING ERROR: "+err); }
@@ -1429,8 +1433,8 @@ function sendBalance(balance) {
     
     // transfer page header footer information
     var page = makePage(balance); // side-effect
-    if(debugReport) console.log("compile.js sendBalance PAGE "+JSON.stringify(page));
-    if(debugReport) console.log();
+    if(debugFlagReport) console.log("compile.js sendBalance PAGE "+JSON.stringify(page));
+    if(debugFlagReport) console.log();
     gResponse[D_Page] = page;
 
     return gResponse;
@@ -1445,9 +1449,9 @@ function distribute(iMoney,bPartner,target) {
     var shares=[ 0n, 0n, 0n, 0n, 0n, 0n ];
     var cents =[ 0n, 0n, 0n, 0n, 0n, 0n ];
     var sign=1n;
-    if(debugTax) console.log('0130 Sender.distribute('+iMoney+') CALL WITH MONEY');
+    if(debugFlagTax) console.log('0130 Sender.distribute('+iMoney+') CALL WITH MONEY');
     if(iMoney<0n) { iMoney = -iMoney; sign=-1n; }
-    if(debugTax) console.log('0132 Sender.distribute('+iMoney+' * '+sign+') ABSOLUTE VALUE ');
+    if(debugFlagTax) console.log('0132 Sender.distribute('+iMoney+' * '+sign+') ABSOLUTE VALUE ');
 //return null;
 
 
@@ -1470,7 +1474,7 @@ function distribute(iMoney,bPartner,target) {
                 if(BigInt(p.denom)>0n) iShare = (iMoney * BigInt(p.gain)) / BigInt(p.denom);
                 shares[index1]=iShare;
                 cents[index1]=0n;
-                if(debugTax) console.log('0134 Sender.distribute #'+n+'='+index1+': '+sign+'*'+iShare+' to '+ p.varCap+ " with "+p.gain+"/"+p.denom);
+                if(debugFlagTax) console.log('0134 Sender.distribute #'+n+'='+index1+': '+sign+'*'+iShare+' to '+ p.varCap+ " with "+p.gain+"/"+p.denom);
                 index1++;
             }
         }
@@ -1479,12 +1483,12 @@ function distribute(iMoney,bPartner,target) {
 
         // skip one-man show
         if(bPartner.length<2) {
-            if(debugTax) console.log('0136 Sender.distributeMoney('+iMoney+') PRE-LOOP NO PARTNERS IN BALANCE'); 
+            if(debugFlagTax) console.log('0136 Sender.distributeMoney('+iMoney+') PRE-LOOP NO PARTNERS IN BALANCE'); 
             shares[0]=iMoney;
         }
         else while(check<iMoney){
             
-            if(debugTax) console.log("\n");
+            if(debugFlagTax) console.log("\n");
 
             // init minimum correction
             let min=cents[0];
@@ -1494,7 +1498,7 @@ function distribute(iMoney,bPartner,target) {
             check=0n;
             for(var q=0;q<shares.length;q++) {
                 check = check + shares[q] + cents[q];
-                if(debugTax) console.log("0138 distribute  "+q+"="+shares[q]+"+"+cents[q])
+                if(debugFlagTax) console.log("0138 distribute  "+q+"="+shares[q]+"+"+cents[q])
             }
             let err = iMoney-check;
 
@@ -1511,7 +1515,7 @@ function distribute(iMoney,bPartner,target) {
 
                 // increment cents' miminum
                 cents[mIndex]=min+1n;                
-                if(debugTax) console.log("0140 (min="+min+"   err="+err+") \n0140cents["+mIndex+"]="+cents[mIndex]+" G"+shares[0]+" E"+shares[1]+" A"+shares[2]+" K"+shares[3]+" T"+shares[5]);
+                if(debugFlagTax) console.log("0140 (min="+min+"   err="+err+") \n0140cents["+mIndex+"]="+cents[mIndex]+" G"+shares[0]+" E"+shares[1]+" A"+shares[2]+" K"+shares[3]+" T"+shares[5]);
                 
 
             }
@@ -1544,7 +1548,7 @@ function distribute(iMoney,bPartner,target) {
             if(p) {
                 p[target]= ""+shares[index];
 
-                if(debugTax) console.log('0142 distributeMoney('+shares[index]+') to '+JSON.stringify(p)+"["+target+"]");
+                if(debugFlagTax) console.log('0142 distributeMoney('+shares[index]+') to '+JSON.stringify(p)+"["+target+"]");
 
                 index++;
 
@@ -1554,8 +1558,8 @@ function distribute(iMoney,bPartner,target) {
     } else console.error('0133 Sender.distributeMoney('+JSON.stringify(iMoney)+') NO PARTNERS IN BALANCE');
 
     
-    if(debugTax && shares && shares.length>1) console.log('0144 Sender.distributeMoney RESULT '+iMoney + " G"+shares[0]+" E"+shares[1]+" A"+shares[2]+" K"+shares[3]+" T"+shares[4]+" L"+shares[5]);
-    if(debugTax && cents && cents.length>1)   console.log('0146 Sender.distributeMoney  CENTS '+iMoney + " G"+cents[0]+"  E"+cents[1] +" A"+ cents[2]+" K"+ cents[3]+" T"+ cents[4]+" L"+ cents[5]);
+    if(debugFlagTax && shares && shares.length>1) console.log('0144 Sender.distributeMoney RESULT '+iMoney + " G"+shares[0]+" E"+shares[1]+" A"+shares[2]+" K"+shares[3]+" T"+shares[4]+" L"+shares[5]);
+    if(debugFlagTax && cents && cents.length>1)   console.log('0146 Sender.distributeMoney  CENTS '+iMoney + " G"+cents[0]+"  E"+cents[1] +" A"+ cents[2]+" K"+ cents[3]+" T"+ cents[4]+" L"+ cents[5]);
     return shares; // shares.map((s,i)=>(s+cents[i]));
 }
 
@@ -1586,14 +1590,14 @@ function makePage(balance) {
 
             for(let key in de_DE) {
                 page[key]=  de_DE[key];  
-                if(debug>1) console.log("compile makePage de_DE "+key+" -> "+de_DE[key]);
+                if(debugFlag>1) console.log("compile makePage de_DE "+key+" -> "+de_DE[key]);
             }
 
             balance[D_Page] = page;
             // side-effect AND return value
 
-            if(debug) console.log();
-            if(debug>1) console.log("compile makePage "+JSON.stringify(Object.keys(page)));
+            if(debugFlag) console.log();
+            if(debugFlag>1) console.log("compile makePage "+JSON.stringify(Object.keys(page)));
 
         } else console.error("compile makePage:  NO schema");
     } else console.error("compile makePage: NO balance");
@@ -1612,7 +1616,7 @@ function bigAssetValueChange(row,iAssets,aXBRL) {
             var test = row[column];
             if(test && test.length > 0 && Sheets.bigEUMoney(test)!=0n  && aXBRL[column].startsWith(xbrlFixed)) {
                 iValue=Sheets.bigEUMoney(test); 
-                if(debugAssets) console.log("ASSET ("+aXBRL[column]+") VALUE CHANGE="+iValue)
+                if(debugFlagAssets) console.log("ASSET ("+aXBRL[column]+") VALUE CHANGE="+iValue)
                 run=false;
             }
             column++;
@@ -1629,7 +1633,7 @@ export function formatTXN(session,reqBody) {
     console.log("0066 compile.js formatTXN("+session.id+") book "+JSON.stringify(reqBody));
 
     if(Object.keys(reqBody).length>2) {
-        if(debug) console.log("compile.js ENTER formatTXN("+session.id+") book "+JSON.stringify(reqBody));
+        if(debugFlag) console.log("compile.js ENTER formatTXN("+session.id+") book "+JSON.stringify(reqBody));
 
         var jFlag  = reqBody.flag; if(!jFlag) jFlag=0;
         var jDate  = reqBody.date;
@@ -1644,17 +1648,25 @@ export function formatTXN(session,reqBody) {
         let sessionId=session.id;
         
         if(session) {
-            if(debug) console.dir("compile.js formatTXN("+sessionId+") book "+JSON.stringify(reqBody));
+            if(debugFlag) console.dir("compile.js formatTXN("+sessionId+") book "+JSON.stringify(reqBody));
+
+
+            try {
+                // GH202601 for a new sheet in a new main.json there will be NO session.generated
+                // so must compile existing session and try the result
+                session.generated = Compiler.compile(session);
+
+            } catch(e) { console.err("1539 sheets.xlsxWrite compile() error: "+e); }
 
             var balance = session.generated;
-
+            
             if(balance && balance[D_Schema]) {
 
                 let year = balance[D_Schema].reportYear;
         
                 if(isSameFY(year) || jFlag) {
 
-                    if(debug>0) console.log("compile.js formatTXN() "+JSON.stringify(jCredit)+"/ "+JSON.stringify(jDebit));
+                    if(debugFlag>0) console.log("compile.js formatTXN() "+JSON.stringify(jCredit)+"/ "+JSON.stringify(jDebit));
 
 
                     var total = balance[D_Schema].total;
@@ -1680,24 +1692,37 @@ export function formatTXN(session,reqBody) {
                         var i=jDebit[money].index;
                         bookingForm[i] = jDebit[money].value;
                     }
-                } else { console.dir("compile.js formatTXN() rejects other fiscal year:"+year);
+                } else { console.dir("0073 compile.js formatTXN() rejects other fiscal year:"+year);
                     return null;
                 }
-            } else console.log("compile.js formatTXN("+sessionId+") no BALANCE table ");
+            } else console.dir("0071 compile.js formatTXN("+sessionId+") no BALANCE table ");
 
-        } else console.log("compile.js formatTXN("+sessionId+") no SESSION ");
+        } else console.dir("0069 compile.js formatTXN("+sessionId+") no SESSION ");
         // receiver will append this to sheetCells
-    } else console.log("compile.js formatTXN() no TXN ");
+    } else console.dir("0067 compile.js formatTXN() no TXN ");
 
-    console.log();
-    console.log("0068 formatTXN returns "+(bookingForm ? bookingForm.join(';'): "null"));
-    console.log();
+    if(debugFlag) {
+        console.log();
+        console.log("0068 formatTXN returns "+(bookingForm ? bookingForm.join(';'): "null"));
+        console.log();
+    }
 
     return bookingForm;
 
 }
 
+/*
 
+
+0068 formatTXN returns null
+
+0610 app.post BOOK config({"root":"","bucket":"","firebase":{}})
+0612 app.post BOOK jTXN('---')
+'1450 sheets.bookSheet ENTER null into HGKG2026 for (HGKG,2026) with 19 lines in sheet '
+'1451 sheets.bookSheet SAVE NO booking statement tBuffer (HGKG,2026) #19'
+0034 save2Bucket Start saving(["year","client","sheetCells","sheetName","clientFunction","id","strTimeSymbol","assets","eqliab","total","author","residence","server","time","txnPattern","partner","firebase"]) to FB for HGKG,2026
+
+*/
 
 
 function getYear() {  return currentYear; }

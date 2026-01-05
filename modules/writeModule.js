@@ -10,7 +10,7 @@ import { strSymbol,timeSymbol } from './login'
 import { setSession } from './serverSession'
 import { compile } from './compile'
 
-const debug=true;
+const debugFlag=true;
 
 const HTMLSPACE=" "; 
 
@@ -137,7 +137,7 @@ export function prepareTXN(schema,flow, name,amount) {
     flow.euBalance=cents2EU(iBalance);
     flow.usBalance=cents2US(iBalance);
     
-    if(debug) console.dir("prepareTXN "+JSON.stringify(flow));
+    if(debugFlag) console.dir("prepareTXN "+JSON.stringify(flow));
     return flow;
 }
 
@@ -184,13 +184,13 @@ export async function writeFile(session) {  //GH20230815
     // write to filePath exists
     try {                
                 var writeStream = fs.createWriteStream(session.serverFile);
-                if(debug) console.log("1670 CREATED "+session.serverFile);
+                if(debugFlag) console.log("1670 CREATED "+session.serverFile);
 
                 writeStream.write(JSON.stringify(session),'UTF8');
-                if(debug) console.log("1680 WRITTEN "+session.serverFile);
+                if(debugFlag) console.log("1680 WRITTEN "+session.serverFile);
 
                 writeStream.end();
-                if(debug) console.log("1690 CLOSED "+session.serverFile);
+                if(debugFlag) console.log("1690 CLOSED "+session.serverFile);
 
                 writeStream.on('finish',function(){ console.log("1690 writeFile finished"); });
 
@@ -210,24 +210,24 @@ export async function sendFile(sig, response) {  // was fs.exists() GH20230401
         fs.access(sig.serverFile,  fs.constants.F_OK, (err) => {
             if (!err) { // 20231217
                 
-                if(debug) console.dir("1662 STARTING TO TRANSFER FILE "+sig.serverFile);
+                if(debugFlag) console.dir("1662 STARTING TO TRANSFER FILE "+sig.serverFile);
 
                 response.writeHead(200, {
                     "Content-Type": "application/octet-stream",
                     "Content-Disposition": "attachment; filename=" + sig.serverFile
                 });
 
-                if(debug) console.log("1666 TRANSFER "+sig.serverFile);
+                if(debugFlag) console.log("1666 TRANSFER "+sig.serverFile);
                 let rStream = fs.createReadStream(sig.serverFile);
                 
-                if(debug) console.log("1672 PIPING "+sig.serverFile);
+                if(debugFlag) console.log("1672 PIPING "+sig.serverFile);
                 rStream.pipe(response);
 
-                //if(debug) console.log("1676 CLOSING "+sig.serverFile);
+                //if(debugFlag) console.log("1676 CLOSING "+sig.serverFile);
                 //rStream.end();
                 //fs.close();
 
-                if(debug) console.log("1680 CLOSED "+sig.serverFile);
+                if(debugFlag) console.log("1680 CLOSED "+sig.serverFile);
                 return;
             }
             
@@ -260,7 +260,7 @@ export async function save2Bucket(jConfig,session,partner,client,year) {
             // async, setSession and compile
             accessFirebase(bucketUpload,fbConfig,partner,client,year,session,startSessionDisplay,null);
                 
-            if(debug) {
+            if(debugFlag) {
                 console.log("0036 save2Bucket session.sheetcells keys="+JSON.stringify(Object.keys(session.sheetCells).map((i)=>(session.sheetCells[i][0]))));
             }
 

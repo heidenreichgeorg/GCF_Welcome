@@ -7,7 +7,7 @@ import { init,localhost } from '../../modules/serverSession'
 import { startSessionDisplay,save2Bucket } from '../../modules/writeModule'
 import { compile } from '../../modules/compile'
 
-const debugUpload = true;
+const debugFlagUpload = true;
 
 var nets;
 
@@ -31,7 +31,7 @@ export default function handler(
     console.log("0808 app.post UPLOAD from "+remote);
 
     let rawData = req.body;
-    if(debugUpload) console.dir("0810 app.post UPLOAD with "+rawData);
+    if(debugFlagUpload) console.dir("0810 app.post UPLOAD with "+rawData);
 
 
     if(rawData && rawData.client && rawData.year) {
@@ -49,12 +49,12 @@ export default function handler(
             rawData.id=computed;
             sessionId=computed;
         }
-        if(debugUpload) console.dir("0812 app.post UPLOAD partner="+partner+"  client="+client+",year="+year+",time="+time+",r="+remote+"  ---> "+computed);
+        if(debugFlagUpload) console.dir("0812 app.post UPLOAD partner="+partner+"  client="+client+",year="+year+",time="+time+",r="+remote+"  ---> "+computed);
 
 
         if(sessionId!=null && computed!=null && year!=null && client!=null) {
             // save file on server, not on client and forward to LOGIN page
-            if(debugUpload) console.dir("0814 app.post UPLOAD with function="+clientFunction+",partner="+partner+",client="+client+",year="+year+",time="+time+",r="+remote+"  ---> "+computed);
+            if(debugFlagUpload) console.dir("0814 app.post UPLOAD with function="+clientFunction+",partner="+partner+",client="+client+",year="+year+",time="+time+",r="+remote+"  ---> "+computed);
          
             let sessionData = rawData;
             sessionData.strTimeSymbol=strTimeSymbol;
@@ -78,14 +78,14 @@ export default function handler(
             // shortcut for OFFLINE start  
             // 20221207 DO NOT call sendDisplay              
             startSessionDisplay(sessionData,null); 
-            if(debugUpload) console.dir("0820 app.post UPLOAD starts offline");
+            if(debugFlagUpload) console.dir("0820 app.post UPLOAD starts offline");
             
 
             
             let cmdLogin = "http://"+localhost().addr+":3000/Status?partner="+partner+"&client="+client+"&year="+year; // GH20250112
             // should not set a sesssion.id because id not known while async save2bucket is not finished       
 
-            if(debugUpload) console.dir("0822 app.post UPLOAD rendering QR code");
+            if(debugFlagUpload) console.dir("0822 app.post UPLOAD rendering QR code");
             res.write('<DIV class="attrRow"><H1>'+year+'&nbsp;'+client+'&nbsp;</H1>'
                 +'<DIV class="attrRow"><DIV class="FIELD C100"><A HREF="'+cmdLogin+'"><BUTTON class="largeKey">LOGIN</BUTTON></A></DIV></DIV>'
                 +'</DIV>'
@@ -93,7 +93,7 @@ export default function handler(
             res.end();
             
 
-        } else if(debugUpload) console.log ( "0813 UPLOAD VOID client="+client+",year="+year+",time="+time+",addr="+remote+"  ---> "+computed);
+        } else if(debugFlagUpload) console.log ( "0813 UPLOAD VOID client="+client+",year="+year+",time="+time+",addr="+remote+"  ---> "+computed);
 
         return;
     } else {

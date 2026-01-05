@@ -106,7 +106,10 @@ export default function Status() {
     const [showAccount, setShowAccount] = useState(false);
     const [jHeads, setJHeads] = useState({});
     const [currLine,setCurrLine] = useState(0);
-    
+
+    const [formReason,setFormReason] = useState('Zeit');
+
+
     const VOID ="-,--";
 
     var funcShowReceipt=null;
@@ -655,7 +658,7 @@ export default function Status() {
             
             <div className="attrLine">
             {(autoAcct && autoAcct.length>0) ? 
-                (<div className="FIELD L280"> Der Betrag in {autoAcct} wird berechnet.</div>)
+                (<div className="FIELD FLEX"> Der Betrag in {autoAcct} wird berechnet.</div>)
                 :
                 (<div className="FIELD L280"> Sachbuchung</div>)
             }
@@ -716,6 +719,17 @@ export default function Status() {
                     </div>)
                 ))}
                 
+
+                <div className="FIELD SYMB" ></div>
+                <div className="FIELD SYMB" ></div>
+                <div className="FIELD SYMB" ></div>
+                <div className="FIELD SYMB" ><button className="key SYMB" onClick={(() => setFormReason(form.reason='Januar'))}>{page.Month}</button></div>
+                <div className="FIELD SEP" ></div>
+                <div className="FIELD SYMB" ><button className="key SYMB" onClick={(() => setFormReason(form.reason='Q1'))}>{page.Quarter}</button></div>
+                <div className="FIELD SEP" ></div>
+                <div className="FIELD SYMB" ><button className="key SYMB" onClick={(() => setFormReason(form.reason='2026'))}>{page.Year}</button></div>
+                <div className="FIELD SEP" ></div>
+
             </div>    
             <div className="attrLine">
                 <div className="FIELD MOAM" >

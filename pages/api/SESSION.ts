@@ -1,4 +1,5 @@
-const debugAUTH=1;
+// violates confidentials secrecy
+const debugFlagAUTH=1;
 
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next'
@@ -26,12 +27,13 @@ export default function handler(
       console.log("0004 SESSION.ts handler "+JSON.stringify(query)+" jConfig="+JSON.stringify(jConfig));
     
       // NO sign-in login authenticat
-      if(auth==currentHash(""+client+(""+partner),year))
+      if(auth==currentHash(""+client+(""+partner),year)) {
         signIn(jConfig,query,req.socket.remoteAddress,res,startSessionJSON); 
-      else  {
+        if(debugFlagAUTH) console.log("0006 good auth "+JSON.stringify(req.query));
+      } else  {
 
-        if(debugAUTH) console.log("0005 no match "+JSON.stringify(query));
-        if(debugAUTH) console.log("0005 wrong auth "+JSON.stringify(req.query));
+        if(debugFlagAUTH) console.log("0005 no match "+JSON.stringify(query));
+        if(debugFlagAUTH) console.log("0005 wrong auth "+JSON.stringify(req.query));
 
         res.json({ id: '0666', code : "NO VALID AUTH"})
       }

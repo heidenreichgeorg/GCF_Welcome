@@ -3,11 +3,11 @@
 import * as fs from 'fs';
 
 
-// debug level violates admin confidentiality
-const debug=8;
+// debugFlag level violates admin confidentiality
+const debugFlag=null;
 
 // SETTING THIS WILL VIOLATE PRIVACY AT ADMIN CONSOLE
-const debugReport=7;
+const debugFlagReport=null;
 
 const MAIN = "main.json";
 
@@ -43,7 +43,7 @@ function getFileContents(fileName) {
       if (err) { console.log("0033 getFileContents FAILED "+JSON.stringify(err));reject(null);  }
 
 
-      //if(debug) console.log("0030 getFileContents  "+JSON.stringify(data));
+      //if(debugFlag) console.log("0030 getFileContents  "+JSON.stringify(data));
       resolve(data ? data.toString() : null)
     });
   })
@@ -85,7 +85,7 @@ function makeSession(strBody,partner,client,year,txnPattern) {
 
 async function bucketDownload(bpStorage,partner,client,year,jData,startSessionCB,callRes) {
 
-    if(debug) console.log('0038 plainFileIO.bucketDownload jData '+JSON.stringify(jData))
+    if(debugFlag) console.log('0038 plainFileIO.bucketDownload jData '+JSON.stringify(jData))
         let sClient = client.replace('.','_');
     let iYear = 0
     try {
@@ -110,13 +110,13 @@ async function bucketDownload(bpStorage,partner,client,year,jData,startSessionCB
             } catch(e) {}
 
 
-            if(debug>1) console.log('0040 plainFileIO.bucketDownload read '+txnFileName+' --> '+txnPattern)
+            if(debugFlag>1) console.log('0040 plainFileIO.bucketDownload read '+txnFileName+' --> '+txnPattern)
 
 
 
             // GH20250212 read local main.json from a file
             const dataFilePath = localPath+client+slash+year+slash+MAIN;
-            if(debug>1) console.log('0042 plainFileIO.bucketDownload read root/entity/client/year/txnPattern.txt; '+txnPattern)
+            if(debugFlag>1) console.log('0042 plainFileIO.bucketDownload read root/entity/client/year/txnPattern.txt; '+txnPattern)
 
             try {
 
@@ -135,25 +135,25 @@ async function bucketDownload(bpStorage,partner,client,year,jData,startSessionCB
                 let strBody = await fs.promises.readFile(dataFilePath,  'utf8');
                 //  fs.readFileSync(fileName, 'utf8');
 
-                if(debug) console.log("0044 plainFileIO.bucketDownload plain local file read "+dataFilePath+" DONE");
+                if(debugFlag) console.log("0044 plainFileIO.bucketDownload plain local file read "+dataFilePath+" DONE");
                 // GH20250714
                 // console.log("0046 plainFileIO.bucketDownload plain  file read "+strBody);
 
                 session = makeSession(strBody,partner,client,year,txnPattern)
 
-                if(debugReport) console.dir("0046 plainFileIO.bucketDownload session "+JSON.stringify(session));
+                if(debugFlagReport) console.dir("0046 plainFileIO.bucketDownload session "+JSON.stringify(session));
 
                 // AVOID double HEADERS 
                 startSessionCB(session,callRes,jData); 
                 // 3rd param to startSessionCB JData is from config = 1st arg on calling plainFileIO.js
     
 
-                if(debugReport) console.dir("0048 plainFileIO.bucketDownload returned from startSessionCB ");
+                if(debugFlagReport) console.dir("0048 plainFileIO.bucketDownload returned from startSessionCB ");
 
                 return null;
             } catch(e) {
 
-              if(debug) console.log("0033 plainFileIO.bucketDownload plain local file "+dataFilePath+" read FAILED");
+              if(debugFlag) console.log("0033 plainFileIO.bucketDownload plain local file "+dataFilePath+" read FAILED");
             }
         }
       }    
@@ -257,12 +257,12 @@ async function bucketUpload(bpStorage,partner,client,year,jData,startSessionCB,c
 	            // Write the updated data to the JSON file
     	        let writeResult = await fs.promises.writeFile(dataFilePath, JSON.stringify(jData));
 
-              if(debug) console.log("0072 plainFileIO.bucketUpload plain local file write DONE: "+dataFilePath);
+              if(debugFlag) console.log("0072 plainFileIO.bucketUpload plain local file write DONE: "+dataFilePath);
 
 
             } catch(e) {
 
-              if(debug) console.log("0073 plainFileIO.bucketUpload plain local file "+dataFilePath+" write FAILED");
+              if(debugFlag) console.log("0073 plainFileIO.bucketUpload plain local file "+dataFilePath+" write FAILED");
             }      
       }
     }

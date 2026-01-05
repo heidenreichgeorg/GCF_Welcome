@@ -1,4 +1,4 @@
-const debug=null;
+const debugFlag=null;
 
 
 import { D_Balance, D_History, D_Report, D_Schema, D_Page, X_ASSETS, X_EQLIAB, X_EQUITY, X_INCOME, X_INCOME_REGULAR, SCREENLINES } from './terms.js'
@@ -18,12 +18,12 @@ export function getSelect(targetId) {
 export function setSelect(targetId,value) { 
     var elem = document.getElementById(targetId);
     if(elem) {
-        if(debug) console.log("App.setSelect "+targetId+" WITH "+value);
+        if(debugFlag) console.log("App.setSelect "+targetId+" WITH "+value);
         let arrElem=elem.options;
         for(let i=0;i<arrElem.length;i++) {
             if(arrElem[i].value==value) {
                 elem.selectedIndex=i;
-                if(debug) console.log("App.setSelect OPTION "+i);
+                if(debugFlag) console.log("App.setSelect OPTION "+i);
             }
         }
     }
@@ -56,7 +56,7 @@ const iSNAM = 16;
 
 export function makeStatusData(response) {
 
-    const debugMSD=1;
+    const debugFlagMSD=null;
 
     const page = response[D_Page];
     
@@ -74,7 +74,7 @@ export function makeStatusData(response) {
     let gls="{close:0}";
 
     var jReport = response[D_Report];
-    if(debugMSD) console.log("1200 makeStatusData from response D_Report"+JSON.stringify(Object.keys(jReport)));
+    if(debugFlagMSD) console.log("1200 makeStatusData from response D_Report"+JSON.stringify(Object.keys(jReport)));
 
     var jHistory = response[D_History];
     var gSchema = response[D_Schema];
@@ -83,29 +83,29 @@ export function makeStatusData(response) {
     // add three additional accounts: ASSETS, EQLIAB, GAINLOSS
     if(jReport["xbrlAssets"].account) { 
         ass = jReport["xbrlAssets"].account; 
-        if(debugMSD) console.log("1210 ASSET "+JSON.stringify(ass)); 
+        if(debugFlagMSD) console.log("1210 ASSET "+JSON.stringify(ass)); 
         jAccounts["xbrlAssets"]=ass;
     }
     if(jReport["xbrlEqLiab"].account) { 
         eql = jReport["xbrlEqLiab"].account; 
-        //if(debugMSD) console.log("1220 EQLIB "+JSON.stringify(eql)); 
+        //if(debugFlagMSD) console.log("1220 EQLIB "+JSON.stringify(eql)); 
         console.log("1220 EQLIB "+jReport["xbrlEqLiab"].account.toString()); 
         jAccounts["xbrlEqLiab"]=eql;
     }
     if(jReport["xbrlRegular"].account) { 
         gls = jReport["xbrlRegular"].account; 
-        if(debugMSD) console.log("1230 GALOS "+JSON.stringify(gls)); 
+        if(debugFlagMSD) console.log("1230 GALOS "+JSON.stringify(gls)); 
         jAccounts["xbrlRegular"]=gls;
     }
 
 
     // show all accounts omn console
-    if(debugMSD) console.log("1240 makeStatusData from response D_Balance"+JSON.stringify(Object.keys(jAccounts)));    
+    if(debugFlagMSD) console.log("1240 makeStatusData from response D_Balance"+JSON.stringify(Object.keys(jAccounts)));    
     else console.log( Object.keys(jAccounts).map((name,i)=>("   "+name+": "+(jAccounts[name].xbrl))).join(" "));
 
 
 
-    if(debugMSD) console.log("1250 "+response.toString());
+    if(debugFlagMSD) console.log("1250 "+response.toString());
     
     // build four columns
     let aLeft={};
@@ -127,10 +127,10 @@ export function makeStatusData(response) {
                     if(account.xbrl.startsWith(jReport.xbrlTanFix.xbrl)) { // accumulate tangible fixed assets
                         iTan = iTan + iClose;
                     }
-                    if(debugMSD) console.log("1260 makeStatusData Fixed Assets: "+JSON.stringify(account))
+                    if(debugFlagMSD) console.log("1260 makeStatusData Fixed Assets: "+JSON.stringify(account))
                 } else if(account.xbrl.startsWith(jReport.xbrlAcurr.xbrl)) { // accumulate current assets#
                     iCur = iCur + iClose;
-                    if(debugMSD) console.log("1270 makeStatusData Currency Assets: "+JSON.stringify(account))
+                    if(debugFlagMSD) console.log("1270 makeStatusData Currency Assets: "+JSON.stringify(account))
 
                     if(account.xbrl.startsWith(jReport.xbrlPaidTax.xbrl)) { // accumulate paid tax#
                         iTax = iTax + iClose;
@@ -181,7 +181,7 @@ export function makeStatusData(response) {
     let iLeft=0;
     for (let name in aLeft)   {
         var account=aLeft[name];
-        if(debugMSD) console.log("1280 STATUS.JS STATUSDATA LEFT "+iLeft+" "+name+"="+account.yearEnd);
+        if(debugFlagMSD) console.log("1280 STATUS.JS STATUSDATA LEFT "+iLeft+" "+name+"="+account.yearEnd);
         if(iLeft<SCREENLINES) {
             statusData[iLeft]={};
             statusData[iLeft].assets=account;
@@ -231,7 +231,7 @@ export function makeStatusData(response) {
 
         for (let hash in jHistory)  {
 
-            if(debugMSD) console.log("Recent TXN("+hash+") #iTran="+iTran+ "      #bLine="+bLine+"    #maxRow="+maxRow);
+            if(debugFlagMSD) console.log("Recent TXN("+hash+") #iTran="+iTran+ "      #bLine="+bLine+"    #maxRow="+maxRow);
 
             if(bLine<=maxRow && iTran>=0) {
         

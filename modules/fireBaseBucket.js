@@ -22,10 +22,10 @@ UPLOAD JSON (Admin only)
 
 */
 
-const debug=7;
+const debugFlagFiles=7;
 
 // SETTING THIS WILL VIOLATE PRIVACY AT ADMIN CONSOLE
-const debugReport=7;
+const debugFlagReport=null;
 
 
 const MAIN = "main.json";
@@ -80,7 +80,7 @@ function accessFirebase(accessMethod,firebaseConfig,partner,client,year,jData,st
 
   // LOGIN user 
   const auth = fbAuth.getAuth();
-  if(debug) console.log("\nFB.bucketInit");
+  if(debugFlagFiles) console.log("\nFB.bucketInit");
   fbAuth.signInWithEmailAndPassword(auth, firebaseConfig.usermail, firebaseConfig.userpassword)
     .then((userCredential) => {
 
@@ -88,7 +88,7 @@ function accessFirebase(accessMethod,firebaseConfig,partner,client,year,jData,st
       // Signed in 
       const user = userCredential.user;
       // compare user===partner ??
-      if(debug) console.log("\n0028 FB.bucketInit LOGGED IN FROM "+jData.root+jData.bucket);
+      if(debugFlagFiles) console.log("\n0028 FB.bucketInit LOGGED IN FROM "+jData.root+jData.bucket);
 
 
       url = accessMethod(bpStorage,partner,client,year,jData,startSessionCB,res);
@@ -99,7 +99,7 @@ function accessFirebase(accessMethod,firebaseConfig,partner,client,year,jData,st
     .catch((error) => {
       const errorCode = error.code;
       const errorMessage = error.message;
-      if(debug) console.log("0027 FB.bucketInit ("+errorCode+") LOGIN FAILED "+errorMessage)
+      if(debugFlagFiles) console.log("0027 FB.bucketInit ("+errorCode+") LOGIN FAILED "+errorMessage)
     });
   
 
@@ -119,7 +119,7 @@ function getFileContents(fileName) {
       if (err) { console.log("0033 getFileContents FAILED "+JSON.stringify(err));reject(null);  }
 
 
-      //if(debug) console.log("0030 getFileContents  "+JSON.stringify(data));
+      //if(debugFlagFiles) console.log("0030 getFileContents  "+JSON.stringify(data));
       resolve(data ? data.toString() : null)
     });
   })
@@ -160,7 +160,7 @@ async function bucketDownload(bpStorage,partner,client,year,jData,startSessionCB
     let sClient = client.replace('.','_');
     let iYear = parseInt(year);
 
-    if(debug) console.log('0030 firebaseBucket.bucketDownload jData '+JSON.stringify(jData))
+    if(debugFlagFiles) console.log('0030 firebaseBucket.bucketDownload jData '+JSON.stringify(jData))
 
 
 
@@ -168,13 +168,13 @@ async function bucketDownload(bpStorage,partner,client,year,jData,startSessionCB
 
     const strChild = Slash+sClient+Slash+iYear+Slash+MAIN;  
     const fileRef = fbStorage.ref(bpStorage, strChild);
-    if(debug) console.log('0030 firebaseBucket.bucketDownload fileRef='+JSON.stringify(fileRef._service.app._options.projectId));
+    if(debugFlagFiles) console.log('0030 firebaseBucket.bucketDownload fileRef='+JSON.stringify(fileRef._service.app._options.projectId));
 
     
     let txnPattern = null;
     try { txnPattern = await getFileContents(jData.root+"entity/"+client+"/"+year+"/txnPattern.txt");
     } catch(e) {}
-    if(debug>1) console.log('0030 firebaseBucket.bucketDownload read root/entity/client/year/txnPattern.txt; '+txnPattern)
+    if(debugFlagFiles>1) console.log('0030 firebaseBucket.bucketDownload read root/entity/client/year/txnPattern.txt; '+txnPattern)
 
 
   fbStorage.getDownloadURL(fileRef)
@@ -183,7 +183,7 @@ async function bucketDownload(bpStorage,partner,client,year,jData,startSessionCB
     function(url) {
 
 
-      if(debug) console.log('0032 Firebase.download url '+url)
+      if(debugFlagFiles) console.log('0032 Firebase.download url '+url)
 
         let session = {};
         https.get(url, res => {
@@ -193,7 +193,7 @@ async function bucketDownload(bpStorage,partner,client,year,jData,startSessionCB
           });
           res.on('end', () => {
             try {
-               if(debugReport) console.dir("0034 Firebase.download body "+body);
+               if(debugFlagReport) console.dir("0034 Firebase.download body "+body);
 
                session = makeSession(body,partner,client,year,txnPattern)
   
@@ -202,9 +202,9 @@ async function bucketDownload(bpStorage,partner,client,year,jData,startSessionCB
                console.error("0035 Firebase.download ERR "+err.toString());
             }
 
-            if(debug) console.log("0038 Firebase.download session "+JSON.stringify(Object.keys(session)));
+            if(debugFlagFiles) console.log("0038 Firebase.download session "+JSON.stringify(Object.keys(session)));
 
-            if(debugReport) console.dir("0039 Firebase.download session "+JSON.stringify(session));
+            if(debugFlagReport) console.dir("0039 Firebase.download session "+JSON.stringify(session));
             // AVOID double HEADERS 
             startSessionCB(session,callRes,jData); 
             // 3rd param to startSessionCB JData is from config = 1st arg on calling fireBaseBucket.js
@@ -310,19 +310,19 @@ async function bucketUpload(bpStorage,partner,client,year,jData,startSessionCB,c
 	            // Write the updated data to the JSON file
     	        let writeResult = await fs.promises.writeFile(dataFilePath, JSON.stringify(jData));
 
-              if(debug) console.log("0072 bucketUpload plain local file write DONE");
+              if(debugFlagFiles) console.log("0072 bucketUpload plain local file write DONE");
 
 
             } catch(e) {
 
-              if(debug) console.log("0073 bucketUpload plain local file "+dataFilePath+" write FAILED");
+              if(debugFlagFiles) console.log("0073 bucketUpload plain local file "+dataFilePath+" write FAILED");
             }
 
 
         // FireBase UPload
         const fileRef = fbStorage.ref(bpStorage, strChild);
         if(fileRef) {
-          if(debug) console.log("0074 bucketUpload fileRef for "+strChild);
+          if(debugFlagFiles) console.log("0074 bucketUpload fileRef for "+strChild);
 
           var jsonString = JSON.stringify(jData);
           const buffer = Buffer.from(jsonString, 'utf8');     
@@ -339,7 +339,7 @@ async function bucketUpload(bpStorage,partner,client,year,jData,startSessionCB,c
                 Math.round((snapshot.bytesTransferred / total) * 100);
               //setProgresspercent(progress);
               
-              if(debug) console.log("0076 bucketUpload "+progress+"%");
+              if(debugFlagFiles) console.log("0076 bucketUpload "+progress+"%");
 
             },
           (error) => { 
@@ -349,7 +349,7 @@ async function bucketUpload(bpStorage,partner,client,year,jData,startSessionCB,c
             // ERROR
           // A full list of error codes is available at
               // https://firebase.google.com/docs/storage/web/handle-errors
-              if(debug) console.log(error.name +" "+error.code+" "+error._baseMessage);
+              if(debugFlagFiles) console.log(error.name +" "+error.code+" "+error._baseMessage);
               
 
               switch (error.code) {
@@ -375,7 +375,7 @@ async function bucketUpload(bpStorage,partner,client,year,jData,startSessionCB,c
             if(uploadTask.snapshot && uploadTask.snapshot.ref && uploadTask.snapshot.ref._location) {
               const loc = uploadTask.snapshot.ref._location;
               downloadUrl = loc.bucket+Slash+loc.path_;
-              if(debug) console.log("0078 Firebase fbWriteJSON to: "+downloadUrl);          
+              if(debugFlagFiles) console.log("0078 Firebase fbWriteJSON to: "+downloadUrl);          
               
               // 20221127
               startSessionCB(jData,callRes,{});

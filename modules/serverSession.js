@@ -6,7 +6,7 @@ import { fbDownload } from './plainFileIO.js'
 import { compile } from './compile.js'
 import { PORT } from './terms.js'
 
-const debug=false;
+const debugFlag=null;
 
 export const HTTP_OK = 200;
 export const HTTP_WRONG = 400;
@@ -64,7 +64,7 @@ export function signIn(jConfig,query,remote,res,startSessionCB) {
 
 export function startSessionJSON(session,res) {
 
-    if(debug) console.log("0040 startSessionJSON="+JSON.stringify(Object.keys(session))); 
+    if(debugFlag) console.log("0040 startSessionJSON="+JSON.stringify(Object.keys(session))); 
 
     let newSession = createSession(session,res);
 
@@ -94,10 +94,10 @@ function processArgv(processArgv) {
     let bucket="";
     let root="";
     processArgv.forEach(function (val, index, array) {
-        if(debug>1) console.log("0002 Starting server " + index + ': ' + val);
+        if(debugFlag>1) console.log("0002 Starting server " + index + ': ' + val);
         let attribute=val.split('=');
         if(index>1 && attribute && attribute.length>1) {
-            //if(debug>1) 
+            //if(debugFlag>1) 
             console.log("0006 Attribute " + index + ': ' + val);
             if(attribute[0].toLowerCase()==='root') {
                 let rawRoot=attribute[1];
@@ -144,7 +144,7 @@ export function setSession(aSession) {
         aPrev.map((field,i)=>((i>5 && field && field.length>1) ? (prev=prev+" "+field):""));
     }
 */        
-    if(debug>4) console.log("\n0580  setSession("+showRecent(aSession)+") "+aSession.id); 
+    if(debugFlag>4) console.log("\n0580  setSession("+showRecent(aSession)+") "+aSession.id); 
 }
 
 
@@ -229,14 +229,14 @@ export function localhost() {
                 if (!results[name]) {
                     results[name] = [];
                 }
-                if(debug) console.dir ( "OS["+name+"] net info "+net.address);
+                if(debugFlag) console.dir ( "OS["+name+"] net info "+net.address);
                 results.push({ 'type':name, 'addr':net.address});
             }
-            if(debug) console.log ( "OS["+name+"]  other  "+JSON.stringify(net));
+            if(debugFlag) console.log ( "OS["+name+"]  other  "+JSON.stringify(net));
         }
     }
     instance = results[0] ? results[0].addr : "127.0.0.1";
-    if(debug) console.dir ( "OS.address  "+instance);
+    if(debugFlag) console.dir ( "OS.address  "+instance);
     
     return { 'addr':instance, 'port':PORT };
 }
@@ -256,7 +256,7 @@ export function sendDisplay(session,res) {
 
         const clientHead = "Login";
 
-        if(debug) console.dir("5010 sendDisplay() rendering url="+url);
+        if(debugFlag) console.dir("5010 sendDisplay() rendering url="+url);
 
         if(res) {
            // qr.toDataURL(url, (err, qrCodeDataUrl) => {
@@ -269,7 +269,7 @@ export function sendDisplay(session,res) {
                 const html = "nbsp;";
 
 
-                if(debug) console.dir("5020 sendDisplay() rendering QR code with #"+html.length+ "chars");
+                if(debugFlag) console.dir("5020 sendDisplay() rendering QR code with #"+html.length+ "chars");
                 
                 res.setHeader("Access-Control-Allow-Origin", "*");
                 res.setHeader("Access-Control-Allow-Headers","Origin, X-Requested-With, Content-Type, Accept, Authorization");        
@@ -281,7 +281,7 @@ export function sendDisplay(session,res) {
     } else {
         res.writeHead(HTTP_OK);
         res.end("\n<HTML>"+clientHead+"<BODY>"+banner+"</BODY></HTML>\n");
-        if(debug) console.dir("5021 sendDisplay: no sessionId");
+        if(debugFlag) console.dir("5021 sendDisplay: no sessionId");
 
     }
 }
