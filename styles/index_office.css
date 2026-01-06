@@ -43,6 +43,7 @@ input[type="radio"]::before {content: "#"; }
 .TRASH    { width: 1rem; text-align: center; font-size:21px; height:17px; vertical-align: top;}		
 .TAG      { width: 1.8rem; text-align: left;  }		
 .SYMB     { width: 3rem;  text-align: left; }		
+.LABL     { width: 4rem;  text-align: center; }		
 .MOAM     { width:5.2rem; text-align: right; font-family:monospace; }
 .TEAM     { width:5.3rem; text-align: right; }
 .SNAM     { width:5.8rem; text-align: left; }		

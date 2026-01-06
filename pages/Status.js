@@ -94,6 +94,15 @@ export default function Status() {
         "Zuordnung Nebenkosten":{"text":"Auslagen werden als Nebenkosten umgebucht","creditEQL":{},"credit":{"FSTF":"0"},"debit":{"NKHA":"0"},"debitA":{},"sender":"Nebenkosten","reason":"Zuordnung","refAcct":"NKHA","refCode":"Abrechnung"}
             */
         };
+
+        const monat = ["Januar","Februar","März","April","Mai","Juni","Juli","August","September","Oktober","November","Dezember"]
+        const dateNow =  new Date(Date.now()); 
+        const strYearNow = ''+ dateNow.getUTCFullYear();
+        const iMonth = dateNow.getUTCMonth();
+        const strMonthNow = ('0' + (1+iMonth)).slice(-2)
+        const strMonat = monat[iMonth];
+        const strQuarterNow =  'Q'+(1+(iMonth%4));
+
             
 
     const [sheet, setSheet]  = useState()
@@ -684,12 +693,27 @@ export default function Status() {
     
                 <div className="FIELD SYMB" >{txt4}</div>
                 <div className="FIELD "><input type ="text" className="key" defaultValue={form.refCode} onChange={((e) => bufferField(strKey,'refCode',e.target.value))}/></div>
-                <div className="FIELD SEP" ></div>
-                
+                <div className="FIELD SEP" ></div>                
             </div>
+
+
             <div className="attrLine">
-      
-                {arrCredit.map((acct,line)=>(
+                <div className="FIELD MOAM" ></div>
+                <div className="FIELD MOAM" ></div>
+                <div className="FIELD MOAM" ></div>
+                <div className="FIELD MOAM" ></div>
+                <div className="FIELD LABL" ></div>
+                <div className="FIELD " ><button className="key LABL" onClick={(() => setFormReason(form.reason=strMonat+' '+strYearNow))}>{page.Month}</button></div>
+                <div className="FIELD " >&nbsp;</div>
+                <div className="FIELD " ><button className="key LABL" onClick={(() => setFormReason(form.reason=strQuarterNow+' '+strYearNow))}>{page.Quarter}</button></div>
+                <div className="FIELD " >&nbsp;</div>
+                <div className="FIELD " ><button className="key LABL" onClick={(() => setFormReason(form.reason=strYearNow))}>{page.Year}</button></div>
+                <div className="FIELD SEP" ></div>
+            </div>    
+
+
+            <div className="attrLine">
+                                {arrCredit.map((acct,line)=>(
                     (<div key={"credit"+line}  >
                         <div className="FIELD TAG" > {acct}</div>
                         { acct!=autoAcct ? (<div className="FIELD "><input type ="number" className="key MOAM" defaultValue={form.credit[acct]} onChange={((e) => bufferAmount(strKey,acct,e.target.value,'credit'))} /></div>):''}
@@ -720,17 +744,9 @@ export default function Status() {
                 ))}
                 
 
-                <div className="FIELD SYMB" ></div>
-                <div className="FIELD SYMB" ></div>
-                <div className="FIELD SYMB" ></div>
-                <div className="FIELD SYMB" ><button className="key SYMB" onClick={(() => setFormReason(form.reason='Januar'))}>{page.Month}</button></div>
-                <div className="FIELD SEP" ></div>
-                <div className="FIELD SYMB" ><button className="key SYMB" onClick={(() => setFormReason(form.reason='Q1'))}>{page.Quarter}</button></div>
-                <div className="FIELD SEP" ></div>
-                <div className="FIELD SYMB" ><button className="key SYMB" onClick={(() => setFormReason(form.reason='2026'))}>{page.Year}</button></div>
-                <div className="FIELD SEP" ></div>
+            </div>
 
-            </div>    
+
             <div className="attrLine">
                 <div className="FIELD MOAM" >
                     <button className="key" onClick={(() => preBook(strKey))}> {page.Display}</button>

@@ -83,6 +83,7 @@ input[type=number] {
 .TAG      { width: 1.8rem; text-align: left;  }		
 .SYMB     { width: 3rem;   text-align: left; }		
 .DATE     { width: 4.3rem; text-align: center; }		
+.LABL     { width: 4rem;  text-align: center; }		
 .MOAM     { width: 5.2rem; text-align: right; font-family:monospace; font-size:1.3em;}
 .TEAM     { width: 5.3rem; text-align: right; }
 .SNAM     { width: 5.8rem; text-align: left; }		
