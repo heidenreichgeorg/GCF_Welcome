@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { getSession, useSession, REACT_APP_API_HOST,getCarryOver,storeCarryOver } from '../modules/sessionmanager';
 import Screen from './Screen'
 import { cents2EU,bigUSMoney,cents20EU,bigEUMoney }  from '../modules/money';
-import { CSEP, D_INITIAL, D_Account, D_Balance, D_Carry, D_CarryOver, D_Page, D_Partner, D_FixAss, D_History, D_Report, D_Schema, J_ACCT, SCREENLINES, X_ASSET_CAPTAX, X_ASSET_UNPCAP, X_ASSETS, X_EQLIAB } from '../modules/terms.js'
+import { CSEP, CDOT, D_Account, D_Balance, D_Carry, D_CarryOver, D_Page, D_Partner, D_FixAss, D_History, D_Report, D_Schema, D_XBRL, J_ACCT, SCREENLINES, X_ASSET_CAPTAX, X_ASSET_UNPCAP, X_ASSETS, X_EQLIAB } from '../modules/terms.js'
 import { book,prepareTXN,makeHistory, symbolic }  from '../modules/writeModule';
 import { makeBalance, makeHGBReport,makeStatusData }  from '../modules/App';
 
@@ -95,15 +95,15 @@ export default function Status() {
             */
         };
 
-        const monat = ["Januar","Februar","März","April","Mai","Juni","Juli","August","September","Oktober","November","Dezember"]
-        const dateNow =  new Date(Date.now()); 
-        const strYearNow = ''+ dateNow.getUTCFullYear();
-        const iMonth = dateNow.getUTCMonth();
-        const strMonthNow = ('0' + (1+iMonth)).slice(-2)
-        const strMonat = monat[iMonth];
-        const strQuarterNow =  'Q'+(1+(iMonth%4));
+    const monat = ["Januar","Februar","März","April","Mai","Juni","Juli","August","September","Oktober","November","Dezember"]
+    const dateNow =  new Date(Date.now()); 
+    const strYearNow = ''+ dateNow.getUTCFullYear();
+    const iMonth = dateNow.getUTCMonth();
+    const strMonthNow = ('0' + (1+iMonth)).slice(-2)
+    const strMonat = monat[iMonth];
+    const strQuarterNow =  'Q'+(1+(iMonth%4));
 
-            
+        
 
     const [sheet, setSheet]  = useState()
     const [year, setYear]   = useState()
@@ -518,17 +518,20 @@ export default function Status() {
         console.log("debitA "+JSON.stringify(arrDebitAInfo));
         console.log("debit "+JSON.stringify(arrDebitInfo));
 
-        arrCreditEQLInfo.forEach((acct)=>{flow=prepareTXN(sheet[D_Schema],flow,acct.name,acct.value);});
-        arrCreditInfo.forEach((acct)=>{flow=prepareTXN(sheet[D_Schema],flow,acct.name,acct.value);});
-        arrDebitAInfo.forEach((acct) =>{flow=prepareTXN(sheet[D_Schema],flow,acct.name,acct.value);});
-        arrDebitInfo.forEach((acct) =>{flow=prepareTXN(sheet[D_Schema],flow,acct.name,acct.value);});
+        const schema = sheet[D_Schema];
+
+        arrCreditEQLInfo.forEach((acct)=>{flow=prepareTXN(schema,flow,acct.name,acct.value);});
+        arrCreditInfo.forEach((acct)=>{flow=prepareTXN(schema,flow,acct.name,acct.value);});
+        arrDebitAInfo.forEach((acct) =>{flow=prepareTXN(schema,flow,acct.name,acct.value);});
+        arrDebitInfo.forEach((acct) =>{flow=prepareTXN(schema,flow,acct.name,acct.value);});
 
         return flow;
     }
 
 
+    
     const BOOK_NOW  = '0';
-    const PRE_CLAIM = '1';
+    const PRE_CLAIM = '1'; // GH2026 pepare claims for capital entity like GmbH
 
     function bookTemplate(jTXN) {   
 
@@ -1055,7 +1058,13 @@ export default function Status() {
     iSumRite=BigInt(0);
     
     let strInterest = (jBalance[showAccount] && jBalance[showAccount].interest) ? jBalance[showAccount].interest : "";
-    
+    // showAccount is the name of the account of which history will be shown
+    const arrXbrl = jBalance[showAccount] ? jBalance[showAccount].xbrl ? jBalance[showAccount].xbrl.split(CDOT) : null : null;
+    const strXbrl = (arrXbrl && arrXbrl.shift()) ? arrXbrl.join(CSEP) : ""; // shift modifies arrXbrl !
+    const strDesc = sheet[D_Schema].Desc;
+    const allNames = sheet[D_Schema].Names;
+    let strAccDesc = showAccount;
+    allNames.forEach((acName,i) => { console.log ("0099 '"+acName+ "' ?? '"+showAccount+"'"); if(acName===showAccount) {strAccDesc=strDesc[i] }})
 
     return (
         <Screen tabSelector={showAccount ? [] : tabHeaders} tabName={tabName} aFunc={aFunc} aText={aText}  > 
@@ -1063,8 +1072,8 @@ export default function Status() {
            {showAccount &&             
                 (
                 <div className="mTable">                     
-                    { TXNReceipt("",D_Account+' '+showAccount, jColumnHeads, jColumnHeads, null, session.year, removeCol, D_History,-1,currLine,setCurrLine) }
-                    <TXNReceiptSum text={D_Carry} jAmounts={jPageSum} jColumnHeads={jColumnHeads} id="(SELECT)" />                   
+                    <TXNReceiptSum text={D_Account+CSEP+showAccount+CSEP+strAccDesc+CSEP+D_Carry} jAmounts={jPageSum} jColumnHeads={jColumnHeads} id={session.year}/>                   
+                    { TXNReceipt("",strXbrl, jColumnHeads, jColumnHeads, null, 'Select', removeCol, D_History,-1,currLine,setCurrLine) }
                     { console.log("096 aSelText() keys = "+Object.keys(aSelText).join('+')) ||
                     Object.keys(aSelText).map((sym,i) => ( (sym && aSelText[sym] && aJMoney[sym] ) ? // && i>1
                                                 
@@ -1379,14 +1388,14 @@ function TXNReceipt(token,text,jAmounts,jColumnHeads,jSum,id,removeCol,name,inde
         <div id="TXNReceipt">
             <div className="attrLine"> <div className="FIELD LNAM">&nbsp;</div></div>
             <div className={index==currLine?"attrLine key":"attrLine"}> 
-                    <div className="FIELD DATE" draggable={bDrag} >{comps[0]}</div>
+                    <div className="FIELD DATE" draggable={bDrag}>{comps[0]}</div>
                     <div className="FIELD NAME" draggable={bDrag}>{comps[1]}</div>                                        
+                    <div className="FIELD L280" draggable={bDrag}>{comps[2]}</div>                                        
                     <div className="FIELD NAME" draggable={bDrag}>{comps[3]}</div>
                     <div className="FIELD NAME" draggable={bDrag}>{comps[4]}</div>
                     {(name && name.length>1) ? ( <div className="FIELD MOAM" draggable={bDrag}>{left}</div>  ):""}
                     {(name && name.length>1) ? ( <div className="FIELD MOAM" draggable={bDrag}>{rite}</div>  ):""}
                     <div className="FIELD SEP" >&nbsp;</div>
-                    <div className="FIELD LNAM" draggable={bDrag}>{comps[2]}</div>                                        
                     <div className="FIELD LNAM" draggable={bDrag} onClick={()=>{if(setCurrLine) setCurrLine(index)}}>{id}</div>
             </div>
         </div>

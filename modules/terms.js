@@ -46,6 +46,8 @@ export const  X_OTC_OTHER_REVENUE = 'regular.operatingTC.otherOpRevenue';
 export const  J_ACCT=6;
 export const  DOUBLE = ':';
 export const  CSEP = ';';
+export const  CDOT = '.';
+
 export const  COLMIN=1; // minimum length of column text
         
 export const  HTTP_OK = 200;
