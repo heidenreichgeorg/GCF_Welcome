@@ -413,23 +413,34 @@ function makeXLTabs(sheetCells,jAssets,jHistory,jSchema,jPartner,jBalance,jXBRL,
                 })
 
                 if(iPartner==0) excelBilanzT.push([xbrl,accName,aNumber,"","",iValue,SH,"0"])
-                   
-                else {
-                    //console.log("1616 EBO PARTNER:"+JSON.stringify(jPartner[index]))
+                    // normal asset / gainloss / liability                   
+                    // also includes other capital in "de-gaap-ci_bs.eqLiab.equity.capRes"
 
+
+                else { 
+                    // capital account
                     let pId=""+iPartner;
-                    let income = (account.income) ? cents2EU(account.income) : "0"
-
+                        excelBilanzT.push([xbrl+".beginYear",           accName+"_ANFANG",  ""+aNumber+"0","","",   cents2EU(account.init),  SH,pId])
                     
-                    excelBilanzT.push([xbrl+".beginYear",           accName+"_ANFANG",  ""+aNumber+"0","","",   cents2EU(account.init),  SH,pId])
-                    excelBilanzT.push([profitLoss,                  accName+"_EINK",    ""+aNumber+"1","","",   income,                  SH,pId])
-                    excelBilanzT.push([xbrl+".incomeUseDeposits",   accName+"_EINLAGE", ""+aNumber+"2","","",   cents2EU(account.credit),SH,pId])
-                    excelBilanzT.push([xbrl+".incomeUseWithdrawals",accName+"_ENTNAHME",""+aNumber+"3","","",   cents2EU(account.debit), SH,pId])
-                    excelBilanzT.push(["",                          accName+"_EINK2",   ""+aNumber+"4","","GKV",income,                  SH,pId,income,"de-gaap-ci_fpl.netIncome"])
-                    excelBilanzT.push(["",                          accName+"_VERWENDG",""+aNumber+"5","","",   income,                  SH,pId,"",    "de-gaap-ci_incomeUse.paidInCapital"])
-                    excelBilanzT.push(["",                          accName+"_EINLAGE2",""+aNumber+"6","","",   "0",                     SH,pId,"",    "de-gaap-ci_incomeUse.deposits"])
-                    excelBilanzT.push(["",                          accName+"_ENTNAHM2",""+aNumber+"7","","",   "0",                     SH,pId,"",    "de-gaap-ci_incomeUse.withdrawals"])
-                   
+                    if(xbrl.endswith('VK')) { // GH20260114 EBO requires below eight values only for variable capital accounts
+
+                        let income = (account.income) ? cents2EU(account.income) : "0"
+                        
+                        excelBilanzT.push([profitLoss,                  accName+"_EINK",    ""+aNumber+"1","","",   income,                  SH,pId])
+                        excelBilanzT.push([xbrl+".incomeUseDeposits",   accName+"_EINLAGE", ""+aNumber+"2","","",   cents2EU(account.credit),SH,pId])
+                        excelBilanzT.push([xbrl+".incomeUseWithdrawals",accName+"_ENTNAHME",""+aNumber+"3","","",   cents2EU(account.debit), SH,pId])
+                        excelBilanzT.push(["",                          accName+"_EINK2",   ""+aNumber+"4","","GKV",income,                  SH,pId,income,"de-gaap-ci_fpl.netIncome"])
+                        excelBilanzT.push(["",                          accName+"_VERWENDG",""+aNumber+"5","","",   income,                  SH,pId,"",    "de-gaap-ci_incomeUse.paidInCapital"])
+                        excelBilanzT.push(["",                          accName+"_EINLAGE2",""+aNumber+"6","","",   "0",                     SH,pId,"",    "de-gaap-ci_incomeUse.deposits"])
+                        excelBilanzT.push(["",                          accName+"_ENTNAHM2",""+aNumber+"7","","",   "0",                     SH,pId,"",    "de-gaap-ci_incomeUse.withdrawals"])
+                    
+                    }
+                    else if(xbrl.endswith('FK') || xbrl.endswith('KK'  )) { // GH20260114 EBO requires below three values only for fixed / Kommandit capital accounts
+                        
+                        excelBilanzT.push(["",                          accName+"_EINLAGE2",""+aNumber+"6","","",   "0",                     SH,pId,"",    "de-gaap-ci_incomeUse.deposits"])
+                        excelBilanzT.push(["",                          accName+"_ENTNAHM2",""+aNumber+"7","","",   "0",                     SH,pId,"",    "de-gaap-ci_incomeUse.withdrawals"])
+                    }
+
                 }
             }
         }
