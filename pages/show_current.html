@@ -3,12 +3,14 @@
 .drop { padding: 9px; margin: 3px;  border-radius: 20px;  font-family: Bahnschrift,monospace;    border:2px solid #030f94; break-after: page; }        
 .rawt { padding: 9px; margin: 3px;  min-height: 19px; font-size: 8pt; font-family: Bahnschrift,monospace;   color:#030f94; background-color: #dfdff4;}        
 .sheet { padding: 9px; margin: 3px;  min-height: 19px; font-size: 10pt; font-family: Bahnschrift,monospace; color:#030f94; background-color: #dfdff4;}        
-.trow   { margin-top: 7px; }    
 .symb   { text-align:left;   border-radius: 6px; border:1px solid #030f94; }   
+.tiny   {  min-width:9em; max-width:9em;  text-align:left;   border-radius: 6px; border:1px solid #030f94; font-size: 8pt; font-family: Courier,Terminal,monospace; color: #000000; }   
+.trow   { margin-top: 7px; }    
 .button { text-align:center; font-size: 10pt; font-family: Bahnschrift,monospace; color:#030f94; }   
 .amount { text-align:right;  border-radius: 6px; border:1px solid #030f94; }   
 .xbrl { min-width:40em; max-width:40em;  }     
 .text { min-width:20em; max-width:20em; border-radius: 6px; border:1px solid #030f94; }     
+.head { min-width:70em; max-width:70em; border-radius: 6px; border:1px solid #030f94; }     
     </style>
     <script>
 /* global BigInt */
@@ -415,7 +417,7 @@ function dropHandler(ev) {
                             if(!isNaN(indicator) && !isInitial) {                            
                                 let jAction=aTrans;
                                 if(aTrans.length>J_ACCT)
-                                    aTransactions.unshift({"text":aTrans[1]+" "+aTrans[4]+" "+aTrans[2],"action":jAction})
+                                    aTransactions.unshift({"text":aTrans[1]+" "+aTrans[4]+" "+aTrans[2],"action":jAction,"header":aTrans.slice(1,J_ACCT)})
                             }
 
 
@@ -628,7 +630,7 @@ function dropHandler(ev) {
 // show historic transactions
                     if(aTransactions.length>0) {
                         aTransactions.forEach((strAction,i)=>{
-                            if(i<20) {
+                            if(i<200) { // show last 200 transactions
                                 let uiDiv=document.createElement('TR'); uiTransactions.append(uiDiv);
                                 let uiRow=document.createElement('TR'); uiTransactions.append(uiRow);
                                 let uiSpc=document.createElement('TD'); uiDiv.append(uiSpc);
@@ -636,6 +638,11 @@ function dropHandler(ev) {
 
                                 let uiDat=document.createElement('TD'); uiRow.append(uiDat);
                                 uiDat.innerHTML=strAction.text; uiDat.className="text";
+
+                                // GH20260118
+                                uiDat.innerHTML='<TABLE><TR><TD class="tiny">'+strAction.header.join('</TD><TD class="tiny">')+'</TD></TR></TABLE>'; 
+                                uiDat.className="xbrl";
+
 
                                 let acLine = ""
                                 let adLine = ""
@@ -656,6 +663,7 @@ function dropHandler(ev) {
                                             if(cText) adLine=adLine+" "+cText
                                         }
                                     }
+                                    
                                 })
                                 
 
