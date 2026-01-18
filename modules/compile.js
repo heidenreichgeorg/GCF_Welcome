@@ -15,7 +15,7 @@ const debugFlagTax=false;
 
 
 const debugFlag=null;
-const debugFlagAssets=null;
+const debugFlagAssets=1;
 const debugFlagRegular=null;
 
 const debugFlagPreBook=1;
@@ -462,7 +462,7 @@ export function compile(sessionData) {
 
                         const MINTXN=5; // elements in a TXN
                         var jHistory = result[D_History];
-                        //if(debugFlag>1)        console.log("0348 BOOK "+row.join(CSEP));
+                        //if(debugFlag>1)        console.log("\n0300 BOOK "+row.join(CSEP));
 
                         if(row.length>MINTXN && result[D_Schema].Names){
                             try {
@@ -471,8 +471,8 @@ export function compile(sessionData) {
                                 var gDesc  = result[D_Schema].Desc;
 
                                 if(debugFlagReport) {
-                                    console.log("0350 BOOK  "+aLine.join(';'));
-                                    console.log("0350 NAMES "+gNames.join(';'));
+                                    console.log("0300 BOOK  "+aLine.join(';'));
+                                    console.log("0300 NAMES "+gNames.join(';'));
                                     console.log();
                                 }
 
@@ -489,13 +489,13 @@ export function compile(sessionData) {
                                             var xdesc=""+xColumn; if(gDesc && gDesc[xColumn]) xdesc=gDesc[xColumn];
                                             if(rawName && rawName.length>1) {
                                                 result[D_Balance][rawName] = Account.makeAccount(rawName,xbrl,xdesc,xColumn,accNumber);
-                                                if(debugFlagReport) console.log("0356 makeAccount("+rawName+","+xbrl+","+xdesc+","+xColumn+"  "+accNumber+")");
+                                                if(debugFlagReport) console.log("0302 makeAccount("+rawName+","+xbrl+","+xdesc+","+xColumn+"  "+accNumber+")");
                                             }
-                                            else if(debugFlagReport) console.log("0357 compile could not use makeAccount(xbrl="+xbrl+" xdesc="+xdesc+" xColumn="+xColumn+")");
+                                            else if(debugFlagReport) console.log("0303 compile could not use makeAccount(xbrl="+xbrl+" xdesc="+xdesc+" xColumn="+xColumn+")");
 
                                             
                                         };
-                                    } catch(err) { console.dir("0359 FIRST REGULAR TXN INPUT "+err); }
+                                    } catch(err) { console.dir("0301 FIRST REGULAR TXN INPUT "+err); }
                                 }
 
                                 if(aLine.length>0) { // transaction line must be an array
@@ -511,7 +511,7 @@ export function compile(sessionData) {
                                                 if(iMonth>0) {
                                                         
                                                         if((iMonth>lMonth) || isLastLine) {
-                                                            console.log("0358 NEXT ("+iMonth+">"+lMonth+")");
+                                                            if(debugFlag>1) console.log("0304 NEXT ("+iMonth+">"+lMonth+")");
                                                             lMonth++; // repeat until lMonth === iMonth !! 
                                                             // assume at least one transaction per month !!
 
@@ -537,7 +537,7 @@ export function compile(sessionData) {
                                                                             let prevInterest = (account && account.interest) ? BigInt(parseInt(account.interest)) : 0n;
                                                                             let currInterest = (bigSaldo * FOURPERCENT) / MONTHLYQUOTE;
                                                                             account.interest = ""+(prevInterest + currInterest).toString();
-                                                                            console.log("0358 INTEREST "+ acName+"  "+bigSaldo + "-> 4%= "+ currInterest+" + "+prevInterest+" => "+account.interest);
+                                                                            if(debugFlag>1) console.log("0306 INTEREST "+ acName+"  "+bigSaldo + "-> 4%= "+ currInterest+" + "+prevInterest+" => "+account.interest);
                                                                             result[D_Balance][acName] = account;
                                                                         }
                                                                     }
@@ -547,20 +547,20 @@ export function compile(sessionData) {
                                                 }
 
 
-                                        //if(debugFlag) 
-                                            console.log("0358 BOOK ("+iMonth+")"+row.join(CSEP));
-
+                                        if(debugFlag) 
+                                            console.log("\n 0308 BOOK ("+iMonth+")"+row.join(CSEP));
+                                        console.log("\n");
 
                                         // NORMAL TRANSACTION PROCESSING: DISTRIBUTE TO EACH ACCOUNT
                                         aLine.forEach(strAmount => {
-                                            if(debugFlagReport>3) console.log("0360 init "+strAmount);
+                                            if(debugFlagReport>3) console.log("0310 init "+strAmount);
                                             if(column>=J_ACCT && strAmount && strAmount.length>0) {
                                                 var acName = gNames[column];
                                                 if(acName && acName.length>1) {
                                                     if(firstLine) {
                                                         // initialize the values with 0,00 if nothing is specified
                                                         if(strAmount==null || strAmount.length==0) strAmount="0";
-                                                        else if(!(strAmount==="0")) console.log("0362 FIRSTLINE OPEN "+acName+"="+strAmount);
+                                                        else if(!(strAmount==="0")) console.log("0312 FIRSTLINE OPEN "+acName+"="+strAmount);
                                                     }
                                                     
                                                     try {
@@ -570,21 +570,21 @@ export function compile(sessionData) {
                                                             if(firstLine) {
                                                                 try {
                                                                     result[D_Balance][acName] = Account.openAccount(account,iAmount);
-                                                                    if(debugFlag>2) console.log("0366 open "+strAmount+"("+iAmount+")"
+                                                                    if(debugFlag>2) console.log("0316 open "+strAmount+"("+iAmount+")"
                                                                         +" for "+gNames[column]
                                                                         +"  = "+JSON.stringify(result[D_Balance][acName])
                                                                     );
-                                                                } catch(err) { console.dir("0366 FIRST TXN BOOKING"+err); }
+                                                                } catch(err) { console.dir("0315 FIRST TXN BOOKING"+err); }
                                                             } else { 
                                                                 try {
                                                                     result[D_Balance][acName] = Account.add(account,iAmount);
-                                                                    if(debugFlag>2) console.log("0368 add  "+strAmount+"("+iAmount+")"
+                                                                    if(debugFlag>2) console.log("0318 add  "+strAmount+"("+iAmount+")"
                                                                     +" to  "+gNames[column]
                                                                     +"  = "+JSON.stringify(result[D_Balance][acName]));
-                                                                } catch(err) { console.dir("0368 REGULAR TXN BOOKING"+err); }
+                                                                } catch(err) { console.dir("0317 REGULAR TXN BOOKING"+err); }
                                                             }
                                                         }
-                                                    } catch(err) { console.dir("0369 REGULAR TXN INPUT "+err); }
+                                                    } catch(err) { console.dir("0313 REGULAR TXN INPUT "+err); }
                                                 }
                                             }
                                             column++;
@@ -603,7 +603,7 @@ export function compile(sessionData) {
                                             var nvst = aLine[3].trim();
                                             var nmbr = aLine[4].trim();
                                             var idnt = aLine[5].trim();
-                                            if(debugFlag>1 && iAcc>=J_ACCT) console.log("0370 compile: known account("+refAcct+"):"+type+"  "+idnt+"  #"+iAcc);
+                                            if(debugFlag>1 && iAcc>=J_ACCT) console.log("0320 compile: known account("+refAcct+"):"+type+"  "+idnt+"  #"+iAcc);
 
                                             // process YIELD,INVEST,SELL,WRITEOFF,ACCUMULATE (REGULAR)
                                             if(refAcct==='INVEST') {
@@ -626,12 +626,12 @@ export function compile(sessionData) {
                                                                                 "cost":""+icost,
                                                                                 "gain":gain}; // GH20230202
 
-                                                    } catch(err) { console.dir("0375 SHEET LINE INVEST nvst="+nvst+" idnt="+idnt+" nmbr="+nmbr+"  orig="+orig+"  when making icost "+err); }
+                                                    } catch(err) { console.dir("0323 SHEET LINE INVEST nvst="+nvst+" idnt="+idnt+" nmbr="+nmbr+"  orig="+orig+"  when making icost "+err); }
 
-                                                    if(debugFlagAssets) console.log("0372 INVEST "+idnt+" for "+
+                                                    if(debugFlagAssets) console.log("0322 INVEST "+idnt+" for "+
                                                         cents2EU(result[D_FixAss][idnt].rest)+ " for #"+nmbr+" at "+cents2EU(icost));
 
-                                                } catch(err) { console.dir("0365 SHEET LINE INVEST orig "+err); }
+                                                } catch(err) { console.dir("0321 SHEET LINE INVEST orig "+err); }
                                             }
 
                                             else if(refAcct==='SELL') {
@@ -682,7 +682,7 @@ export function compile(sessionData) {
                                                                         "cost":""+icost,
                                                                         "gain":gain }; // GH20230303
                                                 if(debugFlagAssets) console.log(
-                                                            "0374 SELL "+type+" "+iSel+" (giving "+cents2EU(iamnt)+
+                                                            "0324 SELL "+type+" "+iSel+" (giving "+cents2EU(iamnt)+
                                                             ") from "+iNum+" of Asset "+idnt+" resulting in "+
                                                             nmbr+" worth "+cents2EU(iremn) + " at "+cents2EU(icost)+" each");
                                             }
@@ -717,12 +717,12 @@ export function compile(sessionData) {
                                                                                 "rest":""+icurr,
                                                                                 "cost":""+icost,
                                                                                 "gain":""+(iamnt+iGain) }; // GH20230303
-                                                        if(debugFlagAssets) console.log("0376 YIELD amount="+iamnt+" changes "+idnt+" from "+cents2EU(icurr)+" to "+cents2EU(result[D_FixAss][idnt].rest) + " adding up to new gain "+esult[D_FixAss][idnt].gain);
+                                                        if(debugFlagAssets) console.log("0326 YIELD amount="+iamnt+" changes "+idnt+" from "+cents2EU(icurr)+" to "+cents2EU(result[D_FixAss][idnt].rest) + " adding up to new gain "+result[D_FixAss][idnt].gain);
 
-                                                    } else console.log("0371 YIELD UNKNOWN "+idnt+" ASSET ENTRY");
+                                                    } else console.log("0325 YIELD UNKNOWN "+idnt+" ASSET ENTRY");
 
                                                 } else {
-                                                    console.log("0373 YIELD UNKNOWN ASSET "+idnt);
+                                                    console.log("0323 YIELD UNKNOWN ASSET "+idnt);
                                                 }
                                             } else if (refAcct==='ACCUMULATE') {
                                                 try {
@@ -755,13 +755,11 @@ export function compile(sessionData) {
                                                                                 "cost":""+iCost,
                                                                                 "gain":gain}; // GH20230202
 
-                                                    } catch(err) { console.dir("0385 SHEET LINE ACCUMULATE change="+iChange+" idnt="+idnt+" nmbr="+nmbr+"  orig="+orig+"  when making icost "+err); }
+                                                        if(debugFlagAssets) console.log("0328 ACCUMULATE amount="+iChange+" changes idnt="+idnt+" from "+cents2EU(iCurr)+" to "+cents2EU(result[D_FixAss][idnt].rest)+ " for #"+nmbr+" units at cost="+cents2EU(iCost));
 
-                                                    //if(debugFlagAssets) 
-                                                        console.log("0382 ACCUMULATE "+idnt+" from "+
-                                                        cents2EU(result[D_FixAss][idnt].rest)+ " for #"+nmbr+" units at "+cents2EU(iCost));
+                                                    } catch(err) { console.dir("0327 SHEET LINE ACCUMULATE change="+iChange+" idnt="+idnt+" nmbr="+nmbr+"  orig="+orig+"  when making icost "+err); }
 
-                                                } catch(err) { console.dir("0381 SHEET LINE ACCUMULATE orig "+err); }                                
+                                                } catch(err) { console.dir("0329 SHEET LINE ACCUMULATE orig "+err); }                                
 
 
                                             } else if (refAcct==='WRITEOFF') {
@@ -794,12 +792,12 @@ export function compile(sessionData) {
                                                                                 "rest":""+irest,
                                                                                 "cost":""+icost,
                                                                                 "gain":gain }; // GH20230303
-                                                        if(debugFlagAssets) console.log("0364 WRITEOFF amount="+iamnt+" changes "+idnt+" from "+cents2EU(icurr)+" to "+cents2EU(result[D_FixAss][idnt].rest));
+                                                        if(debugFlagAssets) console.log("0330 WRITEOFF amount="+iamnt+" changes "+idnt+" from "+cents2EU(icurr)+" to "+cents2EU(result[D_FixAss][idnt].rest));
 
-                                                    } else console.log("0361 WRITEOFF UNKNOWN "+idnt+" ASSET ENTRY");
+                                                    } else console.log("0333 WRITEOFF UNKNOWN "+idnt+" ASSET ENTRY");
                                                     
                                                 } else {
-                                                    console.log("0363 WRITEOFF UNKNOWN ASSET "+idnt);
+                                                    console.log("0331 WRITEOFF UNKNOWN ASSET "+idnt);
                                                 }
                                             } else if(iAcc>0) {
                                                 try {
@@ -807,16 +805,16 @@ export function compile(sessionData) {
                                                     const xRegular=result[D_Report].xbrlRegular.xbrl;
                                                     if(xbrl && xbrl.startsWith(xRegular)) {
                                                         // GH20230202
-                                                        if(debugFlagRegular) console.log("0378 compile: ("+aLine[iAcc]+") regular income:"+xbrl);
+                                                        if(debugFlagRegular) console.log("0332 compile: ("+aLine[iAcc]+") regular income:"+xbrl);
                                                         if(result[D_FixAss][idnt]) {
                                                             var iGain = BigInt(result[D_FixAss][idnt].gain);
                                                             result[D_FixAss][idnt].gain = ""+(iGain+Sheets.bigEUMoney(aLine[iAcc]));
-                                                            if(debugFlagRegular) console.log("0378 compile: Asset gain is "+cents2EU(iGain));
+                                                            if(debugFlagRegular) console.log("0334 compile: Asset gain is "+cents2EU(iGain));
                                                         }
                                                     }
-                                                } catch(err) { console.dir("0353 SHEET LINE GAIN "+err); }
+                                                } catch(err) { console.dir("0335 SHEET LINE GAIN "+err); }
                                             } else {
-                                                if(debugFlag>1) console.log("0354 compile: normal booking transaction");
+                                                if(debugFlag>1) console.log("0340 compile: normal booking transaction");
                                             }
                                         } // end processing ASSETS with keyword   YIELD,SELL,INVEST,WRITEOFF,(REGULAR)
                                     
@@ -824,22 +822,22 @@ export function compile(sessionData) {
 
 
                                     // end general booking line from journal with proper month
-                                    } else console.error("0367 Transaction Line is not an array "+JSON.stringify(aLine));
+                                    } else console.error("0311 Transaction Line is not an array "+JSON.stringify(aLine));
 
-                                } else console.error("0351 Transaction Line is not an array "+JSON.stringify(aLine));
+                                } else console.error("0309 Transaction Line is not an array "+JSON.stringify(aLine));
                                 firstLine=null;               
 
-                            } catch(err) { console.dir("0349 SHEET LINE INPUT "+err); }
+                            } catch(err) { console.dir("0307 SHEET LINE INPUT "+err); }
                         }
                     }
                     else if(row.length>20) {
                         //if(!key || parseInt(key)==0) {                    
-                        if(debugFlagPreBook) console.dir("0352 SHEET LINE PRE-BOOK "+JSON.stringify(row)); 
+                        if(debugFlagPreBook) console.dir("0336 SHEET LINE PRE-BOOK "+JSON.stringify(row)); 
                         row[1]=lineCount; // GH20231002 allow trace-back and put lineCount into date field
                         result[D_PreBook].push(row);
                     }
             });
-                if(debugFlag>1) console.log("0368 compile: check partners");
+                if(debugFlag>1) console.log("0338 compile: check partners");
 
                 // process the partners
                 var partners = {};
@@ -896,7 +894,7 @@ export function compile(sessionData) {
                             let partnerEntry={ 'id':pNum, 'varCap':gNames[col], 'gain':pShare, 'denom':basis, 'iVar':col, 'taxID':arrTaxID[col] };
                             partners[pNum]=partnerEntry;
                             pNum++; // GH20220206 
-                            console.log("0376 compile: PARTNER "+JSON.stringify(partnerEntry));
+                            if(debugFlag>1) console.log("0340 compile: PARTNER "+JSON.stringify(partnerEntry));
 
                         }
                     }
@@ -910,7 +908,7 @@ export function compile(sessionData) {
                                 partners[pNum].iCap=col;
                                 partners[pNum].name=shares[col];
                                 pNum++;
-                                console.log("0376 compile: FIXED"+pNum);
+                                if(debugFlag>1) console.log("0342 compile: FIXED"+pNum);
                             }
                         }
 
@@ -922,10 +920,10 @@ export function compile(sessionData) {
                                 partners[pNum].resCap=gNames[col];
                                 partners[pNum].iRes=col;
                                 pNum++;
-                                console.log("0376 compile: CAP RES"+pNum);
+                                if(debugFlag>1) console.log("0344 compile: CAP RES"+pNum);
                             }
                         }
-                    } else console.log("0377 compile: NO arrXBRL for PARTNERS");
+                    } else console.log("0343 compile: NO arrXBRL for PARTNERS");
 
 
                     /*
@@ -963,12 +961,12 @@ export function compile(sessionData) {
                     */
 
                     
-                } else console.log("0379 compile.compile: NO PARTNERS");
+                } else console.log("0341 compile.compile: NO PARTNERS");
 
 
                 result[D_Partner]=partners;
                 if(debugFlagReport) 
-                    for (let i in partners) { console.log("0380 compile Partner("+i+") "+JSON.stringify(partners[i])); }
+                    for (let i in partners) { console.log("0346 compile Partner("+i+") "+JSON.stringify(partners[i])); }
 
             } catch (err) {
                 console.error('0125 compile.js compile:'+err);
@@ -984,22 +982,22 @@ export function compile(sessionData) {
 
 
     for(let key in result) {
-        if(debugFlag) console.log('0386 compile.js compile() -> balance['+key+']'); 
+        if(debugFlag) console.log('0348 compile.js compile() -> balance['+key+']'); 
     }
 
-    if(debugFlag) console.log("0388 COMPILED = "+JSON.stringify(Object.keys(result)));
+    if(debugFlag) console.log("0350 COMPILED = "+JSON.stringify(Object.keys(result)));
 
 
     let balance = sendBalance(result);
 
     
     //if(debugFlag) console.log("0390 COMPILED         = "+JSON.stringify(Object.keys(balance)));
-    if(debugFlag) console.log("0390 COMPILED HISTORY = "+JSON.stringify(Object.keys(balance[D_History])));
-    if(debugFlagPreBook) console.log("0390 COMPILED PRE_BOOK = "+JSON.stringify(balance[D_PreBook]));
+    if(debugFlag) console.log("0360 COMPILED HISTORY = "+JSON.stringify(Object.keys(balance[D_History])));
+    if(debugFlagPreBook) console.log("0370 COMPILED PRE_BOOK = "+JSON.stringify(balance[D_PreBook]));
 
     if(debugFlagReport) { 
         let jHistory=balance[D_History];
-        Object.keys(jHistory).map((lineNo) => (console.log("0390 #"+lineNo+"= "+JSON.stringify(jHistory[lineNo])))) }
+        Object.keys(jHistory).map((lineNo) => (console.log("0380 #"+lineNo+"= "+JSON.stringify(jHistory[lineNo])))) }
 
     return balance;
 
@@ -1711,18 +1709,6 @@ export function formatTXN(session,reqBody) {
 
 }
 
-/*
-
-
-0068 formatTXN returns null
-
-0610 app.post BOOK config({"root":"","bucket":"","firebase":{}})
-0612 app.post BOOK jTXN('---')
-'1450 sheets.bookSheet ENTER null into HGKG2026 for (HGKG,2026) with 19 lines in sheet '
-'1451 sheets.bookSheet SAVE NO booking statement tBuffer (HGKG,2026) #19'
-0034 save2Bucket Start saving(["year","client","sheetCells","sheetName","clientFunction","id","strTimeSymbol","assets","eqliab","total","author","residence","server","time","txnPattern","partner","firebase"]) to FB for HGKG,2026
-
-*/
 
 
 function getYear() {  return currentYear; }
