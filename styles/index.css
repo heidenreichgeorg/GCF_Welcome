@@ -14,6 +14,20 @@
   color: #c9a935; 
 }
 
+
+.goldControl{  
+  background: transparent; 
+	margin: 0;
+  font-family: Bahnschrift, monospace, sans-serif;
+  padding: 14px; 
+  border-style: none; 
+  border-radius: 10px; 
+  border-width: 2px; 
+  border-color: #91740e;  
+  color: #c9a935; 
+}
+
+
 .printerPaper{   
   background: #ffffff;
 	height: 100%;

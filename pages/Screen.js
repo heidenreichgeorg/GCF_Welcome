@@ -103,7 +103,7 @@ export default function Screen({ children, tabSelector, tabName,
         <div>
             <div className="mScreen">           
                 <div className="attrLine">                     
-                    <select autoFocus type="radio" id={tabName} name={tabName} onChange={(e)=>makeSelect(tabName,e.target)}> 
+                    <select autoFocus    className="goldControl"     type="radio" id={tabName} name={tabName} onChange={(e)=>makeSelect(tabName,e.target)}> 
                         {tabSelector.map((row,tabNum) => (
                             <option  id={"Screen0"+tabNum}  key={"Screen0"+tabNum}  value={row} >{row}</option>
                             // onClick={makeTab(tabName,tabNum,"")}
