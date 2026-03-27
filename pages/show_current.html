@@ -22,6 +22,29 @@ function cents20EU(amount) {
     else return cents2EU(amount);
 }
 
+
+function makeJSONButton(jData,client,year) { 
+    let url=null;
+    if(client) {
+        if(year) {
+
+            var strData = JSON.stringify(jData);
+            var blob = new Blob([strData], {type: "application/json"});
+            url = URL.createObjectURL(blob);
+
+
+            let a = document.createElement('a');
+            a.download = "clean"+client+year+".json";
+            a.href = url;
+            a.style.display = 'block'; // was none
+            a.className = "key";
+            a.innerHTML = "Download";
+            document.body.appendChild(a); 
+        } 
+    } 
+    return url;
+}
+
 function showTXN(jTXN,e) { 
     
                             // console.log("TXN #"+JSON.stringify(jTXN)) 
@@ -153,16 +176,28 @@ function dropHandler(ev) {
             
         // If dropped items aren't files, reject them
         if (ev.dataTransfer.items[0].kind === 'file') {
+
+            let jCleanData = {};
+            let sheetCells=[];
+
+
             let file = ev.dataTransfer.files[0];
             console.log('File '+file.name+'  dropped' );
             var fr = new FileReader();
 
             fr.onload = function () {
-                let fileBuffer = this.result;                                    
+                
                 let jData={};
+                let year=null;
+                let client=null;
+
+
+                let fileBuffer = this.result;                                    
                 try {
                     jData = JSON.parse(fileBuffer);
                 } catch(err) { }
+
+
                 let uiHeader=document.getElementById("headers");
                 let uiAssets=document.getElementById("assets");
                 let uiTransactions=document.getElementById("transactions");
@@ -171,12 +206,36 @@ function dropHandler(ev) {
                 let isInitial=true;
                 let ready=0;
                 if(jData) {
-                    let sheetLines = jData.sheetCells;
+                    year = jData.year;
+                    client = jData.client;
+
+
+                    const sheetLines = jData.sheetCells;
+
+                    jCleanData = {
+                        'year':      year,
+                        'client':    client,
+                        'sheetName': client+year,
+                        'total' :    jData.total,
+                        'assets' :   jData.assets,
+                        'eqliab' :   jData.eqliab,
+                        'author' :   jData.author,
+                        'server' :   jData.server,
+                        'residence': jData.residence,
+                        'time':      jData.time,
+                        'txnPattern':jData.txnPattern,
+                        'partner' :  jData.partner,
+                        'fireBase' : jData.fireBase
+                    }
+
                     if(sheetLines.length>J_ACCT) {
                         console.error("0820 UPLOAD CSV WITH "+sheetLines.length+" lines");                  
                         sheetLines.forEach((arrayTrans)=>{
-                            let aTrans=JSON.parse(JSON.stringify(arrayTrans));
+                            const aTrans=JSON.parse(JSON.stringify(arrayTrans));
 
+                            // GH20260118 copy each line
+                            sheetCells.push(aTrans);
+                            // GH2026 this happens only once
 
                             let isHeader=false;
                             
@@ -414,6 +473,7 @@ function dropHandler(ev) {
                                 
                             }
 
+
                             if(!isNaN(indicator) && !isInitial) {                            
                                 let jAction=aTrans;
                                 if(aTrans.length>J_ACCT)
@@ -435,6 +495,10 @@ function dropHandler(ev) {
 */                                
                         }
                     )}
+
+
+
+
 
                     // show available transaction patterns
                     let txnPattern = jData.txnPattern;
@@ -687,7 +751,28 @@ function dropHandler(ev) {
                             }
                         })
                     }
+
                 }
+
+
+
+
+
+
+
+
+
+
+                // GH20260118 save purged file
+                jCleanData.sheetCells=sheetCells;
+                makeJSONButton(jCleanData,client,year);
+
+
+
+
+
+
+
             }
             fr.readAsText(file);
         }
