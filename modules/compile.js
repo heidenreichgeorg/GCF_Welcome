@@ -82,6 +82,7 @@ let de_DE = {
     eqpart:'Kommanditkapital',
     velimp:'Kommanditisten-VK',
     veulip:'Komplementär-VK',
+    capReport:"Kap.Entwicklung",
     income:"Gewinn",
     closing:"Einkommen",
     

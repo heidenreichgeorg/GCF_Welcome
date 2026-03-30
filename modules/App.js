@@ -470,7 +470,7 @@ export function makeBalance(jAccounts,jReport,value) {
       */  
 }
 
-export function makeHGBReport(jAccounts,page,jReport) {
+export function makeHGBReport(jAccounts,page,jReport,jPartners) {
 
     let balance = []; 
     
@@ -640,8 +640,26 @@ export function makeHGBReport(jAccounts,page,jReport) {
         let performanceBP = 1n;
         if(opCap>0n) performanceBP = (10000n*netGain) / opCap;
         iRite=fillRight(balance,performanceBP,page.CapMargin,22,3);
-        
+
+
+        // GH 20260330
+        let base=SCREENLINES;
+        base=fillPartner(balance,page.Debit,page.Credit,page.Init,page.AccountHistoryEqLiab,base);
+        for (let id in jPartners) {
+            var p=jPartners[id];
+            let iVar=p.iVar; let varCap=p.varCap;
+            let iRes=p.iRes;
+            if(iVar>0 && varCap && varCap.length>0) {
+                let begin = jAccounts[varCap].init;
+                let debit = jAccounts[varCap].debit;
+                let credit = jAccounts[varCap].credit;
+                base=fillPartner(balance,cents2EU(debit),cents2EU(credit),cents2EU(begin),p.name,base);
+            }
+            else 
+                base=fillPartner(balance,0n,0n,0n,p.name,base);
         }
+    }
+
     while(iRite<=SCREENLINES-1 && iLeft<=SCREENLINES-1) {
         balance.push({  });
         iLeft++;
@@ -660,6 +678,23 @@ export function fillRight(balance,cValue,iName,iRite,level) {
         if(level==3) { balance[iRite].an1=dispValue; }
         if(level==2) { balance[iRite].an2=dispValue; }
         if(level==1) { balance[iRite].an3=dispValue; }
+        iRite++;
+    }
+    return iRite;
+}
+
+
+// GH 20260330
+export function fillPartner(balance,cValue1,cValue2,cValue3,iName,iRite) {
+    if(iRite<SCREENLINES  +50) {
+        if(!balance[iRite]) balance[iRite]={};
+        balance[iRite].tx1=iName;
+        let dispValue1=cents2EU(cValue1);
+        let dispValue2=cents2EU(cValue2);
+        let dispValue3=cents2EU(cValue3);
+        balance[iRite].an1=dispValue1; 
+        balance[iRite].an2=dispValue2; 
+        balance[iRite].an3=dispValue3; 
         iRite++;
     }
     return iRite;

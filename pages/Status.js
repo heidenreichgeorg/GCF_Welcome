@@ -966,7 +966,8 @@ export default function Status() {
 
 
     // gain/loss page
-    let hgbReport = makeHGBReport(jBalance,page,jReport);
+    let jPartners = sheet[D_Partner];
+    let hgbReport = makeHGBReport(jBalance,page,jReport,jPartners);
     tabHeaders.push(page.GainlossHGB); fixPages++;
 
 
