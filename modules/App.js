@@ -642,18 +642,25 @@ export function makeHGBReport(jAccounts,page,jReport,jPartners) {
         iRite=fillRight(balance,performanceBP,page.CapMargin,22,3);
 
 
-        // GH 20260330
+        // GH 20260330 Partner Capital
         let base=SCREENLINES;
         base=fillPartner(balance,page.Debit,page.Credit,page.Init,page.AccountHistoryEqLiab,base);
         for (let id in jPartners) {
             var p=jPartners[id];
+
             let iVar=p.iVar; let varCap=p.varCap;
-            let iRes=p.iRes;
             if(iVar>0 && varCap && varCap.length>0) {
-                let begin = jAccounts[varCap].init;
-                let debit = jAccounts[varCap].debit;
-                let credit = jAccounts[varCap].credit;
-                base=fillPartner(balance,cents2EU(debit),cents2EU(credit),cents2EU(begin),p.name,base);
+                let ibegin = BigInt(jAccounts[varCap].init);
+                let idebit = BigInt(jAccounts[varCap].debit);
+                let icredit = BigInt(jAccounts[varCap].credit);
+
+                let iRes=p.iRes; let resCap=p.resCap;
+                if(iRes>0 && resCap && resCap.length>0) {
+                    ibegin = ibegin+BigInt(jAccounts[resCap].init);
+                    idebit = idebit+BigInt(jAccounts[resCap].debit);
+                    icredit = icredit+BigInt(jAccounts[resCap].credit);
+                }
+                base=fillPartner(balance,cents2EU(idebit),cents2EU(icredit),cents2EU(ibegin),p.name,base);
             }
             else 
                 base=fillPartner(balance,0n,0n,0n,p.name,base);
