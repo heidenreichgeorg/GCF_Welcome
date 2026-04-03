@@ -491,7 +491,9 @@ export function makeHGBReport(jAccounts,page,jReport,jPartners) {
         var chgbC = 0n; // Zinsaufwand
         var chgbD = 0n; // Finanzergebnis
         var chgbE = 0n; // gezahlte Steuern v Einkommen und Ertrag
-        var chgbF = 0n; // Steuerforderung d Gesellschafter
+        var chgbF1 = 0n; // Steuerforderung d Gesellschafter KEST
+        var chgbF2 = 0n; // Steuerforderung d Gesellschafter KESO
+        var chgbF3 = 0n; // Steuerforderung d Gesellschafter gesamt
         // Jahresueberschuss
 
         var cAvgFix = 0n; // betriebsnotwendiges Vermoegen
@@ -514,7 +516,9 @@ export function makeHGBReport(jAccounts,page,jReport,jPartners) {
                 if(full_xbrl.startsWith('de-gaap-ci_bs.ass.fixAss'))  { cAvgFix = cAvgFix +(BigInt(init)+BigInt(yearEnd))/2n; console.log("BNV  "+name+"="+cAvgFix); }  
                 if(full_xbrl.startsWith('de-gaap-ci_bs.ass.currAss')) { cAvgCur+=(BigInt(init)+BigInt(yearEnd))/2n; console.log("DUV  "+name+"="+cAvgCur); }
                 if(full_xbrl.startsWith('de-gaap-ci_bs.ass.currAss.receiv')) { cReceiv-=BigInt(yearEnd);                     console.log("FOR  "+name+"="+cReceiv); }
-                if(full_xbrl.startsWith('de-gaap-ci_bs.ass.currAss.receiv.other.otherTaxRec')) { chgbF+=BigInt(yearEnd); console.log("TAX  "+name+"("+yearEnd+")="+chgbF);  } // 20220521 keep tax claims separately
+                if(full_xbrl.startsWith('de-gaap-ci_bs.ass.currAss.receiv.other.otherTaxRec.CapTax.KEST')) { chgbF1+=BigInt(yearEnd); console.log("TAX KEST "+name+"("+yearEnd+")="+chgbF1);  } // 20220521 keep tax claims separately
+                if(full_xbrl.startsWith('de-gaap-ci_bs.ass.currAss.receiv.other.otherTaxRec.CapTax.KESO')) { chgbF2+=BigInt(yearEnd); console.log("TAX KESO "+name+"("+yearEnd+")="+chgbF2);  } // 20220521 keep tax claims separately
+                if(full_xbrl.startsWith('de-gaap-ci_bs.ass.currAss.receiv.other.otherTaxRec')) { chgbF3+=BigInt(yearEnd); console.log("TAX  "+name+"("+yearEnd+")="+chgbF3);  } // 20220521 keep tax claims separately
 
                 // MIET / rent was 'de-gaap-ci_is.netIncome.regular.operatingTC.yearEndTradingProfit'
                 if(full_xbrl.startsWith('de-gaap-ci_is.netIncome.regular.operatingTC.grossTradingProfit')) { chgb1+=BigInt(yearEnd); }
@@ -531,7 +535,7 @@ export function makeHGBReport(jAccounts,page,jReport,jPartners) {
                 if(full_xbrl.startsWith('de-gaap-ci_is.netIncome.regular.fin.expenses')) { chgbC+=BigInt(yearEnd); }
                 if(full_xbrl.startsWith('de-gaap-ci_is.is.netIncome.tax')) { chgbE-=BigInt(yearEnd); }
 
-               // console.log("READ xbrl="+full_xbrl+" "+chgb5+" "+chgb7+" "+chgb8+" "+chgbA+" "+chgbB+" "+chgbC+" "+chgbD+" "+chgbE+" "+chgbF);
+               // console.log("READ xbrl="+full_xbrl+" "+chgb5+" "+chgb7+" "+chgb8+" "+chgbA+" "+chgbB+" "+chgbC+" "+chgbD+" "+chgbE+" "+chgbF3);
                
             }
 
@@ -628,8 +632,16 @@ export function makeHGBReport(jAccounts,page,jReport,jPartners) {
         let gain = regularOTC+fin;
         // Jahresueberschuss
         fillRight(balance,gain,page.closing,14,3);
-        fillRight(balance,-chgbF,page.CapTax,15,3); // -- this part needed for 
-        let netGain = gain-chgbF;
+
+
+        // paid Taxes: for VermVerw  Kommanditgesellschaft: Cap Gain Tax only
+        fillRight(balance,-chgbF1,"chgbF1",15,1); // -- this part needed for Elster
+        fillRight(balance,-chgbF2,"chgbF2",15,2); // -- this part needed for Elster
+        fillRight(balance,-chgbF3,page.CapTax,15,3); // -- this part needed for Elster
+
+        
+
+        let netGain = gain-chgbF3;
         fillRight(balance,netGain,page.NetIncome,16,3);
 
         fillRight(balance,cAvgFix,page.OpAssets,17,1);
@@ -644,7 +656,7 @@ export function makeHGBReport(jAccounts,page,jReport,jPartners) {
 
         // GH 20260330 Partner Capital
         let base=SCREENLINES;
-        base=fillPartner(balance,page.Debit,page.Credit,page.Init,page.AccountHistoryEqLiab,base);
+        base=fillPartner(balance,page.Credit,page.Debit,page.Init,page.AccountHistoryEqLiab,base);
         for (let id in jPartners) {
             var p=jPartners[id];
 
@@ -660,7 +672,7 @@ export function makeHGBReport(jAccounts,page,jReport,jPartners) {
                     idebit = idebit+BigInt(jAccounts[resCap].debit);
                     icredit = icredit+BigInt(jAccounts[resCap].credit);
                 }
-                base=fillPartner(balance,cents2EU(idebit),cents2EU(icredit),cents2EU(ibegin),p.name,base);
+                base=fillPartner(balance,cents2EU(icredit),cents2EU(idebit),cents2EU(ibegin),p.name,base);
             }
             else 
                 base=fillPartner(balance,0n,0n,0n,p.name,base);
