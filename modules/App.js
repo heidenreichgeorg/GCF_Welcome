@@ -477,7 +477,7 @@ export function makeHGBReport(jAccounts,page,jReport,jPartners) {
     console.log("makeReport from response D_Report "+JSON.stringify(Object.keys(jReport)));
               
     if(page) {           
-        var chgb1 = 0n; // Umsatz
+        var iRentGross = 0n; // Umsatz
         var chgb5 = 0n; // MAT+RHB+Leistungen direkter Aufwand
         // Bruttoergebnis
 
@@ -500,12 +500,15 @@ export function makeHGBReport(jAccounts,page,jReport,jPartners) {
         var cAvgCur = 0n; // mittleres Umlaufvermoegen
         var cReceiv = 0n; // Forderungen
 
-
+        var iAuxCredit=0n; // eingenommene Nebenkosten-Vorauszahlungen und Nachzahlungen des Mieters
+        var iAuxDebit =0n; // geleistete Nebenkosten an Dritte, Erstattungen NEGATIVES VORZEICHEN
 
         for (let name in jAccounts)   {
             var account=jAccounts[name];
             var init = account.init;
             var yearEnd = account.yearEnd;
+            var credit = account.credit;
+            var debit = account.debit;
             var iName = account.name;
             var full_xbrl = account.xbrl;
 
@@ -518,11 +521,20 @@ export function makeHGBReport(jAccounts,page,jReport,jPartners) {
                 if(full_xbrl.startsWith('de-gaap-ci_bs.ass.currAss.receiv')) { cReceiv-=BigInt(yearEnd);                     console.log("FOR  "+name+"="+cReceiv); }
                 if(full_xbrl.startsWith('de-gaap-ci_bs.ass.currAss.receiv.other.otherTaxRec.CapTax.KEST')) { chgbF1+=BigInt(yearEnd); console.log("TAX KEST "+name+"("+yearEnd+")="+chgbF1);  } // 20220521 keep tax claims separately
                 if(full_xbrl.startsWith('de-gaap-ci_bs.ass.currAss.receiv.other.otherTaxRec.CapTax.KESO')) { chgbF2+=BigInt(yearEnd); console.log("TAX KESO "+name+"("+yearEnd+")="+chgbF2);  } // 20220521 keep tax claims separately
-                if(full_xbrl.startsWith('de-gaap-ci_bs.ass.currAss.receiv.other.otherTaxRec')) { chgbF3+=BigInt(yearEnd); console.log("TAX  "+name+"("+yearEnd+")="+chgbF3);  } // 20220521 keep tax claims separately
+                if(full_xbrl.startsWith('de-gaap-ci_bs.ass.currAss.receiv.other.otherTaxRec.CapTax')) { chgbF3+=BigInt(yearEnd); console.log("TAX "+name+"("+yearEnd+")="+chgbF3);  } // 20220521 keep tax claims separately
 
                 // MIET / rent was 'de-gaap-ci_is.netIncome.regular.operatingTC.yearEndTradingProfit'
-                if(full_xbrl.startsWith('de-gaap-ci_is.netIncome.regular.operatingTC.grossTradingProfit')) { chgb1+=BigInt(yearEnd); }
-                if(full_xbrl.startsWith('de-gaap-ci_is.netIncome.regular.operatingTC.otherCost.fixingLandBuildings')) { chgb5+=BigInt(yearEnd); }
+                if(full_xbrl.startsWith('de-gaap-ci_bs.eqLiab.liab.advPaym')) { 
+                    chgbF3+=BigInt(yearEnd); 
+                    iAuxCredit+=BigInt(credit); 
+                    iAuxDebit+=BigInt(debit); 
+                    console.log("AUX  "+name+"("+credit+")="+iAuxCredit+"("+debit+")="+iAuxDebit);  
+                    // 20260404 keep aux claims separately
+                }
+                if(full_xbrl.startsWith('de-gaap-ci_is.netIncome.regular.operatingTC.grossTradingProfit')) { iRentGross+=BigInt(yearEnd); }
+                if(full_xbrl.startsWith('de-gaap-ci_is.netIncome.regular.operatingTC.otherCost.fixingLandBuildings')) { 
+                    chgb5+=BigInt(yearEnd); 
+                }
 
                 if(full_xbrl.startsWith('de-gaap-ci_is.netIncome.regular.operatingTC.deprAmort.fixAss.tan')) { chgb7+=BigInt(yearEnd); }
                 if(full_xbrl.startsWith('de-gaap-ci_is.netIncome.regular.operatingTC.otherCost.otherOrdinary')) { chgb8+=BigInt(yearEnd); }
@@ -541,8 +553,8 @@ export function makeHGBReport(jAccounts,page,jReport,jPartners) {
 
         }
 
-        let grossYield = chgb5+chgb1;
-    //                    cursor=printFormat(cursor,[' ',page.Revenue,cents2EU(chgb1)]);
+        let grossYield = chgb5+iRentGross;
+    //                    cursor=printFormat(cursor,[' ',page.Revenue,cents2EU(iRentGross)]);
     //                    cursor=printFormat(cursor,[' ',page.DirectCost,cents2EU(chgb5)]);
     //                    cursor=printFormat(cursor,['Gross Yield',' ',page.yearEndYield,cents2EU(grossYield)]);
 
@@ -609,7 +621,11 @@ export function makeHGBReport(jAccounts,page,jReport,jPartners) {
            iLeft = fillLeft(balance,cBegin,cClose,cNext,iName,iLeft);
         }
 
-        fillRight(balance,chgb1,page.Revenue,0,1);
+        // MIET NKHA,in NKHA.out
+        fillRight(balance,iRentGross,page.Revenue,0,1);
+        fillRight(balance,iAuxCredit,page.Revenue,0,2);
+        fillRight(balance,iAuxDebit,page.Revenue,0,3);
+
         fillRight(balance,chgb5,page.OpCost,1,1);
         fillRight(balance,grossYield,page.GrossYield,2,2);
         // Bruttoergebnis
