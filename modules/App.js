@@ -478,10 +478,10 @@ export function makeHGBReport(jAccounts,page,jReport,jPartners) {
               
     if(page) {           
         var iRentGross = 0n; // Umsatz
-        var chgb5 = 0n; // MAT+RHB+Leistungen direkter Aufwand
+        var erhaltungsAufwand = 0n; // MAT+RHB+Leistungen direkter Aufwand
         // Bruttoergebnis
 
-        var chgb7 = 0n; // Abschreibungen Sachanlagen
+        var aufwandFuerAbnutzung = 0n; // Abschreibungen Sachanlagen
         var chgb8 = 0n; // sonstige betr. Aufwand
         // Ergebnis
 
@@ -533,10 +533,10 @@ export function makeHGBReport(jAccounts,page,jReport,jPartners) {
                 }
                 if(full_xbrl.startsWith('de-gaap-ci_is.netIncome.regular.operatingTC.grossTradingProfit')) { iRentGross+=BigInt(yearEnd); }
                 if(full_xbrl.startsWith('de-gaap-ci_is.netIncome.regular.operatingTC.otherCost.fixingLandBuildings')) { 
-                    chgb5+=BigInt(yearEnd); 
+                    erhaltungsAufwand+=BigInt(yearEnd); 
                 }
 
-                if(full_xbrl.startsWith('de-gaap-ci_is.netIncome.regular.operatingTC.deprAmort.fixAss.tan')) { chgb7+=BigInt(yearEnd); }
+                if(full_xbrl.startsWith('de-gaap-ci_is.netIncome.regular.operatingTC.deprAmort.fixAss.tan')) { aufwandFuerAbnutzung+=BigInt(yearEnd); }
                 if(full_xbrl.startsWith('de-gaap-ci_is.netIncome.regular.operatingTC.otherCost.otherOrdinary')) { chgb8+=BigInt(yearEnd); }
                 
                 // EZIN = de-gaap-ci_is.netIncome.regular.fin.netInterest.income
@@ -547,20 +547,20 @@ export function makeHGBReport(jAccounts,page,jReport,jPartners) {
                 if(full_xbrl.startsWith('de-gaap-ci_is.netIncome.regular.fin.expenses')) { chgbC+=BigInt(yearEnd); }
                 if(full_xbrl.startsWith('de-gaap-ci_is.is.netIncome.tax')) { chgbE-=BigInt(yearEnd); }
 
-               // console.log("READ xbrl="+full_xbrl+" "+chgb5+" "+chgb7+" "+chgb8+" "+chgbA+" "+chgbB+" "+chgbC+" "+chgbD+" "+chgbE+" "+chgbF3);
+               // console.log("READ xbrl="+full_xbrl+" "+erhaltungsAufwand+" "+aufwandFuerAbnutzung+" "+chgb8+" "+chgbA+" "+chgbB+" "+chgbC+" "+chgbD+" "+chgbE+" "+chgbF3);
                
             }
 
         }
 
-        let grossYield = chgb5+iRentGross;
+        let grossYield = erhaltungsAufwand+iRentGross;
     //                    cursor=printFormat(cursor,[' ',page.Revenue,cents2EU(iRentGross)]);
-    //                    cursor=printFormat(cursor,[' ',page.DirectCost,cents2EU(chgb5)]);
+    //                    cursor=printFormat(cursor,[' ',page.DirectCost,cents2EU(erhaltungsAufwand)]);
     //                    cursor=printFormat(cursor,['Gross Yield',' ',page.yearEndYield,cents2EU(grossYield)]);
 
 
-        let regularOTC = grossYield+chgb7+chgb8;
-    //                    cursor=printFormat(cursor,[' ',page.Depreciation,cents2EU(chgb7)]);
+        let regularOTC = grossYield+aufwandFuerAbnutzung+chgb8;
+    //                    cursor=printFormat(cursor,[' ',page.Depreciation,cents2EU(aufwandFuerAbnutzung)]);
     //                    cursor=printFormat(cursor,[' ',page.OtherRegular,cents2EU(chgb8)]);
     //                    cursor=printFormat(cursor,['EBITDA',' ',page.RegularOTC,cents2EU(regularOTC)]);
 
@@ -625,16 +625,18 @@ export function makeHGBReport(jAccounts,page,jReport,jPartners) {
         fillRight(balance,iRentGross,page.Revenue,0,1);
         fillRight(balance,iAuxCredit,page.Revenue,0,2);
         fillRight(balance,iAuxDebit,page.Revenue,0,3);
+        fillRight(balance,erhaltungsAufwand,page.OpCost,1,1);
+        fillRight(balance,aufwandFuerAbnutzung,page.Depreciation,2,1); 
+        fillRight(balance,erhaltungsAufwand+aufwandFuerAbnutzung,"Werbungskosten",3,2);
+        fillRight(balance,regularOTC,page.RegularOTC,4,3);
+        // Ergebnis
 
-        fillRight(balance,chgb5,page.OpCost,1,1);
-        fillRight(balance,grossYield,page.GrossYield,2,2);
+        fillRight(balance,grossYield,page.GrossYield,5,2);
         // Bruttoergebnis
 
-        fillRight(balance,chgb7,page.Depreciation,4,1); 
-        fillRight(balance,chgb8,page.OtherOTC,5,1);
-        fillRight(balance,chgb7+chgb8,page.OtherRegular,6,2);
-        fillRight(balance,regularOTC,page.RegularOTC,7,3);
-        // Ergebnis
+        fillRight(balance,chgb8,page.OtherOTC,6,1);
+        fillRight(balance,aufwandFuerAbnutzung+chgb8,page.OtherRegular,7,2);
+
 
         fillRight(balance,chgb9,page.PartYield,8,1);
         fillRight(balance,chgbA,page.FinSale,9,1);
@@ -663,11 +665,16 @@ export function makeHGBReport(jAccounts,page,jReport,jPartners) {
         fillRight(balance,cAvgFix,page.OpAssets,17,1);
         fillRight(balance,cAvgCur,page.AvgCurrent,18,1);
         fillRight(balance,cReceiv,page.rec,19,1);
+
+
+
+
         let opCap = cAvgFix+cAvgCur+cReceiv;
         fillRight(balance,opCap,page.OpCapital,21,3);
         let performanceBP = 1n;
         if(opCap>0n) performanceBP = (10000n*netGain) / opCap;
         iRite=fillRight(balance,performanceBP,page.CapMargin,22,3);
+
 
 
         // GH 20260330 Partner Capital
