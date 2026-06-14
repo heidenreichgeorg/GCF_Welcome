@@ -165,11 +165,13 @@ function acctPattern(name,pattern) {
 }
 
 
+
 function dragoverHandler(ev) {  ev.preventDefault(); }
-function dropHandler(ev) {
+
+function dropJournalHandler(ev) {
     // Prevent default behavior (Prevent file from being opened)
     ev.preventDefault();
-    console.log('File(s) dropped');        
+    console.log('0800 Journal File(s) dropped');        
 
     if (ev.dataTransfer.items) {
     // Use DataTransferItemList interface to access the file(s)
@@ -182,7 +184,7 @@ function dropHandler(ev) {
 
 
             let file = ev.dataTransfer.files[0];
-            console.log('File '+file.name+'  dropped' );
+            console.log('0810 Journal File '+file.name+'  dropped' );
             var fr = new FileReader();
 
             fr.onload = function () {
@@ -499,47 +501,54 @@ function dropHandler(ev) {
 
 
 
+                        if(uiPatterns) {
+                            // show available transaction patterns
+                            let txnPattern = jData.txnPattern;
+                            let arrTxnKeys=Object.keys(txnPattern)
+                            for(let p=0;p<arrTxnKeys.length;p++) {
 
-                    // show available transaction patterns
-                    let txnPattern = jData.txnPattern;
-                    let arrTxnKeys=Object.keys(txnPattern)
-                    for(let p=0;p<arrTxnKeys.length;p++) {
+                                    let key = arrTxnKeys[p];
+                                    let jPattern = txnPattern[key];
+                                    let strPattern = JSON.stringify(jPattern.credit)+JSON.stringify(jPattern.debitA)+" AN "+JSON.stringify(jPattern.creditEQL)+JSON.stringify(jPattern.debit)
 
-                                let key = arrTxnKeys[p];
-                                let jPattern = txnPattern[key];
-                                let strPattern = JSON.stringify(jPattern.credit)+JSON.stringify(jPattern.debitA)+" AN "+JSON.stringify(jPattern.creditEQL)+JSON.stringify(jPattern.debit)
+                                    let uiDiv=document.createElement('TR');  uiPatterns.append(uiDiv);
+                                    let uiInfoRow=document.createElement('TR'); uiPatterns.append(uiInfoRow);
+                                    let uiDialog=document.createElement('TR'); uiPatterns.append(uiDialog);
+                                    let uiSpc=document.createElement('TD'); uiDiv.append(uiSpc);
+                                    uiInfoRow.className="trow";
+                                    uiDialog.className="trow"; // HIDE
 
-                                let uiDiv=document.createElement('TR'); uiPatterns.append(uiDiv);
-                                let uiInfoRow=document.createElement('TR'); uiPatterns.append(uiInfoRow);
-                                let uiDialog=document.createElement('TR'); uiPatterns.append(uiDialog);
-                                let uiSpc=document.createElement('TD'); uiDiv.append(uiSpc);
-                                uiInfoRow.className="trow";
-                                uiDialog.className="trow"; // HIDE
+                                    let uiKey=document.createElement('TD'); uiInfoRow.append(uiKey);
+                                    uiKey.className="button";
 
-                                let uiKey=document.createElement('TD'); uiInfoRow.append(uiKey);
-                                uiKey.className="button";
+                                    let uiButton=document.createElement('INPUT'); uiKey.append(uiButton);
+                                    uiButton.value=key; uiButton.type='BUTTON';  uiButton.className="button";
+                                    uiButton.addEventListener("click", makeShowTXN(jPattern));
 
-                                let uiButton=document.createElement('INPUT'); uiKey.append(uiButton);
-                                uiButton.value=key; uiButton.type='BUTTON';  uiButton.className="button";
-                                uiButton.addEventListener("click", makeShowTXN(jPattern));
+                                    let uiText=document.createElement('TD'); uiInfoRow.append(uiText);
+                                    uiText.innerHTML=jPattern.text; uiText.className="text";
+                                    
+                                    let uiSend=document.createElement('TD'); uiInfoRow.append(uiSend);
+                                    uiSend.innerHTML=jPattern.refCode; uiSend.className="text";
 
-                                let uiText=document.createElement('TD'); uiInfoRow.append(uiText);
-                                uiText.innerHTML=jPattern.text; uiText.className="text";
-                                
-                                let uiSend=document.createElement('TD'); uiInfoRow.append(uiSend);
-                                uiSend.innerHTML=jPattern.refCode; uiSend.className="text";
+                                    let uiAcct=document.createElement('TD'); uiInfoRow.append(uiAcct);
+                                    uiAcct.innerHTML=jPattern.refAcct; uiAcct.className="text";
 
-                                let uiAcct=document.createElement('TD'); uiInfoRow.append(uiAcct);
-                                uiAcct.innerHTML=jPattern.refAcct; uiAcct.className="text";
+                                    let uiTxt2=document.createElement('TD'); uiInfoRow.append(uiTxt2);
+                                    uiTxt2.innerHTML=jPattern.txt2; uiTxt2.className="text";
 
-                                let uiTxt2=document.createElement('TD'); uiInfoRow.append(uiTxt2);
-                                uiTxt2.innerHTML=jPattern.txt2; uiTxt2.className="text";
-
-                                // uiDialog
-                                let uiTxn=document.createElement('TD'); uiInfoRow.append(uiTxn);
-                                uiTxn.innerHTML=strPattern; uiTxn.className="text";
+                                    // uiDialog
+                                    let uiTxn=document.createElement('TD'); uiInfoRow.append(uiTxn);
+                                    uiTxn.innerHTML=strPattern; uiTxn.className="text";
+                        }
                     }
+
+
+
+
                 }
+
+
 
                 console.log('PROCESSED');
                 let uiAccounts = document.getElementById("accounts")
@@ -779,10 +788,117 @@ function dropHandler(ev) {
     }
 }
 
+function dropTransactionHandler(ev) {
+   // Prevent default behavior (Prevent file from being opened)
+    ev.preventDefault();
+    console.log('0700 TXN File(s) dropped');        
+
+    if (ev.dataTransfer.items) {
+    // Use DataTransferItemList interface to access the file(s)
+            
+        // If dropped items aren't files, reject them
+        if (ev.dataTransfer.items[0].kind === 'file') {
+
+            let jCleanData = {};
+            let sheetCells=[];
+
+
+            let file = ev.dataTransfer.files[0];
+            console.log('0710 TXN File '+file.name+'  dropped' );
+            var fr = new FileReader();
+
+            fr.onload = function () {
+                
+                let date="today";
+                let client=null;
+
+
+                let fileBuffer = this.result;                                    
+                if(fileBuffer.length>0) {
+                    console.log('0720 TXN File has '+fileBuffer.length+'  characters' );
+                    try {
+                        let transaction={};
+                        strData = fileBuffer.split('\n');
+                        let lines=strData.length;
+                        
+                        if(strData) console.log('TXN File has '+lines+'  lines' );
+
+                        try {
+                            for(let i=0;i<lines;i++) {
+                                if(strData[i] && strData[i].length>0) 
+                                {
+                                    console.log(("0"+(730+3*i))+" "+strData[i]);
+
+                                    let control = strData[i].split(':');
+                                    transaction['hash']='abcd';
+                                    ['date','sender','reason','refAcct','refCode'].map((key,j)=>{
+                                        try {
+                                            if(control[0].toLowerCase()===key.toLowerCase()) {
+                                                transaction[key]=control[1];
+                                                console.log(("0"+(731+3*i))+" "+key+" <= "+control[1]);
+                                            }
+                                        } catch(e) {
+                                            console.log("0749 HEADER "+e.message);    
+                                        }
+                                    })
+
+
+                                    aAccount.forEach((acct)=>{
+                                        try {
+                                            if(acct && acct.symb && control[0].toLowerCase()===acct.symb.toLowerCase()) {
+                                                transaction[acct.symb]=control[1];
+                                                console.log(("0"+(732+3*i))+" "+acct.symb+" <= "+control[1]);
+                                            }
+                                        } catch(e) {
+                                            console.log("0759 ACCOUNTS "+e.message);    
+                                        }
+                                    })
+
+                                }
+                            }
+                        } catch(e) {
+                                console.log("0769 FOR "+e.message);    
+                        }
+
+                        console.log("0770 "+JSON.stringify(aAccounts));
+
+                        if( transaction['date'] &&
+                            transaction['sender'] &&
+                            transaction['reason'] &&
+                            transaction['refAcct'] &&
+                            transaction['refCode']) {
+
+                                transaction['hash'] = "abcde";
+
+
+/*
+                                aAccount.forEach((acct)=>{
+                            
+                                    if(acct.Account && acct.xbrl) {
+                                    
+                                        let name=acct.symb;
+                                    }
+                                })
+*/
+                                // ADD ACCOUNTS
+                                console.log("0780 "+JSON.stringify(transaction));
+
+                                // BOOK IT
+                        }
+
+                    } catch(err) { }
+                }
+            }
+
+            fr.readAsText(file);
+        }
+    }
+}
+
 </script>
 <div id="page">
-    <DIV  class="drop" ondrop="dropHandler(event)" ondragover="dragoverHandler(event)">
-        <H1>DROP HERE</H1>
+    <DIV  class="drop" ondrop="dropJournalHandler(event)" ondragover="dragoverHandler(event)">
+        <H1>DROP JSON HERE</H1>
     </DIV>
     <TABLE class="rawt">        
         <TBODY id="headers">
@@ -823,6 +939,9 @@ function dropHandler(ev) {
         <TBODY id="transactions">
         </TBODY>
     </TABLE>
+
+
+    <!--  PATTERNS
     <TABLE class="sheet">
         <THEAD>
             <TR class="trow">
@@ -832,6 +951,10 @@ function dropHandler(ev) {
         <TBODY id="patterns">
         </TBODY>
     </TABLE>
+    -->
+
+    <!--  PENDING
+
     <TABLE class="sheet">
         <THEAD>
             <TR class="trow">
@@ -841,5 +964,11 @@ function dropHandler(ev) {
         <TBODY id="pending">
         </TBODY>
     </TABLE>
+    -->
+
+    <DIV  class="drop" ondrop="dropTransactionHandler(event)" ondragover="dragoverHandler(event)">
+        <H1>DROP TRANSACTION HERE</H1>
+    </DIV>
+
 </div>
 </html>
