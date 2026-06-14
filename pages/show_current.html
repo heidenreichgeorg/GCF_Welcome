@@ -830,37 +830,38 @@ function dropTransactionHandler(ev) {
                                     console.log(("0"+(730+3*i))+" "+strData[i]);
 
                                     let control = strData[i].split(':');
-                                    transaction['hash']='abcd';
-                                    ['date','sender','reason','refAcct','refCode'].map((key,j)=>{
-                                        try {
-                                            if(control[0].toLowerCase()===key.toLowerCase()) {
-                                                transaction[key]=control[1];
-                                                console.log(("0"+(731+3*i))+" "+key+" <= "+control[1]);
+                                    if(control.length>1 && control[0].length>0 && control[1].length>0) {
+
+                                        ['date','sender','reason','refAcct','refCode'].map((key,j)=>{
+                                            try {
+                                                if(control[0].toLowerCase()===key.toLowerCase()) {
+                                                    transaction[key]=control[1];
+                                                    console.log(("0"+(731+3*i))+" "+key+" <= "+control[1]);
+                                                }
+                                            } catch(e) {
+                                                console.log("0749 HEADER "+e.message);    
                                             }
-                                        } catch(e) {
-                                            console.log("0749 HEADER "+e.message);    
-                                        }
-                                    })
+                                        })
 
 
-                                    aAccount.forEach((acct)=>{
-                                        try {
-                                            if(acct && acct.symb && control[0].toLowerCase()===acct.symb.toLowerCase()) {
-                                                transaction[acct.symb]=control[1];
-                                                console.log(("0"+(732+3*i))+" "+acct.symb+" <= "+control[1]);
+                                        aAccount.forEach((acct)=>{
+                                            try {
+                                                if(acct && acct.symb && control[0].toLowerCase()===acct.symb.toLowerCase()) {
+                                                    transaction[acct.symb]=control[1];
+                                                    console.log(("0"+(732+3*i))+" "+acct.symb+" <= "+control[1]);
+                                                }
+                                            } catch(e) {
+                                                console.log("0759 ACCOUNTS "+e.message);    
                                             }
-                                        } catch(e) {
-                                            console.log("0759 ACCOUNTS "+e.message);    
-                                        }
-                                    })
-
+                                        })
+                                    }
                                 }
                             }
                         } catch(e) {
                                 console.log("0769 FOR "+e.message);    
                         }
 
-                        console.log("0770 "+JSON.stringify(aAccounts));
+                        console.log("0770 "+JSON.stringify(transaction));
 
                         if( transaction['date'] &&
                             transaction['sender'] &&
@@ -886,7 +887,7 @@ function dropTransactionHandler(ev) {
                                 // BOOK IT
                         }
 
-                    } catch(err) { }
+                    } catch(err) { console.log("799 "+err.message)}
                 }
             }
 
