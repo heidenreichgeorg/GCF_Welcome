@@ -2,13 +2,18 @@
 	"version": "2.0.0",
 	"tasks": [
 		{
-			"label": "auto",
+			"label": "auto-start npm run dev",
 			"type": "shell",
 			"command": "npm run dev",
+			"presentation": {
+        		"reveal": "always",
+        		"panel": "new"
+      		},
 			"runOptions": {
 				"runOn": "folderOpen"
 			}
-		},
+		}]}
+	/*
 		{
 			"type": "docker-build",
 			"label": "docker-build",
@@ -45,3 +50,4 @@
 		}
 	]
 }
+	*/
