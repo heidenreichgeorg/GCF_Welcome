@@ -147,6 +147,7 @@ let sAccount=[];
 let aPartners=[];
 let currentAssets={} // symbol to current value
 let aTransactions=[];
+let journalData={};
 
 function lookupAsset(symbol) {
     let result = -1;
@@ -185,616 +186,596 @@ function dropJournalHandler(ev) {
             
         // If dropped items aren't files, reject them
         if (ev.dataTransfer.items[0].kind === 'file') {
-
-            let jCleanData = {};
-            let sheetCells=[];
-
-
             let file = ev.dataTransfer.files[0];
             console.log('0810 Journal File '+file.name+'  dropped' );
             var fr = new FileReader();
-
             fr.onload = function () {
-                
-                let jData={};
-                let year=null;
-                let client=null;
-
-
-                let fileBuffer = this.result;                                    
                 try {
-                    jData = JSON.parse(fileBuffer);
+                    upDateDisplay(JSON.parse(this.result));
                 } catch(err) { }
-
-
-                let uiHeader=document.getElementById("headers");
-                let uiAssets=document.getElementById("assets");
-                let uiTransactions=document.getElementById("transactions");
-                let uiPatterns=document.getElementById("patterns");
-
-                let isInitial=true;
-                let ready=0;
-                if(jData) {
-                    year = jData.year;
-                    client = jData.client;
-
-
-                    const sheetLines = jData.sheetCells;
-
-                    jCleanData = {
-                        'year':      year,
-                        'client':    client,
-                        'sheetName': client+year,
-                        'total' :    jData.total,
-                        'assets' :   jData.assets,
-                        'eqliab' :   jData.eqliab,
-                        'author' :   jData.author,
-                        'server' :   jData.server,
-                        'residence': jData.residence,
-                        'time':      jData.time,
-                        'txnPattern':jData.txnPattern,
-                        'partner' :  jData.partner,
-                        'fireBase' : jData.fireBase
-                    }
-
-                    if(sheetLines.length>J_ACCT) {
-                        console.error("0820 UPLOAD CSV WITH "+sheetLines.length+" lines");                  
-                        sheetLines.forEach((arrayTrans)=>{
-                            const aTrans=JSON.parse(JSON.stringify(arrayTrans));
-
-                            // GH20260118 copy each line
-                            sheetCells.push(aTrans);
-                            // GH2026 this happens only once
-
-                            let isHeader=false;
-                            
-
-                            let indicator=aTrans[0];
-                            //console.dir("\n0822 UPLOAD indicator  "+indicator); 
-                            if(indicator=='N') {                            
-                                console.dir("\n0824 N-line  "+JSON.stringify(aTrans)); 
-                                nLine=aTrans;
-                                nLine.forEach((name,i)=>{if(name==='ASSETS') maxAsset=i})
-                                ready+=1;
-                                isHeader=true;
-
-                            } else if(indicator=='S') {                            
-                                console.dir("\n0824 S-line  "+JSON.stringify(aTrans)); 
-                                sLine=JSON.parse(JSON.stringify(aTrans));
-                                isHeader=true;
-
-                            } else if(indicator=='C') {                            
-                                console.dir("\n0824 C-line  "+JSON.stringify(aTrans)); 
-                                cLine=aTrans;
-                                isHeader=true;
-
-                            } else if(indicator=='I') {                            
-                                console.dir("\n0824 I-line  "+JSON.stringify(aTrans)); 
-                                iLine=aTrans;
-                                isHeader=true;
-
-                            } else if(indicator=='R') {                            
-                                console.dir("\n0824 R-line  "+JSON.stringify(aTrans)); 
-                                rLine=aTrans;
-                                isHeader=true;
-
-                            } else if(indicator=='E') {                            
-                                console.dir("\n0824 E-line  "+JSON.stringify(aTrans)); 
-                                eLine=aTrans; 
-                                isHeader=true;
-
-                            } else if(indicator=='X') {                            
-                                console.dir("\n0824 X-line  "+JSON.stringify(aTrans)); 
-                                xLine=aTrans;
-                                ready+=4;
-                                isHeader=true;
-
-                            } else if(indicator=='A') {                            
-                                aLine=aTrans;
-                                let jAsset = {}
-                                jAsset.investDate=aLine[1];
-                                jAsset.code=aLine[2];
-                                jAsset.beginYear=aLine[3];
-                                jAsset.currentUnits=aLine[4];
-                                jAsset.symbol=aLine[5];
-                                jAsset.current=aLine[6];
-                                console.dir("\n0824 A-line  "+JSON.stringify(jAsset)); 
-                                isHeader=true;
-                                aAssets.push(jAsset);
-                                currentAssets[jAsset.symbol]=jAsset.current; // default, if no INVEST SELL WRITEOFF in current year
-
-                            } else if(indicator=='P') {                            
-                                console.dir("\n0824 P-line  "+JSON.stringify(aTrans)); 
-                                pLine=aTrans;
-                                isHeader=true;
-                                let p=0;
-                                let n=0;
-                                bigDenominator= BigInt(parseInt(sLine[2]));
-                                console.log("DENOMINATOR "+bigDenominator);
-
-                                if(sLine && sLine.length>1) {
-                                    pLine.forEach((longName,t)=>{ 
-                                        let shareInfo=sLine[p];
-                                        if(p>J_ACCT && longName && longName.length>1) {
-                                            if(shareInfo.startsWith('-')) shareInfo="0";
-                                            let iShare = parseInt(shareInfo);
-                                            if(!isNaN(iShare)) {
-                                                let nPartner={"tax":longName,"share":iShare,"iVarCap":p};
-                                                aPartners.push(nPartner);
-                                            }
-                                                // names in same ordering as shares
-                                            else if(shareInfo.length>2) {
-                                                aPartners[n].name=shareInfo;
-                                                aPartners[n].fullName=longName;
-                                                console.log("Partner "+JSON.stringify(aPartners[n]));
-                                                n++;
-                                            }
-                                        }
-                                        p++;
-                                    })
-                                }
-
-                            } else if(indicator=='K') {                            
-                                kLine=aTrans;
-                                isHeader=true;
-
-                                console.dir("\n0824 K-line  "+JSON.stringify(aTrans)); 
-                                let year  = kLine[2];
-                                let client= kLine[4];
-                                console.dir("\n0826 UPLOAD client:"+client+"  year:"+year);                                                                                   
-                            
-                            } else if(indicator=='1' && isInitial) {                            
-                                console.dir("\n0828 opening line  "+JSON.stringify(aTrans)); 
-                                oLine=aTrans;
-                                isInitial=false;
-                                let strAmount="0";
-                                isHeader=true;
-
-                                sAccount=nLine;
-                                aAccount=nLine.map((symb,i)=>(
-                                    (xLine[i] && xLine[i].length>4 && ((strAmount = cents20EU(bigMoney(oLine[i],1,0n)))!=null)) ?
-                                        makeAccount(symb,cLine[i],xLine[i],strAmount,strAmount)
-                                        :
-                                        {}
-                                ))
-                                //aAccount.forEach((acct)=>{console.log(JSON.stringify(acct))})
-                                aPartners.forEach((jPartner,n)=>{
-                                    let index=jPartner.iVarCap;
-                                    if(index>J_ACCT)
-                                        jPartner.open=oLine[index]
-                                })
-                                ready+=2;
-                                                                
-
-                            } else if(ready>=7) {
-                                let symbol=parseInt(indicator);
-                                if(!isNaN(symbol)) {
-
-                                    iAsset=-1; // Account column position of asset
-
-
-                                    // REGULAR TRANSACTION BOOKING 
-                                    xLine.forEach((xbrl,i)=>{
-                                            if(xbrl && xbrl.length>4 && aTrans[i] && aTrans[i].length>0) {
-                                                let sign=aTrans[i].charAt(0);
-
-
-                                                // check whether this really is a ass.fixAss account
-                                                if(xbrl.startsWith("de-gaap-ci_bs.ass.fixAss"))
-                                                    iAsset=i; 
-
-
-
-                                                let bigInit=bigMoney(aAccount[i].init,1,0n);
-                                                let bigDebit=bigMoney(aAccount[i].debit,1,0n);
-                                                let bigCredit=bigMoney(aAccount[i].credit,1,0n);
-
-                                                if(sign=='-') {
-                                                    bigDebit=bigMoney(aTrans[i],-1,bigDebit);
-                                                    aAccount[i].debit = cents20EU(bigDebit);
-                                                } else {
-                                                    bigCredit=bigMoney(aTrans[i],1,bigCredit);
-                                                    aAccount[i].credit = cents20EU (bigCredit);
-                                                }
-
-                                                let saldo = cents20EU(bigInit+bigCredit-bigDebit);
-                                                
-
-                                                if(iAsset>=0 && i==iAsset) {
-                                                    // ASSET TRACKING
-                                                    let code=aTrans[2];
-                                                    let symbol=aTrans[5];
-
-                                                    if(aTrans[3]==="INVEST") {
-                                                        console.log("\nINVEST "+aTrans[i]+" into "+code+":"+symbol+"  =  "+ saldo)   
-
-
-
-                                                        // if currentAssets[symbol] does not exist: create aAsset entry
-                                                        if(!currentAssets[symbol]) {
-                                                            let bigSaldo=bigMoney(aTrans[i],1,0n);
-                                                            saldo = cents20EU(bigSaldo);
-
-                                                            let jAsset = {}
-                                                            jAsset.investDate=aTrans[1];
-                                                            jAsset.code=code;
-                                                            jAsset.beginYear="0";
-                                                            jAsset.currentUnits=aTrans[4]; // ??
-                                                            jAsset.symbol=symbol;
-                                                            jAsset.current=saldo;
-                                                            console.dir("NEW ASSET  "+JSON.stringify(jAsset)); 
-                                                            aAssets.push(jAsset);
-                                                        }
-
-
-                                                        currentAssets[symbol]=saldo;
-
-
-                                                    }
-                                                    
-                                                    else if(aTrans[3]==="SELL") {
-                                                        let iAssetEntry = lookupAsset(symbol);
-                                                        let previous = currentAssets[symbol];
-                                                        let sales = aTrans[i];
-                                                        let unitsSold = parseInt(aTrans[4]);
-                                                        if(iAssetEntry>=0) {
-
-                                                            let jAsset = aAssets[iAssetEntry];
-                                                            let unitsRemain = jAsset.currentUnits-unitsSold;
-                                                            console.log("\nSELL "+unitsSold+" units from "+code+":"+symbol+"("+jAsset.currentUnits+")  worth  "+ previous+ " giving "+sales+  " leaving "+unitsRemain)   
-
-
-                                                            jAsset.currentUnits=unitsRemain;
-
-
-
-                                                            // COMPUTE TOTAL SALES ONLY
-                                                            currentAssets[symbol]="0";
-
-                                                        }
-                                                        else console.log("\nFAKE SELL "+unitsSold+" units from "+code+":"+symbol+"  worth  "+ previous+ " giving "+sales)   
-                                                    }
-
-
-
-
-                                                    else if(aTrans[3]==="WRITEOFF") {
-                                                        let iAssetEntry = lookupAsset(symbol);
-                                                        let previous = currentAssets[symbol];
-                                                        let sales = aTrans[i];
-                                                        let unitsSold = parseInt(aTrans[4]);
-                                                        if(iAssetEntry>=0) {
-
-                                                            let jAsset = aAssets[iAssetEntry];
-                                                            let unitsRemain = jAsset.currentUnits-unitsSold;
-                                                            console.log("\nWRITEOFF "+unitsSold+" units from "+code+":"+symbol+"("+jAsset.currentUnits+")  worth  "+ previous+ " giving "+sales+  " leaving "+unitsRemain)   
-                                                        }
-                                                    }
-                                                }
-
-                                                // ALL TRANSACTIONS
-                                                aAccount[i].saldo = saldo;                                                
-                                                console.log( nLine[i] + ":  "+aAccount[i].init+ " + "+aAccount[i].credit+ "  - "+aAccount[i].debit+ " = "+aAccount[i].saldo);
-                                                
-                                            }
-                                    })
-
-                                }
-                                
-                            }
-
-
-                            if(!isNaN(indicator) && !isInitial) {                            
-                                let jAction=aTrans;
-                                if(aTrans.length>J_ACCT)
-                                    aTransactions.unshift({"text":aTrans[1]+" "+aTrans[4]+" "+aTrans[2],"action":jAction,"header":aTrans.slice(1,J_ACCT)})
-                            }
-
-
-
-/*
-                            // header checking on UI
-                            if(isHeader) {
-                                let hRow=document.createElement('TR');uiHeader.append(hRow);
-                                arrayTrans.forEach((cell,i)=>{                                
-                                    let uiCell=document.createElement('TD'); 
-                                    hRow.append(uiCell); 
-                                    uiCell.innerHTML=cell.substring(0,10);
-                                })                            
-                            }
-*/                                
-                        }
-                    )}
-
-
-
-
-                        if(uiPatterns) {
-                            // show available transaction patterns
-                            let txnPattern = jData.txnPattern;
-                            let arrTxnKeys=Object.keys(txnPattern)
-                            for(let p=0;p<arrTxnKeys.length;p++) {
-
-                                    let key = arrTxnKeys[p];
-                                    let jPattern = txnPattern[key];
-                                    let strPattern = JSON.stringify(jPattern.credit)+JSON.stringify(jPattern.debitA)+" AN "+JSON.stringify(jPattern.creditEQL)+JSON.stringify(jPattern.debit)
-
-                                    let uiDiv=document.createElement('TR');  uiPatterns.append(uiDiv);
-                                    let uiInfoRow=document.createElement('TR'); uiPatterns.append(uiInfoRow);
-                                    let uiDialog=document.createElement('TR'); uiPatterns.append(uiDialog);
-                                    let uiSpc=document.createElement('TD'); uiDiv.append(uiSpc);
-                                    uiInfoRow.className="trow";
-                                    uiDialog.className="trow"; // HIDE
-
-                                    let uiKey=document.createElement('TD'); uiInfoRow.append(uiKey);
-                                    uiKey.className="button";
-
-                                    let uiButton=document.createElement('INPUT'); uiKey.append(uiButton);
-                                    uiButton.value=key; uiButton.type='BUTTON';  uiButton.className="button";
-                                    uiButton.addEventListener("click", makeShowTXN(jPattern));
-
-                                    let uiText=document.createElement('TD'); uiInfoRow.append(uiText);
-                                    uiText.innerHTML=jPattern.text; uiText.className="text";
-                                    
-                                    let uiSend=document.createElement('TD'); uiInfoRow.append(uiSend);
-                                    uiSend.innerHTML=jPattern.refCode; uiSend.className="text";
-
-                                    let uiAcct=document.createElement('TD'); uiInfoRow.append(uiAcct);
-                                    uiAcct.innerHTML=jPattern.refAcct; uiAcct.className="text";
-
-                                    let uiTxt2=document.createElement('TD'); uiInfoRow.append(uiTxt2);
-                                    uiTxt2.innerHTML=jPattern.txt2; uiTxt2.className="text";
-
-                                    // uiDialog
-                                    let uiTxn=document.createElement('TD'); uiInfoRow.append(uiTxn);
-                                    uiTxn.innerHTML=strPattern; uiTxn.className="text";
-                        }
-                    }
-
-
-
-
-                }
-
-
-
-                console.log('PROCESSED');
-                let uiAccounts = document.getElementById("accounts")
-                let uiPartners = document.getElementById("partners")
-                if(uiAccounts) {
-
-                        acctPattern('Sachanlagen','de-gaap-ci_bs.ass.fixAss.tan');
-                        acctPattern('Finanzanlagen','de-gaap-ci_bs.ass.fixAss.fin');
-                        acctPattern('Forderungen aus LuL','de-gaap-ci_bs.ass.currAss.receiv.trade');
-            let taxP =  acctPattern('gezahlte Steuern','de-gaap-ci_bs.ass.currAss.receiv.other.otherTaxRec');
-                        acctPattern('Sichteinlagen','de-gaap-ci_bs.ass.currAss.cashEquiv');
-                        acctPattern('Verluste aus Anlagen-Verkauf','de-gaap-ci_bs.ass.currAss.unpaidCapital');
-                        acctPattern('Aktiva','de-gaap-ci_bs.ass');
-
-                        acctPattern('Umsatz',            'de-gaap-ci_is.netIncome.regular.operatingTC.grossTradingProfit');
-                        acctPattern('Rohertrag',         'de-gaap-ci_is.netIncome.regular.operatingTC');
-                        acctPattern('Beteilungsergebnis','de-gaap-ci_is.netIncome.regular.fin');
-            let bilg =  acctPattern('Ergebnis',          'de-gaap-ci_is.netIncome.regular');
-
-                        acctPattern('Verbindlichkeiten aLuL','de-gaap-ci_bs.eqLiab.liab.advPaym');
-                        acctPattern('sonstige Verbindlichkeiten','de-gaap-ci_bs.eqLiab.liab.other.other');
-                        acctPattern('Kapitaldarlehen Komplementäre','de-gaap-ci_bs.eqLiab.equity.subscribed.unlimitedLiablePartners.VK');
-                        acctPattern('Kapitaldarlehen Kommanditisten','de-gaap-ci_bs.eqLiab.equity.subscribed.limitedLiablePartners.VK');
-                        acctPattern('Festkapital Komplementäre','de-gaap-ci_bs.eqLiab.equity.subscribed.unlimitedLiablePartners.FK');
-                        acctPattern('Festkapital Kommanditisten','de-gaap-ci_bs.eqLiab.equity.subscribed.limitedLiablePartners.KK');
-                        acctPattern('Eigenkapital-Reserve','de-gaap-ci_bs.eqLiab.equity.capRes');
-                        
-            let paog =  acctPattern('Kapital und Verbindlichkeiten','de-gaap-ci_bs.eqLiab');
-
-                        aAccount.push(makeAccount(null,"Passiva mit Gewinn",'de-gaap-ci_bs.eqLiab',"",cents20EU(bigMoney("",1,bilg+paog))))
-
-                        // acctPartner('')
-
-                        aAccount.forEach((acct)=>{
-                            //console.log(JSON.stringify(acct))
-                            if(acct.Account && acct.xbrl) {
-                                let uiDiv=document.createElement('TR');uiAccounts.append(uiDiv);
-                                let uiRow=document.createElement('TR');uiAccounts.append(uiRow);
-                                let uiSpc=document.createElement('TD'); uiDiv.append(uiSpc);
-                                let uiNam=document.createElement('TD'); uiRow.append(uiNam);
-                                let uiOpn=document.createElement('TD'); uiRow.append(uiOpn);
-                                let uiCrd=document.createElement('TD'); uiRow.append(uiCrd);
-                                let uiDbt=document.createElement('TD'); uiRow.append(uiDbt);
-                                let uiCls=document.createElement('TD'); uiRow.append(uiCls);
-                                let uiTxt=document.createElement('TD'); uiRow.append(uiTxt);
-
-                                uiRow.className="trow";
-                                uiNam.innerHTML=acct.symb?acct.symb:"---"; uiNam.className="symb";
-                                uiOpn.innerHTML=acct.init;   uiOpn.className="amount";
-                                uiCrd.innerHTML=acct.credit; uiCrd.className="amount";
-                                uiDbt.innerHTML=acct.debit;  uiDbt.className="amount";
-                                uiCls.innerHTML=acct.saldo;  uiCls.className="amount";
-                                uiTxt.innerHTML=acct.Account;uiTxt.className="text";
-                                }                            
-                        })
-
-
-                        // distribute gain/loss
-                        if(bilg!=0n) {
-                            let bigSign=bilg>0n?1n:-1n;
-                            let bigRest=bigSign*bilg; 
-                            bilg=bigRest;
-
-                            aPartners.forEach((jPartner,n)=>{
-                                        let bigShare = (bilg * BigInt(jPartner.share)) / bigDenominator;
-                                        jPartner.save= bigShare;
-                                        bigRest -= bigShare;
-
-                                        let index=jPartner.iVarCap;
-                                        jPartner.credit = aAccount[index].credit;
-                                        jPartner.debit = aAccount[index].debit;
-                                        jPartner.saldo = aAccount[index].saldo;
-                            });
-
-                            aPartners.forEach((jPartner,n)=>{
-                                jPartner.gain= cents20EU(bigSign * BigInt(jPartner.save)+(bigRest>0n?1n:0n));
-                                bigRest--;
-                            });                            
-                        }
-
-                        if(taxP>0n) {
-                            // distribute tax
-                            let bigRest=taxP; 
-                            aPartners.forEach((jPartner,n)=>{
-                                        let index=jPartner.iVarCap;
-                                        let bigTax = (taxP * BigInt(jPartner.share)) / bigDenominator;
-                                        jPartner.save= bigTax;
-                                        bigRest -= bigTax;
-                            });
-                            aPartners.forEach((jPartner,n)=>{
-                                    jPartner.taxP= cents20EU(BigInt(jPartner.save)+(bigRest>0n?1n:0n));
-                                    bigRest--;
-                                });                            
-                        }
-
-                        aPartners.forEach((jPartner,n)=>{
-                                    let index=jPartner.iVarCap;
-                                    if(index>J_ACCT) {
-                                        let uiDiv=document.createElement('TR');uiPartners.append(uiDiv);
-                                        let uiRow=document.createElement('TR');uiPartners.append(uiRow);
-                                        let uiSpc=document.createElement('TD'); uiDiv.append(uiSpc);
-                                        let uiNam=document.createElement('TD'); uiRow.append(uiNam);
-                                        let uiOpn=document.createElement('TD'); uiRow.append(uiOpn);
-                                        let uiCrd=document.createElement('TD'); uiRow.append(uiCrd);
-                                        let uiDbt=document.createElement('TD'); uiRow.append(uiDbt);
-                                        let uiGal=document.createElement('TD'); uiRow.append(uiGal);
-                                        let uiTax=document.createElement('TD'); uiRow.append(uiTax);
-                                        let uiCls=document.createElement('TD'); uiRow.append(uiCls);
-
-                                        uiRow.className="trow";
-                                        uiNam.innerHTML=jPartner.fullName; uiNam.className="text";
-                                        uiOpn.innerHTML=jPartner.open;  uiOpn.className="amount";
-                                        uiCrd.innerHTML=jPartner.credit;uiCrd.className="amount";
-                                        uiDbt.innerHTML=jPartner.debit; uiDbt.className="amount";
-                                        uiGal.innerHTML=jPartner.gain;  uiGal.className="amount";
-                                        uiTax.innerHTML=jPartner.taxP;  uiTax.className="amount";
-                                        uiCls.innerHTML=jPartner.saldo; uiCls.className="amount";
-                                            }
-                                        
-                                })
-
-
-                        aAssets.forEach((jAsset,n)=>{
-                                        let symbol = jAsset.symbol;
-                                        let code = jAsset.code;
-
-                                        let uiDiv=document.createElement('TR');uiAssets.append(uiDiv);
-                                        let uiRow=document.createElement('TR');uiAssets.append(uiRow);
-                                        let uiSpc=document.createElement('TD'); uiDiv.append(uiSpc);
-                                        let uiSym=document.createElement('TD'); uiRow.append(uiSym);
-                                        let uiCod=document.createElement('TD'); uiRow.append(uiCod);
-                                        let uiDat=document.createElement('TD'); uiRow.append(uiDat);
-                                        let uiQua=document.createElement('TD'); uiRow.append(uiQua);
-                                        let uiBeg=document.createElement('TD'); uiRow.append(uiBeg);
-                                        let uiCur=document.createElement('TD'); uiRow.append(uiCur);
-                                        let uiCls=document.createElement('TD'); uiRow.append(uiCls);
-                                        uiRow.className="trow";
-                                        uiSym.innerHTML=symbol;             uiSym.className="amount";
-                                        uiCod.innerHTML=code;               uiCod.className="amount";
-                                        uiDat.innerHTML=jAsset.investDate;  uiDat.className="amount";
-                                        uiQua.innerHTML=jAsset.currentUnits;uiQua.className="amount";
-                                        uiBeg.innerHTML=jAsset.beginYear;   uiBeg.className="amount";
-                                        uiCur.innerHTML=jAsset.current;     uiCur.className="amount";
-                                        uiCls.innerHTML=currentAssets[symbol];uiCls.className="amount";
-                                        
-                                            
-                                        
-                                })
-
-
-
-// show historic transactions
-                    if(aTransactions.length>0) {
-                        aTransactions.forEach((strAction,i)=>{
-                            if(i<200) { // show last 200 transactions
-                                let uiDiv=document.createElement('TR'); uiTransactions.append(uiDiv);
-                                let uiRow=document.createElement('TR'); uiTransactions.append(uiRow);
-                                let uiSpc=document.createElement('TD'); uiDiv.append(uiSpc);
-                                uiRow.className="trow";
-
-                                let uiDat=document.createElement('TD'); uiRow.append(uiDat);
-                                uiDat.innerHTML=strAction.text; uiDat.className="text";
-
-                                // GH20260118
-                                uiDat.innerHTML='<TABLE><TR><TD class="tiny">'+strAction.header.join('</TD><TD class="tiny">')+'</TD></TR></TABLE>'; 
-                                uiDat.className="xbrl";
-
-
-                                let acLine = ""
-                                let adLine = ""
-                                strAction.action.forEach((move,a)=>{
-                                    let cText=null;
-                                    let dText=null;
-                                    if(a>J_ACCT && move && move.length>0) {
-                                        if(move.startsWith('-')) {
-                                            dText=nLine[a]+":"+move.substring(1);
-                                        } else {
-                                            cText=nLine[a]+":"+move;
-                                        }
-                                        if(a<maxAsset) {
-                                            if(cText) acLine=acLine+" "+cText
-                                            if(dText) adLine=adLine+" "+dText
-                                        } else {
-                                            if(dText) acLine=acLine+" "+dText
-                                            if(cText) adLine=adLine+" "+cText
-                                        }
-                                    }
-                                    
-                                })
-                                
-
-                                
-                                let uiCrd=document.createElement('TD'); 
-                                    uiRow.append(uiCrd);
-                                    uiCrd.innerHTML=acLine; 
-                                    uiCrd.className="amount";
-
-                                let uiAn=document.createElement('TD'); 
-                                    uiRow.append(uiAn);
-                                    uiAn.innerHTML="AN"; 
-                                    uiAn.className="amount";
-
-                                let uiDbt=document.createElement('TD'); 
-                                    uiRow.append(uiDbt);
-                                    uiDbt.innerHTML=adLine; 
-                                    uiDbt.className="amount";
-                                
-                                
-                            }
-                        })
-                    }
-
-                }
-
-
-
-
-
-
-
-
-
-
                 // GH20260118 save purged file
-                jCleanData.sheetCells=sheetCells;
-                makeJSONButton(jCleanData,client,year);
-
-
-
-
-
-
-
+                //jCleanData.sheetCells=sheetCells;
+                //makeJSONButton(jCleanData,client,year);
             }
             fr.readAsText(file);
         }
     }
 }
+
+
+function upDateDisplay(jData) {
+    let jCleanData = {};
+    let sheetCells=[];
+    let year=null;
+    let client=null;
+
+    let uiHeader=document.getElementById("headers");
+    let uiAssets=document.getElementById("assets");
+    let uiTransactions=document.getElementById("transactions");
+    let uiPatterns=document.getElementById("patterns");
+
+    let isInitial=true;
+    let ready=0;
+    if(jData) {
+        journalData = jData;
+        year = journalData.year;
+        client = journalData.client;
+
+        const sheetLines = journalData.sheetCells;
+
+        jCleanData = {
+            'year':      year,
+            'client':    client,
+            'sheetName': client+year,
+            'total' :    journalData.total,
+            'assets' :   journalData.assets,
+            'eqliab' :   journalData.eqliab,
+            'author' :   journalData.author,
+            'server' :   journalData.server,
+            'residence': journalData.residence,
+            'time':      journalData.time,
+            'txnPattern':journalData.txnPattern,
+            'partner' :  journalData.partner,
+            'fireBase' : journalData.fireBase
+        }
+
+        if(sheetLines.length>J_ACCT) {
+            console.error("0820 UPLOAD CSV WITH "+sheetLines.length+" lines");                  
+            sheetLines.forEach((arrayTrans)=>{
+                const aTrans=JSON.parse(JSON.stringify(arrayTrans));
+
+                // GH20260118 copy each line
+                sheetCells.push(aTrans);
+                // GH2026 this happens only once
+
+                let isHeader=false;
+                
+
+                let indicator=aTrans[0];
+                //console.dir("\n0822 UPLOAD indicator  "+indicator); 
+                if(indicator=='N') {                            
+                    console.dir("\n0824 N-line  "+JSON.stringify(aTrans)); 
+                    nLine=aTrans;
+                    nLine.forEach((name,i)=>{if(name==='ASSETS') maxAsset=i})
+                    ready+=1;
+                    isHeader=true;
+
+                } else if(indicator=='S') {                            
+                    console.dir("\n0824 S-line  "+JSON.stringify(aTrans)); 
+                    sLine=JSON.parse(JSON.stringify(aTrans));
+                    isHeader=true;
+
+                } else if(indicator=='C') {                            
+                    console.dir("\n0824 C-line  "+JSON.stringify(aTrans)); 
+                    cLine=aTrans;
+                    isHeader=true;
+
+                } else if(indicator=='I') {                            
+                    console.dir("\n0824 I-line  "+JSON.stringify(aTrans)); 
+                    iLine=aTrans;
+                    isHeader=true;
+
+                } else if(indicator=='R') {                            
+                    console.dir("\n0824 R-line  "+JSON.stringify(aTrans)); 
+                    rLine=aTrans;
+                    isHeader=true;
+
+                } else if(indicator=='E') {                            
+                    console.dir("\n0824 E-line  "+JSON.stringify(aTrans)); 
+                    eLine=aTrans; 
+                    isHeader=true;
+
+                } else if(indicator=='X') {                            
+                    console.dir("\n0824 X-line  "+JSON.stringify(aTrans)); 
+                    xLine=aTrans;
+                    ready+=4;
+                    isHeader=true;
+
+                } else if(indicator=='A') {                            
+                    aLine=aTrans;
+                    let jAsset = {}
+                    jAsset.investDate=aLine[1];
+                    jAsset.code=aLine[2];
+                    jAsset.beginYear=aLine[3];
+                    jAsset.currentUnits=aLine[4];
+                    jAsset.symbol=aLine[5];
+                    jAsset.current=aLine[6];
+                    console.dir("\n0824 A-line  "+JSON.stringify(jAsset)); 
+                    isHeader=true;
+                    aAssets.push(jAsset);
+                    currentAssets[jAsset.symbol]=jAsset.current; // default, if no INVEST SELL WRITEOFF in current year
+
+                } else if(indicator=='P') {                            
+                    console.dir("\n0824 P-line  "+JSON.stringify(aTrans)); 
+                    pLine=aTrans;
+                    isHeader=true;
+                    let p=0;
+                    let n=0;
+                    bigDenominator= BigInt(parseInt(sLine[2]));
+                    console.log("DENOMINATOR "+bigDenominator);
+
+                    if(sLine && sLine.length>1) {
+                        pLine.forEach((longName,t)=>{ 
+                            try {
+                                let shareInfo=sLine[p];
+                                if(p>J_ACCT && longName && longName.length>1) {
+                                    if(shareInfo.startsWith('-')) shareInfo="0";
+                                    let iShare = parseInt(shareInfo);
+                                    if(!isNaN(iShare)) {
+                                        let nPartner={"tax":longName,"share":iShare,"iVarCap":p};
+                                        aPartners.push(nPartner);
+                                    }
+                                        // names in same ordering as shares
+                                    else if(shareInfo.length>2) {
+                                        aPartners[n].name=shareInfo;
+                                        aPartners[n].fullName=longName;
+                                        console.log("Partner "+JSON.stringify(aPartners[n]));
+                                        n++;
+                                    }
+                                }
+                                p++;
+                            } catch(e) { console.error("0830 "+e.name+ "   "+e.message)}
+                        })
+                    }
+
+                } else if(indicator=='K') {                            
+                    kLine=aTrans;
+                    isHeader=true;
+
+                    console.dir("\n0832 K-line  "+JSON.stringify(aTrans)); 
+                    let year  = kLine[2];
+                    let client= kLine[4];
+                    console.dir("\n0834 UPLOAD client:"+client+"  year:"+year);                                                                                   
+                
+                } else if(indicator=='1' && isInitial) {                            
+                    console.dir("\n0836 opening line  "+JSON.stringify(aTrans)); 
+                    oLine=aTrans;
+                    isInitial=false;
+                    let strAmount="0";
+                    isHeader=true;
+
+                    sAccount=nLine;
+                    aAccount=nLine.map((symb,i)=>(
+                        (xLine[i] && xLine[i].length>4 && ((strAmount = cents20EU(bigMoney(oLine[i],1,0n)))!=null)) ?
+                            makeAccount(symb,cLine[i],xLine[i],strAmount,strAmount)
+                            :
+                            {}
+                    ))
+                    //aAccount.forEach((acct)=>{console.log(JSON.stringify(acct))})
+                    aPartners.forEach((jPartner,n)=>{
+                        let index=jPartner.iVarCap;
+                        if(index>J_ACCT)
+                            jPartner.open=oLine[index]
+                    })
+                    ready+=2;
+                                                    
+
+                } else if(ready>=7) {
+                    let symbol=parseInt(indicator);
+                    if(!isNaN(symbol)) {
+
+                        iAsset=-1; // Account column position of asset
+
+
+                        // REGULAR TRANSACTION BOOKING 
+                        xLine.forEach((xbrl,i)=>{
+                                if(xbrl && xbrl.length>4 && aTrans[i] && aTrans[i].length>0) {
+                                    let sign=aTrans[i].charAt(0);
+
+
+                                    // check whether this really is a ass.fixAss account
+                                    if(xbrl.startsWith("de-gaap-ci_bs.ass.fixAss"))
+                                        iAsset=i; 
+
+
+
+                                    let bigInit=bigMoney(aAccount[i].init,1,0n);
+                                    let bigDebit=bigMoney(aAccount[i].debit,1,0n);
+                                    let bigCredit=bigMoney(aAccount[i].credit,1,0n);
+
+                                    if(sign=='-') {
+                                        bigDebit=bigMoney(aTrans[i],-1,bigDebit);
+                                        aAccount[i].debit = cents20EU(bigDebit);
+                                    } else {
+                                        bigCredit=bigMoney(aTrans[i],1,bigCredit);
+                                        aAccount[i].credit = cents20EU (bigCredit);
+                                    }
+
+                                    let saldo = cents20EU(bigInit+bigCredit-bigDebit);
+                                    
+
+                                    if(iAsset>=0 && i==iAsset) {
+                                        // ASSET TRACKING
+                                        let code=aTrans[2];
+                                        let symbol=aTrans[5];
+
+                                        if(aTrans[3]==="INVEST") {
+                                            console.log("\nINVEST "+aTrans[i]+" into "+code+":"+symbol+"  =  "+ saldo)   
+
+
+
+                                            // if currentAssets[symbol] does not exist: create aAsset entry
+                                            if(!currentAssets[symbol]) {
+                                                let bigSaldo=bigMoney(aTrans[i],1,0n);
+                                                saldo = cents20EU(bigSaldo);
+
+                                                let jAsset = {}
+                                                jAsset.investDate=aTrans[1];
+                                                jAsset.code=code;
+                                                jAsset.beginYear="0";
+                                                jAsset.currentUnits=aTrans[4]; // ??
+                                                jAsset.symbol=symbol;
+                                                jAsset.current=saldo;
+                                                console.dir("NEW ASSET  "+JSON.stringify(jAsset)); 
+                                                aAssets.push(jAsset);
+                                            }
+
+
+                                            currentAssets[symbol]=saldo;
+
+
+                                        }
+                                        
+                                        else if(aTrans[3]==="SELL") {
+                                            let iAssetEntry = lookupAsset(symbol);
+                                            let previous = currentAssets[symbol];
+                                            let sales = aTrans[i];
+                                            let unitsSold = parseInt(aTrans[4]);
+                                            if(iAssetEntry>=0) {
+
+                                                let jAsset = aAssets[iAssetEntry];
+                                                let unitsRemain = jAsset.currentUnits-unitsSold;
+                                                console.log("\nSELL "+unitsSold+" units from "+code+":"+symbol+"("+jAsset.currentUnits+")  worth  "+ previous+ " giving "+sales+  " leaving "+unitsRemain)   
+
+
+                                                jAsset.currentUnits=unitsRemain;
+
+
+
+                                                // COMPUTE TOTAL SALES ONLY
+                                                currentAssets[symbol]="0";
+
+                                            }
+                                            else console.log("\nFAKE SELL "+unitsSold+" units from "+code+":"+symbol+"  worth  "+ previous+ " giving "+sales)   
+                                        }
+
+
+
+
+                                        else if(aTrans[3]==="WRITEOFF") {
+                                            let iAssetEntry = lookupAsset(symbol);
+                                            let previous = currentAssets[symbol];
+                                            let sales = aTrans[i];
+                                            let unitsSold = parseInt(aTrans[4]);
+                                            if(iAssetEntry>=0) {
+
+                                                let jAsset = aAssets[iAssetEntry];
+                                                let unitsRemain = jAsset.currentUnits-unitsSold;
+                                                console.log("\nWRITEOFF "+unitsSold+" units from "+code+":"+symbol+"("+jAsset.currentUnits+")  worth  "+ previous+ " giving "+sales+  " leaving "+unitsRemain)   
+                                            }
+                                        }
+                                    }
+
+                                    // ALL TRANSACTIONS
+                                    aAccount[i].saldo = saldo;                                                
+                                    console.log( nLine[i] + ":  "+aAccount[i].init+ " + "+aAccount[i].credit+ "  - "+aAccount[i].debit+ " = "+aAccount[i].saldo);
+                                    
+                                }
+                        })
+
+                    }
+                    
+                }
+
+
+                if(!isNaN(indicator) && !isInitial) {                            
+                    let jAction=aTrans;
+                    if(aTrans.length>J_ACCT)
+                        aTransactions.unshift({"text":aTrans[1]+" "+aTrans[4]+" "+aTrans[2],"action":jAction,"header":aTrans.slice(1,J_ACCT)})
+                }
+
+
+
+/*
+                // header checking on UI
+                if(isHeader) {
+                    let hRow=document.createElement('TR');uiHeader.append(hRow);
+                    arrayTrans.forEach((cell,i)=>{                                
+                        let uiCell=document.createElement('TD'); 
+                        hRow.append(uiCell); 
+                        uiCell.innerHTML=cell.substring(0,10);
+                    })                            
+                }
+*/                                
+            }
+        )}
+
+
+
+
+        if(uiPatterns) {
+            // show available transaction patterns
+            let txnPattern = journalData.txnPattern;
+            let arrTxnKeys=Object.keys(txnPattern)
+            for(let p=0;p<arrTxnKeys.length;p++) {
+
+                let key = arrTxnKeys[p];
+                let jPattern = txnPattern[key];
+                let strPattern = JSON.stringify(jPattern.credit)+JSON.stringify(jPattern.debitA)+" AN "+JSON.stringify(jPattern.creditEQL)+JSON.stringify(jPattern.debit)
+
+                let uiDiv=document.createElement('TR');  uiPatterns.append(uiDiv);
+                let uiInfoRow=document.createElement('TR'); uiPatterns.append(uiInfoRow);
+                let uiDialog=document.createElement('TR'); uiPatterns.append(uiDialog);
+                let uiSpc=document.createElement('TD'); uiDiv.append(uiSpc);
+                uiInfoRow.className="trow";
+                uiDialog.className="trow"; // HIDE
+
+                let uiKey=document.createElement('TD'); uiInfoRow.append(uiKey);
+                uiKey.className="button";
+
+                let uiButton=document.createElement('INPUT'); uiKey.append(uiButton);
+                uiButton.value=key; uiButton.type='BUTTON';  uiButton.className="button";
+                uiButton.addEventListener("click", makeShowTXN(jPattern));
+
+                let uiText=document.createElement('TD'); uiInfoRow.append(uiText);
+                uiText.innerHTML=jPattern.text; uiText.className="text";
+                
+                let uiSend=document.createElement('TD'); uiInfoRow.append(uiSend);
+                uiSend.innerHTML=jPattern.refCode; uiSend.className="text";
+
+                let uiAcct=document.createElement('TD'); uiInfoRow.append(uiAcct);
+                uiAcct.innerHTML=jPattern.refAcct; uiAcct.className="text";
+
+                let uiTxt2=document.createElement('TD'); uiInfoRow.append(uiTxt2);
+                uiTxt2.innerHTML=jPattern.txt2; uiTxt2.className="text";
+
+                // uiDialog
+                let uiTxn=document.createElement('TD'); uiInfoRow.append(uiTxn);
+                uiTxn.innerHTML=strPattern; uiTxn.className="text";
+            }
+        }
+    }
+
+
+    console.log('PROCESSED');
+    let uiAccounts = document.getElementById("accounts")
+    let uiPartners = document.getElementById("partners")
+    if(uiAccounts) {
+
+            acctPattern('Sachanlagen','de-gaap-ci_bs.ass.fixAss.tan');
+            acctPattern('Finanzanlagen','de-gaap-ci_bs.ass.fixAss.fin');
+            acctPattern('Forderungen aus LuL','de-gaap-ci_bs.ass.currAss.receiv.trade');
+let taxP =  acctPattern('gezahlte Steuern','de-gaap-ci_bs.ass.currAss.receiv.other.otherTaxRec');
+            acctPattern('Sichteinlagen','de-gaap-ci_bs.ass.currAss.cashEquiv');
+            acctPattern('Verluste aus Anlagen-Verkauf','de-gaap-ci_bs.ass.currAss.unpaidCapital');
+            acctPattern('Aktiva','de-gaap-ci_bs.ass');
+
+            acctPattern('Umsatz',            'de-gaap-ci_is.netIncome.regular.operatingTC.grossTradingProfit');
+            acctPattern('Rohertrag',         'de-gaap-ci_is.netIncome.regular.operatingTC');
+            acctPattern('Beteilungsergebnis','de-gaap-ci_is.netIncome.regular.fin');
+let bilg =  acctPattern('Ergebnis',          'de-gaap-ci_is.netIncome.regular');
+
+            acctPattern('Verbindlichkeiten aLuL','de-gaap-ci_bs.eqLiab.liab.advPaym');
+            acctPattern('sonstige Verbindlichkeiten','de-gaap-ci_bs.eqLiab.liab.other.other');
+            acctPattern('Kapitaldarlehen Komplementäre','de-gaap-ci_bs.eqLiab.equity.subscribed.unlimitedLiablePartners.VK');
+            acctPattern('Kapitaldarlehen Kommanditisten','de-gaap-ci_bs.eqLiab.equity.subscribed.limitedLiablePartners.VK');
+            acctPattern('Festkapital Komplementäre','de-gaap-ci_bs.eqLiab.equity.subscribed.unlimitedLiablePartners.FK');
+            acctPattern('Festkapital Kommanditisten','de-gaap-ci_bs.eqLiab.equity.subscribed.limitedLiablePartners.KK');
+            acctPattern('Eigenkapital-Reserve','de-gaap-ci_bs.eqLiab.equity.capRes');
+            
+let paog =  acctPattern('Kapital und Verbindlichkeiten','de-gaap-ci_bs.eqLiab');
+
+            aAccount.push(makeAccount(null,"Passiva mit Gewinn",'de-gaap-ci_bs.eqLiab',"",cents20EU(bigMoney("",1,bilg+paog))))
+
+            // acctPartner('')
+
+            aAccount.forEach((acct)=>{
+                //console.log(JSON.stringify(acct))
+                if(acct.Account && acct.xbrl) {
+                    let uiDiv=document.createElement('TR');uiAccounts.append(uiDiv);
+                    let uiRow=document.createElement('TR');uiAccounts.append(uiRow);
+                    let uiSpc=document.createElement('TD'); uiDiv.append(uiSpc);
+                    let uiNam=document.createElement('TD'); uiRow.append(uiNam);
+                    let uiOpn=document.createElement('TD'); uiRow.append(uiOpn);
+                    let uiCrd=document.createElement('TD'); uiRow.append(uiCrd);
+                    let uiDbt=document.createElement('TD'); uiRow.append(uiDbt);
+                    let uiCls=document.createElement('TD'); uiRow.append(uiCls);
+                    let uiTxt=document.createElement('TD'); uiRow.append(uiTxt);
+
+                    uiRow.className="trow";
+                    uiNam.innerHTML=acct.symb?acct.symb:"---"; uiNam.className="symb";
+                    uiOpn.innerHTML=acct.init;   uiOpn.className="amount";
+                    uiCrd.innerHTML=acct.credit; uiCrd.className="amount";
+                    uiDbt.innerHTML=acct.debit;  uiDbt.className="amount";
+                    uiCls.innerHTML=acct.saldo;  uiCls.className="amount";
+                    uiTxt.innerHTML=acct.Account;uiTxt.className="text";
+                    }                            
+            })
+
+
+            // distribute gain/loss
+            if(bilg!=0n) {
+                let bigSign=bilg>0n?1n:-1n;
+                let bigRest=bigSign*bilg; 
+                bilg=bigRest;
+
+                aPartners.forEach((jPartner,n)=>{
+                            let bigShare = (bilg * BigInt(jPartner.share)) / bigDenominator;
+                            jPartner.save= bigShare;
+                            bigRest -= bigShare;
+
+                            let index=jPartner.iVarCap;
+                            jPartner.credit = aAccount[index].credit;
+                            jPartner.debit = aAccount[index].debit;
+                            jPartner.saldo = aAccount[index].saldo;
+                });
+
+                aPartners.forEach((jPartner,n)=>{
+                    jPartner.gain= cents20EU(bigSign * BigInt(jPartner.save)+(bigRest>0n?1n:0n));
+                    bigRest--;
+                });                            
+            }
+
+            if(taxP>0n) {
+                // distribute tax
+                let bigRest=taxP; 
+                aPartners.forEach((jPartner,n)=>{
+                            let index=jPartner.iVarCap;
+                            let bigTax = (taxP * BigInt(jPartner.share)) / bigDenominator;
+                            jPartner.save= bigTax;
+                            bigRest -= bigTax;
+                });
+                aPartners.forEach((jPartner,n)=>{
+                        jPartner.taxP= cents20EU(BigInt(jPartner.save)+(bigRest>0n?1n:0n));
+                        bigRest--;
+                    });                            
+            }
+
+            aPartners.forEach((jPartner,n)=>{
+                        let index=jPartner.iVarCap;
+                        if(index>J_ACCT) {
+                            let uiDiv=document.createElement('TR');uiPartners.append(uiDiv);
+                            let uiRow=document.createElement('TR');uiPartners.append(uiRow);
+                            let uiSpc=document.createElement('TD'); uiDiv.append(uiSpc);
+                            let uiNam=document.createElement('TD'); uiRow.append(uiNam);
+                            let uiOpn=document.createElement('TD'); uiRow.append(uiOpn);
+                            let uiCrd=document.createElement('TD'); uiRow.append(uiCrd);
+                            let uiDbt=document.createElement('TD'); uiRow.append(uiDbt);
+                            let uiGal=document.createElement('TD'); uiRow.append(uiGal);
+                            let uiTax=document.createElement('TD'); uiRow.append(uiTax);
+                            let uiCls=document.createElement('TD'); uiRow.append(uiCls);
+
+                            uiRow.className="trow";
+                            uiNam.innerHTML=jPartner.fullName; uiNam.className="text";
+                            uiOpn.innerHTML=jPartner.open;  uiOpn.className="amount";
+                            uiCrd.innerHTML=jPartner.credit;uiCrd.className="amount";
+                            uiDbt.innerHTML=jPartner.debit; uiDbt.className="amount";
+                            uiGal.innerHTML=jPartner.gain;  uiGal.className="amount";
+                            uiTax.innerHTML=jPartner.taxP;  uiTax.className="amount";
+                            uiCls.innerHTML=jPartner.saldo; uiCls.className="amount";
+                                }
+                            
+                    })
+
+
+            aAssets.forEach((jAsset,n)=>{
+                            let symbol = jAsset.symbol;
+                            let code = jAsset.code;
+
+                            let uiDiv=document.createElement('TR');uiAssets.append(uiDiv);
+                            let uiRow=document.createElement('TR');uiAssets.append(uiRow);
+                            let uiSpc=document.createElement('TD'); uiDiv.append(uiSpc);
+                            let uiSym=document.createElement('TD'); uiRow.append(uiSym);
+                            let uiCod=document.createElement('TD'); uiRow.append(uiCod);
+                            let uiDat=document.createElement('TD'); uiRow.append(uiDat);
+                            let uiQua=document.createElement('TD'); uiRow.append(uiQua);
+                            let uiBeg=document.createElement('TD'); uiRow.append(uiBeg);
+                            let uiCur=document.createElement('TD'); uiRow.append(uiCur);
+                            let uiCls=document.createElement('TD'); uiRow.append(uiCls);
+                            uiRow.className="trow";
+                            uiSym.innerHTML=symbol;             uiSym.className="amount";
+                            uiCod.innerHTML=code;               uiCod.className="amount";
+                            uiDat.innerHTML=jAsset.investDate;  uiDat.className="amount";
+                            uiQua.innerHTML=jAsset.currentUnits;uiQua.className="amount";
+                            uiBeg.innerHTML=jAsset.beginYear;   uiBeg.className="amount";
+                            uiCur.innerHTML=jAsset.current;     uiCur.className="amount";
+                            uiCls.innerHTML=currentAssets[symbol];uiCls.className="amount";
+                            
+                                
+                            
+                    })
+
+
+
+// show historic transactions
+        if(aTransactions.length>0) {
+            aTransactions.forEach((strAction,i)=>{
+                if(i<200) { // show last 200 transactions
+                    let uiDiv=document.createElement('TR'); uiTransactions.append(uiDiv);
+                    let uiRow=document.createElement('TR'); uiTransactions.append(uiRow);
+                    let uiSpc=document.createElement('TD'); uiDiv.append(uiSpc);
+                    uiRow.className="trow";
+
+                    let uiDat=document.createElement('TD'); uiRow.append(uiDat);
+                    uiDat.innerHTML=strAction.text; uiDat.className="text";
+
+                    // GH20260118
+                    uiDat.innerHTML='<TABLE><TR><TD class="tiny">'+strAction.header.join('</TD><TD class="tiny">')+'</TD></TR></TABLE>'; 
+                    uiDat.className="xbrl";
+
+
+                    let acLine = ""
+                    let adLine = ""
+                    strAction.action.forEach((move,a)=>{
+                        let cText=null;
+                        let dText=null;
+                        if(a>J_ACCT && move && move.length>0) {
+                            if(move.startsWith('-')) {
+                                dText=nLine[a]+":"+move.substring(1);
+                            } else {
+                                cText=nLine[a]+":"+move;
+                            }
+                            if(a<maxAsset) {
+                                if(cText) acLine=acLine+" "+cText
+                                if(dText) adLine=adLine+" "+dText
+                            } else {
+                                if(dText) acLine=acLine+" "+dText
+                                if(cText) adLine=adLine+" "+cText
+                            }
+                        }
+                        
+                    })
+                    
+
+                    
+                    let uiCrd=document.createElement('TD'); 
+                        uiRow.append(uiCrd);
+                        uiCrd.innerHTML=acLine; 
+                        uiCrd.className="amount";
+
+                    let uiAn=document.createElement('TD'); 
+                        uiRow.append(uiAn);
+                        uiAn.innerHTML="AN"; 
+                        uiAn.className="amount";
+
+                    let uiDbt=document.createElement('TD'); 
+                        uiRow.append(uiDbt);
+                        uiDbt.innerHTML=adLine; 
+                        uiDbt.className="amount";
+                    
+                    
+                }
+            })
+        }
+
+    }
+}
+
+
+
+
+
+
 
 
 
@@ -892,7 +873,7 @@ function dropTransactionHandler(ev) {
                             transaction['refAcct'] &&
                             transaction['refCode']) {
 
-                                transaction['hash'] = "find03";
+                                transaction['hash'] = "01020304";
 
                                 console.log("0700 "+JSON.stringify(transaction));
                                 console.log("0702 "+JSON.stringify(sAccount));
@@ -906,11 +887,11 @@ function dropTransactionHandler(ev) {
                                 headerNames.map((key,pos)=>{   if(key  && key.length>2)  bookingForm[pos]=transaction[key];})
                                 console.log("0706 "+JSON.stringify(bookingForm));
 
+
                                 // ADD ACCOUNTS
                                 sAccount.forEach((symb,pos)=>{ if(pos>=J_ACCT && symb && symb.length>2) {
-                                        console.log(""+(700+pos)+" SYMB "+symb); 
-                                        bookingForm[pos]=transaction[symb];};
-                                        
+                                        console.log("0"+(700+pos)+" SYMB "+symb); 
+                                        bookingForm[pos]=transaction[symb];};                                        
                                 })
 
 
@@ -920,6 +901,23 @@ function dropTransactionHandler(ev) {
 
                                 // BOOK IT
                                 console.log("0710 "+bookingForm);
+
+                                var sheetCells = journalData.sheetCells;
+                                sheetCells.push(bookingForm); // modifies 
+                                const dates = journalData.sheetCells.map((line)=>line[1]);
+                                //console.log("0718 "+JSON.stringify(journalData.sheetCells));
+
+
+
+                                // CHECK RESULT
+                                console.log("0720 "+JSON.stringify(dates));
+
+
+
+                                // SHOW RESULT
+                                initDisplay();
+                                upDateDisplay(journalData);
+
                         }
 
                     } catch(err) { console.log("0699 "+err.message)}
