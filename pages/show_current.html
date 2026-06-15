@@ -15,6 +15,12 @@
     <script>
 /* global BigInt */
 
+const COLON = ',';
+const CSEP = ';';
+const NEWL = '\n';
+const DOUBLC=':';
+
+
 // GH202512 show_current
 
 function cents20EU(amount) { 
@@ -96,7 +102,7 @@ function bigMoney(strAdd,factor,money) {
     var euros=0n;
     var cents=0n;
     if(strAdd && strAdd.length>0) {          
-        var amount = strAdd.split(',');
+        var amount = strAdd.split(COLON);
         var plain = amount[0].replace('.', '').trim(); 
         if(plain.startsWith('-')) { factor=-1n * factor; plain=plain.slice(1); }
         try { euros = BigInt(('0'+plain)); } catch(err) {}
@@ -137,6 +143,7 @@ let bigDenominator=1n;
 
 let aAssets=[];
 let aAccount=[];
+let sAccount=[];
 let aPartners=[];
 let currentAssets={} // symbol to current value
 let aTransactions=[];
@@ -343,6 +350,7 @@ function dropJournalHandler(ev) {
                                 let strAmount="0";
                                 isHeader=true;
 
+                                sAccount=nLine;
                                 aAccount=nLine.map((symb,i)=>(
                                     (xLine[i] && xLine[i].length>4 && ((strAmount = cents20EU(bigMoney(oLine[i],1,0n)))!=null)) ?
                                         makeAccount(symb,cLine[i],xLine[i],strAmount,strAmount)
@@ -788,10 +796,12 @@ function dropJournalHandler(ev) {
     }
 }
 
+
+
 function dropTransactionHandler(ev) {
    // Prevent default behavior (Prevent file from being opened)
     ev.preventDefault();
-    console.log('0700 TXN File(s) dropped');        
+    console.log('0600 TXN File(s) dropped');        
 
     if (ev.dataTransfer.items) {
     // Use DataTransferItemList interface to access the file(s)
@@ -804,7 +814,7 @@ function dropTransactionHandler(ev) {
 
 
             let file = ev.dataTransfer.files[0];
-            console.log('0710 TXN File '+file.name+'  dropped' );
+            console.log('0610 TXN File '+file.name+'  dropped' );
             var fr = new FileReader();
 
             fr.onload = function () {
@@ -815,31 +825,38 @@ function dropTransactionHandler(ev) {
 
                 let fileBuffer = this.result;                                    
                 if(fileBuffer.length>0) {
-                    console.log('0720 TXN File has '+fileBuffer.length+'  characters' );
+                    console.log('0620 TXN File has '+fileBuffer.length+'  characters' );
                     try {
-                        let transaction={};
-                        strData = fileBuffer.split('\n');
+                        let transaction={'hash':'init01'};
+                        strData = fileBuffer.split(NEWL);
                         let lines=strData.length;
                         
-                        if(strData) console.log('TXN File has '+lines+'  lines' );
+                        if(strData) console.log('0630 TXN File has '+lines+'  lines' );
+
+                        // see Status.js
+                        // HASH DATE SENDER REFACCT REASON REFCODE GRSB EBKS CDAK COGK FSTF NKFO KEST KESO VAVA - MIET AUFW NKG EZIN AZIN FSAL - NKHA KAUT D586 
+
+                        const headerNames = ['hash','date','sender','refAcct','reason','refCode'];
+
+
 
                         try {
                             for(let i=0;i<lines;i++) {
                                 if(strData[i] && strData[i].length>0) 
                                 {
-                                    console.log(("0"+(730+3*i))+" "+strData[i]);
+                                    console.log(("0"+(740+3*i))+" "+strData[i]);
 
-                                    let control = strData[i].split(':');
+                                    let control = strData[i].split(DOUBLC);
                                     if(control.length>1 && control[0].length>0 && control[1].length>0) {
 
-                                        ['date','sender','reason','refAcct','refCode'].map((key,j)=>{
+                                        headerNames.map((key,j)=>{
                                             try {
                                                 if(control[0].toLowerCase()===key.toLowerCase()) {
                                                     transaction[key]=control[1];
-                                                    console.log(("0"+(731+3*i))+" "+key+" <= "+control[1]);
+                                                    console.log(("0"+(741+3*i))+" "+key+" <= "+control[1]);
                                                 }
                                             } catch(e) {
-                                                console.log("0749 HEADER "+e.message);    
+                                                console.log("0669 HEADER "+e.message);    
                                             }
                                         })
 
@@ -848,46 +865,62 @@ function dropTransactionHandler(ev) {
                                             try {
                                                 if(acct && acct.symb && control[0].toLowerCase()===acct.symb.toLowerCase()) {
                                                     transaction[acct.symb]=control[1];
-                                                    console.log(("0"+(732+3*i))+" "+acct.symb+" <= "+control[1]);
+                                                    console.log(("0"+(742+3*i))+" "+acct.symb+" <= "+control[1]);
                                                 }
                                             } catch(e) {
-                                                console.log("0759 ACCOUNTS "+e.message);    
+                                                console.log("0679 ACCOUNTS "+e.message);    
                                             }
                                         })
                                     }
                                 }
                             }
                         } catch(e) {
-                                console.log("0769 FOR "+e.message);    
+                                console.log("0689 FOR "+e.message);    
                         }
 
-                        console.log("0770 "+JSON.stringify(transaction));
 
+                        console.log("0690 "+JSON.stringify(aAccount));
+
+
+                        transaction['hash'] = "read02";
+
+                        let result=true;
+                        //headerNames.map((key)=>)
                         if( transaction['date'] &&
                             transaction['sender'] &&
                             transaction['reason'] &&
                             transaction['refAcct'] &&
                             transaction['refCode']) {
 
-                                transaction['hash'] = "abcde";
+                                transaction['hash'] = "find03";
+
+                                console.log("0700 "+JSON.stringify(transaction));
+                                console.log("0702 "+JSON.stringify(sAccount));
+
+                                //let accountNames = aAccount.map((acct)=>{ acct.symb });
+                                //console.log("0704 "+JSON.stringify(accountNames));
+
+                                bookingForm = (CSEP.repeat(sAccount)).split(CSEP);
 
 
-/*
-                                aAccount.forEach((acct)=>{
-                            
-                                    if(acct.Account && acct.xbrl) {
-                                    
-                                        let name=acct.symb;
-                                    }
-                                })
-*/
+                                headerNames.map((key,pos)=>{   if(key  && key.length>2)  bookingForm[pos]=transaction[key];})
+
                                 // ADD ACCOUNTS
-                                console.log("0780 "+JSON.stringify(transaction));
+                                sAccount.map((symb,pos)=>{ if(pos>=J_ACCT && symb && symb.length>2) {
+                                        console.log(""(700+pos)+" SYMB "+symb); 
+                                        bookingForm[pos]=transaction[symb];}
+                                })
+
+
+
+
+
 
                                 // BOOK IT
+                                console.log("0710 "+bookingForm);
                         }
 
-                    } catch(err) { console.log("799 "+err.message)}
+                    } catch(err) { console.log("0699 "+err.message)}
                 }
             }
 
