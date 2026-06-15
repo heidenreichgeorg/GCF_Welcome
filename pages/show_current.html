@@ -904,11 +904,13 @@ function dropTransactionHandler(ev) {
 
 
                                 headerNames.map((key,pos)=>{   if(key  && key.length>2)  bookingForm[pos]=transaction[key];})
+                                console.log("0706 "+JSON.stringify(bookingForm));
 
                                 // ADD ACCOUNTS
-                                sAccount.map((symb,pos)=>{ if(pos>=J_ACCT && symb && symb.length>2) {
-                                        console.log(""(700+pos)+" SYMB "+symb); 
-                                        bookingForm[pos]=transaction[symb];}
+                                sAccount.forEach((symb,pos)=>{ if(pos>=J_ACCT && symb && symb.length>2) {
+                                        console.log(""+(700+pos)+" SYMB "+symb); 
+                                        bookingForm[pos]=transaction[symb];};
+                                        
                                 })
 
 
