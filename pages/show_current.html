@@ -1,4 +1,5 @@
 <html>
+    <head>
     <style>
 .drop { padding: 9px; margin: 3px;  border-radius: 20px;  font-family: Bahnschrift,monospace;    border:2px solid #030f94; break-after: page; }        
 .rawt { padding: 9px; margin: 3px;  min-height: 19px; font-size: 8pt; font-family: Bahnschrift,monospace;   color:#030f94; background-color: #dfdff4;}        
@@ -49,6 +50,31 @@ function makeJSONButton(jData,client,year) {
         } 
     } 
     return url;
+}
+
+function onLoad() {
+            console.log("0100 onLoad entered");
+
+            let jdz = document.getElementById("JSONDROPZONE"); if(jdz) {
+                jdz.style.display="BLOCK";
+                console.log("0110 switched ON json drop zone");
+            }
+
+            let tdz = document.getElementById("TRXNDROPZONE"); if(tdz) {
+                tdz.style.display="NONE";
+                console.log("0120 switched OFF trxn drop zone");
+            }
+}
+
+function initDisplay() {
+    let node=null;
+    node=document.getElementById("pending"); if(node) node.innerHTML="";
+    node=document.getElementById("headers"); if(node) node.innerHTML="";
+    node=document.getElementById("assets"); if(node) node.innerHTML="";
+    node=document.getElementById("transactions"); if(node) node.innerHTML="";
+    node=document.getElementById("patterns"); if(node) node.innerHTML="";
+    node=document.getElementById("accounts"); if(node) node.innerHTML="";
+    node=document.getElementById("partners"); if(node) node.innerHTML="";
 }
 
 function showTXN(jTXN,e) { 
@@ -766,6 +792,11 @@ let paog =  acctPattern('Kapital und Verbindlichkeiten','de-gaap-ci_bs.eqLiab');
                     
                 }
             })
+
+
+
+            let jdz = document.getElementById("JSONDROPZONE"); if(jdz) jdz.style.display="NONE";
+            let tdz = document.getElementById("TRXNDROPZONE"); if(tdz) tdz.style.display="BLOCK";
         }
 
     }
@@ -929,80 +960,82 @@ function dropTransactionHandler(ev) {
     }
 }
 
-</script>
-<div id="page">
-    <DIV  class="drop" ondrop="dropJournalHandler(event)" ondragover="dragoverHandler(event)">
-        <H1>DROP JSON HERE</H1>
-    </DIV>
-    <TABLE class="rawt">        
-        <TBODY id="headers">
-        </TBODY>
-    <TABLE class="sheet">
-        <THEAD>
-            <TR class="trow">
-                <TH class="symb">Symbol&nbsp;</TH><TH class="symb">Initial&nbsp;</TH><TH class="symb">Credit&nbsp;</TH><TH class="symb">Debit&nbsp;</TH><TH class="symb">Close&nbsp;</TH><TH class="text">Name&nbsp;</TH>
-            </TR>
-        </THEAD>
-        <TBODY id="accounts">
-        </TBODY>
-    </TABLE>
-    <TABLE class="sheet">
-        <THEAD>
-            <TR class="trow">
-                <TH class="symb">Symbol&nbsp;</TH><TH class="symb">Initial&nbsp;</TH><TH class="symb">Credit&nbsp;</TH><TH class="symb">Debit&nbsp;</TH><TH class="symb">Earned&nbsp;</TH><TH class="symb">Tax&nbsp;</TH><TH class="symb">Saldo&nbsp;</TH>
-            </TR>
-        </THEAD>
-        <TBODY id="partners">
-        </TBODY>
-    </TABLE>
-    <TABLE class="sheet">
-        <THEAD>
-            <TR class="trow">
-                <TH class="symb">Symbol&nbsp;</TH><TH class="symb">Code&nbsp;</TH> <TH class="symb">Purchase&nbsp;</TH><TH class="symb">Quantity&nbsp;</TH><TH class="symb">Purchase&nbsp;</TH><TH class="symb">Initial&nbsp;</TH><TH class="symb">Current&nbsp;</TH>
-            </TR>
-        </THEAD>
-        <TBODY id="assets">
-        </TBODY>
-    </TABLE>
-    <TABLE class="sheet">
-        <THEAD>
-            <TR class="trow">
-                <TH class="text">Text&nbsp;</TH><TH class="text">Credit&nbsp;</TH><TH class="symb">AN</TH><TH class="text">Debit&nbsp;</TH>
-            </TR>
-        </THEAD>
-        <TBODY id="transactions">
-        </TBODY>
-    </TABLE>
+</script></head>
+    <body onload="onLoad()">
+        <div id="page">
+            <DIV id="JSONDROPZONE" display="BLOCK" class="drop" ondrop="dropJournalHandler(event)" ondragover="dragoverHandler(event)">
+                <H1>DROP JSON HERE</H1>
+            </DIV>
+            <DIV  id="TRXNDROPZONE" display="NONE" class="drop" ondrop="dropTransactionHandler(event)" ondragover="dragoverHandler(event)">
+                <H1>DROP TRANSACTION HERE</H1>
+            </DIV>
+            <TABLE class="rawt">        
+                <TBODY id="headers">
+                </TBODY>
+            <TABLE class="sheet">
+                <THEAD>
+                    <TR class="trow">
+                        <TH class="symb">Symbol&nbsp;</TH><TH class="symb">Initial&nbsp;</TH><TH class="symb">Credit&nbsp;</TH><TH class="symb">Debit&nbsp;</TH><TH class="symb">Close&nbsp;</TH><TH class="text">Name&nbsp;</TH>
+                    </TR>
+                </THEAD>
+                <TBODY id="accounts">
+                </TBODY>
+            </TABLE>
+            <TABLE class="sheet">
+                <THEAD>
+                    <TR class="trow">
+                        <TH class="symb">Symbol&nbsp;</TH><TH class="symb">Initial&nbsp;</TH><TH class="symb">Credit&nbsp;</TH><TH class="symb">Debit&nbsp;</TH><TH class="symb">Earned&nbsp;</TH><TH class="symb">Tax&nbsp;</TH><TH class="symb">Saldo&nbsp;</TH>
+                    </TR>
+                </THEAD>
+                <TBODY id="partners">
+                </TBODY>
+            </TABLE>
+            <TABLE class="sheet">
+                <THEAD>
+                    <TR class="trow">
+                        <TH class="symb">Symbol&nbsp;</TH><TH class="symb">Code&nbsp;</TH> <TH class="symb">Purchase&nbsp;</TH><TH class="symb">Quantity&nbsp;</TH><TH class="symb">Purchase&nbsp;</TH><TH class="symb">Initial&nbsp;</TH><TH class="symb">Current&nbsp;</TH>
+                    </TR>
+                </THEAD>
+                <TBODY id="assets">
+                </TBODY>
+            </TABLE>
+            <TABLE class="sheet">
+                <THEAD>
+                    <TR class="trow">
+                        <TH class="text">Text&nbsp;</TH><TH class="text">Credit&nbsp;</TH><TH class="symb">AN</TH><TH class="text">Debit&nbsp;</TH>
+                    </TR>
+                </THEAD>
+                <TBODY id="transactions">
+                </TBODY>
+            </TABLE>
 
 
-    <!--  PATTERNS
-    <TABLE class="sheet">
-        <THEAD>
-            <TR class="trow">
-                <TH class="symb">Key&nbsp;</TH><TH class="text">Text&nbsp;</TH><TH class="text">Sender&nbsp;</TH><TH class="text">Account&nbsp;</TH><TH class="text">Txt2&nbsp;</TH><TH class="text">TXN&nbsp;</TH>
-            </TR>
-        </THEAD>
-        <TBODY id="patterns">
-        </TBODY>
-    </TABLE>
-    -->
+            <!--  PATTERNS
+            <TABLE class="sheet">
+                <THEAD>
+                    <TR class="trow">
+                        <TH class="symb">Key&nbsp;</TH><TH class="text">Text&nbsp;</TH><TH class="text">Sender&nbsp;</TH><TH class="text">Account&nbsp;</TH><TH class="text">Txt2&nbsp;</TH><TH class="text">TXN&nbsp;</TH>
+                    </TR>
+                </THEAD>
+                <TBODY id="patterns">
+                </TBODY>
+            </TABLE>
+            -->
 
-    <!--  PENDING
+            <!--  PENDING
 
-    <TABLE class="sheet">
-        <THEAD>
-            <TR class="trow">
-                <TH class="text"></TH>
-            </TR>
-        </THEAD>
-        <TBODY id="pending">
-        </TBODY>
-    </TABLE>
-    -->
+            <TABLE class="sheet">
+                <THEAD>
+                    <TR class="trow">
+                        <TH class="text"></TH>
+                    </TR>
+                </THEAD>
+                <TBODY id="pending">
+                </TBODY>
+            </TABLE>
+            -->
 
-    <DIV  class="drop" ondrop="dropTransactionHandler(event)" ondragover="dragoverHandler(event)">
-        <H1>DROP TRANSACTION HERE</H1>
-    </DIV>
 
-</div>
+        </div>
+    </body>
 </html>
