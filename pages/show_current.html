@@ -64,7 +64,31 @@ function onLoad() {
                 tdz.style.display="NONE";
                 console.log("0120 switched OFF trxn drop zone");
             }
+
+            let ptz = document.getElementById("PENDINGZONE"); if(ptz) {
+                ptz.style.display="NONE";
+                console.log("0130 switched OFF pending trxn zone");
+            }
 }
+
+
+function enableTransactions() {
+        let jdz = document.getElementById("JSONDROPZONE"); if(jdz) jdz.style.display="NONE";
+
+        let tdz = document.getElementById("TRXNDROPZONE"); if(tdz) tdz.style.display="BLOCK";
+
+        let ptz = document.getElementById("PENDINGZONE");  if(ptz) ptz.style.display="NONE";
+}
+
+
+function enableSubmit() {
+        let jdz = document.getElementById("JSONDROPZONE"); if(jdz) jdz.style.display="NONE";
+
+        let tdz = document.getElementById("TRXNDROPZONE"); if(tdz) tdz.style.display="NONE";
+        
+        let ptz = document.getElementById("PENDINGZONE");  if(ptz) ptz.style.display="BLOCK";
+}
+
 
 function initDisplay() {
     let node=null;
@@ -78,15 +102,42 @@ function initDisplay() {
 }
 
 function showTXN(jTXN,e) { 
+
+    console.log("0720 #"+JSON.stringify(jTXN)) 
+
+    let queue=document.getElementById("pending");
+    let newRow=document.createElement('TR'); queue.append(newRow);
+    let nxtTXN=document.createElement('TD'); newRow.append(nxtTXN);
     
-                            // console.log("TXN #"+JSON.stringify(jTXN)) 
+        
+
+}
+
+function showTForm(jHeader,aPayload) { 
+
+                            console.log("0740 #"+JSON.stringify(jHeader) + " with "+JSON.stringify(aPayload)) 
 
                             let queue=document.getElementById("pending");
                             let newRow=document.createElement('TR'); queue.append(newRow);
-                            let nxtTXN=document.createElement('TD'); newRow.append(nxtTXN);
-                            nxtTXN.innerHTML=JSON.stringify(jTXN);
-                                
+                            
+                            let penTDate=document.createElement('TD'); newRow.append(penTDate);
+                            penTDate.innerHTML="Date "+JSON.stringify(jHeader.date);
 
+                            let senderTD=document.createElement('TD'); newRow.append(senderTD);
+                            senderTD.innerHTML="Sender "+JSON.stringify(jHeader.sender);
+
+                            let refAcctTD=document.createElement('TD'); newRow.append(refAcctTD);
+                            refAcctTD.innerHTML="RefAcct "+JSON.stringify(jHeader.refAcct);
+
+                            let reasonTD=document.createElement('TD'); newRow.append(reasonTD);
+                            reasonTD.innerHTML="Reason "+JSON.stringify(jHeader.reason);
+
+                            let refCodeTD=document.createElement('TD'); newRow.append(refCodeTD);
+                            refCodeTD.innerHTML="RefCode "+JSON.stringify(jHeader.refCode);
+
+                            let accountsTD=document.createElement('TD'); newRow.append(accountsTD);
+                            //let htmlPayload = aPayload.map((pair)=>pair)
+                            accountsTD.innerHTML=aPayload.join(" # ");
                         }
 
 function makeShowTXN(jTXN) { return (e)=>{showTXN(jTXN,e)} }
@@ -219,9 +270,7 @@ function dropJournalHandler(ev) {
                 try {
                     upDateDisplay(JSON.parse(this.result));
                 } catch(err) { }
-                // GH20260118 save purged file
-                //jCleanData.sheetCells=sheetCells;
-                //makeJSONButton(jCleanData,client,year);
+
             }
             fr.readAsText(file);
         }
@@ -794,9 +843,8 @@ let paog =  acctPattern('Kapital und Verbindlichkeiten','de-gaap-ci_bs.eqLiab');
             })
 
 
+            enableTransactions();
 
-            let jdz = document.getElementById("JSONDROPZONE"); if(jdz) jdz.style.display="NONE";
-            let tdz = document.getElementById("TRXNDROPZONE"); if(tdz) tdz.style.display="BLOCK";
         }
 
     }
@@ -806,6 +854,35 @@ let paog =  acctPattern('Kapital und Verbindlichkeiten','de-gaap-ci_bs.eqLiab');
 
 
 
+function submitHandler() {
+
+                                // BOOK IT
+                                console.log("0710 "+bookingForm);
+
+                                var sheetCells = journalData.sheetCells;
+                                sheetCells.push(bookingForm); // modifies 
+                                const dates = journalData.sheetCells.map((line)=>line[1]);
+                                //console.log("0718 "+JSON.stringify(journalData.sheetCells));
+
+
+
+                                // CHECK RESULT
+                                console.log("0720 "+JSON.stringify(dates));
+
+
+
+                                // SHOW RESULT
+                                initDisplay();
+                                upDateDisplay(journalData);
+
+
+
+                                // GH20260118 save purged file
+                                year = journalData.year;
+                                client = journalData.client;
+                                jCleanData.sheetCells=sheetCells;
+                                makeJSONButton(jCleanData,client,year);
+}
 
 
 
@@ -823,6 +900,8 @@ function dropTransactionHandler(ev) {
 
             let jCleanData = {};
             let sheetCells=[];
+            let jHeader={};
+            let aPayload=[];
 
 
             let file = ev.dataTransfer.files[0];
@@ -833,6 +912,7 @@ function dropTransactionHandler(ev) {
                 
                 let date="today";
                 let client=null;
+                let year=null;
 
 
                 let fileBuffer = this.result;                                    
@@ -851,7 +931,6 @@ function dropTransactionHandler(ev) {
                         const headerNames = ['hash','date','sender','refAcct','reason','refCode'];
 
 
-
                         try {
                             for(let i=0;i<lines;i++) {
                                 if(strData[i] && strData[i].length>0) 
@@ -865,6 +944,7 @@ function dropTransactionHandler(ev) {
                                             try {
                                                 if(control[0].toLowerCase()===key.toLowerCase()) {
                                                     transaction[key]=control[1];
+                                                    jHeader[key]=control[1];
                                                     console.log(("0"+(741+3*i))+" "+key+" <= "+control[1]);
                                                 }
                                             } catch(e) {
@@ -877,6 +957,7 @@ function dropTransactionHandler(ev) {
                                             try {
                                                 if(acct && acct.symb && control[0].toLowerCase()===acct.symb.toLowerCase()) {
                                                     transaction[acct.symb]=control[1];
+                                                    aPayload.push(""+acct.symb+"="+control[1]);
                                                     console.log(("0"+(742+3*i))+" "+acct.symb+" <= "+control[1]);
                                                 }
                                             } catch(e) {
@@ -900,8 +981,8 @@ function dropTransactionHandler(ev) {
                         //headerNames.map((key)=>)
                         if( transaction['date'] &&
                             transaction['sender'] &&
-                            transaction['reason'] &&
                             transaction['refAcct'] &&
+                            transaction['reason'] &&
                             transaction['refCode']) {
 
                                 transaction['hash'] = "01020304";
@@ -921,33 +1002,16 @@ function dropTransactionHandler(ev) {
 
                                 // ADD ACCOUNTS
                                 sAccount.forEach((symb,pos)=>{ if(pos>=J_ACCT && symb && symb.length>2) {
-                                        console.log("0"+(700+pos)+" SYMB "+symb); 
+                                        console.log("0"+(710+pos)+" SYMB "+symb); 
                                         bookingForm[pos]=transaction[symb];};                                        
                                 })
 
 
+                                showTForm(jHeader,aPayload)
 
+                                enableSubmit();
 
-
-
-                                // BOOK IT
-                                console.log("0710 "+bookingForm);
-
-                                var sheetCells = journalData.sheetCells;
-                                sheetCells.push(bookingForm); // modifies 
-                                const dates = journalData.sheetCells.map((line)=>line[1]);
-                                //console.log("0718 "+JSON.stringify(journalData.sheetCells));
-
-
-
-                                // CHECK RESULT
-                                console.log("0720 "+JSON.stringify(dates));
-
-
-
-                                // SHOW RESULT
-                                initDisplay();
-                                upDateDisplay(journalData);
+                                //submitHandler(9;)
 
                         }
 
@@ -965,9 +1029,6 @@ function dropTransactionHandler(ev) {
         <div id="page">
             <DIV id="JSONDROPZONE" display="BLOCK" class="drop" ondrop="dropJournalHandler(event)" ondragover="dragoverHandler(event)">
                 <H1>DROP JSON HERE</H1>
-            </DIV>
-            <DIV  id="TRXNDROPZONE" display="NONE" class="drop" ondrop="dropTransactionHandler(event)" ondragover="dragoverHandler(event)">
-                <H1>DROP TRANSACTION HERE</H1>
             </DIV>
             <TABLE class="rawt">        
                 <TBODY id="headers">
@@ -999,6 +1060,33 @@ function dropTransactionHandler(ev) {
                 <TBODY id="assets">
                 </TBODY>
             </TABLE>
+
+
+
+
+            <!--  PENDING -->
+
+            <TABLE id="PENDINGZONE" display="NONE" class="sheet" >
+                <THEAD>
+                    <TR class="trow">
+                        <TH class="text"></TH>
+                    </TR>
+                </THEAD>
+                <TBODY id="pending">
+                </TBODY>
+            </TABLE>
+
+            
+            <!--  TRANSACTION DROP ZONE -->
+
+            <DIV  id="TRXNDROPZONE" display="NONE" class="drop" ondrop="dropTransactionHandler(event)" ondragover="dragoverHandler(event)">
+                <H1>DROP TRANSACTION HERE</H1>
+            </DIV>
+
+
+
+            <!--  TRANSACTIONS -->
+
             <TABLE class="sheet">
                 <THEAD>
                     <TR class="trow">
@@ -1018,19 +1106,6 @@ function dropTransactionHandler(ev) {
                     </TR>
                 </THEAD>
                 <TBODY id="patterns">
-                </TBODY>
-            </TABLE>
-            -->
-
-            <!--  PENDING
-
-            <TABLE class="sheet">
-                <THEAD>
-                    <TR class="trow">
-                        <TH class="text"></TH>
-                    </TR>
-                </THEAD>
-                <TBODY id="pending">
                 </TBODY>
             </TABLE>
             -->
