@@ -1,17 +1,17 @@
 <html>
     <head>
     <style>
-.drop { padding: 9px; margin: 3px;  border-radius: 20px;  font-family: Bahnschrift,monospace;    border:2px solid #030f94; break-after: page; }        
-.rawt { padding: 9px; margin: 3px;  min-height: 19px; font-size: 8pt; font-family: Bahnschrift,monospace;   color:#030f94; background-color: #dfdff4;}        
-.sheet { padding: 9px; margin: 3px;  min-height: 19px; font-size: 10pt; font-family: Bahnschrift,monospace; color:#030f94; background-color: #dfdff4;}        
+.drop  { padding: 9px; margin: 3px;  border-radius: 20px;  font-family: Bahnschrift,monospace;    border:2px solid #030f94; break-after: page; }        
+.rawt   { padding: 9px; margin: 3px;  min-height: 19px; font-size: 8pt; font-family: Bahnschrift,monospace;   color:#030f94; background-color: #dfdff4;}        
+.sheet  { padding: 9px; margin: 3px;  min-height: 19px; font-size: 10pt; font-family: Bahnschrift,monospace; color:#030f94; background-color: #dfdff4;}        
 .symb   { text-align:left;   border-radius: 6px; border:1px solid #030f94; }   
 .tiny   {  min-width:9em; max-width:9em;  text-align:left;   border-radius: 6px; border:1px solid #030f94; font-size: 8pt; font-family: Courier,Terminal,monospace; color: #000000; }   
 .trow   { margin-top: 7px; }    
 .button { text-align:center; font-size: 10pt; font-family: Bahnschrift,monospace; color:#030f94; }   
 .amount { text-align:right;  border-radius: 6px; border:1px solid #030f94; }   
-.xbrl { min-width:40em; max-width:40em;  }     
-.text { min-width:20em; max-width:20em; border-radius: 6px; border:1px solid #030f94; }     
-.head { min-width:70em; max-width:70em; border-radius: 6px; border:1px solid #030f94; }     
+.xbrl   { min-width:40em; max-width:40em;  }     
+.text   { min-width:20em; max-width:20em; border-radius: 6px; border:1px solid #030f94; }     
+.head   { min-width:70em; max-width:70em; border-radius: 6px; border:1px solid #030f94; }     
     </style>
     <script>
 /* global BigInt */
@@ -113,32 +113,20 @@ function showTXN(jTXN,e) {
 
 }
 
-function showTForm(jHeader,aPayload) { 
+function setDate(jHeader,aPayload) { return (e)=>{
+        let ctlInput=document.getElementById("ctlDate");
+        if(ctlInput) console.log("Date="+ctlInput.value);
+        jHeader.date=ctlInput.value;
+        buildTransaction(jHeader,aPayload);
+    }
+}
 
-                            console.log("0740 #"+JSON.stringify(jHeader) + " with "+JSON.stringify(aPayload)) 
-
-                            let queue=document.getElementById("pending");
-                            let newRow=document.createElement('TR'); queue.append(newRow);
-                            
-                            let penTDate=document.createElement('TD'); newRow.append(penTDate);
-                            penTDate.innerHTML="Date "+JSON.stringify(jHeader.date);
-
-                            let senderTD=document.createElement('TD'); newRow.append(senderTD);
-                            senderTD.innerHTML="Sender "+JSON.stringify(jHeader.sender);
-
-                            let refAcctTD=document.createElement('TD'); newRow.append(refAcctTD);
-                            refAcctTD.innerHTML="RefAcct "+JSON.stringify(jHeader.refAcct);
-
-                            let reasonTD=document.createElement('TD'); newRow.append(reasonTD);
-                            reasonTD.innerHTML="Reason "+JSON.stringify(jHeader.reason);
-
-                            let refCodeTD=document.createElement('TD'); newRow.append(refCodeTD);
-                            refCodeTD.innerHTML="RefCode "+JSON.stringify(jHeader.refCode);
-
-                            let accountsTD=document.createElement('TD'); newRow.append(accountsTD);
-                            //let htmlPayload = aPayload.map((pair)=>pair)
-                            accountsTD.innerHTML=aPayload.join(" # ");
-                        }
+function bookTXN() { return (e)=>{
+                
+                submit();
+                
+            }
+}
 
 function makeShowTXN(jTXN) { return (e)=>{showTXN(jTXN,e)} }
 
@@ -226,6 +214,11 @@ let currentAssets={} // symbol to current value
 let aTransactions=[];
 let journalData={};
 
+
+// pending transaction in extra block
+let jTransaction={'hash':'init01'};
+
+
 function lookupAsset(symbol) {
     let result = -1;
     let lenAssets=aAssets.length;
@@ -277,6 +270,25 @@ function dropJournalHandler(ev) {
     }
 }
 
+// new instance, but shallow copy !
+function getCleanData(client,year,journalData) {
+        return {
+            'year':      year,
+            'client':    client,
+            'sheetName': client+year,
+            'total' :    journalData.total,
+            'assets' :   journalData.assets,
+            'eqliab' :   journalData.eqliab,
+            'author' :   journalData.author,
+            'server' :   journalData.server,
+            'residence': journalData.residence,
+            'time':      journalData.time,
+            'txnPattern':journalData.txnPattern,
+            'partner' :  journalData.partner,
+            'fireBase' : journalData.fireBase,
+            'sheetCells':journalData.sheetCells
+        }
+}
 
 function upDateDisplay(jData) {
     let jCleanData = {};
@@ -298,21 +310,7 @@ function upDateDisplay(jData) {
 
         const sheetLines = journalData.sheetCells;
 
-        jCleanData = {
-            'year':      year,
-            'client':    client,
-            'sheetName': client+year,
-            'total' :    journalData.total,
-            'assets' :   journalData.assets,
-            'eqliab' :   journalData.eqliab,
-            'author' :   journalData.author,
-            'server' :   journalData.server,
-            'residence': journalData.residence,
-            'time':      journalData.time,
-            'txnPattern':journalData.txnPattern,
-            'partner' :  journalData.partner,
-            'fireBase' : journalData.fireBase
-        }
+        jCleanData = getCleanData(client,year,journalData);
 
         if(sheetLines.length>J_ACCT) {
             console.error("0820 UPLOAD CSV WITH "+sheetLines.length+" lines");                  
@@ -850,42 +848,41 @@ let paog =  acctPattern('Kapital und Verbindlichkeiten','de-gaap-ci_bs.eqLiab');
     }
 }
 
-
-
-
-
-function submitHandler() {
-
-                                // BOOK IT
-                                console.log("0710 "+bookingForm);
-
-                                var sheetCells = journalData.sheetCells;
-                                sheetCells.push(bookingForm); // modifies 
-                                const dates = journalData.sheetCells.map((line)=>line[1]);
-                                //console.log("0718 "+JSON.stringify(journalData.sheetCells));
-
-
-
-                                // CHECK RESULT
-                                console.log("0720 "+JSON.stringify(dates));
-
-
-
-                                // SHOW RESULT
-                                initDisplay();
-                                upDateDisplay(journalData);
-
-
-
-                                // GH20260118 save purged file
-                                year = journalData.year;
-                                client = journalData.client;
-                                jCleanData.sheetCells=sheetCells;
-                                makeJSONButton(jCleanData,client,year);
+function symbolic(pat) {   
+    const alpha=['5','7','11','13','17','19','23','29','31','37','39','41','43','47','51','53','57','59','61','67','71','73','79','81','83','87','89'];
+    var res = 0n;
+    if(pat && pat.length>2) {
+        let tap = pat.split().reverse().join();
+        var sequence = tap+pat+tap+pat+tap+pat+tap;
+        let len=sequence.length;
+        for(let p=0;p<len && p<20;p++) {            
+            let a = sequence.charCodeAt(p);
+            let z = sequence.charCodeAt(len-1-p)
+            let iNext = BigInt(alpha[(a+z)%26]);
+            res = (7n * res + iNext);  
+        }
+    }
+    //console.log("SYMBOLIC "+pat.substring(0,9)+"="+res.)
+    return res.toString();
 }
 
 
 
+
+const headerNames = ['hash','date','sender','refAcct','reason','refCode'];
+
+function buildTransaction(jHeader,aPayload) {
+
+    jTransaction={};
+
+    headerNames.map((key,j)=>{jTransaction[key]=jHeader[key]})
+
+    aPayload.forEach((move)=>{ let aMove=move.split("="); jTransaction[aMove[0]]=aMove[1]; })
+
+    jTransaction.hash = symbolic(JSON.stringify(jHeader)+JSON.stringify(aPayload));
+
+    console.log("0770 transaction="+JSON.stringify(jTransaction))
+}
 
 function dropTransactionHandler(ev) {
    // Prevent default behavior (Prevent file from being opened)
@@ -919,7 +916,7 @@ function dropTransactionHandler(ev) {
                 if(fileBuffer.length>0) {
                     console.log('0620 TXN File has '+fileBuffer.length+'  characters' );
                     try {
-                        let transaction={'hash':'init01'};
+                        
                         strData = fileBuffer.split(NEWL);
                         let lines=strData.length;
                         
@@ -928,7 +925,6 @@ function dropTransactionHandler(ev) {
                         // see Status.js
                         // HASH DATE SENDER REFACCT REASON REFCODE GRSB EBKS CDAK COGK FSTF NKFO KEST KESO VAVA - MIET AUFW NKG EZIN AZIN FSAL - NKHA KAUT D586 
 
-                        const headerNames = ['hash','date','sender','refAcct','reason','refCode'];
 
 
                         try {
@@ -943,7 +939,6 @@ function dropTransactionHandler(ev) {
                                         headerNames.map((key,j)=>{
                                             try {
                                                 if(control[0].toLowerCase()===key.toLowerCase()) {
-                                                    transaction[key]=control[1];
                                                     jHeader[key]=control[1];
                                                     console.log(("0"+(741+3*i))+" "+key+" <= "+control[1]);
                                                 }
@@ -956,7 +951,6 @@ function dropTransactionHandler(ev) {
                                         aAccount.forEach((acct)=>{
                                             try {
                                                 if(acct && acct.symb && control[0].toLowerCase()===acct.symb.toLowerCase()) {
-                                                    transaction[acct.symb]=control[1];
                                                     aPayload.push(""+acct.symb+"="+control[1]);
                                                     console.log(("0"+(742+3*i))+" "+acct.symb+" <= "+control[1]);
                                                 }
@@ -964,6 +958,10 @@ function dropTransactionHandler(ev) {
                                                 console.log("0679 ACCOUNTS "+e.message);    
                                             }
                                         })
+
+
+                                        // derive basis for display pending txn and booking
+                                        buildTransaction(jHeader,aPayload);
                                     }
                                 }
                             }
@@ -975,43 +973,26 @@ function dropTransactionHandler(ev) {
                         console.log("0690 "+JSON.stringify(aAccount));
 
 
-                        transaction['hash'] = "read02";
 
                         let result=true;
                         //headerNames.map((key)=>)
-                        if( transaction['date'] &&
-                            transaction['sender'] &&
-                            transaction['refAcct'] &&
-                            transaction['reason'] &&
-                            transaction['refCode']) {
+                        if( jTransaction['date'] &&
+                            jTransaction['sender'] &&
+                            jTransaction['refAcct'] &&
+                            jTransaction['reason'] &&
+                            jTransaction['refCode']) {
 
-                                transaction['hash'] = "01020304";
 
-                                console.log("0700 "+JSON.stringify(transaction));
+                                console.log("0700 "+JSON.stringify(jTransaction));
                                 console.log("0702 "+JSON.stringify(sAccount));
 
                                 //let accountNames = aAccount.map((acct)=>{ acct.symb });
                                 //console.log("0704 "+JSON.stringify(accountNames));
 
-                                bookingForm = (CSEP.repeat(sAccount)).split(CSEP);
 
-
-                                headerNames.map((key,pos)=>{   if(key  && key.length>2)  bookingForm[pos]=transaction[key];})
-                                console.log("0706 "+JSON.stringify(bookingForm));
-
-
-                                // ADD ACCOUNTS
-                                sAccount.forEach((symb,pos)=>{ if(pos>=J_ACCT && symb && symb.length>2) {
-                                        console.log("0"+(710+pos)+" SYMB "+symb); 
-                                        bookingForm[pos]=transaction[symb];};                                        
-                                })
-
-
-                                showTForm(jHeader,aPayload)
+                                showTForm(jHeader,aPayload,jTransaction)
 
                                 enableSubmit();
-
-                                //submitHandler(9;)
 
                         }
 
@@ -1023,6 +1004,103 @@ function dropTransactionHandler(ev) {
         }
     }
 }
+
+
+function showTForm(jHeader,aPayload,jTransaction) { 
+
+        console.log("0740 #"+JSON.stringify(jHeader) + " with "+JSON.stringify(aPayload)) 
+
+        let queue=document.getElementById("pending");
+        let newRow=document.createElement('TR'); queue.append(newRow);
+        
+        let penTDate=document.createElement('TD'); newRow.append(penTDate);
+
+        let bookButton=document.createElement('LABEL'); penTDate.append(bookButton);
+        bookButton.className="button";
+        bookButton.innerHTML="Book";                            
+        // this does not take (date) data from jHeaders,aPayload
+        bookButton.addEventListener("click", bookTXN(jTransaction));
+
+
+        let dateEdit=document.createElement('INPUT'); 
+        penTDate.append(dateEdit);
+        dateEdit.id="ctlDate"; 
+        dateEdit.value=jHeader.date; 
+        dateEdit.type='EDIT';  
+        dateEdit.className="button";
+        let dateButton=document.createElement('LABEL'); penTDate.append(dateButton);
+        dateButton.className="button";
+        dateButton.innerHTML="Set Date";                            
+        dateButton.addEventListener("click", setDate(jHeader,aPayload));
+        
+
+        let senderTD=document.createElement('TD'); newRow.append(senderTD);
+        senderTD.innerHTML="Sender "+JSON.stringify(jHeader.sender);
+
+        let refAcctTD=document.createElement('TD'); newRow.append(refAcctTD);
+        refAcctTD.innerHTML="RefAcct "+JSON.stringify(jHeader.refAcct);
+
+        let reasonTD=document.createElement('TD'); newRow.append(reasonTD);
+        reasonTD.innerHTML="Reason "+JSON.stringify(jHeader.reason);
+
+        let refCodeTD=document.createElement('TD'); newRow.append(refCodeTD);
+        refCodeTD.innerHTML="RefCode "+JSON.stringify(jHeader.refCode);
+
+        let accountsTD=document.createElement('TD'); newRow.append(accountsTD);
+        //let htmlPayload = aPayload.map((pair)=>pair)
+        accountsTD.innerHTML=aPayload.join(" # ");
+    }
+
+
+
+function submit() {
+
+
+            let bookingForm = (CSEP.repeat(sAccount)).split(CSEP);
+
+
+            // ADD HEADERS
+            headerNames.map((key,pos)=>{   if(key  && key.length>2)  bookingForm[pos]=jTransaction[key];})
+            console.log("0706 "+JSON.stringify(bookingForm));
+
+
+            // ADD ACCOUNTS
+            sAccount.forEach((symb,pos)=>{ if(pos>=J_ACCT && symb && symb.length>2) {
+                    console.log("0"+(710+pos)+" SYMB "+symb); 
+                    bookingForm[pos]=jTransaction[symb];};                                        
+            })
+
+
+            // BOOK IT
+            console.log("0710 "+bookingForm);
+
+            var sheetCells = journalData.sheetCells;
+            sheetCells.push(bookingForm); // modifies 
+            const dates = journalData.sheetCells.map((line)=>line[1]);
+            //console.log("0718 "+JSON.stringify(journalData.sheetCells));
+
+
+
+            // CHECK RESULT
+            console.log("0720 "+JSON.stringify(dates));
+
+
+
+            // SHOW RESULT
+            initDisplay();
+            upDateDisplay(journalData);
+
+
+
+            // GH20260118 save purged file
+            year = journalData.year;
+            client = journalData.client;
+            jCleanData = getCleanData(client,year,journalData);
+            jCleanData.sheetCells=sheetCells;
+            makeJSONButton(jCleanData,client,year);
+}
+
+
 
 </script></head>
     <body onload="onLoad()">
