@@ -50,7 +50,7 @@ export function getParam(strParam) {
 
 // STOP Left Rite Midl
 
-const iSNAM = 16;
+const iSNAM = 17;
 
 
 

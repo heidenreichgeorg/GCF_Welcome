@@ -380,9 +380,10 @@ export default function Status() {
                 <div className="FIELD SYMB" onClick={(e)=>displayAccount(tx3)}> {tx3}</div>
                 <div className="FIELD DASH"> &nbsp;</div>
                 <div className="FIELD DATE"> {d}</div>
-                <div className="FIELD NAME"> {n}</div>
+                <div className="FIELD LNAM"> {n}</div>
                 <div className="FIELD SNAM"> {r}</div>
-                <div className="FIELD NAME"> {t}</div>
+                <div className="FIELD SEP"> &nbsp;</div>
+                <div className="FIELD LNAM"> {t}</div>
                 <div className="FIELD">{l}</div>
                 {click==null ? (<div className="FIELD SEP"> &nbsp;</div>) : (
                 <div className="FIELD"  onClick={(() => click())}>&nbsp;.&nbsp;</div>
@@ -681,7 +682,7 @@ export default function Status() {
                 
     
                 <div className="FIELD TAG" >Datum</div>
-                <div className="FIELD NAME">
+                <div className="FIELD">
                     <input  className="key SNAM" id="dateBooked" type="date" defaultValue={form.date} onChange={((e) => bufferField(strKey,'date',e.target.value))}/>
                 </div>
     
@@ -1104,14 +1105,14 @@ export default function Status() {
                 <div className="FIELD" key={"Dashboard"} id={'Overview0'} style= {{ 'display': aPages[0]}} >
                     <div className="FIELD LNAM">&nbsp;</div>
                     <div className="attrLine">{page.Closing}&nbsp;{parseInt(session.year)}</div>
-                    <StatusRow am1={page.Assets} am2={page.Gain}  am3={page.eqliab} d={page.Date} n={page.Recipient} r={page.Reason} l={page.TXNType} />
+                    <StatusRow am1={page.Assets} am2={page.Gain}  am3={page.eqliab} d={page.Date} n={page.Recipient} l={page.TXNType} r={page.Reason}  />
                     {
                         statusReport.map((row,line) => (
                             <StatusRow  key={"Status"+line}  
                                                 am1={row.assets.yearEnd} tx1={row.assets.name} 
                                                 am2={row.gals.yearEnd} tx2={row.gals.name} 
                                                 am3={row.eqLiab.yearEnd} tx3={row.eqLiab.name} 
-                                                d={row.dTran} n={row.nTran} r={row.rTran} l={row.lTran} t={row.tTran}
+                                                d={row.dTran} n={row.nTran} l={row.lTran} r={row.rTran} t={row.tTran}
                                                 click={(line==0)?handleReview:null}/>                       
                         ))
                     }
@@ -1393,7 +1394,7 @@ function TXNReceipt(token,text,jAmounts,jColumnHeads,jSum,id,removeCol,name,inde
                     <div className="FIELD NAME" draggable={bDrag}>{comps[1]}</div>                                        
                     <div className="FIELD L280" draggable={bDrag}>{comps[2]}</div>                                        
                     <div className="FIELD NAME" draggable={bDrag}>{comps[3]}</div>
-                    <div className="FIELD NAME" draggable={bDrag}>{comps[4]}</div>
+                    <div className="FIELD" draggable={bDrag}>{comps[4]}</div>
                     {(name && name.length>1) ? ( <div className="FIELD MOAM" draggable={bDrag}>{left}</div>  ):""}
                     {(name && name.length>1) ? ( <div className="FIELD MOAM" draggable={bDrag}>{rite}</div>  ):""}
                     <div className="FIELD SEP" >&nbsp;</div>
