@@ -108,10 +108,8 @@ function showTXN(jTXN,e) {
     let queue=document.getElementById("pending");
     let newRow=document.createElement('TR'); queue.append(newRow);
     let nxtTXN=document.createElement('TD'); newRow.append(nxtTXN);
-    
-        
-
 }
+
 
 function setDate(jHeader,aPayload) { return (e)=>{
         let ctlInput=document.getElementById("ctlDate");
@@ -159,6 +157,7 @@ function cents2EU(amount) {
     } catch(err) { /*result=typeof(cents);*/ }
     return result;
 }
+
 
 function bigMoney(strAdd,factor,money) {
     if(money==null) money = 0n;

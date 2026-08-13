@@ -98,7 +98,7 @@ let de_DE = {
     Assets:"Aktiva",
     AssetList:"Anlagespiegel",
     BalanceOpen:"Eröffnungsbilanz",
-    DashBoard:"Übersicht",
+    DashBoard:"Ansicht / Aktion wählen",
     AccountHistory:"Kontenverlauf",
     AccountHistoryAssets:"Verlauf Vermögen",
     AccountHistoryEqLiab:"Verlauf Kapital",

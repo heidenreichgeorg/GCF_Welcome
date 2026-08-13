@@ -1383,6 +1383,8 @@ function TXNReceipt(token,text,jAmounts,jColumnHeads,jSum,id,removeCol,name,inde
         if(iAmount<0) { rite= cents2EU(-iAmount);  iSumRite-=iAmount; }
     }
 
+    let saldo = cents2EU(iInitial + iSumLeft - iSumRite)
+
     // 20241228 move currLine by clicking on the receipt number in the rightmost column
     let bDrag = (index==currLine) ? "true":"false";
 
@@ -1397,6 +1399,8 @@ function TXNReceipt(token,text,jAmounts,jColumnHeads,jSum,id,removeCol,name,inde
                     <div className="FIELD" draggable={bDrag}>{comps[4]}</div>
                     {(name && name.length>1) ? ( <div className="FIELD MOAM" draggable={bDrag}>{left}</div>  ):""}
                     {(name && name.length>1) ? ( <div className="FIELD MOAM" draggable={bDrag}>{rite}</div>  ):""}
+                    <div className="FIELD SEP" >&nbsp;</div>
+                    <div className="FIELD MOAM">{saldo}</div>
                     <div className="FIELD SEP" >&nbsp;</div>
                     <div className="FIELD LNAM" draggable={bDrag} onClick={()=>{if(setCurrLine) setCurrLine(index)}}>{id}</div>
             </div>
