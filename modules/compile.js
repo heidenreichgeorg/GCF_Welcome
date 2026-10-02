@@ -1,9 +1,15 @@
 
+// type into below shell   npm run dev
+// whch will start the server
+// then make URL with the page  "Buchungen GrundbesitzKG" by pressing "Absenden" / "Submit Query"
+// and then click the LOCAL link
+
+
 // all JSONs - substitute INVEST with ACCUMULATE if an extra value is augmenting an existing asset
 
 
 // OPEN
-//generate monthly SALDO for partner account - inserting a virtual booking to an interest members
+// generate monthly SALDO for partner account - inserting a virtual booking to an interest members
 // ! assume at least one transaction per month !!
 // stores it in the account structure but cannot reproduce it in the TXNReceipt page
 
