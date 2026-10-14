@@ -1074,7 +1074,7 @@ export default function Status() {
            {showAccount &&             
                 (
                 <div className="mTable">                     
-                    <TXNReceiptSum text={D_Account+CSEP+showAccount+CSEP+strAccDesc+CSEP+D_Carry} jAmounts={jPageSum} jColumnHeads={jColumnHeads} id={session.year}/>                   
+                    <TXNReceiptSum text={page.Date+CSEP+page.Recipient+CSEP+showAccount+CSEP+page.Reason+CSEP+strAccDesc+CSEP+D_Carry} jAmounts={jPageSum} jColumnHeads={jColumnHeads} id={session.year}/>                   
                     { TXNReceipt("",strXbrl, jColumnHeads, jColumnHeads, null, 'Select', removeCol, D_History,-1,currLine,setCurrLine) }
                     { console.log("096 aSelText() keys = "+Object.keys(aSelText).join('+')) ||
                     Object.keys(aSelText).map((sym,i) => ( (sym && aSelText[sym] && aJMoney[sym] ) ? // && i>1
@@ -1394,11 +1394,11 @@ function TXNReceipt(token,text,jAmounts,jColumnHeads,jSum,id,removeCol,name,inde
             <div className={index==currLine?"attrLine key":"attrLine"}> 
                     <div className="FIELD DATE" draggable={bDrag}>{comps[0]}</div>
                     <div className="FIELD NAME" draggable={bDrag}>{comps[1]}</div>                                        
-                    <div className="FIELD L280" draggable={bDrag}>{comps[2]}</div>                                        
+                    <div className="FIELD DATE" draggable={bDrag}>{comps[2]}</div>                                        
                     <div className="FIELD NAME" draggable={bDrag}>{comps[3]}</div>
-                    <div className="FIELD" draggable={bDrag}>{comps[4]}</div>
-                    {(name && name.length>1) ? ( <div className="FIELD MOAM" draggable={bDrag}>{left}</div>  ):""}
-                    {(name && name.length>1) ? ( <div className="FIELD MOAM" draggable={bDrag}>{rite}</div>  ):""}
+                    <div className="FIELD NAME" draggable={bDrag}>{comps[4]}</div>
+                    <div className="FIELD MOAM" draggable={bDrag}>{left}</div>  
+                    <div className="FIELD MOAM" draggable={bDrag}>{rite}</div>  
                     <div className="FIELD SEP" >&nbsp;</div>
                     <div className="FIELD MOAM">{saldo}</div>
                     <div className="FIELD SEP" >&nbsp;</div>
