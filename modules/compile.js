@@ -421,24 +421,28 @@ export function compile(sessionData) {
                     else if(key && key==='A') {
                         if(debugFlagAssets) console.log("0270 compile.compile ASSET  "+row);
                         const assetInfo = row;
-                        if(assetInfo.length>J_ACCT) {
+                        if(assetInfo.length>=J_ACCT) {
                             var date = assetInfo[1];
-                            var type = assetInfo[2];
+                            var idnt = assetInfo[2];
                             var orig = Sheets.bigEUMoney(assetInfo[3]); // bigENMoney AnschaffungsK parse huge EN format string
                             var nmbr = assetInfo[4];
-                            var idnt = assetInfo[5];
+                            var rest = assetInfo[5];
+                            var iRest = Sheets.bigEUMoney(rest);
+
+
                             if(idnt && idnt.length>COLMIN && nmbr && nmbr.length>0) {
-                                var irest =bigAssetValueChange(assetInfo,iAssets,result[D_XBRL]);
-                                var icost =bigCost(idnt,nmbr,orig);
+                                var iDepr =bigAssetValueChange(assetInfo,iAssets,result[D_XBRL]);
+                                var icost =bigCost(idnt,nmbr,orig); // unit cost
                                 result[D_FixAss][idnt]={ "date":date, 
-                                                         "type":type,
                                                          "orig":""+orig,
+                                                         "type":"fixAss",
                                                          "nmbr":nmbr,
                                                          "idnt":idnt,
-                                                         "rest":""+irest,
+                                                         "rest":""+iRest,
                                                          "cost":""+icost,
+                                                         "depr":""+iDepr, // GH20261017
                                                          "gain":"0" }; // GH20230303
-                                if(debugFlagReport) console.log("0280 BOOK  "+idnt+" = "+result[D_FixAss][idnt].orig+ "for #"+nmbr+" at "+icost);                                
+                                if(debugFlagAssets) console.log("0280 ASSET  "+idnt+" original€"+result[D_FixAss][idnt].orig+ " for #"+nmbr+"pieces at "+icost+ " each - at current big value "+iRest+" with annual write-off by "+cents2EU(iDepr));                                
                             }
                         }
                     }
@@ -632,6 +636,7 @@ export function compile(sessionData) {
                                                                                 "idnt":idnt,
                                                                                 "rest":""+orig,
                                                                                 "cost":""+icost,
+                                                                                "depr":""+orig, // GH 20261017
                                                                                 "gain":gain}; // GH20230202
 
                                                     } catch(err) { console.dir("0323 SHEET LINE INVEST nvst="+nvst+" idnt="+idnt+" nmbr="+nmbr+"  orig="+orig+"  when making icost "+err); }
@@ -651,6 +656,7 @@ export function compile(sessionData) {
                                                 var iamnt = bigAssetValueChange(aLine,iAssets,result[D_XBRL]);  // asset value change
 
                                                 var orig = BigInt(result[D_FixAss][idnt].orig);
+                                                var depr = BigInt(result[D_FixAss][idnt].depr);
 
                                                 // sales reduce number of assets and amount of asset value
                                                 var iNum = parseInt(result[D_FixAss][idnt].nmbr);
@@ -688,6 +694,7 @@ export function compile(sessionData) {
                                                                         "idnt":idnt,
                                                                         "rest":""+iremn,
                                                                         "cost":""+icost,
+                                                                        "depr":""+depr, // GH 20261017
                                                                         "gain":gain }; // GH20230303
                                                 if(debugFlagAssets) console.log(
                                                             "0324 SELL "+type+" "+iSel+" (giving "+cents2EU(iamnt)+
@@ -704,6 +711,7 @@ export function compile(sessionData) {
                                                         var date = result[D_FixAss][idnt].date;
                                                         var type = result[D_FixAss][idnt].type;
                                                         var iVal = result[D_FixAss][idnt].orig;
+                                                        var depr = result[D_FixAss][idnt].depr;
                                                         var nmbr =  result[D_FixAss][idnt].nmbr;
                                                         var icurr = BigInt(result[D_FixAss][idnt].rest);
                                                         var iGain = 0n; try { iGain= BigInt(result[D_FixAss][idnt].gain); } catch(e) {}
@@ -724,6 +732,7 @@ export function compile(sessionData) {
                                                                                 "idnt":idnt,
                                                                                 "rest":""+icurr,
                                                                                 "cost":""+icost,
+                                                                                "depr":""+depr, // GH 20261017
                                                                                 "gain":""+(iamnt+iGain) }; // GH20230303
                                                         if(debugFlagAssets) console.log("0326 YIELD amount="+iamnt+" changes "+idnt+" from "+cents2EU(icurr)+" to "+cents2EU(result[D_FixAss][idnt].rest) + " adding up to new gain "+result[D_FixAss][idnt].gain);
 
@@ -741,6 +750,7 @@ export function compile(sessionData) {
 
                                                         var type =  result[D_FixAss][idnt].type;
                                                         var orig =  result[D_FixAss][idnt].orig;
+                                                        var depr =  result[D_FixAss][idnt].depr;
                                                         var nmbr =  result[D_FixAss][idnt].nmbr;
                                                         var gain =  "0"; try { gain = result[D_FixAss][idnt].gain; } catch(e) {}
                                                         var iCost = BigInt(result[D_FixAss][idnt].cost);
@@ -759,8 +769,9 @@ export function compile(sessionData) {
                                                                                 "idnt":idnt,
                                                                                 "orig":orig,
                                                                                 "nmbr":""+iNum,
-                                                                                "rest":""+iRest,
+                                                                                "rest":""+iRest, 
                                                                                 "cost":""+iCost,
+                                                                                "depr":""+depr, // GH 20261017
                                                                                 "gain":gain}; // GH20230202
 
                                                         if(debugFlagAssets) console.log("0328 ACCUMULATE amount="+iChange+" changes idnt="+idnt+" from "+cents2EU(iCurr)+" to "+cents2EU(result[D_FixAss][idnt].rest)+ " for #"+nmbr+" units at cost="+cents2EU(iCost));
@@ -778,6 +789,7 @@ export function compile(sessionData) {
                                                         var date = result[D_FixAss][idnt].date;
                                                         var type = result[D_FixAss][idnt].type;
                                                         var iVal = result[D_FixAss][idnt].orig;
+                                                        var depr = result[D_FixAss][idnt].depr;
                                                         var nmbr =  result[D_FixAss][idnt].nmbr;
                                                         var gain = "0"; try { gain = result[D_FixAss][idnt].gain; } catch(e) {}
                                                         var icurr = BigInt(result[D_FixAss][idnt].rest);
@@ -799,6 +811,7 @@ export function compile(sessionData) {
                                                                                 "idnt":idnt,
                                                                                 "rest":""+irest,
                                                                                 "cost":""+icost,
+                                                                                "depr":""+depr, // GH 20261017
                                                                                 "gain":gain }; // GH20230303
                                                         if(debugFlagAssets) console.log("0330 WRITEOFF amount="+iamnt+" changes "+idnt+" from "+cents2EU(icurr)+" to "+cents2EU(result[D_FixAss][idnt].rest));
 
@@ -1612,8 +1625,8 @@ function makePage(balance) {
 }
 
 
+// this function looks up te writeOff value (Found in the related account column)
 function bigAssetValueChange(row,iAssets,aXBRL) {
-    // aXBRL == result[D_XBRL]
     var column=J_ACCT;
     var iValue = 0n;
     var run=true;

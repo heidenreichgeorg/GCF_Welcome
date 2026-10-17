@@ -1266,7 +1266,8 @@ export default function Status() {
                             'nmbr':page.AssetNumber, // 'Anzahl',
                             'rest':page.AssetRemain, //'Zeitwert',
                             'cost':page.AssetPrice, // 'Stückpreis',
-                            'gain':page.AssetGain  // 'Ertrag'} } />
+                            'gain':page.AssetGain,  // 'Ertrag'} } />
+                            'depr':page.Depreciation  // 'Abschreibung'} } />
                             }} /> 
 
 
@@ -1279,7 +1280,8 @@ export default function Status() {
                                 nmbr:row.nmbr,
                                 rest:cents2EU(row.rest),
                                 cost:cents2EU(row.cost),
-                                gain:cents2EU(row.gain)
+                                gain:cents2EU(row.gain),
+                                depr:cents2EU(row.depr)
                                 }} />
                         )
                         })
@@ -1290,7 +1292,8 @@ export default function Status() {
                             'nmbr':' ',
                             'rest':cents2EU(iRest),
                             'current':' ',
-                            'cost':' ' } }
+                            'cost':' ',
+                        'depr':' ' } }
                     />
                 </div>
 
@@ -1493,6 +1496,7 @@ function FixedAssetsRow(mRow) {
             <div className="FIELD MOAM">{mRow.p.rest}</div>
             <div className="FIELD MOAM">{mRow.p.cost}</div>
             <div className="FIELD MOAM">{mRow.p.gain}</div>
+            <div className="FIELD MOAM">{mRow.p.depr}</div>
         </div>        
     )
 }
