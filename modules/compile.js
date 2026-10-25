@@ -179,8 +179,9 @@ let de_DE = {
     Transaction:"Buchung",
 
     // Anlage
-    AcqDate:"Anschaffungsdatum",
-    AcquisitionPrice:"Anschaffungspreis",
+    AssetIdISIN:"Name/WKN",
+    AcquisitionDate:"Kaufdatum",
+    AcquisitionPrice:"Kaufpreis",
     Init:"Anfangswert",
     Close:"Abschluss",
     Next:"Folgejahr",
@@ -634,7 +635,7 @@ export function compile(sessionData) {
                                                                                 "nmbr":nmbr,
                                                                                 "rest":""+orig,
                                                                                 "cost":""+icost,
-                                                                                "depr":""+orig, // GH 20261017
+                                                                                "depr":"0", // GH 20261025
                                                                                 "gain":gain}; // GH20230202
 
                                                     } catch(err) { console.dir("0323 SHEET LINE INVEST nvst="+nvst+" idnt="+idnt+" nmbr="+nmbr+"  orig="+orig+"  when making icost "+err); }

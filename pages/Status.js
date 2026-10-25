@@ -1260,7 +1260,7 @@ export default function Status() {
 
                     { console.log("130 STATUS show fixed assets ") }
 
-                    <FixedAssetsRow p={ {'idnt':'Name', 'type':'WKN/Typ', 
+                    <FixedAssetsRow p={ {'idnt':page.AssetIdISIN,  'type':' ', // 20261025
                             'date':page.AcquisitionDate,
                             'init':page.AcquisitionPrice, 
                             'nmbr':page.AssetNumber, // 'Anzahl',
