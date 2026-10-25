@@ -434,11 +434,10 @@ export function compile(sessionData) {
                                 var iDepr =bigAssetValueChange(assetInfo,J_ACCT,iAssets,result[D_XBRL]);
                                 var icost =bigCost(idnt,nmbr,orig); // unit cost
                                 result[D_FixAss][idnt]={ "date":date, 
-                                                         "orig":""+orig,
-                                                         "type":"fixAss",
-                                                         "nmbr":nmbr,
                                                          "idnt":idnt,
-                                                         "rest":""+iRest,
+                                                         "orig":""+orig,
+                                                         "nmbr":nmbr,
+                                                         "rest":""+iRest,                                                         
                                                          "cost":""+icost,
                                                          "depr":""+iDepr, // GH20261017
                                                          "gain":"0" }; // GH20230303
@@ -611,10 +610,10 @@ export function compile(sessionData) {
                                         if(refAcct) {
                                             let iAcc=iAccount(refAcct,result[D_Schema].Names);
                                             var date = aLine[1].trim();
-                                            var idnt = aLine[2].trim(); let type=idnt; // GH20261018
+                                            var idnt = aLine[2].trim(); 
                                             var nvst = aLine[3].trim();
                                             var nmbr = aLine[4].trim();
-                                            var curr = aLine[5].trim(); // GH20261018
+                                            var curr = aLine[5].trim(); // GH20261018 rest
                                             if(debugFlagAssets>1 && iAcc>=J_ACCT) console.log("0320 compile: known account("+refAcct+"):  "+idnt+"  #"+iAcc+" with "+nmbr+" units.");
 
                                             // process YIELD,INVEST,SELL,WRITEOFF,ACCUMULATE (REGULAR)
@@ -630,10 +629,9 @@ export function compile(sessionData) {
                                                         var icost = bigCost(idnt,nmbr,orig);
                             
                                                         result[D_FixAss][idnt]={"date":date, 
-                                                                                "type":type,
+                                                                                "idnt":idnt,
                                                                                 "orig":""+orig,
                                                                                 "nmbr":nmbr,
-                                                                                "idnt":idnt,
                                                                                 "rest":""+orig,
                                                                                 "cost":""+icost,
                                                                                 "depr":""+orig, // GH 20261017
@@ -688,17 +686,16 @@ export function compile(sessionData) {
                                                 // OPEN
                                                 // MUST VERIFY existing identifier
                                                 result[D_FixAss][idnt]={"date":date, 
-                                                                        "type":type,
+                                                                        "idnt":idnt,
                                                                         "orig":""+orig,
                                                                         "nmbr":nmbr,
-                                                                        "idnt":idnt,
                                                                         "rest":""+iremn,
                                                                         "cost":""+icost,
                                                                         "depr":""+depr, // GH 20261017
                                                                         "gain":gain }; // GH20230303
                                                 if(debugFlagAssets) console.log(
-                                                            "0324 SELL "+type+" "+iSel+" (giving "+cents2EU(iamnt)+
-                                                            ") from "+iNum+" of Asset "+idnt+" resulting in "+
+                                                            "0324 SELL Asset "+idnt+"  "+iSel+" (giving "+cents2EU(iamnt)+
+                                                            ") from "+iNum+" resulting in "+
                                                             nmbr+" worth "+cents2EU(iremn) + " at "+cents2EU(icost)+" each");
                                             }
 
@@ -710,10 +707,9 @@ export function compile(sessionData) {
                                                 if(result[D_FixAss]) {
                                                     if(result[D_FixAss][idnt]) {
                                                         var date = result[D_FixAss][idnt].date;
-                                                        var type = result[D_FixAss][idnt].type;
                                                         var iVal = result[D_FixAss][idnt].orig;
-                                                        var depr = result[D_FixAss][idnt].depr;
                                                         var nmbr =  result[D_FixAss][idnt].nmbr;
+                                                        var depr = result[D_FixAss][idnt].depr;
                                                         var icurr = BigInt(result[D_FixAss][idnt].rest);
                                                         var iGain = 0n; try { iGain= BigInt(result[D_FixAss][idnt].gain); } catch(e) {}
 
@@ -730,10 +726,9 @@ export function compile(sessionData) {
                                                         // OPEN
                                                         // MUST VERIFY existing identifier
                                                         result[D_FixAss][idnt]={"date":date,
-                                                                                "type":type,
+                                                                                "idnt":idnt,
                                                                                 "orig":iVal,
                                                                                 "nmbr":nmbr,
-                                                                                "idnt":idnt,
                                                                                 "rest":""+iRest, // GH 20261018
                                                                                 "cost":""+iCost, // GH 20261018
                                                                                 "depr":""+depr, // GH 20261017
@@ -753,7 +748,6 @@ export function compile(sessionData) {
 
                                                         // this transaction is about augmenting some existing asset with value given in asset account column
 
-                                                        var type =  result[D_FixAss][idnt].type;
                                                         var orig =  result[D_FixAss][idnt].orig;
                                                         var depr =  result[D_FixAss][idnt].depr;
                                                         var nmbr =  result[D_FixAss][idnt].nmbr;
@@ -770,7 +764,6 @@ export function compile(sessionData) {
                                                         if(iNum!=0n)  iCost = iRest / iNum; 
                             
                                                         result[D_FixAss][idnt]={"date":date, 
-                                                                                "type":type,
                                                                                 "idnt":idnt,
                                                                                 "orig":orig,
                                                                                 "nmbr":""+iNum,
@@ -792,7 +785,6 @@ export function compile(sessionData) {
                                                 if(result[D_FixAss]) {
                                                     if(result[D_FixAss][idnt]) {
                                                         var date = result[D_FixAss][idnt].date;
-                                                        var type = result[D_FixAss][idnt].type;
                                                         var iVal = result[D_FixAss][idnt].orig;
                                                         var depr = result[D_FixAss][idnt].depr;
                                                         var nmbr =  result[D_FixAss][idnt].nmbr;
@@ -810,7 +802,6 @@ export function compile(sessionData) {
                                                         // OPEN
                                                         // MUST VERIFY existing identifier
                                                         result[D_FixAss][idnt]={ "date":date,
-                                                                                "type":type,
                                                                                 "orig":iVal,
                                                                                 "nmbr":nmbr,
                                                                                 "idnt":idnt,
