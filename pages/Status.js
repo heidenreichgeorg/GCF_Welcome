@@ -274,6 +274,11 @@ export default function Status() {
     function nextFunc() {  console.log("CLICK NEXT");   window.location.href="/Accounts?client="+client+"&year="+year; }
 
 
+
+    function executeReview() {        
+        book({'partner':session.partner,'client':session.client,'year':session.year},session)
+    }
+
     
     function handleXLSave() {
         
@@ -295,11 +300,6 @@ export default function Status() {
     }
 
 
-
-    function handleReview() {        
-        book({'partner':session.partner,'client':session.client,'year':session.year},session)
-    }
-
     function makeXLSButton(url,client,year) { 
         console.log("1196 makeXLSButton XLSX "+url);
         if(client) {
@@ -317,6 +317,63 @@ export default function Status() {
         return url;
     }
 
+
+
+
+/**************************************************************************************** */
+
+
+    function handleWriteoffSave() {
+        console.log("1160 Partner.makeWriteoffButton sessionId = "+session.id);
+        const rqOptions = { method: 'GET', headers: {  'Accept': 'application/json'}, mode:'cors'};
+        try {
+            
+            fetch(`${REACT_APP_API_HOST}/DOWNLOAD?partner=${partner}&client=${session.client}&year=${session.year}`, rqOptions)
+            .then((response) => response.blob())
+            .then((blob) => blob.text())
+            .then((text) => JSON.parse(text)) // make java from the response, which is the main.json binary
+            .then((jMain) => (jMain.sheetCells ? jMain.sheetCells : {}))
+            .then((jSheet) => jSheet.filter((txn) => txn.length &&  txn.length>0 && txn[0]==='A'))
+            .then((jAssets) => JSON.stringify(jAssets))
+            .then((strAssets) => new Blob([ strAssets ],{type : "text/plain;charset=utf-8"}))
+            .then((blob) => URL.createObjectURL(blob))
+            .then((url) => console.log("1150 makeWriteoffButton URL= "+ makeWriteoffButton(url)))
+            .catch((err) => console.error("1157 makeWriteoffButton ERR "+err));
+            
+        } catch(err) { console.log("1167 GET /JSON makeWriteoffButton:"+err);}
+        console.log("1170 Partner.handleWriteoffSave EXIT");
+    }
+
+/*
+{
+                let jAssets=[]; 
+                for(let i=0;jSheet.length && jSheet.length<i;i++) {
+                    if(jSheet[i] && jSheet[i].length) { 
+                        let txn=jSheet[i]; 
+                        if(txn.length && txn.length>0 && txn[0]==='A') jAssets.push(txn) ;   
+                    }
+                }
+                return jAssets;
+            }
+*/
+
+    function makeWriteoffButton(url) { 
+
+        console.log("1180 makeWriteoffButton XLSX "+url);
+        
+        let a = document.createElement('a');
+        a.href = url
+        a.download = "writeoff.json";
+        a.style.display = 'block'; // was none
+        a.className = "key";
+        a.innerHTML = "Download";
+        document.body.appendChild(a); 
+        console.log("1190 makeWriteoffButton make button");
+        
+        return url;
+    };
+
+    
     /**************************************************************************************** */
 
 
@@ -338,7 +395,7 @@ export default function Status() {
     
     function makeJSONButton(url) { 
 
-        console.log("1196 makeJSONButton XLSX "+url);
+        console.log("1196 makeJSONButton JSON "+url);
         
         let a = document.createElement('a');
         a.href = url
@@ -347,7 +404,7 @@ export default function Status() {
         a.className = "key";
         a.innerHTML = "Download";
         document.body.appendChild(a); 
-        console.log("1198 downloadButton make button");
+        console.log("1198 makeWriteoffButton make button");
         
         return url;
     };
@@ -1048,8 +1105,8 @@ export default function Status() {
 
 
     // extra footer buttons
-    let aFunc=[handleXLSave,handleJSONSave];
-    let aText=["Get XLSX","Get JSON"];
+    let aFunc=[handleXLSave,handleJSONSave,handleWriteoffSave];
+    let aText=["Get XLSX","Get JSON","Get Writeoffs"];
     if(showAccount) {
         aFunc.push(funcKeepReceipt); aText.push(D_CarryOver);
         aFunc.push(funcHideReceipt); aText.push(page.DashBoard);
@@ -1113,7 +1170,7 @@ export default function Status() {
                                                 am2={row.gals.yearEnd} tx2={row.gals.name} 
                                                 am3={row.eqLiab.yearEnd} tx3={row.eqLiab.name} 
                                                 d={row.dTran} n={row.nTran} l={row.lTran} r={row.rTran} t={row.tTran}
-                                                click={(line==0)?handleReview:null}/>                       
+                                                click={(line==0)?executeReview:null}/>                       
                         ))
                     }
                 </div>
