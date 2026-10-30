@@ -1452,11 +1452,13 @@ function TXNReceipt(token,text,jAmounts,jColumnHeads,jSum,id,removeCol,name,inde
         <div id="TXNReceipt">
             <div className="attrLine"> <div className="FIELD LNAM">&nbsp;</div></div>
             <div className={index==currLine?"attrLine key":"attrLine"}> 
+                
                     <div className="FIELD DATE" draggable={bDrag}>{comps[0]}</div>
                     <div className="FIELD NAME" draggable={bDrag}>{comps[1]}</div>                                        
                     <div className="FIELD DATE" draggable={bDrag}>{comps[2]}</div>                                        
                     <div className="FIELD NAME" draggable={bDrag}>{comps[3]}</div>
                     <div className="FIELD NAME" draggable={bDrag}>{comps[4]}</div>
+
                     <div className="FIELD MOAM" draggable={bDrag}>{left}</div>  
                     <div className="FIELD MOAM" draggable={bDrag}>{rite}</div>  
                     <div className="FIELD SEP" >&nbsp;</div>
@@ -1472,13 +1474,16 @@ function TXNReceiptTotal(textSum,name,strInterest,year,textYearEnd) {
     return( // FIELD
         <div id="TXNReceiptTotal">
             <div className="attrLine"> <div className="FIELD LNAM">&nbsp;</div></div>
+
             <div className="attrLine">  <div className="FIELD DATE">{year}-12-31</div>
-                                        <div className="FIELD NAME">{textSum+' '+name}</div>
-                                        <div className="FIELD MOAM" draggable="true">={(strInterest && strInterest.length)? '('+cents20EU(strInterest)+')':''}</div> 
-                                        <div className="FIELD TAG">&nbsp;</div>
-                                        <div className="FIELD MOAM" draggable="true">{cents20EU(iInitial)}</div>
+                                        <div className="FIELD NAME">{textSum}</div>
+                                        <div className="FIELD DATE">{name}</div>
+                                        <div className="FIELD MONY" draggable="true">={(strInterest && strInterest.length)? '('+cents20EU(strInterest)+')':''}</div> 
+                                        <div className="FIELD MONY" draggable="true">{cents20EU(iInitial)}</div>
+                                        
                                         <div className="FIELD MOAM" draggable="true">+{cents20EU(iSumLeft)}</div> 
                                         <div className="FIELD MOAM" draggable="true">-{cents20EU(iSumRite)}</div> 
+                                        <div className="FIELD SEP" >&nbsp;</div>
                                         <div className="FIELD MOAM" draggable="true">={cents20EU(iInitial+iSumLeft-iSumRite)}</div> 
                                         <div className="FIELD SEP" >&nbsp;</div>
                                         <div className="FIELD NAME">{textYearEnd}</div>
