@@ -614,7 +614,7 @@ export function compile(sessionData) {
                                             var idnt = aLine[2].trim(); 
                                             var nvst = aLine[3].trim();
                                             var nmbr = aLine[4].trim();
-                                            var curr = aLine[5].trim(); // GH20261018 rest
+                                            var aset = aLine[5].trim(); // GH20261030 for ACCUMULATE: idnt
                                             if(debugFlagAssets>1 && iAcc>=J_ACCT) console.log("0320 compile: known account("+refAcct+"):  "+idnt+"  #"+iAcc+" with "+nmbr+" units.");
 
                                             // process YIELD,INVEST,SELL,WRITEOFF,ACCUMULATE (REGULAR)
@@ -743,6 +743,7 @@ export function compile(sessionData) {
                                                     console.log("0323 YIELD UNKNOWN ASSET "+idnt);
                                                 }
                                             } else if (refAcct==='ACCUMULATE') {
+                                                idnt = aset; // GH20261030 in ACCUMULATE bookings: row[5] is the asset identifier
                                                 try {
                                                     var iChange = bigAssetValueChange(aLine,J_ACCT,iAssets,result[D_XBRL]);
                                                     try {
@@ -775,7 +776,10 @@ export function compile(sessionData) {
 
                                                         if(debugFlagAssets) console.log("0328 ACCUMULATE amount="+iChange+" changes idnt="+idnt+" from "+cents2EU(iCurr)+" to "+cents2EU(result[D_FixAss][idnt].rest)+ " for #"+nmbr+" units at cost="+cents2EU(iCost));
 
-                                                    } catch(err) { console.dir("0327 SHEET LINE ACCUMULATE change="+iChange+" idnt="+idnt+" nmbr="+nmbr+"  orig="+orig+"  when making icost "+err); }
+                                                    } catch(err) { 
+                                                        console.dir("0327 SHEET LINE "+row.toString()); 
+                                                        console.dir("0327  ACCUMULATE change="+iChange+" idnt="+idnt+" nmbr="+nmbr+"  orig="+orig+"  when making icost "+err);
+                                                    }
 
                                                 } catch(err) { console.dir("0329 SHEET LINE ACCUMULATE orig "+err); }                                
 
