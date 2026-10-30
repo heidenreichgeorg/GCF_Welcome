@@ -1,7 +1,16 @@
+
+
+
+
+    const FIXED_ASSETS = 10;
+
+
+
+
 import { useEffect, useState } from 'react';
 import { getSession, useSession, REACT_APP_API_HOST,getCarryOver,storeCarryOver } from '../modules/sessionmanager';
 import Screen from './Screen'
-import { cents2EU,bigUSMoney,cents20EU,bigEUMoney }  from '../modules/money';
+import { cents2EU,bigUSMoney,cents20EU,bigEUMoney,bigAssetValueChange }  from '../modules/money';
 import { CSEP, CDOT, D_Account, D_Balance, D_Carry, D_CarryOver, D_Page, D_Partner, D_FixAss, D_History, D_Report, D_Schema, D_XBRL, J_ACCT, SCREENLINES, X_ASSET_CAPTAX, X_ASSET_UNPCAP, X_ASSETS, X_EQLIAB } from '../modules/terms.js'
 import { book,prepareTXN,makeHistory, symbolic }  from '../modules/writeModule';
 import { makeBalance, makeHGBReport,makeStatusData }  from '../modules/App';
@@ -323,6 +332,8 @@ export default function Status() {
 /**************************************************************************************** */
 
 
+
+    
     function handleWriteoffSave() {
         console.log("1160 Partner.makeWriteoffButton sessionId = "+session.id);
         const rqOptions = { method: 'GET', headers: {  'Accept': 'application/json'}, mode:'cors'};
@@ -332,9 +343,14 @@ export default function Status() {
             .then((response) => response.blob())
             .then((blob) => blob.text())
             .then((text) => JSON.parse(text)) // make java from the response, which is the main.json binary
-            .then((jMain) => (jMain.sheetCells ? jMain.sheetCells : {}))
-            .then((jSheet) => jSheet.filter((txn) => txn.length &&  txn.length>0 && txn[0]==='A'))
-            .then((jAssets) => JSON.stringify(jAssets))
+            .then((jMain) => (jMain.sheetCells ? jMain.sheetCells : {})) // look at the 'sheetCells'
+            .then((jSheet) => jSheet.filter((txn) => txn.length &&  txn.length>0 && txn[0]==='A')) // filter out the A asset lines
+            .then((jAssets) => jAssets.map((txn) => ( {
+                    'date':txn[1],
+                    'idnt':txn[2],
+                    'depr':cents2EU(bigAssetValueChange(txn,J_ACCT,txn.length)) } ))) // filter out depreciation value
+            .then((jDepr) => jDepr.filter((set) => set && set.depr && set.depr.length>0)) // filter out the non-empty depreciations
+            .then((jDepr) => JSON.stringify(jDepr))
             .then((strAssets) => new Blob([ strAssets ],{type : "text/plain;charset=utf-8"}))
             .then((blob) => URL.createObjectURL(blob))
             .then((url) => console.log("1150 makeWriteoffButton URL= "+ makeWriteoffButton(url)))

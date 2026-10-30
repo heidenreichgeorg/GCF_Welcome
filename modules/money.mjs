@@ -119,3 +119,23 @@ export function cents2US(amount) {
     return result;
 }
 
+
+// this function looks up the writeOff value (Found in the related account column)
+export function bigAssetValueChange(row,nFrom,nBefore) {
+    var column=nFrom;
+    var iValue = 0n;
+    var run=true;
+    try {
+        while(run && iValue==0n && column<nBefore) { // was  iValue<1n  GH20230924   was value == 0 GH20261018
+            var test = row[column];
+            if(test && test.length > 0 && bigEUMoney(test) != 0n /* && aXBRL[column].startsWith(xbrlFixed) */ ) { // GH20261018
+                iValue=bigEUMoney(test); 
+                console.log("ASSET ("+column+") VALUE CHANGE="+iValue)
+                run=false;
+            }
+            column++;
+        } // values before cash / accounts
+    } catch(err) { console.dir("asset value("+row+")="+iValue+"   ERROR "+err); }
+    return iValue;
+}
+
