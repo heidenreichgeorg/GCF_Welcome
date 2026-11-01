@@ -16,6 +16,7 @@ const HTMLSPACE=" ";
 
 export const CSEP = ';';
 export const S_COLUMN = 15;
+export const L_COLUMN = 25;
 export const iCpField = 75;
 
 

@@ -50,9 +50,14 @@ const Account = require('./account');
 const Compiler = require('./compile.js' );
 
 const Sheets = require('./sheets'); // setting root attribute
-//const Server = require('../.old/server');
+
+const Money = require('./money'); // currency representation 20261101
+import { cents2EU }  from '../modules/money';
 
 const HTMLSPACE=" "; 
+
+// first character in Asset definition records
+const PFX_ASSETS = 'A';
 
 
 // OBSOLETE extra XML pattern
@@ -225,7 +230,6 @@ const D_Page = "Seite";   // client register reference author
 
 const D_INITIAL=1; // erste Zelle in der Eröffnungszeile
 
-import { cents2EU }  from '../modules/money';
 
 
 
@@ -419,7 +423,7 @@ export function compile(sessionData) {
                         result[D_Schema].client    = row[3];
                         result[D_Schema].Numbers= row;  // 20251228
                     }
-                    else if(key && key==='A') {
+                    else if(key && key.startsWith(PFX_ASSETS)) {
                         if(debugFlagAssets) console.log("0270 compile.compile ASSET  "+row);
                         const assetInfo = row;
                         if(assetInfo.length>=J_ACCT) {

@@ -2,7 +2,7 @@
 
 
 
-    const FIXED_ASSETS = 10;
+const PFX_ASSETS = 'A';
 
 
 
@@ -10,9 +10,9 @@
 import { useEffect, useState } from 'react';
 import { getSession, useSession, REACT_APP_API_HOST,getCarryOver,storeCarryOver } from '../modules/sessionmanager';
 import Screen from './Screen'
-import { cents2EU,bigUSMoney,cents20EU,bigEUMoney,bigAssetValueChange }  from '../modules/money';
+import { bigAssetValueChange,bigEUMoney,bigUSMoney,cents20EU,cents2EU }  from '../modules/money';
 import { CSEP, CDOT, D_Account, D_Balance, D_Carry, D_CarryOver, D_Page, D_Partner, D_FixAss, D_History, D_Report, D_Schema, D_XBRL, J_ACCT, SCREENLINES, X_ASSET_CAPTAX, X_ASSET_UNPCAP, X_ASSETS, X_EQLIAB } from '../modules/terms.js'
-import { book,prepareTXN,makeHistory, symbolic }  from '../modules/writeModule';
+import { book,prepareTXN,makeHistory, symbolic, L_COLUMN }  from '../modules/writeModule';
 import { makeBalance, makeHGBReport,makeStatusData }  from '../modules/App';
 
 // the ORIGINAL FORMAT from journal sheet is 
@@ -297,18 +297,22 @@ export default function Status() {
 
         console.log("1110 Status.handleXLSave sessionId = "+session.id);
         
+
+        // is it session.client or client ???
+        // is it session.year or year ???
+
         const rqOptions = { method: 'GET', headers: rqHeaders, mode:'cors'};
-        try {                
+        if(client && year) try {                
             fetch(`${REACT_APP_API_HOST}/EXCEL?partner=${partner}&client=${client}&year=${year}`, rqOptions)
             .then((response) => response.blob())
             .then((blob) => URL.createObjectURL(blob))
-            .then((url) => console.log("1120 handleXLSave URL= "+ makeXLSButton(url,session.client,session.year)))
+            .then((url) => console.log("1120 handleXLSave URL= "+ appendButton(url,"REPORT"+client+year+".XLSX")))
             .catch((err) => console.error("1127 handleXLSave ERR "+err));           
         } catch(err) { console.log("1117 GET /EXCEL handleXLSave:"+err);}
         console.log("1130 Status.handleXLSave EXIT");
     }
 
-
+/*
     function makeXLSButton(url,client,year) { 
         console.log("1196 makeXLSButton XLSX "+url);
         if(client) {
@@ -325,7 +329,7 @@ export default function Status() {
         } else console.log("1195 makeXLSButton XLSX NO client");
         return url;
     }
-
+*/
 
 
 
@@ -344,8 +348,9 @@ export default function Status() {
             .then((blob) => blob.text())
             .then((text) => JSON.parse(text)) // make java from the response, which is the main.json binary
             .then((jMain) => (jMain.sheetCells ? jMain.sheetCells : {})) // look at the 'sheetCells'
-            .then((jSheet) => jSheet.filter((txn) => txn.length &&  txn.length>0 && txn[0]==='A')) // filter out the A asset lines
+            .then((jSheet) => jSheet.filter((txn) => txn.length &&  txn.length>0 && txn[0].startsWith(PFX_ASSETS)) // filter out the A asset lines
             .then((jAssets) => jAssets.map((txn) => ( {
+                    'info':txn[0].substring(1),
                     'date':txn[1],
                     'idnt':txn[2],
                     'depr':cents2EU(bigAssetValueChange(txn,J_ACCT,txn.length)) } ))) // filter out depreciation value
@@ -353,33 +358,52 @@ export default function Status() {
             .then((jDepr) => JSON.stringify(jDepr))
             .then((strAssets) => new Blob([ strAssets ],{type : "text/plain;charset=utf-8"}))
             .then((blob) => URL.createObjectURL(blob))
-            .then((url) => console.log("1150 makeWriteoffButton URL= "+ makeWriteoffButton(url)))
+            .then((url) => console.log("1150 makeWriteoffButton URL= "+ appendButton(url,"writeoff.json")))
             .catch((err) => console.error("1157 makeWriteoffButton ERR "+err));
             
         } catch(err) { console.log("1167 GET /JSON makeWriteoffButton:"+err);}
         console.log("1170 Partner.handleWriteoffSave EXIT");
     }
 
-/*
+
+
+// INPUT
+// ["A",     
+// "2023-10-16",  date
+// "DACH2023",    idnt
+// "16660",       orig
+// "1",           nmbr
+// "15160,60",    rest
+// "","","","667","","","",
+// "...","\r"]
+
+/* OUTPUT
 {
-                let jAssets=[]; 
-                for(let i=0;jSheet.length && jSheet.length<i;i++) {
-                    if(jSheet[i] && jSheet[i].length) { 
-                        let txn=jSheet[i]; 
-                        if(txn.length && txn.length>0 && txn[0]==='A') jAssets.push(txn) ;   
-                    }
-                }
-                return jAssets;
-            }
+"Abschreibung Haus":
+{
+    "text":"Abschluss: Abschreibung des Hauses im Eifelweg 22 -2%",
+    "creditEQL":{"ABSC":"2430"},
+    "credit":{},
+    "debitA":{"GRSB":"0"},
+    "debit":{},
+    "sender":"Haus",
+    "txt3":"Jahr", "reason":"1",
+    
+    "refAcct":"WRITEOFF",
+    
+    "txt2":"Objekt",
+    "txt4":"Code", "refCode":"Eifelweg22"
+    
+    }
 */
 
-    function makeWriteoffButton(url) { 
+    function appendButton(url,label) { 
 
         console.log("1180 makeWriteoffButton XLSX "+url);
         
         let a = document.createElement('a');
         a.href = url
-        a.download = "writeoff.json";
+        a.download = label;
         a.style.display = 'block'; // was none
         a.className = "key";
         a.innerHTML = "Download";
@@ -401,7 +425,7 @@ export default function Status() {
             fetch(`${REACT_APP_API_HOST}/DOWNLOAD?partner=${partner}&client=${session.client}&year=${session.year}`, rqOptions)
             .then((response) => response.blob())
             .then((blob) => URL.createObjectURL(blob))
-            .then((url) => console.log("1120 handleJSONSave URL= "+ makeJSONButton(url)))
+            .then((url) => console.log("1120 handleJSONSave URL= "+ appendButton(url,"main.json")))
             .catch((err) => console.error("1127 handleJSONSave ERR "+err));
             
         } catch(err) { console.log("1117 GET /JSON handleJSONSave:"+err);}
@@ -409,22 +433,6 @@ export default function Status() {
     }
 
     
-    function makeJSONButton(url) { 
-
-        console.log("1196 makeJSONButton JSON "+url);
-        
-        let a = document.createElement('a');
-        a.href = url
-        a.download = "main.json";
-        a.style.display = 'block'; // was none
-        a.className = "key";
-        a.innerHTML = "Download";
-        document.body.appendChild(a); 
-        console.log("1198 makeWriteoffButton make button");
-        
-        return url;
-    };
-
 
 
     /**************************************************************************************** */
@@ -1185,7 +1193,10 @@ export default function Status() {
                                                 am1={row.assets.yearEnd} tx1={row.assets.name} 
                                                 am2={row.gals.yearEnd} tx2={row.gals.name} 
                                                 am3={row.eqLiab.yearEnd} tx3={row.eqLiab.name} 
-                                                d={row.dTran} n={row.nTran} l={row.lTran} r={row.rTran} t={row.tTran}
+                                                d={row.dTran} n={row.nTran} 
+                                                l={row.lTran ? row.lTran.substring(0,L_COLUMN) : "0"} 
+                                                r={row.rTran ? row.rTran.substring(0,L_COLUMN) : "0"} 
+                                                t={row.tTran}
                                                 click={(line==0)?executeReview:null}/>                       
                         ))
                     }
