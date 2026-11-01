@@ -427,9 +427,10 @@ export function compile(sessionData) {
                         if(debugFlagAssets) console.log("0270 compile.compile ASSET  "+row);
                         const assetInfo = row;
                         if(assetInfo.length>=J_ACCT) {
+                            var info = assetInfo[0].substring(1);
                             var date = assetInfo[1];
                             var idnt = assetInfo[2];
-                            var orig = Sheets.bigEUMoney(assetInfo[3]); // bigENMoney AnschaffungsK parse huge EN format string
+                            var orig = Sheets.bigEUMoney(assetInfo[3]); // bigEUMoney AnschaffungsK parse huge EN format string
                             var nmbr = assetInfo[4];
                             var rest = assetInfo[5];
                             var iRest = Sheets.bigEUMoney(rest);
@@ -438,7 +439,8 @@ export function compile(sessionData) {
                             if(idnt && idnt.length>COLMIN && nmbr && nmbr.length>0) {
                                 var iDepr =bigAssetValueChange(assetInfo,J_ACCT,iAssets,result[D_XBRL]);
                                 var icost =bigCost(idnt,nmbr,orig); // unit cost
-                                result[D_FixAss][idnt]={ "date":date, 
+                                result[D_FixAss][idnt]={ "info":info,
+                                                         "date":date, 
                                                          "idnt":idnt,
                                                          "orig":""+orig,
                                                          "nmbr":nmbr,
@@ -449,7 +451,7 @@ export function compile(sessionData) {
                                 if(debugFlagAssets) console.log("0280 ASSET  "+idnt+" original€"+result[D_FixAss][idnt].orig+ " for #"+nmbr+"pieces at "+icost+ " each - at current big value "+iRest+" with annual write-off by "+cents2EU(iDepr));                                
                             }
                         }
-                    }
+                    } // A...
                     else if(key && key==='X') {
 
                         // GH20220126
@@ -614,6 +616,7 @@ export function compile(sessionData) {
                                         let  refAcct = (aLine[3] && ((aLine[3].trim().length)>1)) ? aLine[3].trim() : null;
                                         if(refAcct) {
                                             let iAcc=iAccount(refAcct,result[D_Schema].Names);
+                                            
                                             var date = aLine[1].trim();
                                             var idnt = aLine[2].trim(); 
                                             var nvst = aLine[3].trim();
@@ -632,8 +635,9 @@ export function compile(sessionData) {
 
 
                                                         var icost = bigCost(idnt,nmbr,orig);
-                            
-                                                        result[D_FixAss][idnt]={"date":date, 
+                                                        var info = result[D_FixAss][idnt];
+                                                        result[D_FixAss][idnt]={"info":info,
+                                                                                "date":date, 
                                                                                 "idnt":idnt,
                                                                                 "orig":""+orig,
                                                                                 "nmbr":nmbr,
@@ -690,7 +694,9 @@ export function compile(sessionData) {
 
                                                 // OPEN
                                                 // MUST VERIFY existing identifier
-                                                result[D_FixAss][idnt]={"date":date, 
+                                                var info = result[D_FixAss][idnt];
+                                                result[D_FixAss][idnt]={"info":info,
+                                                                        "date":date,
                                                                         "idnt":idnt,
                                                                         "orig":""+orig,
                                                                         "nmbr":nmbr,
@@ -730,7 +736,9 @@ export function compile(sessionData) {
 
                                                         // OPEN
                                                         // MUST VERIFY existing identifier
-                                                        result[D_FixAss][idnt]={"date":date,
+                                                        var info = result[D_FixAss][idnt];
+                                                        result[D_FixAss][idnt]={"info":info,
+                                                                                "date":date,
                                                                                 "idnt":idnt,
                                                                                 "orig":iVal,
                                                                                 "nmbr":nmbr,
@@ -768,8 +776,10 @@ export function compile(sessionData) {
                                                         // shall also compute new unit cost
                                                         var iNum =  1n; try { iNum=BigInt(nmbr); } catch(e) {}
                                                         if(iNum!=0n)  iCost = iRest / iNum; 
-                            
-                                                        result[D_FixAss][idnt]={"date":date, 
+
+                                                        var info = result[D_FixAss][idnt];
+                                                        result[D_FixAss][idnt]={"info":info,
+                                                                                "date":date, 
                                                                                 "idnt":idnt,
                                                                                 "orig":orig,
                                                                                 "nmbr":""+iNum,
@@ -810,7 +820,9 @@ export function compile(sessionData) {
 
                                                         // OPEN
                                                         // MUST VERIFY existing identifier
-                                                        result[D_FixAss][idnt]={ "date":date,
+                                                        var info = result[D_FixAss][idnt];
+                                                        result[D_FixAss][idnt]={"info":info,
+                                                                                "date":date, 
                                                                                 "orig":iVal,
                                                                                 "nmbr":nmbr,
                                                                                 "idnt":idnt,
@@ -1630,44 +1642,6 @@ function makePage(balance) {
 }
 
 
-// this function looks up te writeOff value (Found in the related account column)
-function bigAssetValueChange(row,nFrom,nBefore,aXBRL) {
-    var column=nFrom;
-    var iValue = 0n;
-    var run=true;
-    try {
-        while(run && iValue==0n && column<nBefore) { // was  iValue<1n  GH20230924   was value == 0 GH20261018
-            var test = row[column];
-            if(test && test.length > 0 && Sheets.bigEUMoney(test) != 0n /* && aXBRL[column].startsWith(xbrlFixed) */ ) { // GH20261018
-                iValue=Sheets.bigEUMoney(test); 
-                if(debugFlagAssets) console.log("ASSET ("+aXBRL[column]+") VALUE CHANGE="+iValue)
-                run=false;
-            }
-            column++;
-        } // shares before cash / account
-    } catch(err) { console.dir("asset value("+row+")="+iValue+"   ERROR "+err); }
-    return iValue;
-}
-
-
-// this function looks up te writeOff column 
-function bigAssetValueIndex(row,nFrom,nBefore,aXBRL) {
-    var column=nFrom;
-    var iValue = 0n;
-    var run=true;
-    try {
-        while(run && iValue==0n && column<nBefore) { // was  iValue<1n  GH20230924   was value == 0 GH20261018
-            var test = row[column];
-            if(test && test.length > 0 && Sheets.bigEUMoney(test) != 0n /* && aXBRL[column].startsWith(xbrlFixed) */ ) { // GH20261018
-                iValue=Sheets.bigEUMoney(test); 
-                if(debugFlagAssets) console.log("ASSET ("+aXBRL[column]+") VALUE CHANGE="+iValue)
-                run=false;
-            }
-            column++;
-        } // shares before cash / account
-    } catch(err) { console.dir("asset value("+row+")="+iValue+"   ERROR "+err); }
-    return column;
-}
 
 
 export function formatTXN(session,reqBody) {

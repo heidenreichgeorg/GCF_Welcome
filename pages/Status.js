@@ -348,7 +348,7 @@ export default function Status() {
             .then((blob) => blob.text())
             .then((text) => JSON.parse(text)) // make java from the response, which is the main.json binary
             .then((jMain) => (jMain.sheetCells ? jMain.sheetCells : {})) // look at the 'sheetCells'
-            .then((jSheet) => jSheet.filter((txn) => txn.length &&  txn.length>0 && txn[0].startsWith(PFX_ASSETS)) // filter out the A asset lines
+            .then((jSheet) => jSheet.filter((txn) => txn.length &&  txn.length>0 && txn[0].startsWith(PFX_ASSETS))) // filter out the A asset lines
             .then((jAssets) => jAssets.map((txn) => ( {
                     'info':txn[0].substring(1),
                     'date':txn[1],
