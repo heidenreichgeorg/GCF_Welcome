@@ -49,10 +49,10 @@ const Account = require('./account');
 
 const Compiler = require('./compile.js' );
 
-const Sheets = require('./sheets'); // setting root attribute
+//const Sheets = require('./sheets'); // setting root attribute
 
 const Money = require('./money'); // currency representation 20261101
-import { cents2EU }  from '../modules/money';
+import { bigAssetValueChange, bigEUMoney, cents2EU }  from '../modules/money';
 
 const HTMLSPACE=" "; 
 
@@ -430,10 +430,10 @@ export function compile(sessionData) {
                             var info = assetInfo[0].substring(1);
                             var date = assetInfo[1];
                             var idnt = assetInfo[2];
-                            var orig = Sheets.bigEUMoney(assetInfo[3]); // bigEUMoney AnschaffungsK parse huge EN format string
+                            var orig = bigEUMoney(assetInfo[3]); // bigEUMoney AnschaffungsK parse huge EN format string
                             var nmbr = assetInfo[4];
                             var rest = assetInfo[5];
-                            var iRest = Sheets.bigEUMoney(rest);
+                            var iRest = bigEUMoney(rest);
 
 
                             if(idnt && idnt.length>COLMIN && nmbr && nmbr.length>0) {
@@ -584,7 +584,7 @@ export function compile(sessionData) {
                                                     try {
                                                         var account = result[D_Balance][acName];
                                                         if(account && account.xbrl) {
-                                                            const iAmount = Sheets.bigEUMoney(strAmount);
+                                                            const iAmount = bigEUMoney(strAmount);
                                                             if(firstLine) {
                                                                 try {
                                                                     result[D_Balance][acName] = Account.openAccount(account,iAmount);
@@ -635,7 +635,7 @@ export function compile(sessionData) {
 
 
                                                         var icost = bigCost(idnt,nmbr,orig);
-                                                        var info = result[D_FixAss][idnt];
+                                                        var info = result[D_FixAss][idnt].info;
                                                         result[D_FixAss][idnt]={"info":info,
                                                                                 "date":date, 
                                                                                 "idnt":idnt,
@@ -694,7 +694,7 @@ export function compile(sessionData) {
 
                                                 // OPEN
                                                 // MUST VERIFY existing identifier
-                                                var info = result[D_FixAss][idnt];
+                                                var info = result[D_FixAss][idnt].info;
                                                 result[D_FixAss][idnt]={"info":info,
                                                                         "date":date,
                                                                         "idnt":idnt,
@@ -713,7 +713,7 @@ export function compile(sessionData) {
                                             else if(refAcct==='YIELD') {
 
                                                 var iamnt = bigAssetValueChange(aLine,J_ACCT,iAssets,result[D_XBRL]); // asset value change
-                                                var nAset = bigAssetValueIndex(aLine,J_ACCT,iAssets,result[D_XBRL]); // asset value column
+                                                var nAset = Money.bigAssetValueIndex(aLine,J_ACCT,iAssets,result[D_XBRL]); // asset value column
 
                                                 if(result[D_FixAss]) {
                                                     if(result[D_FixAss][idnt]) {
@@ -736,7 +736,7 @@ export function compile(sessionData) {
 
                                                         // OPEN
                                                         // MUST VERIFY existing identifier
-                                                        var info = result[D_FixAss][idnt];
+                                                        var info = result[D_FixAss][idnt].info;
                                                         result[D_FixAss][idnt]={"info":info,
                                                                                 "date":date,
                                                                                 "idnt":idnt,
@@ -777,7 +777,7 @@ export function compile(sessionData) {
                                                         var iNum =  1n; try { iNum=BigInt(nmbr); } catch(e) {}
                                                         if(iNum!=0n)  iCost = iRest / iNum; 
 
-                                                        var info = result[D_FixAss][idnt];
+                                                        var info = result[D_FixAss][idnt].info;
                                                         result[D_FixAss][idnt]={"info":info,
                                                                                 "date":date, 
                                                                                 "idnt":idnt,
@@ -820,7 +820,7 @@ export function compile(sessionData) {
 
                                                         // OPEN
                                                         // MUST VERIFY existing identifier
-                                                        var info = result[D_FixAss][idnt];
+                                                        var info = result[D_FixAss][idnt].info;
                                                         result[D_FixAss][idnt]={"info":info,
                                                                                 "date":date, 
                                                                                 "orig":iVal,
@@ -846,7 +846,7 @@ export function compile(sessionData) {
                                                         if(debugFlagRegular) console.log("0332 compile: ("+aLine[iAcc]+") regular income:"+xbrl);
                                                         if(result[D_FixAss][idnt]) {
                                                             var iGain = BigInt(result[D_FixAss][idnt].gain);
-                                                            result[D_FixAss][idnt].gain = ""+(iGain+Sheets.bigEUMoney(aLine[iAcc]));
+                                                            result[D_FixAss][idnt].gain = ""+(iGain+bigEUMoney(aLine[iAcc]));
                                                             if(debugFlagRegular) console.log("0334 compile: Asset gain is "+cents2EU(iGain));
                                                         }
                                                     }
@@ -1674,7 +1674,7 @@ export function formatTXN(session,reqBody) {
                 // so must compile existing session and try the result
                 session.generated = Compiler.compile(session);
 
-            } catch(e) { console.err("1539 sheets.xlsxWrite compile() error: "+e); }
+            } catch(e) { console.err("1539 compile.js formatTXN() Compiler.compile() error: "+e); }
 
             var balance = session.generated;
             

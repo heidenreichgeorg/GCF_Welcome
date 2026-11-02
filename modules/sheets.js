@@ -841,7 +841,7 @@ function makeTax(jBalance,partner,index,fix) {
 }
 
 
-export function bigEUMoney(strSet) {
+export function bigEUMoneySheets(strSet) {
     var euros=0n;
     var cents=0n;
     var factor=1n;

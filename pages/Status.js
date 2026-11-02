@@ -368,12 +368,12 @@ export default function Status() {
 
 
 // INPUT
-// ["A",     
-// "2023-10-16",  date
-// "DACH2023",    idnt
-// "16660",       orig
-// "1",           nmbr
-// "15160,60",    rest
+// ["Alengthyinfotext", info
+// "2023-10-16",        date
+// "DACH2023",          idnt
+// "16660",             orig
+// "1",                 nmbr
+// "15160,60",          rest
 // "","","","667","","","",
 // "...","\r"]
 
@@ -486,7 +486,7 @@ export default function Status() {
                     <div className="FIELD SYMB" onClick={(e)=>displayAccount(tx1)}> {tx1}</div>
                     <div className="FIELD SEP">+&nbsp;</div>
                     <div className="FIELD MOAM"> {cents2EU(am2)}</div>
-                    <div className="FIELD SEP">-&nbsp;</div>
+                    <div className="FIELD SEP">+&nbsp;</div>
                     <div className="FIELD MOAM"> {cents2EU(am3)}</div>
                     <div className="FIELD SEP">=&nbsp;</div>
                     <div className="FIELD MOAM"> {cents2EU(am4)}</div>
@@ -1014,6 +1014,10 @@ export default function Status() {
 
     // Verlauf Vermögen
     // account history page for assets
+    let iAssetsBegin=0n;
+    let iAssetsIn=0n;
+    let iAssetsOut=0n;
+    let iAssetsEnd=0n;
     tabHeaders.push(page.AccountHistoryAssets); fixPages++;
 
     // Kapital Verlauf
@@ -1203,7 +1207,12 @@ export default function Status() {
                 </div>
 
 
-                { console.log("102 ACCOUNTHISTORY show results ASSETS") }
+                { (console.log("102 ACCOUNTHISTORY show results ASSETS") ? 
+                    (iAssetsBegin=0n).toString()+
+                    (iAssetsIn=0n).toString()+
+                    (iAssetsOut=0n).toString()+
+                    (iAssetsEnd=0n).toString() : '')
+                 }
                 <div className="FIELD" key={"AccountHistory"} id={'Overview1'} style= {{ 'display': aPages[1]}} >
                     
                     <div className="FIELD LNAM">&nbsp;</div>
@@ -1216,16 +1225,26 @@ export default function Status() {
                         
                         
                         {
-                            statusReport.map((row,line) => (
+                            statusReport.filter((row)=>(!(row.assets.name===page.assets))).map((row,line) => (
                                 <AccountHistoryRow  key={"AcctHistoryAssets"+line}  
-                                                    am1={row.assets.init} tx1={row.assets.name} 
-                                                    am2={row.assets.credit} 
-                                                    am3={row.assets.debit} 
-                                                    am4={row.assets.yearEnd} 
+                                                    am1={row.assets.init}    blind0 = {iAssetsBegin+= BigInt(row.assets.init ? row.assets.init : 0n)}
+                                                    tx1={row.assets.name} 
+                                                    am2={row.assets.credit}  blind1 = {iAssetsIn += BigInt(row.assets.credit ? row.assets.credit :0n)}
+                                                    am3={row.assets.debit}   blind2 = {iAssetsOut += BigInt(row.assets.debit ? row.assets.debit  :0n)}
+                                                    am4={row.assets.yearEnd} blind3 = {iAssetsEnd+=BigInt(row.assets.yearEnd ? row.assets.yearEnd:0n)}
                                                     showAssets={true}
                                                 />                       
                             ))
+
+                            
+                            
                         }
+
+                    <AccountHistoryRow  key={"AcctHistoryAssets"}  
+                                                    am1={cents2EU(iAssetsBegin)} tx1={page.assets} am2={cents2EU(iAssetsIn)} am3={cents2EU(iAssetsOut)} am4={cents2EU(iAssetsEnd)} 
+                                                    showAssets={true}
+                                                />                       
+                  
                 </div>
 
 
@@ -1346,6 +1365,7 @@ export default function Status() {
 
                     <FixedAssetsRow p={ {'idnt':page.AssetIdISIN,  'type':' ', // 20261025
                             'date':page.AcquisitionDate,
+                            'info':'info',
                             'init':page.AcquisitionPrice, 
                             'nmbr':page.AssetNumber, // 'Anzahl',
                             'rest':page.AssetRemain, //'Zeitwert',
@@ -1361,6 +1381,7 @@ export default function Status() {
                         return (
                             <FixedAssetsRow  key={"Fixed0"+n}  p={{idnt:row.idnt,type:row.type,date:row.date,
                                 init:cents2EU(row.orig),
+                                info:row.info,
                                 nmbr:row.nmbr,
                                 rest:cents2EU(row.rest),
                                 cost:cents2EU(row.cost),
@@ -1578,7 +1599,7 @@ function FixedAssetsRow(mRow) {
     return (
         <div className="attrLine">
             <div className="FIELD LNAM">{mRow.p.idnt}</div>
-            <div className="FIELD NAME">{mRow.p.type}</div>
+            <div className="FIELD LTXT">{mRow.p.info}</div>
             <div className="FIELD NAME">{mRow.p.date}</div>
             <div className="FIELD MOAM">{mRow.p.init}</div>
             <div className="FIELD MOAM">{mRow.p.nmbr}</div>
