@@ -595,10 +595,10 @@ export default function Status() {
         var arrDebitAInfo=list(simpleTXN.debitA,-1);
         var arrDebitInfo=list(simpleTXN.debit,1);
 
-        console.log("creditEQL "+JSON.stringify(arrCreditEQLInfo));
-        console.log("credit "+JSON.stringify(arrCreditInfo));
-        console.log("debitA "+JSON.stringify(arrDebitAInfo));
-        console.log("debit "+JSON.stringify(arrDebitInfo));
+        console.log("Status.js buildTransaction creditEQL "+JSON.stringify(arrCreditEQLInfo));
+        console.log("Status.js buildTransaction credit "+JSON.stringify(arrCreditInfo));
+        console.log("Status.js buildTransaction debitA "+JSON.stringify(arrDebitAInfo));
+        console.log("Status.js buildTransaction debit "+JSON.stringify(arrDebitInfo));
 
         const schema = sheet[D_Schema];
 
