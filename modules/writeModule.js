@@ -138,7 +138,7 @@ export function prepareTXN(schema,flow, name,amount) {
     flow.euBalance=cents2EU(iBalance);
     flow.usBalance=cents2US(iBalance);
     
-    if(debugFlag) console.dir("prepareTXN "+JSON.stringify(flow));
+    if(debugFlag) console.dir("prepareTXN flow={"+"c"+JSON.stringify(flow.credit)+" d"+JSON.stringify(flow.debit)+" €"+flow.euBalance+" $"+flow.usBalance+"}");
     return flow;
 }
 
