@@ -146,7 +146,7 @@ let de_DE = {
     OpCost:      "Betriebsaufwand",
     DirectCost:  "zurechenb. Kosten",
     GrossYield:  "Rohertrag",
-    Distribute:  "nach Schlüssel z ver",
+    Distribute:  "nach Schlüssel zu ver",
     DirectCost:  "zurechenb. Kosten",
     Depreciation:"Abschreibung",
     OtherOTC:    "betriebl. Nebenkosten",
