@@ -621,38 +621,28 @@ export function makeHGBReport(jAccounts,page,jReport,jPartners) {
            iLeft = fillLeft(balance,cBegin,cClose,cNext,iName,iLeft);
         }
 
-        // MIET NKHA,in NKHA.out
         fillRight(balance,regularOTC,page.Distribute,0,2);
-        fillRight(balance,iRentGross,page.Revenue,1,1);
-        fillRight(balance,iAuxCredit,page.Revenue,1,2);
-        fillRight(balance,iAuxDebit,page.Revenue,1,3);
+        // MIET NKHA,in NKHA.out
+        fillRight(balance,iAuxCredit,page.Revenue,1,1);
+        fillRight(balance,iAuxDebit,page.Revenue,1,2);
+        fillRight(balance,iRentGross,page.Revenue,1,3);
         fillRight(balance,aufwandFuerAbnutzung,page.Depreciation,2,1); 
         fillRight(balance,erhaltungsAufwand,page.OpCost,3,1);
         fillRight(balance,erhaltungsAufwand+aufwandFuerAbnutzung,"Werbungskosten",4,2);
-        fillRight(balance,regularOTC,page.RegularOTC,5,3);
-        // Ergebnis
-
-        fillRight(balance,grossYield,page.GrossYield,6,2);
-        // Bruttoergebnis
-
-        fillRight(balance,chgb8,page.OtherOTC,7,1);
-        fillRight(balance,aufwandFuerAbnutzung+chgb8,page.OtherRegular,8,2);
-
-
+        fillRight(balance,grossYield,page.GrossYield,5,3);
+        fillRight(balance,chgb8,page.OtherOTC,6,1);
+        fillRight(balance,aufwandFuerAbnutzung+chgb8,page.OtherRegular,7,2);
+        fillRight(balance,regularOTC,page.RegularOTC,8,3);
         fillRight(balance,chgb9,page.PartYield,9,1);
         fillRight(balance,chgbA,page.FinSale,10,1);
         fillRight(balance,chgb9+chgbD,'('+page.RegularEQUITY+')',11,2);
         fillRight(balance,chgbB,page.NetInterest,12,1);
         fillRight(balance,chgbC,page.InterestCost,13,1);
-        
         let fin = chgb9+chgbA+chgbB+chgbC;
-        fillRight(balance,fin,page.FinYield,14,3);
-        
+        fillRight(balance,fin,page.FinYield,14,2);        
         let gain = regularOTC+fin;
         // Jahresueberschuss
         fillRight(balance,gain,page.closing,15,3);
-
-
         // paid Taxes: for VermVerw  Kommanditgesellschaft: Cap Gain Tax only
         fillRight(balance,-chgbF1,"chgbF1",16,1); // -- this part needed for Elster
         fillRight(balance,-chgbF2,"chgbF2",16,2); // -- this part needed for Elster
