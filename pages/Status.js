@@ -860,23 +860,23 @@ export default function Status() {
                 <div className="FIELD L280"> {form.title}</div>
     
                 <div className="FIELD NAME">
-                <div className="FIELD DATE" >{form.date}</div>
+                   <div className="FIELD DATE" >{form.date}</div>
                 </div>
                         
-                <div className="FIELD SYMB" >{txt2}</div>
-                <div className="FIELD TEAM" >{form.sender}</div>
+                <div className="FIELD LABL" >{txt2}</div>
+                <div className="FIELD TENY" >{form.sender}</div>
                 <div className="FIELD SEP" ></div>
     
-                <div className="FIELD SYMB" >{txt3}</div>
-                <div className="FIELD TEAM" >{form.reason}</div>
+                <div className="FIELD LABL" >{txt3}</div>
+                <div className="FIELD TENY" >{form.reason}</div>
                 <div className="FIELD SEP" ></div>
     
-                <div className="FIELD SYMB" >{txt4}</div>
-                <div className="FIELD TEAM" >{form.refCode}</div>
+                <div className="FIELD LABL" >{txt4}</div>
+                <div className="FIELD TENY" >{form.refCode}</div>
                 <div className="FIELD SEP" ></div>
                 
-                <div className="FIELD SYMB" >Balance</div>
-                <div className="FIELD TEAM" >{form.euBalance}</div>
+                <div className="FIELD LABL" >Balance</div>
+                <div className="FIELD TENY" >{form.euBalance}</div>
                 <div className="FIELD SEP" ></div>
             </div>
             <div className="attrLine">
