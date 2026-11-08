@@ -24,9 +24,9 @@ const DOUBLC=':';
 
 // GH202512 show_current
 
-function cents20EU(amount) { 
+function sCents20EU(amount) { 
     if(!amount) return "0";
-    else return cents2EU(amount);
+    else return sCents2EU(amount);
 }
 
 
@@ -128,7 +128,7 @@ function bookTXN() { return (e)=>{
 
 function makeShowTXN(jTXN) { return (e)=>{showTXN(jTXN,e)} }
 
-function cents2EU(amount) { 
+function sCents2EU(amount) { 
     let cents=amount; 
     
     if(!cents) return "";
@@ -236,7 +236,7 @@ function acctPattern(name,pattern) {
             }
         }
     })
-    aAccount.push({ "Account":name, "xbrl":pattern, "init":cents20EU(bigPatternInit), "credit":"0", "debit":"0", "saldo":cents20EU(bigPatternClos) })
+    aAccount.push({ "Account":name, "xbrl":pattern, "init":sCents20EU(bigPatternInit), "credit":"0", "debit":"0", "saldo":sCents20EU(bigPatternClos) })
    // symb not filled by intent - because this new account is synthetic
     return bigPatternClos;
 }
@@ -428,7 +428,7 @@ function upDateDisplay(jData) {
 
                     sAccount=nLine;
                     aAccount=nLine.map((symb,i)=>(
-                        (xLine[i] && xLine[i].length>4 && ((strAmount = cents20EU(bigMoney(oLine[i],1,0n)))!=null)) ?
+                        (xLine[i] && xLine[i].length>4 && ((strAmount = sCents20EU(bigMoney(oLine[i],1,0n)))!=null)) ?
                             makeAccount(symb,cLine[i],xLine[i],strAmount,strAmount)
                             :
                             {}
@@ -467,13 +467,13 @@ function upDateDisplay(jData) {
 
                                     if(sign=='-') {
                                         bigDebit=bigMoney(aTrans[i],-1,bigDebit);
-                                        aAccount[i].debit = cents20EU(bigDebit);
+                                        aAccount[i].debit = sCents20EU(bigDebit);
                                     } else {
                                         bigCredit=bigMoney(aTrans[i],1,bigCredit);
-                                        aAccount[i].credit = cents20EU (bigCredit);
+                                        aAccount[i].credit = sCents20EU (bigCredit);
                                     }
 
-                                    let saldo = cents20EU(bigInit+bigCredit-bigDebit);
+                                    let saldo = sCents20EU(bigInit+bigCredit-bigDebit);
                                     
 
                                     if(iAsset>=0 && i==iAsset) {
@@ -489,7 +489,7 @@ function upDateDisplay(jData) {
                                             // if currentAssets[symbol] does not exist: create aAsset entry
                                             if(!currentAssets[symbol]) {
                                                 let bigSaldo=bigMoney(aTrans[i],1,0n);
-                                                saldo = cents20EU(bigSaldo);
+                                                saldo = sCents20EU(bigSaldo);
 
                                                 let jAsset = {}
                                                 jAsset.investDate=aTrans[1];
@@ -657,7 +657,7 @@ let bilg =  acctPattern('Ergebnis',          'de-gaap-ci_is.netIncome.regular');
             
 let paog =  acctPattern('Kapital und Verbindlichkeiten','de-gaap-ci_bs.eqLiab');
 
-            aAccount.push(makeAccount(null,"Passiva mit Gewinn",'de-gaap-ci_bs.eqLiab',"",cents20EU(bigMoney("",1,bilg+paog))))
+            aAccount.push(makeAccount(null,"Passiva mit Gewinn",'de-gaap-ci_bs.eqLiab',"",sCents20EU(bigMoney("",1,bilg+paog))))
 
             // acctPartner('')
 
@@ -703,7 +703,7 @@ let paog =  acctPattern('Kapital und Verbindlichkeiten','de-gaap-ci_bs.eqLiab');
                 });
 
                 aPartners.forEach((jPartner,n)=>{
-                    jPartner.gain= cents20EU(bigSign * BigInt(jPartner.save)+(bigRest>0n?1n:0n));
+                    jPartner.gain= sCents20EU(bigSign * BigInt(jPartner.save)+(bigRest>0n?1n:0n));
                     bigRest--;
                 });                            
             }
@@ -718,7 +718,7 @@ let paog =  acctPattern('Kapital und Verbindlichkeiten','de-gaap-ci_bs.eqLiab');
                             bigRest -= bigTax;
                 });
                 aPartners.forEach((jPartner,n)=>{
-                        jPartner.taxP= cents20EU(BigInt(jPartner.save)+(bigRest>0n?1n:0n));
+                        jPartner.taxP= sCents20EU(BigInt(jPartner.save)+(bigRest>0n?1n:0n));
                         bigRest--;
                     });                            
             }

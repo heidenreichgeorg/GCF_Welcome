@@ -9,7 +9,7 @@ const debugFlagReport=null;
 
 /* global BigInt */
 import {  symbolic } from './writeModule'
-import { cents2EU }  from './money';
+import { sCents2EU }  from './money';
 
 const Compiler=require("./compile.js");
 
@@ -399,7 +399,7 @@ function makeXLTabs(sheetCells,jAssets,jHistory,jSchema,jPartner,jBalance,jXBRL,
             let account = jBalance[accName];
             if(account) {
                 const xbrl = account.xbrl;
-                const iValue = cents2EU(account.yearEnd);
+                const iValue = sCents2EU(account.yearEnd);
                 const aNumber = account.number;
                 const SH = xbrl.startsWith("de-gaap-ci_bs.ass") ? "S" : "H";
 
@@ -420,15 +420,15 @@ function makeXLTabs(sheetCells,jAssets,jHistory,jSchema,jPartner,jBalance,jXBRL,
                 else { 
                     // capital account
                     let pId=""+iPartner;
-                        excelBilanzT.push([xbrl+".beginYear",           accName+"_ANFANG",  ""+aNumber+"0","","",   cents2EU(account.init),  SH,pId])
+                        excelBilanzT.push([xbrl+".beginYear",           accName+"_ANFANG",  ""+aNumber+"0","","",   sCents2EU(account.init),  SH,pId])
                     
                     if(xbrl.endswith('VK')) { // GH20260114 EBO requires below eight values only for variable capital accounts
 
-                        let income = (account.income) ? cents2EU(account.income) : "0"
+                        let income = (account.income) ? sCents2EU(account.income) : "0"
                         
                         excelBilanzT.push([profitLoss,                  accName+"_EINK",    ""+aNumber+"1","","",   income,                  SH,pId])
-                        excelBilanzT.push([xbrl+".incomeUseDeposits",   accName+"_EINLAGE", ""+aNumber+"2","","",   cents2EU(account.credit),SH,pId])
-                        excelBilanzT.push([xbrl+".incomeUseWithdrawals",accName+"_ENTNAHME",""+aNumber+"3","","",   cents2EU(account.debit), SH,pId])
+                        excelBilanzT.push([xbrl+".incomeUseDeposits",   accName+"_EINLAGE", ""+aNumber+"2","","",   sCents2EU(account.credit),SH,pId])
+                        excelBilanzT.push([xbrl+".incomeUseWithdrawals",accName+"_ENTNAHME",""+aNumber+"3","","",   sCents2EU(account.debit), SH,pId])
                         excelBilanzT.push(["",                          accName+"_EINK2",   ""+aNumber+"4","","GKV",income,                  SH,pId,income,"de-gaap-ci_fpl.netIncome"])
                         excelBilanzT.push(["",                          accName+"_VERWENDG",""+aNumber+"5","","",   income,                  SH,pId,"",    "de-gaap-ci_incomeUse.paidInCapital"])
                         excelBilanzT.push(["",                          accName+"_EINLAGE2",""+aNumber+"6","","",   "0",                     SH,pId,"",    "de-gaap-ci_incomeUse.deposits"])

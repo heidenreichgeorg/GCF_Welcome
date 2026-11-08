@@ -52,7 +52,7 @@ const Compiler = require('./compile.js' );
 //const Sheets = require('./sheets'); // setting root attribute
 
 const Money = require('./money'); // currency representation 20261101
-import { bigAssetValueChange, bigEUMoney, cents2EU }  from '../modules/money';
+import { bigAssetValueChange, bigEUMoney, sCents2EU }  from '../modules/money';
 
 const HTMLSPACE=" "; 
 
@@ -168,7 +168,7 @@ let de_DE = {
     AvgCurrent:  "mittl. Umlaufvermögen",
     OpCapital:   "betriebsnotw.Kapital",
     TaxClaims:   "Steuerforderung",
-    SecLosses:   "Verluste Anl VK",
+    SecLosses:   "Verlust AnlVK",
     CapMargin:   "Kapitalrendite",
 
     // Buttons
@@ -448,7 +448,7 @@ export function compile(sessionData) {
                                                          "cost":""+icost,
                                                          "depr":""+iDepr, // GH20261017
                                                          "gain":"0" }; // GH20230303
-                                if(debugFlagAssets) console.log("0280 ASSET  "+idnt+" original€"+result[D_FixAss][idnt].orig+ " for #"+nmbr+"pieces at "+icost+ " each - at current big value "+iRest+" with annual write-off by "+cents2EU(iDepr));                                
+                                if(debugFlagAssets) console.log("0280 ASSET  "+idnt+" original€"+result[D_FixAss][idnt].orig+ " for #"+nmbr+"pieces at "+icost+ " each - at current big value "+iRest+" with annual write-off by "+sCents2EU(iDepr));                                
                             }
                         }
                     } // A...
@@ -649,7 +649,7 @@ export function compile(sessionData) {
                                                     } catch(err) { console.dir("0323 SHEET LINE INVEST nvst="+nvst+" idnt="+idnt+" nmbr="+nmbr+"  orig="+orig+"  when making icost "+err); }
 
                                                     if(debugFlagAssets) console.log("0322 INVEST "+idnt+" for "+
-                                                        cents2EU(result[D_FixAss][idnt].rest)+ " for #"+nmbr+" at "+cents2EU(icost));
+                                                        sCents2EU(result[D_FixAss][idnt].rest)+ " for #"+nmbr+" at "+sCents2EU(icost));
 
                                                 } catch(err) { console.dir("0321 SHEET LINE INVEST orig "+err); }
                                             }
@@ -705,9 +705,9 @@ export function compile(sessionData) {
                                                                         "depr":""+depr, // GH 20261017
                                                                         "gain":gain }; // GH20230303
                                                 if(debugFlagAssets) console.log(
-                                                            "0324 SELL Asset "+idnt+"  "+iSel+" (giving "+cents2EU(iamnt)+
+                                                            "0324 SELL Asset "+idnt+"  "+iSel+" (giving "+sCents2EU(iamnt)+
                                                             ") from "+iNum+" resulting in "+
-                                                            nmbr+" worth "+cents2EU(iremn) + " at "+cents2EU(icost)+" each");
+                                                            nmbr+" worth "+sCents2EU(iremn) + " at "+sCents2EU(icost)+" each");
                                             }
 
                                             else if(refAcct==='YIELD') {
@@ -788,7 +788,7 @@ export function compile(sessionData) {
                                                                                 "depr":""+depr, // GH 20261017
                                                                                 "gain":gain}; // GH20230202
 
-                                                        if(debugFlagAssets) console.log("0328 ACCUMULATE amount="+iChange+" changes idnt="+idnt+" from "+cents2EU(iCurr)+" to "+cents2EU(result[D_FixAss][idnt].rest)+ " for #"+nmbr+" units at cost="+cents2EU(iCost));
+                                                        if(debugFlagAssets) console.log("0328 ACCUMULATE amount="+iChange+" changes idnt="+idnt+" from "+sCents2EU(iCurr)+" to "+sCents2EU(result[D_FixAss][idnt].rest)+ " for #"+nmbr+" units at cost="+sCents2EU(iCost));
 
                                                     } catch(err) { 
                                                         console.dir("0327 SHEET LINE "+row.toString()); 
@@ -830,7 +830,7 @@ export function compile(sessionData) {
                                                                                 "cost":""+icost,
                                                                                 "depr":""+depr, // GH 20261017
                                                                                 "gain":gain }; // GH20230303
-                                                        if(debugFlagAssets) console.log("0330 WRITEOFF amount="+iamnt+" changes "+idnt+" from "+cents2EU(icurr)+" to "+cents2EU(result[D_FixAss][idnt].rest));
+                                                        if(debugFlagAssets) console.log("0330 WRITEOFF amount="+iamnt+" changes "+idnt+" from "+sCents2EU(icurr)+" to "+sCents2EU(result[D_FixAss][idnt].rest));
 
                                                     } else console.log("0333 WRITEOFF UNKNOWN "+idnt+" ASSET ENTRY");
                                                     
@@ -847,7 +847,7 @@ export function compile(sessionData) {
                                                         if(result[D_FixAss][idnt]) {
                                                             var iGain = BigInt(result[D_FixAss][idnt].gain);
                                                             result[D_FixAss][idnt].gain = ""+(iGain+bigEUMoney(aLine[iAcc]));
-                                                            if(debugFlagRegular) console.log("0334 compile: Asset gain is "+cents2EU(iGain));
+                                                            if(debugFlagRegular) console.log("0334 compile: Asset gain is "+sCents2EU(iGain));
                                                         }
                                                     }
                                                 } catch(err) { console.dir("0335 SHEET LINE GAIN "+err); }

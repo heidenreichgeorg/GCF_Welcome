@@ -10,9 +10,9 @@ const PFX_ASSETS = 'A';
 import { useEffect, useState } from 'react';
 import { getSession, useSession, REACT_APP_API_HOST,getCarryOver,storeCarryOver } from '../modules/sessionmanager';
 import Screen from './Screen'
-import { bigAssetValueChange,bigEUMoney,bigUSMoney,cents20EU,cents2EU }  from '../modules/money';
+import { bigAssetValueChange,bigEUMoney,bigUSMoney,sCents20EU,sCents2EU }  from '../modules/money';
 import { CSEP, CDOT, D_Account, D_Balance, D_Carry, D_CarryOver, D_Page, D_Partner, D_FixAss, D_History, D_Report, D_Schema, D_XBRL, J_ACCT, SCREENLINES, X_ASSET_CAPTAX, X_ASSET_UNPCAP, X_ASSETS, X_EQLIAB } from '../modules/terms.js'
-import { book,prepareTXN,makeHistory, symbolic, L_COLUMN }  from '../modules/writeModule';
+import { book,prepareTXN,makeHistory, symbolic, L_COLUMN, T_COLUMN }  from '../modules/writeModule';
 import { makeBalance, makeHGBReport,makeStatusData }  from '../modules/App';
 
 // the ORIGINAL FORMAT from journal sheet is 
@@ -191,7 +191,7 @@ export default function Status() {
     
             let saldo="";
             if(isNaN(row.saldo)) saldo="0";
-            else saldo = cents20EU(row.saldo); // cents2EU with 0 digit
+            else saldo = sCents20EU(row.saldo); // sCents2EU with 0 digit
             
             let id = symbolic(''+nLine+aRow.join('')+nLine+JSON.stringify(tRow));
     
@@ -353,7 +353,7 @@ export default function Status() {
                     'info':txn[0].substring(1),
                     'date':txn[1],
                     'idnt':txn[2],
-                    'depr':cents2EU(bigAssetValueChange(txn,J_ACCT,txn.length)) } ))) // filter out depreciation value
+                    'depr':sCents2EU(bigAssetValueChange(txn,J_ACCT,txn.length)) } ))) // filter out depreciation value
             .then((jDepr) => jDepr.filter((set) => set && set.depr && set.depr.length>0)) // filter out the non-empty depreciations
             .then((jDepr) => JSON.stringify(jDepr))
             .then((strAssets) => new Blob([ strAssets ],{type : "text/plain;charset=utf-8"}))
@@ -434,10 +434,6 @@ export default function Status() {
 
     
 
-
-    /**************************************************************************************** */
-    // dashboard portal page
-
     function displayAccount(shrtName) { 
 
         funcShowReceipt(shrtName); 
@@ -447,17 +443,28 @@ export default function Status() {
         console.log("SHOW ACCOUNT "+shrtName); 
         //window.open("/History?client=HGKG&year=2023&APATTERN="+shrtName+"&SELECTALL=1"); 
     }
+
+
+    /**************************************************************************************** */
+
+    // COMPONENTS
+
+    // dashboard portal page
+
     
+
+
+    // Uebersichtsseite
     function StatusRow({ am1,tx1, am2, tx2, am3, tx3, d, n, r, l, t, click}) {
         return(
             <div className="attrLine">
-                <div className="FIELD MOAM"> {cents2EU(am1)}</div>
+                <div className="FIELD MOAM"> {am1}</div>
                 <div className="FIELD SYMB" onClick={(e)=>displayAccount(tx1)}> {tx1}</div>
                 <div className="FIELD SEP"> &nbsp;</div>
-                <div className="FIELD MOAM"> {cents2EU(am2)}</div>
+                <div className="FIELD MOAM"> {am2}</div>
                 <div className="FIELD SYMB" onClick={(e)=>displayAccount(tx2)}> {tx2}</div>
                 <div className="FIELD SEP"> &nbsp;</div>
-                <div className="FIELD MOAM"> {cents2EU(am3)}</div>
+                <div className="FIELD MOAM"> {am3}</div>
                 <div className="FIELD SYMB" onClick={(e)=>displayAccount(tx3)}> {tx3}</div>
                 <div className="FIELD DASH"> &nbsp;</div>
                 <div className="FIELD DATE"> {d}</div>
@@ -482,31 +489,31 @@ export default function Status() {
             <div className="attrLine">
                 { showAssets ? 
                 (<div>
-                    <div className="FIELD MOAM"> {cents2EU(am1)}</div>
+                    <div className="FIELD MOAM"> {am1}</div>
                     <div className="FIELD SYMB" onClick={(e)=>displayAccount(tx1)}> {tx1}</div>
                     <div className="FIELD SEP">+&nbsp;</div>
-                    <div className="FIELD MOAM"> {cents2EU(am2)}</div>
+                    <div className="FIELD MOAM"> {am2}</div>
                     <div className="FIELD SEP">+&nbsp;</div>
-                    <div className="FIELD MOAM"> {cents2EU(am3)}</div>
+                    <div className="FIELD MOAM"> {am3}</div>
                     <div className="FIELD SEP">=&nbsp;</div>
-                    <div className="FIELD MOAM"> {cents2EU(am4)}</div>
+                    <div className="FIELD MOAM"> {am4}</div>
                     <div className="FIELD SEP"> &nbsp;</div>
                 </div>):"" }
                 <div className="FIELD SEP">|&nbsp;</div>
                 { showEqLiab ? 
                 (<div>
-                    <div className="FIELD MOAM"> {cents2EU(am5)}</div>
+                    <div className="FIELD MOAM"> {am5}</div>
                     <div className="FIELD SYMB" onClick={(e)=>displayAccount(tx2)}> {tx2}</div>
                     <div className="FIELD SEP">+&nbsp;</div>
-                    <div className="FIELD MOAM"> {cents2EU(am6)}</div>
+                    <div className="FIELD MOAM"> {am6}</div>
                     <div className="FIELD SEP">-&nbsp;</div>
-                    <div className="FIELD MOAM"> {cents2EU(am7)}</div>
+                    <div className="FIELD MOAM"> {am7}</div>
                     <div className="FIELD SEP">+&nbsp;</div>
-                    <div className="FIELD MOAM"> {cents2EU(am8)}</div>
+                    <div className="FIELD MOAM"> {am8}</div>
                     <div className="FIELD SEP">-&nbsp;</div>
-                    <div className="FIELD MOAM"> {cents2EU(am9)}</div>
+                    <div className="FIELD MOAM"> {am9}</div>
                     <div className="FIELD SEP">=&nbsp;</div>
-                    <div className="FIELD MOAM"> {cents2EU(amA)}</div>
+                    <div className="FIELD MOAM"> {amA}</div>
                 </div>):"" }
             </div>
         )
@@ -521,20 +528,20 @@ export default function Status() {
     function IncomeUsedRow({ am1,tx1, am2, tx2, am3, tx3, am4, am5, am6}) {
         return(
             <div className="attrLine">
-                <div className="FIELD MOAM"> {cents2EU(am1)}</div>
+                <div className="FIELD MOAM"> {am1}</div>
                 <div className="FIELD SYMB" onClick={(e)=>displayAccount(tx1)}> {tx1}</div>
                 <div className="FIELD SEP"> &nbsp;</div>
-                <div className="FIELD MOAM"> {cents2EU(am2)}</div>
+                <div className="FIELD MOAM"> {am2}</div>
                 <div className="FIELD SYMB" onClick={(e)=>displayAccount(tx2)}> {tx2}</div>
                 <div className="FIELD SEP"> &nbsp;</div>
-                <div className="FIELD MOAM"> {cents2EU(am3)}</div>
-                <div className="FIELD SYMB" onClick={(e)=>displayAccount(tx3)}> {tx3}</div>
+                <div className="FIELD MOAM"> {am3}</div>
+                <div className="FIELD LABL" onClick={(e)=>displayAccount(tx3)}> {tx3}</div>
                 <div className="FIELD SEP"> &nbsp;</div>
-                <div className="FIELD MOAM"> {cents2EU(am4)}</div>
-                <div className="FIELD SYMB" onClick={(e)=>displayAccount(tx3)}> {tx3}</div>
-                <div className="FIELD MOAM"> {cents2EU(am5)}</div>
-                <div className="FIELD SYMB" onClick={(e)=>displayAccount(tx3)}> {tx3}</div>
-                <div className="FIELD MOAM"> {cents2EU(am6)}</div>
+                <div className="FIELD MOAM"> {am4}</div>
+                <div className="FIELD SYMB"> &nbsp;</div>
+                <div className="FIELD MOAM"> {am5}</div>
+                <div className="FIELD SYMB"> &nbsp;</div>
+                <div className="FIELD MOAM"> {am6}</div>
                 <div className="FIELD SEP"> &nbsp;</div>
             </div>
         )
@@ -550,25 +557,25 @@ export default function Status() {
     function ClosingRow({ am1,tx1, am2, tx2, am3, tx3, am4, tx4, am5, tx5, am6, tx6}) {
         return(
             <div className="attrLine">
-                <div className="FIELD MOAM"> {cents2EU(am1)}</div>
+                <div className="FIELD MOAM"> {(am1)}</div>
                 <div className="FIELD SYMB" onClick={(e)=>displayAccount(tx1)}> {tx1}</div>
                 <div className="FIELD SEP"> &nbsp;</div>
-                <div className="FIELD MOAM"> {cents2EU(am2)}</div>
+                <div className="FIELD MOAM"> {(am2)}</div>
                 <div className="FIELD SYMB" onClick={(e)=>displayAccount(tx2)}> {tx2}</div>
                 <div className="FIELD SEP"> &nbsp;</div>
                 <div className="FIELD SEP"> &nbsp;</div>
                 <div className="FIELD SEP"> &nbsp;|</div>
                 <div className="FIELD SEP"> &nbsp;</div>
-                <div className="FIELD MOAM"> {cents2EU(am3)}</div>
+                <div className="FIELD MOAM"> {(am3)}</div>
                 <div className="FIELD SYMB" onClick={(e)=>displayAccount(tx3)}> {tx3}</div>
                 <div className="FIELD SEP"> &nbsp;</div>
-                <div className="FIELD MOAM"> {cents2EU(am4)}</div>
+                <div className="FIELD MOAM"> {(am4)}</div>
                 <div className="FIELD SYMB" onClick={(e)=>displayAccount(tx4)}> {tx4}</div>
                 <div className="FIELD SEP"> &nbsp;</div>
-                <div className="FIELD MOAM"> {cents2EU(am5)}</div>
+                <div className="FIELD MOAM"> {(am5)}</div>
                 <div className="FIELD SYMB" onClick={(e)=>displayAccount(tx5)}> {tx5}</div>
                 <div className="FIELD SEP"> &nbsp;</div>
-                <div className="FIELD MOAM"> {cents2EU(am6)}</div>
+                <div className="FIELD MOAM"> {(am6)}</div>
                 <div className="FIELD SYMB" onClick={(e)=>displayAccount(tx6)}> {tx6}</div>
                 <div className="FIELD SEP"> &nbsp;</div>
             </div>
@@ -578,7 +585,7 @@ export default function Status() {
     /**************************************************************************************** */
     
     function list(side,factor) { 
-        return Object.keys(side).map((acct)=>({'name':acct, 'value':(side[acct]&&side[acct].length>0 ? cents2EU(bigUSMoney(side[acct],factor)):"0")}));
+        return Object.keys(side).map((acct)=>({'name':acct, 'value':(side[acct]&&side[acct].length>0 ? sCents2EU(bigUSMoney(side[acct],factor)):"0")}));
     }
 
     // generate FLOW FORMAT for booking
@@ -955,7 +962,7 @@ export default function Status() {
                     let iShare = cFix+(iPosition*igain/ideno/10n);
                     if(cFix>0) cFix--;
                     iSum = iSum + iShare;
-                    result[name] = cents2EU(iShare)})
+                    result[name] = sCents2EU(iShare)})
             ifix++;
         } 
 
@@ -980,7 +987,7 @@ export default function Status() {
                     let iShare = cFix+(iPosition*igain/ideno/10n);
                     if(cFix>0) cFix--;
                     iSum = iSum + iShare;
-                    deficit[name] = cents2EU(iShare)})
+                    deficit[name] = sCents2EU(iShare)})
             ifix++;
         } 
 
@@ -1022,6 +1029,15 @@ export default function Status() {
 
     // Kapital Verlauf
     // account history page for equity/liability
+    let iEqLiabBegin=0n;
+    let iEqLiabCredit=0n;
+    let iEqLiabDebit=0n;
+    let iEqLiabIncome=0n;
+    let iEqLiabTax=0n;
+    let iEqLiabNext=0n;
+
+    let iGain=0n; 
+
     tabHeaders.push(page.AccountHistoryEqLiab); fixPages++;
 
     // income used page
@@ -1194,17 +1210,19 @@ export default function Status() {
                     {
                         statusReport.map((row,line) => (
                             <StatusRow  key={"Status"+line}  
-                                                am1={row.assets.yearEnd} tx1={row.assets.name} 
-                                                am2={row.gals.yearEnd} tx2={row.gals.name} 
-                                                am3={row.eqLiab.yearEnd} tx3={row.eqLiab.name} 
+                                                am1={sCents2EU(row.assets.yearEnd)} tx1={row.assets.name} 
+                                                am2={sCents2EU(row.gals.yearEnd)} tx2={row.gals.name} 
+                                                am3={sCents2EU(row.eqLiab.yearEnd)} tx3={row.eqLiab.name} 
                                                 d={row.dTran} n={row.nTran} 
-                                                l={row.lTran ? row.lTran.substring(0,L_COLUMN) : "0"} 
                                                 r={row.rTran ? row.rTran.substring(0,L_COLUMN) : "0"} 
                                                 t={row.tTran}
+                                                l={row.lTran ? row.lTran.substring(0,T_COLUMN) : "0"} 
                                                 click={(line==0)?executeReview:null}/>                       
                         ))
                     }
                 </div>
+
+
 
 
                 { (console.log("102 ACCOUNTHISTORY show results ASSETS") ? 
@@ -1227,11 +1245,11 @@ export default function Status() {
                         {
                             statusReport.filter((row)=>(!(row.assets.name===page.assets))).map((row,line) => (
                                 <AccountHistoryRow  key={"AcctHistoryAssets"+line}  
-                                                    am1={row.assets.init}    blind0 = {iAssetsBegin+= BigInt(row.assets.init ? row.assets.init : 0n)}
+                                                    am1={sCents2EU(row.assets.init)}    blind0 = {iAssetsBegin+= BigInt(row.assets.init ? row.assets.init : 0n)}
                                                     tx1={row.assets.name} 
-                                                    am2={row.assets.credit}  blind1 = {iAssetsIn += BigInt(row.assets.credit ? row.assets.credit :0n)}
-                                                    am3={row.assets.debit}   blind2 = {iAssetsOut += BigInt(row.assets.debit ? row.assets.debit  :0n)}
-                                                    am4={row.assets.yearEnd} blind3 = {iAssetsEnd+=BigInt(row.assets.yearEnd ? row.assets.yearEnd:0n)}
+                                                    am2={sCents2EU(row.assets.credit)}  blind1 = {iAssetsIn += BigInt(row.assets.credit ? row.assets.credit :0n)}
+                                                    am3={sCents2EU(row.assets.debit)}   blind2 = {iAssetsOut += BigInt(row.assets.debit ? row.assets.debit  :0n)}
+                                                    am4={sCents2EU(row.assets.yearEnd)} blind3 = {iAssetsEnd+=BigInt(row.assets.yearEnd ? row.assets.yearEnd:0n)}
                                                     showAssets={true}
                                                 />                       
                             ))
@@ -1240,8 +1258,8 @@ export default function Status() {
                             
                         }
 
-                    <AccountHistoryRow  key={"AcctHistoryAssets"}  
-                                                    am1={cents2EU(iAssetsBegin)} tx1={page.assets} am2={cents2EU(iAssetsIn)} am3={cents2EU(iAssetsOut)} am4={cents2EU(iAssetsEnd)} 
+                    <AccountHistoryRow  key={"AcctHistoryAssetsFooter"}  
+                                                    am1={sCents2EU(iAssetsBegin)} tx1={page.assets} am2={sCents2EU(iAssetsIn)} am3={sCents2EU(iAssetsOut)} am4={sCents2EU(iAssetsEnd)} 
                                                     showAssets={true}
                                                 />                       
                   
@@ -1256,25 +1274,41 @@ export default function Status() {
                         
                     <AccountHistoryRow  key={"AcctHistoryEqLiab"}  
                                                     showEqLiab={true}
+
+                                                    blind0 = {  sCents2EU((iEqLiabBegin=0n) +(iEqLiabCredit=0n)
+                                                    +(iEqLiabDebit=0n)+(iEqLiabIncome=0n)
+                                                    +(iEqLiabTax=0n)  +(iEqLiabNext=0n))} 
+
                                                     am5={page.Init} tx2={page.Name} am6={page.Credit} am7={page.Debit} am8={page.income} am9={page.Tax} amA={page.NextYear} 
                                                 />                       
                         
                         
                         {
-                            statusReport.map((row,line) => (
+                            statusReport.filter((row)=>(!(row.eqLiab.name===page.eqliab))).map((row,line) => (
                                 <AccountHistoryRow  key={"AcctHistoryEqLiab"+line}  
                                                     showEqLiab={true}
 
 
-                                                    am5={row.eqLiab.init} tx2={row.eqLiab.name} 
-                                                    am6={row.eqLiab.credit} 
-                                                    am7={row.eqLiab.debit} 
-                                                    am8={row.eqLiab.income} 
-                                                    am9={row.eqLiab.tax} 
-                                                    amA={row.eqLiab.next} 
+                                                    am5={sCents2EU(row.eqLiab.init)} tx2={row.eqLiab.name} blind0= {iEqLiabBegin+= BigInt(row.eqLiab.init ? row.eqLiab.init : 0n)}
+                                                    am6={sCents2EU(row.eqLiab.credit)}  blind1= {iEqLiabCredit+= BigInt(row.eqLiab.credit ? row.eqLiab.credit : 0n)}
+                                                    am7={sCents2EU(row.eqLiab.debit)}   blind2= {iEqLiabDebit += BigInt(row.eqLiab.debit ?  row.eqLiab.debit : 0n)}
+                                                    am8={sCents2EU(row.eqLiab.income)}  blind3= {iEqLiabIncome += BigInt(row.eqLiab.income ?  row.eqLiab.income : 0n)}
+                                                    am9={sCents2EU(row.eqLiab.tax)}     blind4= {iEqLiabTax += BigInt(row.eqLiab.tax ?  row.eqLiab.tax : 0n)}
+                                                    amA={sCents2EU(row.eqLiab.next)}    blind5= {iEqLiabNext += BigInt(row.eqLiab.next ?  row.eqLiab.next : 0n)}
                                                 />                       
                             ))
                         }
+
+                    <AccountHistoryRow  key={"AcctHistoryEqLiabFooter"} 
+                                                    showEqLiab={true} 
+                                                    am5={sCents20EU(iEqLiabBegin)} tx2={page.eqliab} 
+                                                    am6={sCents20EU(iEqLiabCredit)} 
+                                                    am7={sCents20EU(iEqLiabDebit)} 
+                                                    am8={sCents20EU(iEqLiabIncome)} 
+                                                    am9={sCents20EU(iEqLiabTax)}
+                                                    amA={sCents20EU(iEqLiabNext)} 
+                                                   
+                                                />                       
                 </div>
 
 
@@ -1286,19 +1320,25 @@ export default function Status() {
                     <div className="attrLine">{page.IncomeUsed}&nbsp;{parseInt(session.year)}</div>
 
 
-                    <IncomeUsedRow am1={page.Assets} am2={page.Gain}  am3={page.eqliab} am4={page.eq_income} am5={page.eq_tax} am6={page.eq_next}/>
+                    <IncomeUsedRow 
+                            blind4= {sCents2EU((iEqLiabTax=0n)+(iEqLiabIncome=0n))}
+                            am1={page.Assets} am2={page.Gain}  am3={page.eqliab} am4={page.eq_income} am5={page.eq_tax} am6={page.eq_next}/>
                     {
-                        statusReport.map((row,line) => (
-                            <IncomeUsedRow  key={"Status"+line}  
-                                                am1={row.assets.yearEnd} tx1={row.assets.name} 
-                                                am2={row.gals.yearEnd}   tx2={row.gals.name} 
-                                                am3={row.eqLiab.yearEnd} tx3={row.eqLiab.name} 
-                                                am4={row.eqLiab.income} // 20230218 income used
-                                                am5={row.eqLiab.tax} // 20230218 tax paid
-                                                am6={row.eqLiab.next} // 20230218 next year
+                        statusReport.filter((row)=>(!(row.eqLiab.name===page.eqliab))).map((row,line) => (
+                            <IncomeUsedRow  key={"IncomeUsed"+line}  
+                                                am1={sCents2EU(row.assets.yearEnd)} tx1={row.assets.name} 
+                                                am2={sCents2EU(row.gals.yearEnd)}   tx2={row.gals.name} 
+                                                am3={sCents2EU(row.eqLiab.yearEnd)} tx3={row.eqLiab.name} 
+                                                am4={sCents2EU(row.eqLiab.income)}  blind3= {iEqLiabIncome += BigInt(row.eqLiab.income ?  row.eqLiab.income : 0n)}
+                                                am5={sCents2EU(row.eqLiab.tax)}     blind4= {iEqLiabTax += BigInt(row.eqLiab.tax ?  row.eqLiab.tax : 0n)}
+                                                am6={sCents2EU(row.eqLiab.next)} // 20230218 next year
                                                />                       
                         ))
                     }
+                            <IncomeUsedRow  key={"IncomeUsedFooter"}  
+                                                am4={sCents20EU(iEqLiabIncome)} tx3={page.IncomeUsed} 
+                                                am5={sCents2EU(iEqLiabTax)}                                                
+                                               />                       
                 </div>
 
 
@@ -1314,12 +1354,12 @@ export default function Status() {
                     {
                         statusReport.map((row,line) => (
                             <ClosingRow  key={"Status"+line}  
-                                                am1={row.assets.init}     tx1={row.assets.name} 
-                                                am2={row.eqLiab.init}     tx2={row.eqLiab.name} 
-                                                am3={row.eqLiab.yearEnd}  tx3={row.eqLiab.name}  
-                                                am4={row.eqLiab.income}   tx4={row.eqLiab.name}
-                                                am5={row.eqLiab.tax}      tx5={row.eqLiab.name} 
-                                                am6={row.eqLiab.next}     tx6={row.eqLiab.name}
+                                                am1={sCents2EU(row.assets.init)}     tx1={row.assets.name} 
+                                                am2={sCents2EU(row.eqLiab.init)}     tx2={row.eqLiab.name} 
+                                                am3={sCents2EU(row.eqLiab.yearEnd)}  tx3={row.eqLiab.name}  
+                                                am4={sCents2EU(row.eqLiab.income)}   tx4={row.eqLiab.name}
+                                                am5={sCents2EU(row.eqLiab.tax)}      tx5={row.eqLiab.name} 
+                                                am6={sCents2EU(row.eqLiab.next)}     tx6={row.eqLiab.name}
                                                />                       
                         ))
                     }
@@ -1380,14 +1420,16 @@ export default function Status() {
                         iRest+=BigInt(row.rest);
                         return (
                             <FixedAssetsRow  key={"Fixed0"+n}  p={{idnt:row.idnt,type:row.type,date:row.date,
-                                init:cents2EU(row.orig),
+                                init:sCents2EU(row.orig),
                                 info:row.info,
                                 nmbr:row.nmbr,
-                                rest:cents2EU(row.rest),
-                                cost:cents2EU(row.cost),
-                                gain:cents2EU(row.gain),
-                                depr:cents2EU(row.depr)
-                                }} />
+                                rest:sCents2EU(row.rest),
+                                cost:sCents2EU(row.cost),
+                                gain:sCents2EU(row.gain), 
+                                depr:sCents2EU(row.depr)
+                                }} 
+                                noGain={(iGain += row.gain? row.gain : 0n)}
+                                />
                         )
                         })
                     }
@@ -1395,9 +1437,10 @@ export default function Status() {
                     <FixedAssetsRow p={{ 'idnt':jReport.xbrlFixed.de_DE, 'type':' ', 'date':session.year+"-12-31",
                             'init':' ', 
                             'nmbr':' ',
-                            'rest':cents2EU(iRest),
+                            'rest':sCents2EU(iRest),
                             'current':' ',
                             'cost':' ',
+                            'gain':sCents2EU(iGain),
                         'depr':' ' } }
                     />
                 </div>
@@ -1412,19 +1455,29 @@ export default function Status() {
                             <div className="attrLine"></div>
                             <div className="attrLine">{page.Tax}&nbsp;{parseInt(session.year)}</div>
 
-                            <PartnerTitleRow p={ {'name':page.Name, 
-                                'init':page.Init, 
-                                'credit':page.Credit,
-                                'debit':page.Debit,
-                                'yearEnd':page.YearEnd,
-                                'netIncomeOTC':page.RegularOTC,
-                                'netIncomeFin':page.RegularFIN,
-                                'close':page.Close,
-                                'tax':page.PaidTax,
-                                'cyLoss':page.SecLosses,
-                                'next':page.NextYear} } />     
+                            <PartnerRow p={ {'name':page.Name, 
+                                'init':(page.Init), 
+                                'credit':(page.Credit),
+                                'debit':(page.Debit),
+                                'yearEnd':(page.YearEnd),
+                                'netIncomeOTC':(page.RegularOTC),
+                                'netIncomeFin':(page.RegularFIN),
+                                'close':(page.Close),
+                                'tax':(page.PaidTax),
+                                'cyLoss':(page.SecLosses),
+                                'next':(page.NextYear)} } />     
 
-                            <PartnerRow p={jPartnerReport[partnerNo]}/>    
+                            <PartnerRow p={ {'name':jPartnerReport[partnerNo].name,
+                                'init':sCents2EU(jPartnerReport[partnerNo].init), 
+                                'credit':sCents2EU(jPartnerReport[partnerNo].credit),
+                                'debit':sCents2EU(jPartnerReport[partnerNo].debit),
+                                'yearEnd':sCents2EU(jPartnerReport[partnerNo].yearEnd),
+                                'netIncomeOTC':sCents2EU(jPartnerReport[partnerNo].netIncomeOTC),
+                                'netIncomeFin':sCents2EU(jPartnerReport[partnerNo].netIncomeFin),
+                                'close':sCents2EU(jPartnerReport[partnerNo].close),
+                                'tax':sCents2EU(jPartnerReport[partnerNo].tax),
+                                'cyLoss':sCents2EU(jPartnerReport[partnerNo].cyLoss),
+                                'next':sCents2EU(jPartnerReport[partnerNo].next)} } />     
         
                     </div>
 
@@ -1472,7 +1525,7 @@ function TXNReceipt(token,text,jAmounts,jColumnHeads,jSum,id,removeCol,name,inde
         if(jSum && value && value.length>2) {   
             console.log("TXNReceipt "+acct+" add "+value);        
             if(jSum[acct]) {
-                jSum[acct] = cents20EU(bigEUMoney(jSum[acct]) + bigEUMoney(value));
+                jSum[acct] = sCents20EU(bigEUMoney(jSum[acct]) + bigEUMoney(value));
             }
         }
     })
@@ -1485,13 +1538,13 @@ function TXNReceipt(token,text,jAmounts,jColumnHeads,jSum,id,removeCol,name,inde
     let iAmount = (name && name.length>1) ? bigEUMoney(jAmounts[name]) :BigInt(0);
 
     // detect first opening line, does not recognize D_INITIAL
-    if(token==="1")     { left= cents2EU( iAmount);  iInitial=iAmount; } 
+    if(token==="1")     { left= sCents2EU( iAmount);  iInitial=iAmount; } 
     else {
-        if(iAmount>0) { left= cents2EU( iAmount);  iSumLeft+=iAmount; }
-        if(iAmount<0) { rite= cents2EU(-iAmount);  iSumRite-=iAmount; }
+        if(iAmount>0) { left= sCents2EU( iAmount);  iSumLeft+=iAmount; }
+        if(iAmount<0) { rite= sCents2EU(-iAmount);  iSumRite-=iAmount; }
     }
 
-    let saldo = cents2EU(iInitial + iSumLeft - iSumRite)
+    let saldo = sCents2EU(iInitial + iSumLeft - iSumRite)
 
     // 20241228 move currLine by clicking on the receipt number in the rightmost column
     let bDrag = (index==currLine) ? "true":"false";
@@ -1526,13 +1579,13 @@ function TXNReceiptTotal(textSum,name,strInterest,year,textYearEnd) {
             <div className="attrLine">  <div className="FIELD DATE">{year}-12-31</div>
                                         <div className="FIELD NAME">{textSum}</div>
                                         <div className="FIELD DATE">{name}</div>
-                                        <div className="FIELD MONY" draggable="true">={(strInterest && strInterest.length)? '('+cents20EU(strInterest)+')':''}</div> 
-                                        <div className="FIELD MONY" draggable="true">{cents20EU(iInitial)}</div>
+                                        <div className="FIELD MONY" draggable="true">={(strInterest && strInterest.length)? '('+sCents20EU(strInterest)+')':''}</div> 
+                                        <div className="FIELD MONY" draggable="true">{sCents20EU(iInitial)}</div>
                                         
-                                        <div className="FIELD MOAM" draggable="true">+{cents20EU(iSumLeft)}</div> 
-                                        <div className="FIELD MOAM" draggable="true">-{cents20EU(iSumRite)}</div> 
+                                        <div className="FIELD MOAM" draggable="true">+{sCents20EU(iSumLeft)}</div> 
+                                        <div className="FIELD MOAM" draggable="true">-{sCents20EU(iSumRite)}</div> 
                                         <div className="FIELD SEP" >&nbsp;</div>
-                                        <div className="FIELD MOAM" draggable="true">={cents20EU(iInitial+iSumLeft-iSumRite)}</div> 
+                                        <div className="FIELD MOAM" draggable="true">={sCents20EU(iInitial+iSumLeft-iSumRite)}</div> 
                                         <div className="FIELD SEP" >&nbsp;</div>
                                         <div className="FIELD NAME">{textYearEnd}</div>
             </div>
@@ -1616,40 +1669,22 @@ function PartnerRow(mRow) {
     console.log("PartnerRow mRow="+JSON.stringify(mRow));
     return (
         <div className="attrLine">
-            <div className="FIELD NAME">{mRow.p.name}</div>
-            <div className="FIELD MOAM">{cents2EU(mRow.p.init)}</div>
-            <div className="FIELD MOAM">{cents2EU(mRow.p.credit)}</div>
-            <div className="FIELD MOAM">{cents2EU(mRow.p.debit)}</div>
-            <div className="FIELD MOAM">{cents2EU(mRow.p.yearEnd)}</div>
-            <div className="FIELD MONY">{cents2EU(mRow.p.netIncomeOTC)}</div>
-            <div className="FIELD MONY">{cents2EU(mRow.p.netIncomeFin)}</div>
-            <div className="FIELD MOAM">{cents2EU(mRow.p.close)}</div>
-            <div className="FIELD MONY">{cents2EU(mRow.p.tax)}</div>
-            <div className="FIELD MOAM">{cents2EU(mRow.p.cyLoss)}</div>
-            <div className="FIELD MOAM">{cents2EU(mRow.p.next)}</div>
+            <div className="FIELD NAME">{(mRow.p.name)}</div>
+            <div className="FIELD MOAM">{(mRow.p.init)}</div>
+            <div className="FIELD MOAM">{(mRow.p.credit)}</div>
+            <div className="FIELD MOAM">{(mRow.p.debit)}</div>
+            <div className="FIELD MOAM">{(mRow.p.yearEnd)}</div>
+            <div className="FIELD MONY">{(mRow.p.netIncomeOTC)}</div>
+            <div className="FIELD MONY">{(mRow.p.netIncomeFin)}</div>
+            <div className="FIELD MOAM">{(mRow.p.close)}</div>
+            <div className="FIELD MONY">{(mRow.p.tax)}</div>
+            <div className="FIELD MONY">{(mRow.p.cyLoss)}</div>
+            <div className="FIELD MOAM">{(mRow.p.next)}</div>
         </div>
     )
 }
 
 
-function PartnerTitleRow(mRow) {
-    console.log("PartnerTitleRow mRow="+JSON.stringify(mRow));
-    return (
-        <div className="attrLine">
-            <div className="FIELD NAME">{mRow.p.name}</div>
-            <div className="FIELD TEAM">{cents2EU(mRow.p.init)}</div>
-            <div className="FIELD TEAM">{cents2EU(mRow.p.credit)}</div>
-            <div className="FIELD TEAM">{cents2EU(mRow.p.debit)}</div>
-            <div className="FIELD TEAM">{cents2EU(mRow.p.yearEnd)}</div>
-            <div className="FIELD TENY">{cents2EU(mRow.p.netIncomeOTC)}</div>
-            <div className="FIELD TENY">{cents2EU(mRow.p.netIncomeFin)}</div>
-            <div className="FIELD TEAM">{cents2EU(mRow.p.close)}</div>
-            <div className="FIELD TENY">{cents2EU(mRow.p.tax)}</div>
-            <div className="FIELD TEAM">{cents2EU(mRow.p.cyLoss)}</div>
-            <div className="FIELD TEAM">{cents2EU(mRow.p.next)}</div>
-        </div>
-    )
-}
 
 function FooterRow({left,midleft,midright,right}) {
     return(

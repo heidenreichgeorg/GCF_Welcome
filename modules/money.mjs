@@ -72,13 +72,13 @@ export function bigEUMoney(strSet) {
     return bigMoney(strSet,1n,null); }
 
     
-export function cents20EU(amount) { 
+export function sCents20EU(amount) { 
     if(!amount) return "0";
-    else return cents2EU(amount);
+    else return sCents2EU(amount);
 }
         
 
-export function cents2EU(amount) { 
+export function sCents2EU(amount) { 
     let result="";
     if(amount!=null) {
         try {
@@ -101,11 +101,11 @@ export function cents2EU(amount) {
                 cents = cents - (euroNum*100n);
 
                 result =  sign + megaStr + milleStr + euroStr+"," +(BigInt(cents%100n).toString().padStart(2,'0'));
-            } catch(err) {  console.error("money.mjs cents2EU("+cents.toString()+") failed:"+err.toString())}
+            } catch(err) {  console.error("money.mjs sCents2EU("+cents.toString()+") failed:"+err.toString())}
 
-        } catch(err) {  console.error("money.mjs cents2EU() cents=BigInt("+amount.toString()+") failed:"+err.toString())}
+        } catch(err) {  console.error("money.mjs sCents2EU() cents=BigInt("+amount.toString()+") failed:"+err.toString())}
     } // no cents 
-    else { console.log("money.mjs cents2EU called with null cents");}
+    else { console.log("money.mjs sCents2EU called with null cents");}
 
     return result;
 }

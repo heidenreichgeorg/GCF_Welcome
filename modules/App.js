@@ -2,7 +2,7 @@ const debugFlag=null;
 
 
 import { D_Balance, D_History, D_Report, D_Schema, D_Page, X_ASSETS, X_EQLIAB, X_EQUITY, X_INCOME, X_INCOME_REGULAR, SCREENLINES } from './terms.js'
-import { cents2EU }  from '../modules/money.mjs';
+import { sCents2EU }  from '../modules/money.mjs';
 import { iCpField, prettyTXN } from './writeModule'
 
 
@@ -265,9 +265,9 @@ export function fillLeft(balance,dispValue1,dispValue2,dispValue3,iName,iLeft) {
     if(iLeft<SCREENLINES) {
         if(!balance[iLeft]) balance[iLeft]={};
         balance[iLeft].tw1=iName;
-        let cValue1=cents2EU(dispValue1);
-        let cValue2=cents2EU(dispValue2);
-        let cValue3=cents2EU(dispValue3);
+        let cValue1=sCents2EU(dispValue1);
+        let cValue2=sCents2EU(dispValue2);
+        let cValue3=sCents2EU(dispValue3);
         balance[iLeft].am3=cValue1; 
         balance[iLeft].am2=cValue2; 
         balance[iLeft].am1=cValue3; 
@@ -422,7 +422,7 @@ export function makeBalance(jAccounts,jReport,value) {
                 if(iLeft<SCREENLINES) {
                     if(!balance[iLeft]) balance[iLeft]={};
                     balance[iLeft].tw1=iName;
-                    let cValue=cents2EU(dispValue);
+                    let cValue=sCents2EU(dispValue);
                     if(level==1) { balance[iLeft].am1=cValue; }
                     if(level==2) { balance[iLeft].am2=cValue; }
                     if(level==3) { balance[iLeft].am3=cValue; }
@@ -432,7 +432,7 @@ export function makeBalance(jAccounts,jReport,value) {
             } else {
                 if(iRite<SCREENLINES) {
                     if(!balance[iRite]) balance[iRite]={};
-                    let cValue=cents2EU(dispValue);
+                    let cValue=sCents2EU(dispValue);
                     balance[iRite].tx1=iName;
                     if(level==1) { balance[iRite].an1=cValue; }
                     if(level==2) { balance[iRite].an2=cValue; }
@@ -554,15 +554,15 @@ export function makeHGBReport(jAccounts,page,jReport,jPartners) {
         }
 
         let grossYield = erhaltungsAufwand+iRentGross;
-    //                    cursor=printFormat(cursor,[' ',page.Revenue,cents2EU(iRentGross)]);
-    //                    cursor=printFormat(cursor,[' ',page.DirectCost,cents2EU(erhaltungsAufwand)]);
-    //                    cursor=printFormat(cursor,['Gross Yield',' ',page.yearEndYield,cents2EU(grossYield)]);
+    //                    cursor=printFormat(cursor,[' ',page.Revenue,sCents2EU(iRentGross)]);
+    //                    cursor=printFormat(cursor,[' ',page.DirectCost,sCents2EU(erhaltungsAufwand)]);
+    //                    cursor=printFormat(cursor,['Gross Yield',' ',page.yearEndYield,sCents2EU(grossYield)]);
 
 
         let regularOTC = grossYield+aufwandFuerAbnutzung+chgb8;
-    //                    cursor=printFormat(cursor,[' ',page.Depreciation,cents2EU(aufwandFuerAbnutzung)]);
-    //                    cursor=printFormat(cursor,[' ',page.OtherRegular,cents2EU(chgb8)]);
-    //                    cursor=printFormat(cursor,['EBITDA',' ',page.RegularOTC,cents2EU(regularOTC)]);
+    //                    cursor=printFormat(cursor,[' ',page.Depreciation,sCents2EU(aufwandFuerAbnutzung)]);
+    //                    cursor=printFormat(cursor,[' ',page.OtherRegular,sCents2EU(chgb8)]);
+    //                    cursor=printFormat(cursor,['EBITDA',' ',page.RegularOTC,sCents2EU(regularOTC)]);
 
 
 
@@ -686,7 +686,7 @@ export function makeHGBReport(jAccounts,page,jReport,jPartners) {
                     idebit = idebit+BigInt(jAccounts[resCap].debit);
                     icredit = icredit+BigInt(jAccounts[resCap].credit);
                 }
-                base=fillPartner(balance,cents2EU(icredit),cents2EU(idebit),cents2EU(ibegin),p.name,base);
+                base=fillPartner(balance,sCents2EU(icredit),sCents2EU(idebit),sCents2EU(ibegin),p.name,base);
             }
             else 
                 base=fillPartner(balance,0n,0n,0n,p.name,base);
@@ -707,7 +707,7 @@ export function fillRight(balance,cValue,iName,iRite,level) {
     if(iRite<SCREENLINES) {
         if(!balance[iRite]) balance[iRite]={};
         balance[iRite].tx1=iName;
-        let dispValue=cents2EU(cValue);
+        let dispValue=sCents2EU(cValue);
         if(level==3) { balance[iRite].an1=dispValue; }
         if(level==2) { balance[iRite].an2=dispValue; }
         if(level==1) { balance[iRite].an3=dispValue; }
@@ -722,9 +722,9 @@ export function fillPartner(balance,cValue1,cValue2,cValue3,iName,iRite) {
     if(iRite<SCREENLINES  +50) {
         if(!balance[iRite]) balance[iRite]={};
         balance[iRite].tx1=iName;
-        let dispValue1=cents2EU(cValue1);
-        let dispValue2=cents2EU(cValue2);
-        let dispValue3=cents2EU(cValue3);
+        let dispValue1=sCents2EU(cValue1);
+        let dispValue2=sCents2EU(cValue2);
+        let dispValue3=sCents2EU(cValue3);
         balance[iRite].an1=dispValue1; 
         balance[iRite].an2=dispValue2; 
         balance[iRite].an3=dispValue3; 

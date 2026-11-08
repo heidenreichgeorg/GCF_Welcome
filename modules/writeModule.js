@@ -5,7 +5,7 @@ import * as fs from 'fs';
 import { accessFirebase,bucketUpload,loadFBConfig } from './plainFileIO' 
 import {  J_ACCT, COLMIN, DOUBLE } from './terms.js'
 import { REACT_APP_API_HOST } from "./sessionmanager"
-import { bigEUMoney, cents2US, cents2EU, cents20EU } from './money'
+import { bigEUMoney, cents2US, sCents2EU, sCents20EU } from './money'
 import { strSymbol,timeSymbol } from './login'
 import { setSession } from './serverSession'
 import { compile } from './compile'
@@ -15,8 +15,10 @@ const debugFlag=true;
 const HTMLSPACE=" "; 
 
 export const CSEP = ';';
-export const S_COLUMN = 15;
+
 export const L_COLUMN = 25;
+export const T_COLUMN = 55;
+
 export const iCpField = 75;
 
 
@@ -126,7 +128,7 @@ export function prepareTXN(schema,flow, name,amount) {
                 && amount && amount !='0') { 
                 
                 let iValue = bigEUMoney(amount);
-                let entry = { index:i, value: cents20EU(iValue) }
+                let entry = { index:i, value: sCents20EU(iValue) }
                 if(i<aLen && i!=eLen) {newCredit[name]=entry; iBalance+=iValue; }
                 if(i>aLen && i!=eLen) {newDebit[name]= entry; iBalance-=iValue; }
             }
@@ -135,7 +137,7 @@ export function prepareTXN(schema,flow, name,amount) {
 
     flow.credit=newCredit;
     flow.debit=newDebit;
-    flow.euBalance=cents2EU(iBalance);
+    flow.euBalance=sCents2EU(iBalance);
     flow.usBalance=cents2US(iBalance);
     
     if(debugFlag) console.dir("prepareTXN flow={"+"c"+JSON.stringify(flow.credit)+" d"+JSON.stringify(flow.debit)+" €"+flow.euBalance+" $"+flow.usBalance+"}");
