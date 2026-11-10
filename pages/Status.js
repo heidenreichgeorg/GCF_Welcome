@@ -525,20 +525,20 @@ export default function Status() {
    
     
     
-    function IncomeUsedRow({ am1,tx1, am2, tx2, am3, tx3, am4, am5, am6}) {
+    function IncomeUsedRow({ am1,tx1, am2, tx2, am3, tx3, am4, tx4, am5, am6}) {
         return(
             <div className="attrLine">
                 <div className="FIELD MOAM"> {am1}</div>
                 <div className="FIELD SYMB" onClick={(e)=>displayAccount(tx1)}> {tx1}</div>
                 <div className="FIELD SEP"> &nbsp;</div>
                 <div className="FIELD MOAM"> {am2}</div>
-                <div className="FIELD SYMB" onClick={(e)=>displayAccount(tx2)}> {tx2}</div>
+                <div className="FIELD LABL" onClick={(e)=>displayAccount(tx2)}> {tx2}</div>
                 <div className="FIELD SEP"> &nbsp;</div>
                 <div className="FIELD MOAM"> {am3}</div>
                 <div className="FIELD LABL" onClick={(e)=>displayAccount(tx3)}> {tx3}</div>
                 <div className="FIELD SEP"> &nbsp;</div>
                 <div className="FIELD MOAM"> {am4}</div>
-                <div className="FIELD SYMB"> &nbsp;</div>
+                <div className="FIELD SYMB"> {tx4}</div>
                 <div className="FIELD MOAM"> {am5}</div>
                 <div className="FIELD SYMB"> &nbsp;</div>
                 <div className="FIELD MOAM"> {am6}</div>
@@ -1032,6 +1032,7 @@ export default function Status() {
     let iEqLiabBegin=0n;
     let iEqLiabCredit=0n;
     let iEqLiabDebit=0n;
+    let iEqLiabEnd=0n;
     let iEqLiabIncome=0n;
     let iEqLiabTax=0n;
     let iEqLiabNext=0n;
@@ -1321,23 +1322,25 @@ export default function Status() {
 
 
                     <IncomeUsedRow 
-                            blind4= {sCents2EU((iEqLiabTax=0n)+(iEqLiabIncome=0n))}
+                            blind4= {sCents2EU((iEqLiabEnd=0n)+(iEqLiabTax=0n)+(iEqLiabIncome=0n)+(iEqLiabNext=0n))}
                             am1={page.Assets} am2={page.Gain}  am3={page.eqliab} am4={page.eq_income} am5={page.eq_tax} am6={page.eq_next}/>
                     {
                         statusReport.filter((row)=>(!(row.eqLiab.name===page.eqliab))).map((row,line) => (
                             <IncomeUsedRow  key={"IncomeUsed"+line}  
                                                 am1={sCents2EU(row.assets.yearEnd)} tx1={row.assets.name} 
                                                 am2={sCents2EU(row.gals.yearEnd)}   tx2={row.gals.name} 
-                                                am3={sCents2EU(row.eqLiab.yearEnd)} tx3={row.eqLiab.name} 
+                                                am3={sCents2EU(row.eqLiab.yearEnd)} tx3={row.eqLiab.name} blind2= {iEqLiabEnd += BigInt(row.eqLiab.yearEnd ?  row.eqLiab.yearEnd : 0n)}
                                                 am4={sCents2EU(row.eqLiab.income)}  blind3= {iEqLiabIncome += BigInt(row.eqLiab.income ?  row.eqLiab.income : 0n)}
                                                 am5={sCents2EU(row.eqLiab.tax)}     blind4= {iEqLiabTax += BigInt(row.eqLiab.tax ?  row.eqLiab.tax : 0n)}
-                                                am6={sCents2EU(row.eqLiab.next)} // 20230218 next year
+                                                am6={sCents2EU(row.eqLiab.next)}    blind5= {iEqLiabNext+= BigInt(row.eqLiab.next ? row.eqLiab.next: 0n)}
                                                />                       
                         ))
                     }
                             <IncomeUsedRow  key={"IncomeUsedFooter"}  
-                                                am4={sCents20EU(iEqLiabIncome)} tx3={page.IncomeUsed} 
-                                                am5={sCents2EU(iEqLiabTax)}                                                
+                                                tx2={page.YearEnd} am3={sCents20EU(iEqLiabEnd)} 
+                                                tx3={'+'} am4={sCents20EU(iEqLiabIncome)}  
+                                                tx4={'-'} am5={sCents2EU(iEqLiabTax)}      
+                                                tx5={'='} am6={sCents2EU(iEqLiabNext)}
                                                />                       
                 </div>
 
