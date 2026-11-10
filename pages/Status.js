@@ -1267,7 +1267,14 @@ export default function Status() {
                 </div>
 
 
-                { console.log("104 ACCOUNTHISTORY show results EQLIAB") }
+                { 
+                    (iEqLiabNext=0n).toString()+ // initialize right side with VAVA yearEnd value
+                    console.log("104 ACCOUNTHISTORY show results EQLIAB "+
+                        statusReport
+                            .filter((row)=>(row.assets.name==="VAVA"))
+                            .map((row,line) => ( iEqLiabNext += BigInt(row.assets.yearEnd ?  row.assets.yearEnd : 0n) )).join('+')
+                    ) }
+
                 <div className="FIELD" key={"AccountHistoryEqLiab"} id={'Overview2'} style= {{ 'display': aPages[2]}} >
 
                     <div className="FIELD LNAM">&nbsp;</div>
@@ -1278,7 +1285,7 @@ export default function Status() {
 
                                                     blind0 = {  sCents2EU((iEqLiabBegin=0n) +(iEqLiabCredit=0n)
                                                     +(iEqLiabDebit=0n)+(iEqLiabIncome=0n)
-                                                    +(iEqLiabTax=0n)  +(iEqLiabNext=0n))} 
+                                                    +(iEqLiabTax=0n))} 
 
                                                     am5={page.Init} tx2={page.Name} am6={page.Credit} am7={page.Debit} am8={page.income} am9={page.Tax} amA={page.NextYear} 
                                                 />                       
@@ -1314,7 +1321,15 @@ export default function Status() {
 
 
 
-                { console.log("106 INCOMEUSED show results") }
+                { 
+                    (iEqLiabNext=0n).toString()+ // initialize right side with VAVA yearEnd value
+                    console.log("106 INCOMEUSED show results, start right side with "+
+                        statusReport
+                            .filter((row)=>(row.assets.name==="VAVA"))
+                            .map((row,line) => ( iEqLiabNext += BigInt(row.assets.yearEnd ?  row.assets.yearEnd : 0n) )).join('+')
+                    )
+                    
+                 }
                 <div className="FIELD" key={"IncomeUsed"} id={'Overview3'} style= {{ 'display': aPages[3]}} >
 
                     <div className="FIELD LNAM">&nbsp;</div>
@@ -1322,7 +1337,7 @@ export default function Status() {
 
 
                     <IncomeUsedRow 
-                            blind4= {sCents2EU((iEqLiabEnd=0n)+(iEqLiabTax=0n)+(iEqLiabIncome=0n)+(iEqLiabNext=0n))}
+                            blind4= {sCents2EU((iEqLiabEnd=0n)+(iEqLiabTax=0n)+(iEqLiabIncome=0n))}
                             am1={page.Assets} am2={page.Gain}  am3={page.eqliab} am4={page.eq_income} am5={page.eq_tax} am6={page.eq_next}/>
                     {
                         statusReport.filter((row)=>(!(row.eqLiab.name===page.eqliab))).map((row,line) => (
