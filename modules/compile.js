@@ -15,16 +15,17 @@
 
 
 // SETTING THIS WILL VIOLATE PRIVACY AT THE ADMIN CONSOLE !!! 
-const debugFlagEquity=false;
+const debugFlagEquity=true;
+
 const debugFlagReport=false;
-const debugFlagTax=false;
+const debugFlagTax=true;
 
 
 const debugFlag=null;
-const debugFlagAssets=1;
+const debugFlagAssets=false;
 const debugFlagRegular=null;
 
-const debugFlagPreBook=1;
+const debugFlagPreBook=false;
 
 
 /* global BigInt */
@@ -1519,7 +1520,7 @@ function distribute(iMoney,bPartner,target) {
 
         // skip one-man show
         if(bPartner.length<2) {
-            if(debugFlagTax) console.log('0136 Sender.distributeMoney('+iMoney+') PRE-LOOP NO PARTNERS IN BALANCE'); 
+            if(debugFlagTax) console.log('0136 Sender.distributeMoney('+iMoney+') as "+target+": PRE-LOOP NO PARTNERS IN BALANCE'); 
             shares[0]=iMoney;
         }
         else while(check<iMoney){
@@ -1534,7 +1535,7 @@ function distribute(iMoney,bPartner,target) {
             check=0n;
             for(var q=0;q<shares.length;q++) {
                 check = check + shares[q] + cents[q];
-                if(debugFlagTax) console.log("0138 distribute  "+q+"="+shares[q]+"+"+cents[q])
+                if(debugFlagTax) console.log("0138 distribute  as "+target+":  "+q+"="+shares[q]+"+"+cents[q])
             }
             let err = iMoney-check;
 
@@ -1584,18 +1585,18 @@ function distribute(iMoney,bPartner,target) {
             if(p) {
                 p[target]= ""+shares[index];
 
-                if(debugFlagTax) console.log('0142 distributeMoney('+shares[index]+') to '+JSON.stringify(p)+"["+target+"]");
+                if(debugFlagTax) console.log('0142 distributeMoney('+shares[index]+') as '+target+':  to '+JSON.stringify(p)+"["+target+"]");
 
                 index++;
 
             }
         }
 
-    } else console.error('0133 Sender.distributeMoney('+JSON.stringify(iMoney)+') NO PARTNERS IN BALANCE');
+    } else console.error('0133 Sender.distributeMoney('+JSON.stringify(iMoney)+')  as '+target+':  NO PARTNERS IN BALANCE');
 
     
-    if(debugFlagTax && shares && shares.length>1) console.log('0144 Sender.distributeMoney RESULT '+iMoney + " G"+shares[0]+" E"+shares[1]+" A"+shares[2]+" K"+shares[3]+" T"+shares[4]+" L"+shares[5]);
-    if(debugFlagTax && cents && cents.length>1)   console.log('0146 Sender.distributeMoney  CENTS '+iMoney + " G"+cents[0]+"  E"+cents[1] +" A"+ cents[2]+" K"+ cents[3]+" T"+ cents[4]+" L"+ cents[5]);
+    if(debugFlagTax && shares && shares.length>1) console.log('0144 Sender.distributeMoney  as '+target+':  RESULT '+iMoney + " G"+shares[0]+" E"+shares[1]+" A"+shares[2]+" K"+shares[3]+" T"+shares[4]+" L"+shares[5]);
+    if(debugFlagTax && cents && cents.length>1)   console.log('0146 Sender.distributeMoney  as '+target+':  CENTS '+iMoney + " G"+cents[0]+"  E"+cents[1] +" A"+ cents[2]+" K"+ cents[3]+" T"+ cents[4]+" L"+ cents[5]);
     return shares; // shares.map((s,i)=>(s+cents[i]));
 }
 
