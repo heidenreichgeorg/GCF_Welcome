@@ -525,7 +525,7 @@ export default function Status() {
    
     
     
-    function IncomeUsedRow({ am1,tx1, am2, tx2, am3, tx3, am4, tx4, am5, am6}) {
+    function IncomeUsedRow({ am1,tx1, am2, tx2, am3, tx3, am4, tx4, am5, am6, tx6, am7}) {
         return(
             <div className="attrLine">
                 <div className="FIELD MOAM"> {am1}</div>
@@ -542,6 +542,8 @@ export default function Status() {
                 <div className="FIELD MOAM"> {am5}</div>
                 <div className="FIELD SYMB"> &nbsp;</div>
                 <div className="FIELD MOAM"> {am6}</div>
+                <div className="FIELD SYMB"> {tx6}</div>
+                <div className="FIELD MOAM"> {am7}</div>
                 <div className="FIELD SEP"> &nbsp;</div>
             </div>
         )
@@ -1273,7 +1275,7 @@ export default function Status() {
                         statusReport
                             .filter((row)=>(row.assets.name==="VAVA"))
                             .map((row,line) => ( iEqLiabNext += BigInt(row.assets.yearEnd ?  row.assets.yearEnd : 0n) )).join('+')
-                    ) }
+                    )?"":"" }
 
                 <div className="FIELD" key={"AccountHistoryEqLiab"} id={'Overview2'} style= {{ 'display': aPages[2]}} >
 
@@ -1322,12 +1324,8 @@ export default function Status() {
 
 
                 { 
-                    (iEqLiabNext=0n).toString()+ // initialize right side with VAVA yearEnd value
-                    console.log("106 INCOMEUSED show results, start right side with "+
-                        statusReport
-                            .filter((row)=>(row.assets.name==="VAVA"))
-                            .map((row,line) => ( iEqLiabNext += BigInt(row.assets.yearEnd ?  row.assets.yearEnd : 0n) )).join('+')
-                    )
+                    
+                    console.log("106 INCOMEUSED show results")?"":""
                     
                  }
                 <div className="FIELD" key={"IncomeUsed"} id={'Overview3'} style= {{ 'display': aPages[3]}} >
@@ -1337,8 +1335,8 @@ export default function Status() {
 
 
                     <IncomeUsedRow 
-                            blind4= {sCents2EU((iEqLiabEnd=0n)+(iEqLiabTax=0n)+(iEqLiabIncome=0n))}
-                            am1={page.Assets} am2={page.Gain}  am3={page.eqliab} am4={page.eq_income} am5={page.eq_tax} am6={page.eq_next}/>
+                            blind4= {sCents2EU((iEqLiabEnd=0n)+(iEqLiabTax=0n)+(iEqLiabIncome=0n)+(iEqLiabNext=0n))}
+                            am1={page.Assets} am2={page.Gain}  am3={page.eqliab} am4={page.eq_income} am5={page.eq_tax} am6={page.eq_loss} am7={page.eq_next}/>
                     {
                         statusReport.filter((row)=>(!(row.eqLiab.name===page.eqliab))).map((row,line) => (
                             <IncomeUsedRow  key={"IncomeUsed"+line}  
@@ -1347,7 +1345,8 @@ export default function Status() {
                                                 am3={sCents2EU(row.eqLiab.yearEnd)} tx3={row.eqLiab.name} blind2= {iEqLiabEnd += BigInt(row.eqLiab.yearEnd ?  row.eqLiab.yearEnd : 0n)}
                                                 am4={sCents2EU(row.eqLiab.income)}  blind3= {iEqLiabIncome += BigInt(row.eqLiab.income ?  row.eqLiab.income : 0n)}
                                                 am5={sCents2EU(row.eqLiab.tax)}     blind4= {iEqLiabTax += BigInt(row.eqLiab.tax ?  row.eqLiab.tax : 0n)}
-                                                am6={sCents2EU(row.eqLiab.next)}    blind5= {iEqLiabNext+= BigInt(row.eqLiab.next ? row.eqLiab.next: 0n)}
+                                                am6={sCents2EU(row.eqLiab.cyLoss)}  blind5= {iEqLiabNext+= BigInt(row.eqLiab.cyLoss ?  row.eqLiab.cyLoss : 0n)}
+                                                am7={sCents2EU(row.eqLiab.next)}    blind6= {iEqLiabNext+= BigInt(row.eqLiab.next ? row.eqLiab.next: 0n)}
                                                />                       
                         ))
                     }
@@ -1355,7 +1354,7 @@ export default function Status() {
                                                 tx2={page.YearEnd} am3={sCents20EU(iEqLiabEnd)} 
                                                 tx3={'+'} am4={sCents20EU(iEqLiabIncome)}  
                                                 tx4={'-'} am5={sCents2EU(iEqLiabTax)}      
-                                                tx5={'='} am6={sCents2EU(iEqLiabNext)}
+                                                tx5={'='} am7={sCents2EU(iEqLiabNext)}
                                                />                       
                 </div>
 
