@@ -87,6 +87,7 @@ let de_DE = {
     eq_income:'st. Ergebnis',
     eq_tax:'Steueranteil',
     eq_next:'Folgejahr',
+    eq_loss:'Verlust',
     equity:'Eigenkapital',
     liab:'Fremdkapital',
     liabother:'Sonstige Verb.',
@@ -1191,7 +1192,7 @@ function sendBalance(balance) {
         let vava = balance[D_Balance][all_cs];
         if(vava) {
             
-            if(debugFlagReport) console.log("0294 compile.js sendBalance Sold-Security ("+all_cs+") Loss="+JSON.stringify(vava));
+            if(debugFlagEquity) console.log("0294 compile.js sendBalance Sold-Security ("+all_cs+") Loss="+JSON.stringify(vava));
 
             big_cyloss = Account.bigChange(vava)
 
@@ -1301,8 +1302,9 @@ function sendBalance(balance) {
             p.close =  ""+(iYearEnd + iIncome);
             p.cyLoss = ""+iSecLoss; 
             p.next=varcap.next;
-            varcap.tax = ""+(iTaxPaid); // 20230218
 
+            varcap.tax = ""+(iTaxPaid); // 20230218
+            varcap.cyLoss = p.cyLoss; // GH20261110
 
             if(debugFlagEquity) console.log('compile sendBalance  '+JSON.stringify(p) + "\n ==>> MODIFY K2xx "+JSON.stringify(varcap));
 
