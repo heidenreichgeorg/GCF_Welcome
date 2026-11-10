@@ -48,6 +48,7 @@ function add(account,strCents) {
 module.exports['add']=add;
 
 
+/*
 function getNextYear(account) {
     var init=BigInt(account.init);    
     var credit=BigInt(account.credit)+init;    
@@ -60,7 +61,7 @@ function getNextYear(account) {
     return ""+next;
 }
 module.exports['getNextYear']=getNextYear;
-
+*/
 
 function bigChange(account) { return BigInt(account.debit)+BigInt(account.credit);}
 module.exports['bigChange']=bigChange;
