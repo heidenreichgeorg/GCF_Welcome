@@ -1,0 +1,53 @@
+name: Build, Push, and Deploy Docker Image for GCF_Welcome
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build_and_publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Log in to GitHub Container Registry
+        run: echo "${{ GH_PAT }}" | sudo docker login ghcr.io -u heidenreichgeorg --password-stdin
+
+      - name: Build and push the Docker image
+        run: |
+          sudo docker build . --tag ghcr.io/heidenreichgeorg/finreport:latest
+          sudo docker push ghcr.io/heidenreichgeorg/finreport:latest
+
+  deploy:
+    needs: build_and_publish
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Log in to GitHub Container Registry
+        run: echo "${{ GH_PAT }}" | sudo docker login ghcr.io -u heidenreichgeorg --password-stdin
+
+      - name: Pull Docker image
+        run: sudo docker pull ghcr.io/heidenreichgeorg/finreport:latest
+
+      - name: Create a container and extract static files
+        run: |
+          mkdir -p ./public
+          sudo docker run --rm -d --name finreport ghcr.io/heidenreichgeorg/finreport:latest
+          sleep 10 # Wait for the container to start
+          docker cp finreport-container:/var/www/html ./public
+          docker stop finreport-container
+          ls -la ./public # List files to ensure index.html is present
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GIT_TOKEN }}
+          publish_dir: ./public/html  # Adjusted path to the html folder
+          publish_branch: gh-pages
+          
