@@ -1363,7 +1363,7 @@ export default function Status() {
 
 
 
-                { (iEqLiabNext=0n).toString()+console.log("108 OVERVIEW show results") }
+                { console.log("108 OVERVIEW show results"+(iEqLiabNext=0n).toString()) }
                 <div className="FIELD" key={"Closing"} id={'Overview4'} style= {{ 'display': aPages[4]}} >
 
                     <div className="FIELD LNAM">&nbsp;</div>
