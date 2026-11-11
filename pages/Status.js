@@ -1031,12 +1031,14 @@ export default function Status() {
 
     // Kapital Verlauf
     // account history page for equity/liability
+    let iTemp=0n;
     let iEqLiabBegin=0n;
     let iEqLiabCredit=0n;
     let iEqLiabDebit=0n;
     let iEqLiabEnd=0n;
     let iEqLiabIncome=0n;
     let iEqLiabTax=0n;
+    let iEqLiabLoss=0n;
     let iEqLiabNext=0n;
 
     let iGain=0n; 
@@ -1335,7 +1337,7 @@ export default function Status() {
 
 
                     <IncomeUsedRow 
-                            blind4= {sCents2EU((iEqLiabEnd=0n)+(iEqLiabTax=0n)+(iEqLiabIncome=0n)+(iEqLiabNext=0n))}
+                            blind4= {sCents2EU((iEqLiabEnd=0n)+(iEqLiabTax=0n)+(iEqLiabIncome=0n)+(iEqLiabNext=0n)+(iEqLiabLoss=0n))}
                             am1={page.Assets} am2={page.Gain}  am3={page.eqliab} am4={page.eq_income} am5={page.eq_tax} am6={page.eq_loss} am7={page.eq_next}/>
                     {
                         statusReport.filter((row)=>(!(row.eqLiab.name===page.eqliab))).map((row,line) => (
@@ -1345,22 +1347,23 @@ export default function Status() {
                                                 am3={sCents2EU(row.eqLiab.yearEnd)} tx3={row.eqLiab.name} blind2= {iEqLiabEnd += BigInt(row.eqLiab.yearEnd ?  row.eqLiab.yearEnd : 0n)}
                                                 am4={sCents2EU(row.eqLiab.income)}  blind3= {iEqLiabIncome += BigInt(row.eqLiab.income ?  row.eqLiab.income : 0n)}
                                                 am5={sCents2EU(row.eqLiab.tax)}     blind4= {iEqLiabTax += BigInt(row.eqLiab.tax ?  row.eqLiab.tax : 0n)}
-                                                am6={sCents2EU(row.eqLiab.cyLoss)}  blind5= {iEqLiabNext+= BigInt(row.eqLiab.cyLoss ?  row.eqLiab.cyLoss : 0n)}
+                                                am6={sCents2EU(row.eqLiab.cyLoss)}  blind5= {iEqLiabLoss+= BigInt(row.eqLiab.cyLoss ?  row.eqLiab.cyLoss : 0n)}
                                                 am7={sCents2EU(row.eqLiab.next)}    blind6= {iEqLiabNext+= BigInt(row.eqLiab.next ? row.eqLiab.next: 0n)}
                                                />                       
                         ))
                     }
                             <IncomeUsedRow  key={"IncomeUsedFooter"}  
-                                                tx2={page.YearEnd} am3={sCents20EU(iEqLiabEnd)} 
-                                                tx3={'+'} am4={sCents20EU(iEqLiabIncome)}  
-                                                tx4={'-'} am5={sCents2EU(iEqLiabTax)}      
-                                                tx5={'='} am7={sCents2EU(iEqLiabNext)}
+                                                tx2={page.YearEnd}  am3={sCents20EU(iEqLiabEnd)} 
+                                                tx3={'+'}           am4={sCents20EU(iEqLiabIncome)}  
+                                                tx4={'-'}           am5={sCents2EU(iEqLiabTax)}      
+                                                                    am6={sCents2EU(iEqLiabLoss)}      
+                                                tx5={'='}           am7={sCents2EU(iEqLiabNext)}
                                                />                       
                 </div>
 
 
 
-                { console.log("108 OVERVIEW show results") }
+                { (iEqLiabNext=0n).toString()+console.log("108 OVERVIEW show results") }
                 <div className="FIELD" key={"Closing"} id={'Overview4'} style= {{ 'display': aPages[4]}} >
 
                     <div className="FIELD LNAM">&nbsp;</div>
@@ -1369,17 +1372,25 @@ export default function Status() {
 
                     <ClosingRow  am1={page.Assets}  am2={page.Init}  am3={page.YearEnd}  am4={page.income}  am5={page.Tax}  am6={page.Next}    /> 
                     {
-                        statusReport.map((row,line) => (
+                        
+                        statusReport.filter((row)=>(!(row.eqLiab.name===page.eqliab))).map((row,line) => (
                             <ClosingRow  key={"Status"+line}  
-                                                am1={sCents2EU(row.assets.init)}     tx1={row.assets.name} 
+                                                am1={sCents2EU(row.assets.yearEnd)}  tx1={row.assets.name} 
                                                 am2={sCents2EU(row.eqLiab.init)}     tx2={row.eqLiab.name} 
                                                 am3={sCents2EU(row.eqLiab.yearEnd)}  tx3={row.eqLiab.name}  
                                                 am4={sCents2EU(row.eqLiab.income)}   tx4={row.eqLiab.name}
                                                 am5={sCents2EU(row.eqLiab.tax)}      tx5={row.eqLiab.name} 
-                                                am6={sCents2EU(row.eqLiab.next)}     tx6={row.eqLiab.name}
+                                                blind6 = {iTemp=(BigInt(row.eqLiab.next?row.eqLiab.next:0n)+BigInt(row.eqLiab.cyLoss?row.eqLiab.cyLoss:0n))}
+                                                am6={sCents2EU(iTemp)}    
+                                                blind7 = {iEqLiabNext+=iTemp}
+                                                 tx6={row.eqLiab.name}
                                                />                       
                         ))
+
+                        
                     }
+
+                    <ClosingRow   am5={page.Closing}  am6={sCents2EU(iEqLiabNext)}    /> 
                 </div>
 
 
