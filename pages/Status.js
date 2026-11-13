@@ -1207,7 +1207,8 @@ export default function Status() {
 
         {!showAccount &&                                                                     
             (<div>
-                { console.log("100 STATUS show history") }
+                { console.log("100 STATUS show history")+(iAssetsEnd=0n).toString()+(iEqLiabEnd=0n).toString()+(iGain=0n).toString()? '' : '' }
+
                 <div className="FIELD" key={"Dashboard"} id={'Overview0'} style= {{ 'display': aPages[0]}} >
                     <div className="FIELD LNAM">&nbsp;</div>
                     <div className="attrLine">{page.Closing}&nbsp;{parseInt(session.year)}</div>
@@ -1215,15 +1216,24 @@ export default function Status() {
                     {
                         statusReport.map((row,line) => (
                             <StatusRow  key={"Status"+line}  
-                                                am1={sCents2EU(row.assets.yearEnd)} tx1={row.assets.name} 
-                                                am2={sCents2EU(row.gals.yearEnd)} tx2={row.gals.name} 
-                                                am3={sCents2EU(row.eqLiab.yearEnd)} tx3={row.eqLiab.name} 
+                                                am1={sCents2EU(row.assets.yearEnd)} tx1={row.assets.name}  blind0={(iAssetsEnd+=BigInt(row.assets.yearEnd?row.assets.yearEnd:0n))}
+                                                am2={sCents2EU(row.gals.yearEnd)} tx2={row.gals.name}      blind1={(iGain+=BigInt(row.gals.yearEnd?row.gals.yearEnd:0n))}
+                                                am3={sCents2EU(row.eqLiab.yearEnd)} tx3={row.eqLiab.name}  blind2={(iEqLiabEnd+=BigInt(row.eqLiab.yearEnd?row.eqLiab.yearEnd:0n))}
                                                 d={row.dTran} n={row.nTran} 
                                                 r={row.rTran ? row.rTran.substring(0,L_COLUMN) : "0"} 
                                                 t={row.tTran}
                                                 l={row.lTran ? row.lTran.substring(0,T_COLUMN) : "0"} 
                                                 click={(line==0)?executeReview:null}/>                       
                         ))
+
+                        
+                    }
+                    {
+                        <StatusRow  key={"StatusFooter"}  
+                                                am1={sCents2EU(iAssetsEnd)} tx1={page.Assets} 
+                                                am2={sCents2EU(iGain)} tx2={page.Gals} 
+                                                am3={sCents2EU(iEqLiabEnd)} tx3={page.eqliab} 
+                        />
                     }
                 </div>
 
