@@ -1207,12 +1207,14 @@ export default function Status() {
 
         {!showAccount &&                                                                     
             (<div>
-                { console.log("100 STATUS show history")+(iAssetsEnd=0n).toString()+(iEqLiabEnd=0n).toString()+(iGain=0n).toString()? '' : '' }
+                { console.log("100 STATUS show history") }
 
                 <div className="FIELD" key={"Dashboard"} id={'Overview0'} style= {{ 'display': aPages[0]}} >
                     <div className="FIELD LNAM">&nbsp;</div>
                     <div className="attrLine">{page.Closing}&nbsp;{parseInt(session.year)}</div>
-                    <StatusRow am1={page.Assets} am2={page.Gain}  am3={page.eqliab} d={page.Date} n={page.Recipient} l={page.TXNType} r={page.Reason}  />
+                    <StatusRow am1={page.Assets} am2={page.Gain}  am3={page.eqliab} d={page.Date} n={page.Recipient} l={page.TXNType} r={page.Reason}  
+                       blind0 = {(iAssetsEnd=0n).toString()+(iEqLiabEnd=0n).toString()+(iGain=0n)}
+                    />
                     {
                         statusReport.map((row,line) => (
                             <StatusRow  key={"Status"+line}  
@@ -1439,7 +1441,7 @@ export default function Status() {
                     <div className="attrLine">{page.fixed}&nbsp;{parseInt(session.year)}</div>
 
 
-                    { console.log("130 STATUS show fixed assets ") }
+                    { console.log("130 STATUS show fixed assets ")+(iGain=0n).toString()?"":"" }
 
                     <FixedAssetsRow p={ {'idnt':page.AssetIdISIN,  'type':' ', // 20261025
                             'date':page.AcquisitionDate,
@@ -1455,7 +1457,7 @@ export default function Status() {
 
                     {Object.keys(jAssets).map(function(key,n) {
                         var row = jAssets[key];
-                        iRest+=BigInt(row.rest);
+                        iRest+=BigInt(row.rest ? row.rest:0n); // GH20261113
                         return (
                             <FixedAssetsRow  key={"Fixed0"+n}  p={{idnt:row.idnt,type:row.type,date:row.date,
                                 init:sCents2EU(row.orig),
@@ -1463,10 +1465,10 @@ export default function Status() {
                                 nmbr:row.nmbr,
                                 rest:sCents2EU(row.rest),
                                 cost:sCents2EU(row.cost),
-                                gain:sCents2EU(row.gain), 
+                                gain:sCents2EU(row.gain), // ?? always empty
                                 depr:sCents2EU(row.depr)
                                 }} 
-                                noGain={(iGain += row.gain? row.gain : 0n)}
+                                noGain={sCents2EU(iGain += BigInt(row.gain? row.gain : 0n))} // GH20261113
                                 />
                         )
                         })

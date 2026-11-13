@@ -724,7 +724,9 @@ export function compile(sessionData) {
                                                         var nmbr =  result[D_FixAss][idnt].nmbr;
                                                         var depr = result[D_FixAss][idnt].depr;
                                                         var icurr = BigInt(result[D_FixAss][idnt].rest);
-                                                        var iGain = 0n; try { iGain= BigInt(result[D_FixAss][idnt].gain); } catch(e) {}
+                                                        var iGain = 0n; try { iGain= BigInt(result[D_FixAss][idnt].gain); } catch(e) {
+                                                            console.dir("0321 SHEET LINE YIELD ("+idnt+"): "+err)
+                                                        }
 
                                                         // GH 20261018
                                                         var iRest = icurr+iamnt;
@@ -809,7 +811,9 @@ export function compile(sessionData) {
                                                         var iVal = result[D_FixAss][idnt].orig;
                                                         var depr = result[D_FixAss][idnt].depr;
                                                         var nmbr =  result[D_FixAss][idnt].nmbr;
-                                                        var gain = "0"; try { gain = result[D_FixAss][idnt].gain; } catch(e) {}
+                                                        var gain = "0"; try { gain = result[D_FixAss][idnt].gain; } catch(e) {
+                                                            console.dir("0341 SHEET LINE WRITEOFF ("+idnt+"): "+err)
+                                                        }
                                                         var icurr = BigInt(result[D_FixAss][idnt].rest);
 
                                                         // WRITEOFF type of dividend payment reduces the REST value
