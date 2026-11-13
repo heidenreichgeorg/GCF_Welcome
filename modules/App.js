@@ -184,7 +184,7 @@ export function makeStatusData(response) {
     for (let name in aLeft)   {
         var account=aLeft[name];
         if(debugFlagMSD) console.log("1280 STATUS.JS STATUSDATA LEFT "+iLeft+" "+name+"="+account.yearEnd);
-        if(iLeft<SCREENLINES && !(account.xbrl===X_ASSETS)) {
+        if(iLeft<SCREENLINES && !(account.xbrl===X_ASSETS)) { // GH20261113
             statusData[iLeft]={};
             statusData[iLeft].assets=account;
         }
@@ -200,8 +200,10 @@ export function makeStatusData(response) {
     let iMidl=0;
     for (let name in aMidl)   {
         var account=aMidl[name];
-        statusData[iMidl].gals=account;
-        iMidl++;
+        if(iMidl<SCREENLINES && !(account.xbrl===X_INCOME_REGULAR)) { // GH20261113)
+            statusData[iMidl].gals=account;
+            iMidl++;
+        }
     }
     for (let i=iMidl;i<maxRow && i<SCREENLINES;i++) {  statusData[i].gals={}; }
 
@@ -210,7 +212,7 @@ export function makeStatusData(response) {
     let iRite=0;    
     for (let name in aRite)   {
         var account=aRite[name];        
-        if(iRite<SCREENLINES && !(account.xbrl===X_EQLIAB)) {           
+        if(iRite<SCREENLINES && !(account.xbrl===X_EQLIAB)) {    // GH20261113       
             statusData[iRite].eqLiab=account;
             //console.log("1290 App.makeStatusData EqLiab account "+account.xbrl)
             iRite++;
@@ -283,7 +285,7 @@ export function fillLeft(balance,dispValue1,dispValue2,dispValue3,iName,iLeft) {
 
 function ignore(e) { e.preventDefault(); }
 
-export function InputRow({ arrAcct, arrCode, txn }) {
+function UnusedInputRow({ arrAcct, arrCode, txn }) {
     let date=txn.date;
     let sender=txn.sender;
     let reason=txn.reason;
@@ -316,7 +318,7 @@ export function InputRow({ arrAcct, arrCode, txn }) {
         </div>)
 }
 
-export function FieldRow({ txn }) {
+function UnusedFieldRow({ txn }) {
 
     return(
         <div className="attrRow">            
@@ -352,7 +354,7 @@ export function makeBalance(jAccounts,jReport,value) {
     if(jReport["xbrlAssets"].account) { 
         ass = jReport["xbrlAssets"].account; 
         //console.log("ASSET "+JSON.stringify(ass)); 
-        //jAccounts["xbrlAssets"]=ass; GH20261113
+        jAccounts["xbrlAssets"]=ass; 
     }
     if(jReport["xbrlEqLiab"].account) { 
         eql = jReport["xbrlEqLiab"].account; 
