@@ -56,9 +56,9 @@ const iSNAM = 17;
 
 export function makeStatusData(response) {
 
-    const debugFlagMSD=null;
+    const debugFlagMSD=true;
 
-    const page = response[D_Page];
+ //   const page = response[D_Page];
     
     let iDebit=0n;
     let iCredit=0n;
@@ -83,23 +83,25 @@ export function makeStatusData(response) {
     // add three additional accounts: ASSETS, EQLIAB, GAINLOSS
     if(jReport["xbrlAssets"].account) { 
         ass = jReport["xbrlAssets"].account; 
-        if(debugFlagMSD) console.log("1210 ASSET "+JSON.stringify(ass)); 
-        jAccounts["xbrlAssets"]=ass;
+        if(debugFlagMSD) console.log("1210 ASSET "+ass.toString()); 
+        //jAccounts["xbrlAssets"]=ass; GH20261113
+
+        
     }
     if(jReport["xbrlEqLiab"].account) { 
         eql = jReport["xbrlEqLiab"].account; 
-        //if(debugFlagMSD) console.log("1220 EQLIB "+JSON.stringify(eql)); 
+        if(debugFlagMSD) console.log("1220 EQLIB "+eql.toString()); 
         console.log("1220 EQLIB "+jReport["xbrlEqLiab"].account.toString()); 
         jAccounts["xbrlEqLiab"]=eql;
     }
     if(jReport["xbrlRegular"].account) { 
         gls = jReport["xbrlRegular"].account; 
-        if(debugFlagMSD) console.log("1230 GALOS "+JSON.stringify(gls)); 
+        if(debugFlagMSD) console.log("1230 GALOS "+gls.toString()); 
         jAccounts["xbrlRegular"]=gls;
     }
 
 
-    // show all accounts omn console
+    // show all accounts on console
     if(debugFlagMSD) console.log("1240 makeStatusData from response D_Balance"+JSON.stringify(Object.keys(jAccounts)));    
     else console.log( Object.keys(jAccounts).map((name,i)=>("   "+name+": "+(jAccounts[name].xbrl))).join(" "));
 
@@ -182,7 +184,7 @@ export function makeStatusData(response) {
     for (let name in aLeft)   {
         var account=aLeft[name];
         if(debugFlagMSD) console.log("1280 STATUS.JS STATUSDATA LEFT "+iLeft+" "+name+"="+account.yearEnd);
-        if(iLeft<SCREENLINES) {
+        if(iLeft<SCREENLINES && !(account.xbrl===X_ASSETS)) {
             statusData[iLeft]={};
             statusData[iLeft].assets=account;
         }
@@ -208,8 +210,9 @@ export function makeStatusData(response) {
     let iRite=0;    
     for (let name in aRite)   {
         var account=aRite[name];        
-        if(iRite<SCREENLINES) {           
+        if(iRite<SCREENLINES && !(account.xbrl===X_EQLIAB)) {           
             statusData[iRite].eqLiab=account;
+            //console.log("1290 App.makeStatusData EqLiab account "+account.xbrl)
             iRite++;
         }        
     }
@@ -349,7 +352,7 @@ export function makeBalance(jAccounts,jReport,value) {
     if(jReport["xbrlAssets"].account) { 
         ass = jReport["xbrlAssets"].account; 
         //console.log("ASSET "+JSON.stringify(ass)); 
-        jAccounts["xbrlAssets"]=ass;
+        //jAccounts["xbrlAssets"]=ass; GH20261113
     }
     if(jReport["xbrlEqLiab"].account) { 
         eql = jReport["xbrlEqLiab"].account; 

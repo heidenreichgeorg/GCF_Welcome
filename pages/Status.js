@@ -1248,7 +1248,7 @@ export default function Status() {
                         
                         
                         {
-                            statusReport.filter((row)=>(!(row.assets.name===page.assets))).map((row,line) => (
+                            statusReport.map((row,line) => (
                                 <AccountHistoryRow  key={"AcctHistoryAssets"+line}  
                                                     am1={sCents2EU(row.assets.init)}    blind0 = {iAssetsBegin+= BigInt(row.assets.init ? row.assets.init : 0n)}
                                                     tx1={row.assets.name} 
@@ -1273,10 +1273,8 @@ export default function Status() {
 
                 { 
                     (iEqLiabNext=0n).toString()+ // initialize right side with VAVA yearEnd value
-                    console.log("104 ACCOUNTHISTORY show results EQLIAB "+
-                        statusReport
-                            .filter((row)=>(row.assets.name==="VAVA"))
-                            .map((row,line) => ( iEqLiabNext += BigInt(row.assets.yearEnd ?  row.assets.yearEnd : 0n) )).join('+')
+                    console.log("104 ACCOUNTHISTORY show results EQLIAB "
+                        +statusReport.filter((row)=>(row.assets && row.assets.xbrl && row.assets.xbrl.includes('unpaidCapital'))).map((row,line) => ( iEqLiabNext += BigInt(row.assets.yearEnd ?  row.assets.yearEnd : 0n) )).join('+')
                     )?"":"" }
 
                 <div className="FIELD" key={"AccountHistoryEqLiab"} id={'Overview2'} style= {{ 'display': aPages[2]}} >
@@ -1291,12 +1289,12 @@ export default function Status() {
                                                     +(iEqLiabDebit=0n)+(iEqLiabIncome=0n)
                                                     +(iEqLiabTax=0n))} 
 
-                                                    am5={page.Init} tx2={page.Name} am6={page.Credit} am7={page.Debit} am8={page.income} am9={page.Tax} amA={page.NextYear} 
+                                                    am5={page.Init} tx2={page.Name} am6={page.Credit} am7={page.Debit} am8={page.income} am9={page.Tax} amA={page.Closing} 
                                                 />                       
                         
                         
                         {
-                            statusReport.filter((row)=>(!(row.eqLiab.name===page.eqliab))).map((row,line) => (
+                            statusReport.map((row,line) => (
                                 <AccountHistoryRow  key={"AcctHistoryEqLiab"+line}  
                                                     showEqLiab={true}
 
@@ -1340,7 +1338,7 @@ export default function Status() {
                             blind4= {sCents2EU((iEqLiabEnd=0n)+(iEqLiabTax=0n)+(iEqLiabIncome=0n)+(iEqLiabNext=0n)+(iEqLiabLoss=0n))}
                             am1={page.Assets} am2={page.Gain}  am3={page.eqliab} am4={page.eq_income} am5={page.eq_tax} am6={page.eq_loss} am7={page.eq_next}/>
                     {
-                        statusReport.filter((row)=>(!(row.eqLiab.name===page.eqliab))).map((row,line) => (
+                        statusReport.map((row,line) => ( 
                             <IncomeUsedRow  key={"IncomeUsed"+line}  
                                                 am1={sCents2EU(row.assets.yearEnd)} tx1={row.assets.name} 
                                                 am2={sCents2EU(row.gals.yearEnd)}   tx2={row.gals.name} 
@@ -1373,7 +1371,7 @@ export default function Status() {
                     <ClosingRow  am1={page.Assets}  am2={page.Init}  am3={page.YearEnd}  am4={page.income}  am5={page.Tax}  am6={page.Next}    /> 
                     {
                         
-                        statusReport.filter((row)=>(!(row.eqLiab.name===page.eqliab))).map((row,line) => (
+                        statusReport.map((row,line) => (
                             <ClosingRow  key={"Status"+line}  
                                                 am1={sCents2EU(row.assets.yearEnd)}  tx1={row.assets.name} 
                                                 am2={sCents2EU(row.eqLiab.init)}     tx2={row.eqLiab.name} 
@@ -1557,7 +1555,7 @@ function TXNReceipt(token,text,jAmounts,jColumnHeads,jSum,id,removeCol,name,inde
             }
         }
     })
-    if(jSum) console.log("TXNReceipt ("+token+") jSum "+JSON.stringify(jSum));
+    if(jSum) console.log("TXNReceipt ("+token+") jSum "+JSON.stringify(jSum) + " in "+text);
     
 
     let comps = text.split(CSEP)
