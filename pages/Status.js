@@ -1240,12 +1240,8 @@ export default function Status() {
 
 
 
-                { (console.log("102 ACCOUNTHISTORY show results ASSETS") ? 
-                    (iAssetsBegin=0n).toString()+
-                    (iAssetsIn=0n).toString()+
-                    (iAssetsOut=0n).toString()+
-                    (iAssetsEnd=0n).toString() : '')
-                 }
+                { (console.log("102 ACCOUNTHISTORY show results ASSETS") )   }
+
                 <div className="FIELD" key={"AccountHistory"} id={'Overview1'} style= {{ 'display': aPages[1]}} >
                     
                     <div className="FIELD LNAM">&nbsp;</div>
@@ -1253,12 +1249,13 @@ export default function Status() {
 
                     <AccountHistoryRow  key={"AcctHistoryAssets"}  
                                                     am1={page.Init} tx1={page.Name} am2={page.Credit} am3={page.Debit} am4={page.YearEnd} 
+                                                    blind0 = {(iAssetsBegin=0n)+(iAssetsIn=0n)+(iAssetsOut=0n)+(iAssetsEnd=0n)}
                                                     showAssets={true}
                                                 />                       
                         
                         
                         {
-                            statusReport.map((row,line) => (
+                            statusReport.filter((row)=>(!(row.assets && row.assets.xbrl && row.assets.xbrl===X_ASSETS))).map((row,line) => (
                                 <AccountHistoryRow  key={"AcctHistoryAssets"+line}  
                                                     am1={sCents2EU(row.assets.init)}    blind0 = {iAssetsBegin+= BigInt(row.assets.init ? row.assets.init : 0n)}
                                                     tx1={row.assets.name} 
@@ -1274,7 +1271,10 @@ export default function Status() {
                         }
 
                     <AccountHistoryRow  key={"AcctHistoryAssetsFooter"}  
-                                                    am1={sCents2EU(iAssetsBegin)} tx1={page.assets} am2={sCents2EU(iAssetsIn)} am3={sCents2EU(iAssetsOut)} am4={sCents2EU(iAssetsEnd)} 
+                                                    am1={sCents2EU(iAssetsBegin)} tx1={page.assets} 
+                                                    am2={sCents2EU(iAssetsIn)} 
+                                                    am3={sCents2EU(iAssetsOut)} 
+                                                    am4={sCents2EU(iAssetsEnd)} 
                                                     showAssets={true}
                                                 />                       
                   
@@ -1294,6 +1294,8 @@ export default function Status() {
                         
                     <AccountHistoryRow  key={"AcctHistoryEqLiab"}  
                                                     showEqLiab={true}
+
+                                                    am0 = {sCents2EU(iEqLiabEnd)}
 
                                                     blind0 = {  sCents2EU((iEqLiabBegin=0n) +(iEqLiabCredit=0n)
                                                     +(iEqLiabDebit=0n)+(iEqLiabIncome=0n)
@@ -1378,7 +1380,7 @@ export default function Status() {
                     <div className="attrLine">{page.Closing}&nbsp;{parseInt(session.year)}</div>
 
 
-                    <ClosingRow  am1={page.Assets}  am2={page.Init}  am3={page.YearEnd}  am4={page.income}  am5={page.Tax}  am6={page.Next}    /> 
+                    <ClosingRow  am1={page.Assets}  am2={page.Init}  am3={page.YearEnd}  am4={page.income}  am5={page.Tax}  am6={page.Closing}    /> 
                     {
                         
                         statusReport.map((row,line) => (
