@@ -1,5 +1,6 @@
 /* global BigInt */
 
+const debugFlagAssets=false;
 
 export function addEUMoney(strAdd,money) {
         return bigMoney(strAdd,1n,money); }
@@ -14,15 +15,16 @@ export function bigAssetValueChange(row,nFrom,nBefore) {
     var run=true;
     try {
         while(run && iValue==0n && column<nBefore) { // was  iValue<1n  GH20230924   was value == 0 GH20261018
+            // finds the first column of non-zero turnover, sometimes with gross sales
             var test = row[column];
             if(test && test.length > 0 && bigEUMoney(test) != 0n ) { // GH20261018
                 iValue=bigEUMoney(test); 
-                console.log("ASSET ("+column+") VALUE CHANGE="+iValue)
+                console.log("Money.bigAssetValueChange ASSET ("+column+") VALUE CHANGE="+iValue)
                 run=false;
             }
             column++;
         } // values before cash / accounts
-    } catch(err) { console.dir("asset value("+row+")="+iValue+"   ERROR "+err); }
+    } catch(err) { console.dir("Money.bigAssetValueChange asset value("+row+")="+iValue+"   ERROR "+err); }
     return iValue;
 }
 
@@ -36,9 +38,9 @@ export function bigAssetValueIndex(row,nFrom,nBefore,aXBRL) {
     try {
         while(run && iValue==0n && column<nBefore) { // was  iValue<1n  GH20230924   was value == 0 GH20261018
             var test = row[column];
-            if(test && test.length > 0 && Sheets.bigEUMoney(test) != 0n  ) { // GH20261018
-                iValue=Sheets.bigEUMoney(test); 
-                if(debugFlagAssets) console.log("ASSET ("+aXBRL[column]+") VALUE CHANGE="+iValue)
+            if(test && test.length > 0 &&  bigEUMoney(test) != 0n  ) { // GH20261018
+                iValue=bigEUMoney(test); 
+                if(debugFlagAssets) console.log("ASSET ("+aXBRL[column]+") VALUE INDEX="+iValue)
                 run=false;
             }
             column++;

@@ -15,14 +15,14 @@
 
 
 // SETTING THIS WILL VIOLATE PRIVACY AT THE ADMIN CONSOLE !!! 
-const debugFlagEquity=true;
+const debugFlagEquity=false;
 
 const debugFlagReport=false;
-const debugFlagTax=true;
+const debugFlagTax=false;
 
 
 const debugFlag=null;
-const debugFlagAssets=false;
+const debugFlagAssets=true;
 const debugFlagRegular=null;
 
 const debugFlagPreBook=false;
@@ -50,7 +50,6 @@ const Account = require('./account');
 
 const Compiler = require('./compile.js' );
 
-//const Sheets = require('./sheets'); // setting root attribute
 
 const Money = require('./money'); // currency representation 20261101
 import { bigAssetValueChange, bigEUMoney, sCents2EU }  from '../modules/money';
@@ -712,7 +711,67 @@ export function compile(sessionData) {
                                                             nmbr+" worth "+sCents2EU(iremn) + " at "+sCents2EU(icost)+" each");
                                             }
 
-                                            else if(refAcct==='YIELD') {
+                                            else if(refAcct==='RENT') {
+
+
+                                                // GH20261113
+                                                // crutch to get regular income to assets gains
+                                                let sSender=aLine[2].trim();
+                                                let sAsset =aLine[5].trim();
+                                                aLine[5]=sSender; aset=sSender;
+                                                aLine[2]=sAsset;  idnt=sAsset;
+
+
+
+
+                                                var iamnt = bigAssetValueChange(aLine,J_ACCT,iAssets,result[D_XBRL]); // asset value change
+                                                var nAset = Money.bigAssetValueIndex(aLine,J_ACCT,iAssets,result[D_XBRL]); // asset value column
+
+                                                console.log("0352 RENT switches "+sSender+"  and  "+sAsset+ " for adding "+ iamnt + "to asset gain in column "+nAset);
+
+                                                if(result[D_FixAss]) {
+                                                    if(result[D_FixAss][idnt]) {
+                                                        var date = result[D_FixAss][idnt].date;
+                                                        var iVal = result[D_FixAss][idnt].orig;
+                                                        var nmbr =  result[D_FixAss][idnt].nmbr;
+                                                        var depr = result[D_FixAss][idnt].depr;
+                                                        var icurr = BigInt(result[D_FixAss][idnt].rest);
+                                                        var iGain = 0n; try { iGain= BigInt(result[D_FixAss][idnt].gain); } catch(e) {
+                                                            console.dir("0351 SHEET LINE RENT ("+idnt+"): "+err)
+                                                        }
+
+                                                        // GH 20261018
+                                                        var iRest = icurr+iamnt;
+                                                        var iRent = iamnt; // GH2026114
+                                                        // GH20250103 iamnt with rent type of payment increases the GAIN value
+                                                        bigAssetValueChange(aLine,nAset+1,iAssets,result[D_XBRL]); // yield on gain value 
+
+                                                        var iCost = bigCost(idnt,nmbr,icurr);
+                                                        // GH20230102 NEW cost is calculated as the REST price per number of units
+
+                                                        if(debugFlagAssets) console.log("0352 RENT: processing("+iRent+") from ["+aLine.join('|')+"]");
+
+                                                        // OPEN
+                                                        // MUST VERIFY existing identifier
+                                                        var info = result[D_FixAss][idnt].info;
+                                                        result[D_FixAss][idnt]={"info":info,
+                                                                                "date":date,
+                                                                                "idnt":idnt,
+                                                                                "orig":iVal,
+                                                                                "nmbr":nmbr,
+                                                                                "rest":""+iRest, // GH 20261018
+                                                                                "cost":""+iCost, // GH 20261018
+                                                                                "depr":""+depr, // GH 20261017
+                                                                                "gain":""+(iGain+iRent) }; // GH20230303
+
+                                                        if(debugFlagAssets) console.log("0352 RENT amount="+iamnt+" changes "+idnt+" in column "+nAset+" by "+iamnt+" adding up "+iRent+" to "+iGain+" and new gain "+result[D_FixAss][idnt].gain);
+
+                                                    } else console.log("0353 RENT UNKNOWN "+idnt+" ASSET ENTRY");
+
+                                                } else {
+                                                    console.log("0355 RENT UNKNOWN ASSET "+idnt);
+                                                }
+                                            } else if(refAcct==='YIELD') {
 
                                                 var iamnt = bigAssetValueChange(aLine,J_ACCT,iAssets,result[D_XBRL]); // asset value change
                                                 var nAset = Money.bigAssetValueIndex(aLine,J_ACCT,iAssets,result[D_XBRL]); // asset value column
@@ -736,7 +795,7 @@ export function compile(sessionData) {
                                                         var iCost = bigCost(idnt,nmbr,icurr);
                                                         // GH20230102 NEW cost is calculated as the REST price per number of units
 
-                                                        if(debugFlagAssets) console.log(aLine.join('  '));
+                                                        if(debugFlagAssets) console.log("0326 YIELD: processing("+iYild+") from ["+aLine.join('|')+"]");
 
                                                         // OPEN
                                                         // MUST VERIFY existing identifier
@@ -751,7 +810,7 @@ export function compile(sessionData) {
                                                                                 "depr":""+depr, // GH 20261017
                                                                                 "gain":""+(iGain+iYild) }; // GH20230303
 
-                                                        if(debugFlagAssets) console.log("0326 YIELD amount="+iamnt+" changes "+idnt+" in column "+nAset+" by "+iamnt+" adding up "+iYild+" to "+iRest+" and new gain "+result[D_FixAss][idnt].gain);
+                                                        if(debugFlagAssets) console.log("0326 YIELD amount="+iamnt+" changes "+idnt+" in column "+nAset+" by "+iamnt+" adding up "+iYild+" to "+iGain+" and new gain "+result[D_FixAss][idnt].gain);
 
                                                     } else console.log("0325 YIELD UNKNOWN "+idnt+" ASSET ENTRY");
 
