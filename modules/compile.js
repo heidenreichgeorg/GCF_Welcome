@@ -17,12 +17,12 @@
 // SETTING THIS WILL VIOLATE PRIVACY AT THE ADMIN CONSOLE !!! 
 const debugFlagEquity=false;
 
-const debugFlagReport=false;
+const debugFlagReport=true;
 const debugFlagTax=false;
 
 
 const debugFlag=null;
-const debugFlagAssets=true;
+const debugFlagAssets=false;
 const debugFlagRegular=null;
 
 const debugFlagPreBook=false;
@@ -51,8 +51,9 @@ const Account = require('./account');
 const Compiler = require('./compile.js' );
 
 
-const Money = require('./money'); // currency representation 20261101
-import { bigAssetValueChange, bigEUMoney, sCents2EU }  from '../modules/money';
+//const Money = require('./money'); // currency representation 20261101
+import { bigAssetValueChange, bigAssetValueIndex, bigEUMoney, sCents2EU }  from '../modules/money';
+import { X_ASS_RECEIV, X_JOINTLOSS }  from '../modules/terms';
 
 const HTMLSPACE=" "; 
 
@@ -725,7 +726,7 @@ export function compile(sessionData) {
 
 
                                                 var iamnt = bigAssetValueChange(aLine,J_ACCT,iAssets,result[D_XBRL]); // asset value change
-                                                var nAset = Money.bigAssetValueIndex(aLine,J_ACCT,iAssets,result[D_XBRL]); // asset value column
+                                                var nAset = bigAssetValueIndex(aLine,J_ACCT,iAssets,result[D_XBRL]); // asset value column
 
                                                 console.log("0352 RENT switches "+sSender+"  and  "+sAsset+ " for adding "+ iamnt + "to asset gain in column "+nAset);
 
@@ -774,7 +775,7 @@ export function compile(sessionData) {
                                             } else if(refAcct==='YIELD') {
 
                                                 var iamnt = bigAssetValueChange(aLine,J_ACCT,iAssets,result[D_XBRL]); // asset value change
-                                                var nAset = Money.bigAssetValueIndex(aLine,J_ACCT,iAssets,result[D_XBRL]); // asset value column
+                                                var nAset = bigAssetValueIndex(aLine,J_ACCT,iAssets,result[D_XBRL]); // asset value column
 
                                                 if(result[D_FixAss]) {
                                                     if(result[D_FixAss][idnt]) {
@@ -1237,40 +1238,51 @@ function sendBalance(balance) {
     distribute(iTaxPaid,partners,'tax');
 
 
-    // find common VAVA account GH202112222 and distribute current-year changes to partners
-    var all_cs=null;
-    var big_cyloss=0n;
-    var all_iSale=-1;
-    var assets = balance[D_Schema].assets;
-    for(var lossCol=J_ACCT;lossCol<assets;lossCol++) {
-        if( arrXBRL[lossCol] && arrXBRL[lossCol].includes('unpaidCapital')) { // GH20230910
-            all_cs=gNames[lossCol]; // Kontoname gemeinschaftl Verluste aus Verkaeufen von Aktien
-            all_iSale=lossCol;      // SpaltenNr in der Matrix für gemeinschaftl Verluste aus Verkaeufen von Aktien
-        }
-    }
-    // distribute share-sales losses to partners
-    var p_cyLoss;
-    if(all_cs) {
-        //  distribute current-year VAVA changes to partners
-        let vava = balance[D_Balance][all_cs];
-        if(vava) {
-            
-            if(debugFlagEquity) console.log("0294 compile.js sendBalance Sold-Security ("+all_cs+") Loss="+JSON.stringify(vava));
 
-            big_cyloss = Account.bigChange(vava)
 
-            if(debugFlagReport) {
-                console.log("VAVA INIT   "+vava.init);
-                console.log("VAVA CREDIT "+vava.credit);
-                console.log("VAVA DEBIT  "+vava.debit);
-                console.log("VAVA CHANGE "+big_cyloss);
+    try { 
+        // find common VAVA account GH202112222 and distribute current-year changes to partners
+        var all_cs=null;
+        var big_cyloss=0n;
+        
+        var assets = balance[D_Schema].assets;
+        for(var lossCol=J_ACCT;lossCol<assets;lossCol++) {
+            if( arrXBRL[lossCol] && arrXBRL[lossCol].startsWith(X_ASS_RECEIV) && arrXBRL[lossCol].includes(X_JOINTLOSS)) { // GH20230910
+                all_cs=gNames[lossCol]; // Kontoname gemeinschaftl Verluste aus Verkaeufen von Aktien
+                //all_iSale=lossCol;      // SpaltenNr in der Matrix für gemeinschaftl Verluste aus Verkaeufen von Aktien
             }
+        }
 
-            p_cyLoss = distribute(big_cyloss,partners,'cyLoss');
-            if(debugFlagReport) console.log("0296 compile.js sendBalance CYLOSS  G"+p_cyLoss[0]+" E"+p_cyLoss[1]+" A"+p_cyLoss[2]+" K"+p_cyLoss[3]+" T"+p_cyLoss[4]+" L"+p_cyLoss[5]); 
-        } else if(debugFlagReport) console.log("0295 compile.js sendBalance CYLOSS  NO VAVA"); 
-    }
-    
+        try {
+            // distribute share-sales losses to partners
+            if(all_cs) {
+                //  distribute current-year VAVA changes to partners
+                let vava = balance[D_Balance][all_cs];
+                if(vava) {
+                    
+                    if(debugFlagEquity) console.log("0294 compile.js sendBalance Sold-Security ("+all_cs+") Loss="+JSON.stringify(vava));
+
+                    big_cyloss = Account.bigChange(vava)
+
+                    if(debugFlagReport) {
+                        console.log("VAVA INIT   "+vava.init);
+                        console.log("VAVA CREDIT "+vava.credit);
+                        console.log("VAVA DEBIT  "+vava.debit);
+                        console.log("VAVA CHANGE "+big_cyloss);
+                    }
+                    
+                } else if(debugFlagReport) console.log("0295 compile.js sendBalance CYLOSS  NO VAVA"); 
+            }
+        } catch(eDist) { console.log("0291 "+eDist.toString())}
+
+        var p_cyLoss = distribute(big_cyloss,partners,'cyLoss');
+        //if(debugFlagReport) 
+            console.log("0296 compile.js sendBalance CYLOSS  G"+p_cyLoss[0]+" E"+p_cyLoss[1]+" A"+p_cyLoss[2]+" K"+p_cyLoss[3]+" T"+p_cyLoss[4]+" L"+p_cyLoss[5]); 
+        
+    } catch(eLoss) { console.log("0293 "+eLoss.toString())}
+
+
+
 
     //   transfer overview to report 
     if(debugFlagReport) console.log("0298 compile.js sendBalance overview"+JSON.stringify(gReport));

@@ -29,6 +29,8 @@ export const  X_ASS_RECEIV='de-gaap-ci_bs.ass.currAss.receiv';
 export const  X_ASSET_TAX = 'ass.currAss.receiv.other.otherTaxRec';
 export const  X_ASSET_CAPTAX='de-gaap-ci_bs.ass.currAss.receiv.other.otherTaxRec.CapTax';
 export const  X_ASSET_UNPCAP='de-gaap-ci_bs.ass.currAss.receiv.unpaidCapital';
+export const  X_JOINTLOSS = 'unpaidCapital';
+export const  X_ASS_LIM_RECEIV='bs.ass.currAss.receiv.unpaidCapitalPartners.limitedLiable';
 
 export const  X_EQLIAB = 'de-gaap-ci_bs.eqLiab';
 export const  X_LIABILITY = 'de-gaap-ci_bs.eqLiab.liab';

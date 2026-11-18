@@ -11,7 +11,7 @@ import { useEffect, useState } from 'react';
 import { getSession, useSession, REACT_APP_API_HOST,getCarryOver,storeCarryOver } from '../modules/sessionmanager';
 import Screen from './Screen'
 import { bigAssetValueChange,bigEUMoney,bigUSMoney,sCents20EU,sCents2EU }  from '../modules/money';
-import { CSEP, CDOT, D_Account, D_Balance, D_Carry, D_CarryOver, D_Page, D_Partner, D_FixAss, D_History, D_Report, D_Schema, D_XBRL, J_ACCT, SCREENLINES, X_ASSET_CAPTAX, X_ASSET_UNPCAP, X_ASSETS, X_EQLIAB } from '../modules/terms.js'
+import { CSEP, CDOT, D_Balance, D_Carry, D_CarryOver, D_Page, D_Partner, D_FixAss, D_History, D_Report, D_Schema, J_ACCT, SCREENLINES, X_ASSET_CAPTAX, X_ASSET_UNPCAP, X_ASSETS, X_JOINTLOSS } from '../modules/terms.js'
 import { book,prepareTXN,makeHistory, symbolic, L_COLUMN, T_COLUMN }  from '../modules/writeModule';
 import { makeBalance, makeHGBReport,makeStatusData }  from '../modules/App';
 
@@ -1286,7 +1286,7 @@ export default function Status() {
                 { 
                     (iEqLiabNext=0n).toString()+ // initialize right side with VAVA yearEnd value
                     console.log("104 ACCOUNTHISTORY show results EQLIAB "
-                        +statusReport.filter((row)=>(row.assets && row.assets.xbrl && row.assets.xbrl.includes('unpaidCapital'))).map((row,line) => ( iEqLiabNext += BigInt(row.assets.yearEnd ?  row.assets.yearEnd : 0n) )).join('+')
+                        +statusReport.filter((row)=>(row.assets && row.assets.xbrl && row.assets.xbrl.includes(X_JOINTLOSS))).map((row,line) => ( iEqLiabNext += BigInt(row.assets.yearEnd ?  row.assets.yearEnd : 0n) )).join('+')
                     )?"":"" }
 
                 <div className="FIELD" key={"AccountHistoryEqLiab"} id={'Overview2'} style= {{ 'display': aPages[2]}} >
@@ -1481,7 +1481,7 @@ export default function Status() {
                             'current':' ',
                             'cost':' ',
                             'gain':sCents2EU(iGain),
-                        'depr':' ' } }
+                        'depr':sCents2EU(((iGain+5n)*10000n)/iRest)+'%'} }
                     />
                 </div>
 
@@ -1516,7 +1516,7 @@ export default function Status() {
                                 'netIncomeFin':sCents2EU(jPartnerReport[partnerNo].netIncomeFin),
                                 'close':sCents2EU(jPartnerReport[partnerNo].close),
                                 'tax':sCents2EU(jPartnerReport[partnerNo].tax),
-                                'cyLoss':sCents2EU(jPartnerReport[partnerNo].cyLoss),
+                                'cyLoss':sCents2EU(jPartnerReport[partnerNo].cyLoss ? jPartnerReport[partnerNo].cyLoss : "0"),
                                 'next':sCents2EU(jPartnerReport[partnerNo].next)} } />     
         
                     </div>
