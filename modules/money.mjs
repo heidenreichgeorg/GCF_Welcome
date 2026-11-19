@@ -30,7 +30,7 @@ export function bigAssetValueChange(row,nFrom,nBefore) {
 
 
 
-// this function looks up te writeOff column 
+// this function looks up the writeOff column 
 export function bigAssetValueIndex(row,nFrom,nBefore,aXBRL) {
     var column=nFrom;
     var iValue = 0n;
@@ -43,7 +43,7 @@ export function bigAssetValueIndex(row,nFrom,nBefore,aXBRL) {
                 if(debugFlagAssets) console.log("ASSET ("+aXBRL[column]+") VALUE INDEX="+iValue)
                 run=false;
             }
-            column++;
+            else column++;
         } // shares before cash / account
     } catch(err) { console.dir("asset value("+row+")="+iValue+"   ERROR "+err); }
     return column;

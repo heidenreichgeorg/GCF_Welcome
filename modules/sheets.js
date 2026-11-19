@@ -841,33 +841,6 @@ function makeTax(jBalance,partner,index,fix) {
 }
 
 
-function unusedbigEUMoneySheets(strSet) {
-    var euros=0n;
-    var cents=0n;
-    var factor=1n;
-    var result=0n;
-
-    if(strSet && strSet.length>0) {
-        try {
-            var amount = strSet.split(',');
-            var plain = amount[0].replace('.', '').trim(); 
-            if(plain.startsWith('-')) { factor=-1n; plain=plain.slice(1); }
-            try {
-                euros = BigInt(('0'+plain));
-                if(amount.length>1) {                 
-                    const digits=amount[1]+"00";
-                    const strDigits=digits[0]+digits[1];
-                    cents=BigInt(strDigits);
-                }
-            } catch(err) { console.error("0475 bigEUMoney("+plain+"=>"+factor+"*("+euros+",$"+srDigits+")"); }
-            try {
-                result = factor * ( euros * 100n + cents );
-            } catch(err) { console.error("0477 bigEUMoney("+plain+"=>"+factor+"*("+euros+",$"+srDigits+")"); }
-        } catch(err) { console.error("0479 bigEUMoney("+strSet+"=>"+factor+"*("+euros+","+cents+")"); }
-    }
-    return result;        
-}
-
 
 
 
