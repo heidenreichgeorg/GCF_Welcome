@@ -31,7 +31,7 @@ export default function handler(
     partner = req.query.partner;
     client =  req.query.client;
     year = req.query.year;
-    const query:JSON = <JSON><unknown> { "ext":"JSON", "partner":partner, "client":client, "year":year  }
+    const query:JSON = <JSON><unknown> { ext:'JSON', partner:partner, client:client, year:year  }
     console.log("    DOWNLOAD.handler "+JSON.stringify(query));
 
       signIn(jConfig,query,req.socket.remoteAddress,res,downloadJSON); 
