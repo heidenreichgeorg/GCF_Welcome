@@ -23,7 +23,7 @@ export default function handler(
   if(req && req.query && req.socket) {       
       
       const { partner, client, year, auth } = req.query;
-      const query:JSON = <JSON><unknown> { "partner":partner, "client":client, "year":year, "auth":auth  };
+      const query:JSON = <JSON><unknown> { "partner":partner, "client":client, "year":year, "auth":auth  }
       console.log("0004 SESSION.ts handler "+JSON.stringify(query)+" jConfig="+JSON.stringify(jConfig));
     
       // NO sign-in login authenticat

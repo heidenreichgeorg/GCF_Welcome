@@ -45,7 +45,8 @@ export default function handler(
         partner = req.body.partner ; // GH20250112
         client =  req.body.client;
         year = req.body.year;
-        const query:JSON = <JSON><unknown> { "ext":"JSON", "partner":partner, "client":client, "year":year  }; // GH20250112
+        const query:JSON = <JSON><unknown> { "ext":"JSON", "partner":partner, "client":client, "year":year  }
+        // GH20250112
         if(debugFlag) console.log("0064 BOOK.handler "+JSON.stringify(query));
         sessionTime=timeSymbol();
         nextSessionId= strSymbol(sessionTime+client+year+sessionTime);
