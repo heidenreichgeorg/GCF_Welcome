@@ -205,7 +205,7 @@ let de_DE = {
     Reason:"Grund",
     TXNType:"Buchungssatz"
 }
-module.exports['de_DE']=de_DE;
+// GH2026 UPDATE module.exports['de_DE']=de_DE;
 let jLastTransaction={};
 
 
@@ -1119,14 +1119,14 @@ export function compile(sessionData) {
 
 
 
-function isSameFY(year) 
+export function isSameFY(year) 
 {
     let numYear=unixYear();
     if(debugFlag) console.log("isSameFY"+numYear);
     if(parseInt(year)>numYear-1) return true;
     return (parseInt(year)==numYear) 
 }
-module.exports['isSameFY']=isSameFY;
+// GH2026 UPDATE  module.exports['isSameFY']=isSameFY;
 
 
 
@@ -1819,7 +1819,7 @@ export function formatTXN(session,reqBody) {
 
 
 
-function getYear() {  return currentYear; }
-module.exports['getYear']=getYear;
+export function getYear() {  return currentYear; }
+// GH2026 UPDATE module.exports['getYear']=getYear;
 
 

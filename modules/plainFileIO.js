@@ -23,13 +23,13 @@ const bpStorage=null;
 const sessionKeys = ["partner","client","year","remote","time","sheetCells","sheetName","id","creditorsT","sheetFile","sessionId","generated","ext","clientFunction","strTimeSymbol","fireBase"]
 
 
-function accessFirebase(accessMethod,filebaseConfig,partner,client,year,jData,startSessionCB,res) { 
+export function accessFirebase(accessMethod,filebaseConfig,partner,client,year,jData,startSessionCB,res) { 
     let url = accessMethod(bpStorage,partner,client,year,jData,startSessionCB,res);
     if(jData) {
       jData.firebase = url;    
     }
 }
-module.exports['accessFirebase']=accessFirebase;
+// GH2026 UPDATE module.exports['accessFirebase']=accessFirebase;
 
 
 
@@ -83,7 +83,7 @@ function makeSession(strBody,partner,client,year,txnPattern) {
 }
 
 
-async function bucketDownload(bpStorage,partner,client,year,jData,startSessionCB,callRes) {
+export async function bucketDownload(bpStorage,partner,client,year,jData,startSessionCB,callRes) {
 
     if(debugFlag) console.log('0038 plainFileIO.bucketDownload jData '+JSON.stringify(jData))
         let sClient = client.replace('.','_');
@@ -159,7 +159,7 @@ async function bucketDownload(bpStorage,partner,client,year,jData,startSessionCB
       }    
       return null; // synch caller gets null value
 }
-module.exports['bucketDownload']=bucketDownload;
+// GH2026 UPDATE module.exports['bucketDownload']=bucketDownload;
 
 
 
@@ -171,7 +171,7 @@ module.exports['bucketDownload']=bucketDownload;
 
 const jMetadata = { contentType: 'application/json' };
 
-async function bucketUpload(bpStorage,partner,client,year,jData,startSessionCB,callRes) {
+export async function bucketUpload(bpStorage,partner,client,year,jData,startSessionCB,callRes) {
 
   let downloadUrl = "no bpStorage";
 
@@ -268,7 +268,7 @@ async function bucketUpload(bpStorage,partner,client,year,jData,startSessionCB,c
     }
     return downloadUrl;
 }
-module.exports['bucketUpload']=bucketUpload;
+// GH2026 UPDATE  module.exports['bucketUpload']=bucketUpload;
 
 
 
