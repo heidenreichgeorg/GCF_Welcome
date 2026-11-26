@@ -748,9 +748,8 @@ export function compile(sessionData) {
                                                             }
 
                                                             // GH 20261018
-                                                            var iRest = icurr+iamnt;
                                                             var iRent = iamnt; // GH2026114
-                                                            // GH20250103 iamnt with rent type of payment increases the GAIN value
+                                                            // GH20250103 iamnt with rent type of payment increases the GAIN value, but not the REST value
                                                             bigAssetValueChange(aLine,nAset+1,iAssets,result[D_XBRL]); // yield on gain value 
 
                                                             var iCost = bigCost(idnt,nmbr,icurr);
@@ -766,7 +765,7 @@ export function compile(sessionData) {
                                                                                     "idnt":idnt,
                                                                                     "orig":iVal,
                                                                                     "nmbr":nmbr,
-                                                                                    "rest":""+iRest, // GH 20261018
+                                                                                    "rest":""+icurr, // GH 20261126
                                                                                     "cost":""+iCost, // GH 20261018
                                                                                     "depr":""+depr, // GH 20261017
                                                                                     "gain":""+(iGain+iRent) }; // GH20230303
