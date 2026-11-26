@@ -2,7 +2,7 @@ const debugFlag=null;
 
 
 import { D_Balance, D_History, D_Report, D_Schema, D_Page, X_ASSETS, X_EQLIAB, X_EQUITY, X_INCOME, X_INCOME_REGULAR, SCREENLINES } from './terms.js'
-import { sCents2EU }  from '../modules/money.mjs';
+import { bigEUMoney,sCents2EU }  from '../modules/money.mjs';
 import { iCpField, prettyTXN } from './writeModule'
 
 
@@ -617,7 +617,7 @@ export function makeHGBReport(jAccounts,page,jReport,jPartners) {
 
         // GH 20260330 Partner Capital
         let base=SCREENLINES;
-        base=fillPartner(balance,page.Credit,page.Debit,page.Init,page.AccountHistoryEqLiab,base);
+        base=fillPartner(balance,bigEUMoney(page.Credit),bigEUMoney(page.Debit),bigEUMoney(page.Init),page.AccountHistoryEqLiab,base);
         for (let id in jPartners) {
             var p=jPartners[id];
 
@@ -633,7 +633,7 @@ export function makeHGBReport(jAccounts,page,jReport,jPartners) {
                     idebit = idebit+BigInt(jAccounts[resCap].debit);
                     icredit = icredit+BigInt(jAccounts[resCap].credit);
                 }
-                base=fillPartner(balance,sCents2EU(icredit),sCents2EU(idebit),sCents2EU(ibegin),p.name,base);
+                base=fillPartner(balance,icredit,idebit,ibegin,p.name,base);
             }
             else 
                 base=fillPartner(balance,0n,0n,0n,p.name,base);
