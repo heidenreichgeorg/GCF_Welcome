@@ -60,7 +60,7 @@ input[type="radio"]::before {content: "#"; }
 .L280     { width:12rem; text-align: left;} 
 .LTXT     { width:14rem; text-align: left;}
 .FLEX     { min-width:49rem; text-align: left;} 
-
+.WIDE     { width:54rem; text-align: left;} 
 
 #wrapper {position: relative;  margin: auto; }
 #meter { width: 100%; height: 100%;  transform: rotateX(180deg); }
