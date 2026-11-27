@@ -110,7 +110,7 @@ export default function Status() {
     const iMonth = dateNow.getUTCMonth();
     const strMonthNow = ('0' + (1+iMonth)).slice(-2)
     const strMonat = monat[iMonth];
-    const strQuarterNow =  'Q'+(1+(iMonth%4));
+    const strQuarterNow =  'Q'+(1+Math.floor(iMonth/3)); // GH20261127
 
         
 
@@ -771,27 +771,28 @@ export default function Status() {
             <div className="attrLine">
                 
     
-                <div className="FIELD TAG" >Datum</div>
+                <div className="FIELD SYMB" >Datum</div>
                 <div className="FIELD">
                     <input  className="key SNAM" id="dateBooked" type="date" defaultValue={form.date} onChange={((e) => bufferField(strKey,'date',e.target.value))}/>
                 </div>
     
                         
-                <div className="FIELD SYMB" >{txt2}</div>
+                <div className="FIELD TEAM" >{txt2}</div>
                 <div className="FIELD" ><input type ="text" className="key" defaultValue={form.sender} onChange={((e) => bufferField(strKey,'sender',e.target.value))}/></div>
                 <div className="FIELD SEP" ></div>
     
-                <div className="FIELD SYMB" >{txt3}</div>
+                <div className="FIELD TEAM" >{txt3}</div>
                 <div className="FIELD "><input type ="text" className="key" defaultValue={form.reason} onChange={((e) => bufferField(strKey,'reason',e.target.value))}/></div>
                 <div className="FIELD SEP" ></div>
     
-                <div className="FIELD SYMB" >{txt4}</div>
+                <div className="FIELD TEAM" >{txt4}</div>
                 <div className="FIELD "><input type ="text" className="key" defaultValue={form.refCode} onChange={((e) => bufferField(strKey,'refCode',e.target.value))}/></div>
                 <div className="FIELD SEP" ></div>                
             </div>
 
 
             <div className="attrLine">
+                <div className="FIELD MOAM" ></div>
                 <div className="FIELD MOAM" ></div>
                 <div className="FIELD MOAM" ></div>
                 <div className="FIELD MOAM" ></div>
