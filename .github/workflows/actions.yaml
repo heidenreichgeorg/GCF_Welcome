@@ -21,7 +21,16 @@ jobs:
           sudo docker build . --tag ghcr.io/heidenreichgeorg/finreport:latest
           sudo docker push ghcr.io/heidenreichgeorg/finreport:latest
 
-  deploy:
+deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Run next
+        run: npm run dev
+
+      
+
+deploy_docker:
     needs: build_and_publish
     runs-on: ubuntu-latest
 
