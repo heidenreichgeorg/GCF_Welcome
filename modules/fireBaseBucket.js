@@ -1,6 +1,6 @@
 
 // local fileSystem
-import * as fs from 'fs';
+//import * as fs from 'fs';
 
 /*
 
@@ -67,7 +67,7 @@ const sessionKeys = ["partner","client","year","remote","time","sheetCells","she
 
 let bpApp = null;
 
-function accessFirebase(accessMethod,firebaseConfig,partner,client,year,jData,startSessionCB,res) {
+export function accessFirebase(accessMethod,firebaseConfig,partner,client,year,jData,startSessionCB,res) {
 
   let url = "sync";
 
@@ -105,7 +105,6 @@ function accessFirebase(accessMethod,firebaseConfig,partner,client,year,jData,st
 
 
 }
-module.exports['accessFirebase']=accessFirebase;
 
 
 
@@ -156,7 +155,7 @@ function makeSession(body,partner,client,year,txnPattern) {
 }
 
 
-async function bucketDownload(bpStorage,partner,client,year,jData,startSessionCB,callRes) {
+export async function bucketDownload(bpStorage,partner,client,year,jData,startSessionCB,callRes) {
     let sClient = client.replace('.','_');
     let iYear = parseInt(year);
 
@@ -281,13 +280,12 @@ storage/server-file-wrong-size
 
   return null; // synch caller gets null value
 }
-module.exports['bucketDownload']=bucketDownload;
 
 const jMetadata = {
     contentType: 'application/json',
   };
 
-async function bucketUpload(bpStorage,partner,client,year,jData,startSessionCB,callRes) {
+export async function bucketUpload(bpStorage,partner,client,year,jData,startSessionCB,callRes) {
 
   let downloadUrl = "no Firebase Storage";
   if(fbStorage) {
@@ -402,7 +400,6 @@ async function bucketUpload(bpStorage,partner,client,year,jData,startSessionCB,c
   }
   return downloadUrl;
 }
-module.exports['bucketUpload']=bucketUpload;
 
 
 
@@ -477,4 +474,6 @@ export function fbDownload(jConfig,partner,client,year,callBack,res) {
     return null;
     
 }
+
+
 

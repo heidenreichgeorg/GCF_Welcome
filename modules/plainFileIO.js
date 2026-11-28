@@ -14,8 +14,6 @@ const MAIN = "main.json";
 import { Slash, Backslash } from './serverSession'
 
 
-//const { MongoClient, ServerApiVersion } = require('mongodb');
-
 
 const https = require('https');
 const bpStorage=null;
@@ -29,7 +27,6 @@ export function accessFirebase(accessMethod,filebaseConfig,partner,client,year,j
       jData.firebase = url;    
     }
 }
-// GH2026 UPDATE module.exports['accessFirebase']=accessFirebase;
 
 
 
@@ -120,15 +117,7 @@ export async function bucketDownload(bpStorage,partner,client,year,jData,startSe
 
             try {
 
-/*
-                let dbcred = process.env.dbcred;
-                let dbinst = process.env.dbinst;
-                if(dbcred && dbinst) {
-                  let strMongoDB = "mongodb+srv://"+dbcred+"@"+dbinst+"?retryWrites=true&w=majority&appName=Sampling"
-                  console.log(strMongoDB);
-                }
 
-*/
                 let session = {};
 
                 //Read data from the JSON file
@@ -159,7 +148,6 @@ export async function bucketDownload(bpStorage,partner,client,year,jData,startSe
       }    
       return null; // synch caller gets null value
 }
-// GH2026 UPDATE module.exports['bucketDownload']=bucketDownload;
 
 
 
@@ -200,49 +188,6 @@ export async function bucketUpload(bpStorage,partner,client,year,jData,startSess
       const strFile = sClient+slash+iYear+slash+MAIN;
 
       if(process.env.localPath) {
-/*
-                let dbcred = process.env.dbcred;
-                let dbinst = process.env.dbinst;
-                if(dbcred && dbinst) {
-                  
-                  const uri = "mongodb+srv://"+dbcred+"@"+dbinst+"?retryWrites=true&w=majority&appName=Sampling"
-
-
-
-                  // Create a MongoClient with a MongoClientOptions object to set the Stable API version
-                  const client = new MongoClient(uri, {
-                    serverApi: {
-                      version: ServerApiVersion.v1,
-                      strict: true,
-                      deprecationErrors: true,
-                    }
-                  });
-
-                  async function run() {
-                    try {
-                      // Connect the client to the server	(optional starting in v4.7)
-                      await client.connect();
-                      // Send a ping to confirm a successful connection
-                      await client.db("admin").command({ ping: 1 });
-                      console.log("Pinged your deployment. You successfully connected to MongoDB!");
-                    } finally {
-                      // Ensures that the client will close when you finish/error
-                      await client.close();
-                    }
-                  }
-                  run().catch(console.dir);
-
-                }
-
-*/
-
-
-
-
-
-
-
-
 
             // must be terminated with a slash
             let localPath = process.env.localPath;
@@ -268,7 +213,6 @@ export async function bucketUpload(bpStorage,partner,client,year,jData,startSess
     }
     return downloadUrl;
 }
-// GH2026 UPDATE  module.exports['bucketUpload']=bucketUpload;
 
 
 
